@@ -27,9 +27,176 @@
         }
 
         /* --- 1. SLIDER --- */
-        .slider-wrapper { display: flex; align-items: center; gap: var(--gap); overflow-x: auto; padding: 40px 0; scrollbar-width: none; scroll-behavior: smooth; }
-        .tile-slider { flex: 0 0 var(--tile-width); background: white; padding: 40px; border-radius: 45px; box-shadow: 0 5px 25px rgba(0,0,0,0.06); text-align: center; border: 1px solid #f0f0f0; transition: 0.8s; opacity: 0.15; transform: scale(0.9); }
-        .tile-slider.is-visible { opacity: 1; transform: scale(1.05); }
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-clean);
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .slider-container {
+    width: 100%;
+    position: relative;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  }
+
+  .slider-container.revealed { opacity: 1; }
+
+  .tiles-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    padding: 80px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+
+  .tiles-wrapper::-webkit-scrollbar { display: none; }
+
+  .tile {
+    flex: 0 0 var(--tile-width);
+    background: white;
+    padding: 50px 40px;
+    border-radius: 55px;
+    box-sizing: border-box;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.06); 
+    border: 1px solid #f0f0f0;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s, filter 0.8s, box-shadow 0.8s;
+    opacity: 0.15;
+    transform: scale(0.85);
+    filter: blur(4px);
+  }
+
+  .tile.is-visible {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(0px);
+    box-shadow: 0 20px 50px rgba(30, 58, 138, 0.1);
+    border-color: #e5e7eb;
+  }
+
+  h3 { 
+    font-family: 'Playfair Display', serif; 
+    color: var(--navy); 
+    font-size: var(--h3-size); 
+    margin: 0 0 8px 0; 
+  }
+  
+  p { 
+    color: #64748b; 
+    font-size: var(--p-size); 
+    line-height: 1.4; 
+    margin: 0; 
+  }
+
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 60px;
+    background: white;
+    border: 1px solid #f0f0f0;
+    border-radius: 50%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 1.2rem;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    opacity: 0;
+  }
+
+  .slider-container.revealed ~ .nav-btn { opacity: 1; }
+  .nav-btn:hover { background: var(--navy); color: white; transform: translateY(-50%) scale(1.1); }
+  .prev-btn { left: 3%; }
+  .next-btn { right: 3%; }
+</style>
+</head>
+<body>
+
+<div class="slider-container" id="mainContainer">
+  <div class="tiles-wrapper" id="slider"></div>
+</div>
+
+<button class="nav-btn prev-btn" id="prev">❮</button>
+<button class="nav-btn next-btn" id="next">❯</button>
+
+<script>
+  const slider = document.getElementById('slider');
+  const container = document.getElementById('mainContainer');
+  const nextBtn = document.getElementById('next');
+  const prevBtn = document.getElementById('prev');
+
+  const getScrollStep = () => {
+    const tile = document.querySelector('.tile');
+    const style = window.getComputedStyle(slider);
+    const gap = parseInt(style.gap) || 0;
+    return tile.offsetWidth + gap;
+  };
+
+  const content = `
+    <div class="tile"><h3>Instrument</h3><p>Nie masz instrumentu? <span class="highlight">Dowieziemy pianino</span> (+20 zł) lub studio.</p></div>
+    <div class="tile"><h3>Dydaktyka</h3><p>Pracujemy na <span class="highlight">autorskich</span> pomocach dopasowanych do ucznia.</p></div>
+    <div class="tile"><h3>Koszt</h3><p>Standardowa cena za lekcję to <span class="highlight">99 zł / h</span>.</p></div>
+    <div class="tile"><h3>Dla kogo</h3><p>Zapraszamy wszystkich <span class="highlight">od 6 roku życia</span> wzwyż.</p></div>
+    <div class="tile"><h3>Miejsce</h3><p>Studio w <span class="highlight">Gdyni</span> lub dojazd: <span class="highlight">Gdynia i Sopot</span>.</p></div>
+  `;
+
+  slider.innerHTML = content.repeat(20);
+
+  const resetToCenterOne = () => {
+    const allTiles = document.querySelectorAll('.tile');
+    const targetIndex = Math.floor(allTiles.length / 2); 
+    const targetTile = allTiles[targetIndex];
+    const offset = targetTile.offsetLeft - (window.innerWidth / 2) + (targetTile.offsetWidth / 2);
+    slider.scrollLeft = offset;
+  };
+
+  window.addEventListener('load', () => {
+    resetToCenterOne();
+    setTimeout(() => { container.classList.add('revealed'); }, 100); 
+  });
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resetToCenterOne, 150);
+  });
+
+  nextBtn.onclick = () => slider.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
+  prevBtn.onclick = () => slider.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+        entry.target.classList.add('is-visible');
+      } else {
+        entry.target.classList.remove('is-visible');
+      }
+    });
+  }, { root: slider, threshold: 0.6 });
+
+  document.querySelectorAll('.tile').forEach(tile => observer.observe(tile));
+
 
         /* --- 2. BENTO GRID --- */
         .bento-grid-main { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; margin: 40px 0; }
