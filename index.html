@@ -1,410 +1,246 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-  @import url('https://googleapis.com');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lekcje Pianina Gdynia - Łukasz Ganczarek</title>
+    
+    <!-- Import czcionek -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #d4af37;
+            --navy: #1e3a8a;
+            --blue: #3b82f6;
+            --bg-clean: #ffffff;
+            --border-light: #f0f0f0;
+            --text-dark: #334155;
+            /* Slider & General */
+            --tile-width: 320px;
+            --gap: 60px;
+            /* Piano Desktop */
+            --key-w: 65px; --key-h: 280px;
+            --black-w: 42px; --black-h: 170px;
+            --black-m: -21px; --font-label: 13px;
+        }
 
-  :root {
-    --gold: #d4af37;
-    --navy: #1e3a8a;
-    --bg-clean: #ffffff;
-    /* DESKTOP */
-    --tile-width: 320px;
-    --gap: 60px;
-    --h3-size: 1.7rem;
-    --p-size: 0.95rem;
-  }
+        /* --- RESPONSYWNOŚĆ --- */
+        @media (max-width: 1024px) {
+            :root { --key-w: 50px; --key-h: 210px; --black-w: 32px; --black-h: 125px; --black-m: -16px; }
+        }
+        @media (max-width: 768px) {
+            :root {
+                --tile-width: 170px; --gap: 15px;
+                --key-w: 26px; --key-h: 110px;
+                --black-w: 18px; --black-h: 65px;
+                --black-m: -9px; --font-label: 7px;
+            }
+            .bento-container { grid-template-columns: 1fr !important; }
+        }
 
-  /* --- ZMNIEJSZENIE O POŁOWĘ NA TELEFONACH --- */
-  @media (max-width: 768px) {
-    :root {
-      --tile-width: 170px; /* O połowę mniejszy niż desktop */
-      --gap: 15px;
-      --h3-size: 1.0rem;   /* Mniejszy tytuł */
-      --p-size: 0.75rem;   /* Mniejszy opis */
-    }
-    .tile { 
-      padding: 20px 15px !important; 
-      min-height: 190px !important; /* Znacznie niższy kafelek */
-      border-radius: 25px !important;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05) !important;
-    }
-    .nav-btn { 
-      width: 35px !important; 
-      height: 35px !important; 
-      font-size: 0.8rem !important; 
-    }
-    .tiles-wrapper { padding: 40px 0 !important; }
-  }
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--bg-clean);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            scroll-behavior: smooth;
+        }
 
-  /* EKSTREMALNIE MAŁE EKRANY */
-  @media (max-width: 480px) {
-    :root {
-      --tile-width: 145px;
-      --h3-size: 0.9rem;
-      --p-size: 0.65rem;
-    }
-    .tile { min-height: 160px !important; }
-  }
+        section { padding: 80px 0; width: 100%; position: relative; box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: var(--bg-clean);
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    min-height: 100vh;
-    overflow: hidden;
-  }
+        /* --- 1. SLIDER --- */
+        .slider-container {
+            width: 100%; opacity: 0; transition: opacity 1.5s ease;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+        .slider-container.revealed { opacity: 1; }
+        .tiles-wrapper { display: flex; align-items: center; gap: var(--gap); padding: 40px 0; overflow-x: auto; scrollbar-width: none; }
+        .tiles-wrapper::-webkit-scrollbar { display: none; }
+        .tile {
+            flex: 0 0 var(--tile-width); background: white; padding: 40px; border-radius: 50px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.06); border: 1px solid var(--border-light);
+            min-height: 280px; display: flex; flex-direction: column; justify-content: center;
+            text-align: center; transition: 0.8s; opacity: 0.15; transform: scale(0.85); filter: blur(4px);
+        }
+        .tile.is-visible { opacity: 1; transform: scale(1.05); filter: blur(0px); box-shadow: 0 20px 50px rgba(30, 58, 138, 0.1); }
+        .tile h3 { font-family: 'Playfair Display', serif; color: var(--navy); margin-bottom: 10px; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .nav-btn-s { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; background: white; border-radius: 50%; border: 1px solid #eee; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
 
-  .slider-container {
-    width: 100%;
-    position: relative;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-  }
+        /* --- 2. BENTO GRID (POZNAJMY SIĘ) --- */
+        .bento-container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; padding: 0 20px; }
+        .flip-card { perspective: 1000px; min-height: 350px; opacity: 0; transform: translateY(40px); transition: 0.8s; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 40px; border: 1px solid var(--border-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .card-front { background: white; padding: 35px; display: flex; flex-direction: column; justify-content: center; }
+        .card-back { background: #f8fafc; transform: rotateY(180deg); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card-back img { width: 85%; border-radius: 15px; }
+        .card { background: white; border-radius: 40px; padding: 35px; border: 1px solid var(--border-light); box-shadow: 0 10px 30px rgba(0,0,0,0.05); opacity: 0; transform: translateY(40px); transition: 0.8s; }
+        .bento-container.active .card, .bento-container.active .flip-card { opacity: 1; transform: translateY(0); }
+        .badge { background: var(--gold); color: white; padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; display: inline-block; margin-bottom: 15px; width: fit-content; }
+        
+        /* Tooltips */
+        .tags-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .tag-wrapper { position: relative; display: inline-block; }
+        .tag { border: 1px solid var(--gold); color: var(--gold); padding: 8px 18px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; cursor: help; }
+        .tag-note { visibility: hidden; width: 220px; background: var(--navy); color: white; border-radius: 15px; padding: 15px; position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%); font-size: 0.75rem; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 100; }
+        .tag-wrapper:hover .tag-note { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-10px); }
+        .tag-wrapper:hover .tag { background: var(--gold); color: white; }
 
-  .slider-container.revealed { opacity: 1; }
+        /* --- 3. REZERWACJA --- */
+        .booking-section { background: #f8fafc; }
+        .booking-card { background: var(--navy); border-radius: 40px; padding: 40px 20px; max-width: 850px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.15); overflow: hidden; }
+        iframe { width: 100%; height: 450px; border-radius: 20px; border: none; filter: invert(92%) hue-rotate(190deg); }
+        .btn-open { display: block; width: fit-content; margin: 25px auto 0; background: var(--gold); color: var(--navy); padding: 15px 45px; border-radius: 50px; font-weight: 800; cursor: pointer; border: none; }
+        
+        .form-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; clip-path: circle(0% at 50% 90%); transition: 0.8s cubic-bezier(0.7, 0, 0.3, 1); }
+        .form-overlay.open { clip-path: circle(150% at 50% 90%); }
+        .close-f { position: absolute; top: 20px; right: 25px; font-size: 2rem; color: var(--navy); cursor: pointer; font-weight: bold; }
+        .contact-box { background: var(--navy); border-radius: 25px; padding: 25px; display: flex; flex-direction: column; gap: 12px; }
+        input, textarea { width: 100%; padding: 12px; border-radius: 12px; border: none; font-family: 'Poppins'; }
+        .btn-submit { width: 100%; background: #ccc; padding: 16px; border-radius: 50px; font-weight: 800; cursor: not-allowed; border: none; }
+        .btn-submit.active { background: var(--gold); color: #000; cursor: pointer; }
 
-  .tiles-wrapper {
-    display: flex;
-    align-items: center;
-    gap: var(--gap);
-    padding: 80px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
-  }
-
-  .tiles-wrapper::-webkit-scrollbar { display: none; }
-
-  .tile {
-    flex: 0 0 var(--tile-width);
-    background: white;
-    padding: 50px 40px;
-    border-radius: 55px;
-    box-sizing: border-box;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.06); 
-    border: 1px solid #f0f0f0;
-    min-height: 320px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s, filter 0.8s, box-shadow 0.8s;
-    opacity: 0.15;
-    transform: scale(0.85);
-    filter: blur(4px);
-  }
-
-  .tile.is-visible {
-    opacity: 1;
-    transform: scale(1.05);
-    filter: blur(0px);
-    box-shadow: 0 20px 50px rgba(30, 58, 138, 0.1);
-    border-color: #e5e7eb;
-  }
-
-  h3 { 
-    font-family: 'Playfair Display', serif; 
-    color: var(--navy); 
-    font-size: var(--h3-size); 
-    margin: 0 0 8px 0; 
-  }
-  
-  p { 
-    color: #64748b; 
-    font-size: var(--p-size); 
-    line-height: 1.4; 
-    margin: 0; 
-  }
-
-  .highlight { color: var(--gold); font-weight: 600; }
-
-  .nav-btn {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
-    background: white;
-    border: 1px solid #f0f0f0;
-    border-radius: 50%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    cursor: pointer;
-    z-index: 1000;
-    font-size: 1.2rem;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
-    opacity: 0;
-  }
-
-  .slider-container.revealed ~ .nav-btn { opacity: 1; }
-  .nav-btn:hover { background: var(--navy); color: white; transform: translateY(-50%) scale(1.1); }
-  .prev-btn { left: 3%; }
-  .next-btn { right: 3%; }
-<div class="slider-container" id="mainContainer">
-  <div class="tiles-wrapper" id="slider"></div>
-</div>
-
-<button class="nav-btn prev-btn" id="prev">❮</button>
-<button class="nav-btn next-btn" id="next">❯</button>
-
-<script>
-  const slider = document.getElementById('slider');
-  const container = document.getElementById('mainContainer');
-  const nextBtn = document.getElementById('next');
-  const prevBtn = document.getElementById('prev');
-
-  const getScrollStep = () => {
-    const tile = document.querySelector('.tile');
-    const style = window.getComputedStyle(slider);
-    const gap = parseInt(style.gap) || 0;
-    return tile.offsetWidth + gap;
-  };
-
-  const content = `
-    <div class="tile"><h3>Instrument</h3><p>Nie masz instrumentu? <span class="highlight">Dowieziemy pianino</span> (+20 zł) lub studio.</p></div>
-    <div class="tile"><h3>Dydaktyka</h3><p>Pracujemy na <span class="highlight">autorskich</span> pomocach dopasowanych do ucznia.</p></div>
-    <div class="tile"><h3>Koszt</h3><p>Standardowa cena za lekcję to <span class="highlight">99 zł / h</span>.</p></div>
-    <div class="tile"><h3>Dla kogo</h3><p>Zapraszamy wszystkich <span class="highlight">od 6 roku życia</span> wzwyż.</p></div>
-    <div class="tile"><h3>Miejsce</h3><p>Studio w <span class="highlight">Gdyni</span> lub dojazd: <span class="highlight">Gdynia i Sopot</span>.</p></div>
-  `;
-
-  slider.innerHTML = content.repeat(20);
-
-  const resetToCenterOne = () => {
-    const allTiles = document.querySelectorAll('.tile');
-    const targetIndex = Math.floor(allTiles.length / 2); 
-    const targetTile = allTiles[targetIndex];
-    const offset = targetTile.offsetLeft - (window.innerWidth / 2) + (targetTile.offsetWidth / 2);
-    slider.scrollLeft = offset;
-  };
-
-  window.addEventListener('load', () => {
-    resetToCenterOne();
-    setTimeout(() => { container.classList.add('revealed'); }, 100); 
-  });
-
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resetToCenterOne, 150);
-  });
-
-  nextBtn.onclick = () => slider.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
-  prevBtn.onclick = () => slider.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
-        entry.target.classList.add('is-visible');
-      } else {
-        entry.target.classList.remove('is-visible');
-      }
-    });
-  }, { root: slider, threshold: 0.6 });
-
-  document.querySelectorAll('.tile').forEach(tile => observer.observe(tile));
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://googleapis.com" rel="stylesheet">
-
-<style>
-  :root { --navy: #1e3a8a; --gold: #d4af37; --blue: #3b82f6; --border: rgba(255, 255, 255, 0.15); }
-  body { margin: 0; padding: 10px; background-color: white; font-family: 'Poppins', sans-serif; }
-
-  .main-section {
-    background-color: var(--navy); border-radius: 40px; padding: 30px 20px;
-    max-width: 95%; margin: 0 auto; border: 1px solid var(--border);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15); position: relative; overflow: hidden;
-    opacity: 0; transform: translateY(20px); transition: all 1s ease-out;
-  }
-  .main-section.active { opacity: 1; transform: translateY(0); }
-  .section-title { font-family: 'Playfair Display', serif; text-align: center; font-size: 2rem; color: var(--gold); margin-bottom: 25px; }
-
-  /* MODAL */
-  .form-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: white; z-index: 100; display: flex; align-items: center; justify-content: center; 
-    padding: 20px; box-sizing: border-box; clip-path: circle(0% at 50% 90%); 
-    transition: clip-path 0.8s cubic-bezier(0.7, 0, 0.3, 1);
-  }
-  .form-overlay.open { clip-path: circle(150% at 50% 90%); }
-  .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: var(--navy); cursor: pointer; font-weight: bold; }
-
-  .form-content { width: 100%; max-width: 500px; text-align: center; color: var(--navy); }
-  .price-tag { background: #f9fbfe; border: 2px dashed var(--gold); border-radius: 12px; padding: 10px; margin-bottom: 15px; }
-  .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-  .tile { background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px; text-align: left; cursor: pointer; transition: 0.3s; font-size: 0.85rem; color: #333; }
-  .tile.selected { border-color: var(--blue); background: #f0f7ff; }
-
-  #piano-options { display: none; margin-bottom: 15px; }
-
-  .contact-box { 
-    background: var(--navy); border-radius: 25px; padding: 20px; position: relative; 
-    display: flex; flex-direction: column; gap: 12px;
-  }
-  
-  input, textarea { 
-    width: 100%; padding: 12px; border-radius: 15px; 
-    border: 2px solid transparent; font-family: 'Poppins'; box-sizing: border-box; font-size: 0.9rem;
-    transition: 0.3s;
-  }
-  input.error { border-color: #ff4d4d !important; background: #fff5f5; }
-
-  .btn-submit {
-    width: 100%; background: #ccc; color: #666; border: none; padding: 15px; 
-    border-radius: 50px; font-weight: 800; cursor: not-allowed; transition: 0.3s; margin-top: 5px;
-  }
-  .btn-submit.active { background: var(--gold); color: #000; cursor: pointer; }
-
-  #tooltip {
-    display: none; position: absolute; bottom: 75px; left: 50%; transform: translateX(-50%);
-    background: #ff4d4d; color: white; padding: 8px 15px; border-radius: 10px;
-    font-size: 0.7rem; width: 220px; text-align: center; z-index: 10;
-  }
-
-  .info-card { background: rgba(255, 255, 255, 0.05); border-radius: 35px; padding: 15px; }
-  iframe { width: 100%; height: 400px; border-radius: 20px; border: none; filter: invert(92%) hue-rotate(190deg); }
-  .btn-open-form { display: block; width: fit-content; margin: 20px auto 0; background: var(--gold); color: var(--navy); padding: 15px 45px; border-radius: 50px; font-weight: 800; border: none; cursor: pointer; }
-</style>
+        /* --- 4. PIANINO --- */
+        .piano-section { display: flex; flex-direction: column; align-items: center; }
+        .controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; background: white; padding: 15px 30px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid var(--border-light); }
+        .piano-container { width: 100%; display: flex; justify-content: center; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+        .piano { display: flex; position: relative; }
+        .key { display: flex; align-items: flex-end; justify-content: center; cursor: pointer; border: 1px solid #333; position: relative; box-sizing: border-box; }
+        .white { width: var(--key-w); height: var(--key-h); background: white; border-radius: 0 0 6px 6px; z-index: 1; }
+        .black { width: var(--black-w); height: var(--black-h); background: #111; margin: 0 var(--black-m); z-index: 2; border-radius: 0 0 4px 4px; }
+        .key span { font-size: var(--font-label); font-weight: 800; padding-bottom: 10px; color: #94a3b8; }
+        .key.playing { background: #e2e8f0; transform: translateY(3px); }
+        .key.next-note { background: var(--blue) !important; z-index: 3; }
+        .key.next-note span { color: white !important; }
+        .btn-p { padding: 8px 18px; border-radius: 50px; border: 2px solid var(--navy); background: white; color: var(--navy); font-weight: 700; cursor: pointer; }
+        .btn-p.active { background: var(--navy); color: white; }
+    </style>
 </head>
-<body>
+<body class="piano-mode">
 
-<div class="main-section" id="appleLocation">
-  <h2 class="section-title">Terminy i Miejsce</h2>
-  <div class="info-card">
-    <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com"></iframe>
-    <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
-  </div>
-
-  <div class="form-overlay" id="formOverlay">
-    <span class="close-btn" onclick="toggleForm(false)">✕</span>
-    <div class="form-content">
-      <h3 style="margin-top:0; margin-bottom:10px;">Szczegóły rezerwacji</h3>
-      <div class="price-tag"><span style="font-weight: 800; font-size: 1.4rem;" id="price-val">99 zł / h</span></div>
-
-      <div class="bento-grid">
-        <div class="tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-        <div class="tile" id="loc-uczen" onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-      </div>
-
-      <div id="piano-options">
-        <div class="bento-grid">
-          <div class="tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b></div>
-          <div class="tile" id="piano-no" onclick="setPiano(false)"><b>Nie mam</b></div>
+    <!-- 1. SLIDER -->
+    <section>
+        <button class="nav-btn-s" style="left: 2%;" onclick="moveSlider(-1)">❮</button>
+        <div class="slider-container" id="sliderMain">
+            <div class="tiles-wrapper" id="sliderItems"></div>
         </div>
-      </div>
+        <button class="nav-btn-s" style="right: 2%;" onclick="moveSlider(1)">❯</button>
+    </section>
 
-      <div class="contact-box">
-        <div id="tooltip"></div>
-        <input type="text" id="name" placeholder="Twoje Imię" oninput="val()">
-        <input type="tel" id="phone" placeholder="Numer telefonu (min. 9 cyfr)" oninput="val()">
-        <textarea id="msg" placeholder="Dodatkowe informacje..." oninput="val()"></textarea>
-        <button class="btn-submit" id="subBtn" onclick="wyslij()" onmouseenter="checkMissing()" onmouseleave="clearErrors()">WYŚLIJ ZGŁOSZENIE</button>
-      </div>
-    </div>
-  </div>
-</div>
+    <!-- 2. BENTO GRID -->
+    <section>
+        <div class="bento-container" id="bentoBox">
+            <div class="flip-card">
+                <div class="flip-card-inner">
+                    <div class="card-front">
+                        <span class="badge">Nauczyciel & Muzyk</span>
+                        <h2 style="font-family:'Playfair Display'; color:var(--navy);">Poznajmy się</h2>
+                        <p>Jestem <b>Łukasz Ganczarek</b>. Uczę pianina od 2025 r., łącząc praktykę z teorią i historią muzyki.</p>
+                    </div>
+                    <div class="card-back"><img src="https://imgur.com" alt="Wizytówka"></div>
+                </div>
+            </div>
+            <div class="card" style="background: var(--gold); border: none; color: white;">
+                <h3 style="font-family:'Playfair Display'; margin: 0 0 15px 0;">Edukacja</h3>
+                <div class="tags-container">
+                    <div class="tag-wrapper"><span class="tag" style="color:white; border-color:white;">Harmonia</span><div class="tag-note">Sztuka łączenia akordów.</div></div>
+                    <div class="tag-wrapper"><span class="tag" style="color:white; border-color:white;">Słuch</span><div class="tag-note">Gra ze słuchu bez nut.</div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. REZERWACJA -->
+    <section class="booking-section">
+        <div class="booking-card">
+            <h2 style="font-family:'Playfair Display'; text-align:center; color:var(--gold); font-size:2rem; margin-top:0;">Terminy</h2>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 30px; padding: 15px;">
+                <iframe src="https://google.com"></iframe>
+                <button class="btn-open" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
+            </div>
+            <div class="form-overlay" id="formOverlay">
+                <span class="close-f" onclick="toggleForm(false)">✕</span>
+                <div style="width:100%; max-width:450px; text-align:center;">
+                    <div class="price-tag"><span id="price-val" style="font-size:1.5rem; font-weight:800;">99 zł / h</span></div>
+                    <div class="contact-box">
+                        <input type="text" id="fname" placeholder="Imię" oninput="valF()">
+                        <input type="tel" id="fphone" placeholder="Telefon" oninput="valF()">
+                        <textarea id="fmsg" placeholder="Wiadomość..." rows="2" oninput="valF()"></textarea>
+                        <button class="btn-submit" id="subBtn" onclick="sendF()">WYŚLIJ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. PIANINO -->
+    <section class="piano-section">
+        <div class="controls">
+            <button class="btn-p active" id="p-btn" onclick="changeInst('piano')">Pianino</button>
+            <button class="btn-p" id="h-btn" onclick="changeInst('harpsi')">Klawesyn</button>
+            <button class="btn-p" onclick="toggleSong(0)">🍎</button>
+            <button class="btn-p" onclick="toggleSong(1)">🐱</button>
+        </div>
+        <div class="piano-container"><div class="piano" id="pianoBody"></div></div>
+    </section>
 
 <script>
-  let isStudio = true; let hasPiano = true;
-  const hook = 'https://hook.eu1.make.com/d62azmfruksckfjj8gtwyxjvxt9aqdis';
+    // --- SLIDER ---
+    const sliderItems = document.getElementById('sliderItems');
+    const sContent = `<div class="tile"><h3>Instrument</h3><p>Dowieziemy <span class="highlight">pianino</span>.</p></div>
+                      <div class="tile"><h3>Dydaktyka</h3><p>Autorskie <span class="highlight">pomoce</span>.</p></div>
+                      <div class="tile"><h3>Koszt</h3><p>Lekcja: <span class="highlight">99 zł</span>.</p></div>`;
+    sliderItems.innerHTML = sContent.repeat(5);
+    function moveSlider(d) { sliderItems.scrollBy({ left: d * 350, behavior: 'smooth' }); }
 
-  function toggleForm(show) { document.getElementById('formOverlay').classList.toggle('open', show); }
-
-  function setLoc(loc) {
-    isStudio = (loc === 'studio');
-    document.getElementById('loc-studio').classList.toggle('selected', isStudio);
-    document.getElementById('loc-uczen').classList.toggle('selected', !isStudio);
-    document.getElementById('piano-options').style.display = isStudio ? 'none' : 'block';
-    updatePrice();
-  }
-
-  function setPiano(val) { hasPiano = val; document.getElementById('piano-yes').classList.toggle('selected', hasPiano); document.getElementById('piano-no').classList.toggle('selected', !hasPiano); updatePrice(); }
-
-  function updatePrice() {
-    let price = isStudio ? 99 : (hasPiano ? 99 : 119);
-    document.getElementById('price-val').innerText = price + " zł / h";
-    val();
-  }
-
-  function val() {
-    const n = document.getElementById('name').value;
-    const p = document.getElementById('phone').value.replace(/\D/g, '');
-    const btn = document.getElementById('subBtn');
-    if(n.length > 2 && p.length >= 9) {
-      btn.classList.add('active');
-      document.getElementById('tooltip').style.display = "none";
-    } else { btn.classList.remove('active'); }
-  }
-
-  function checkMissing() {
-    const btn = document.getElementById('subBtn');
-    if(!btn.classList.contains('active')) {
-      const n = document.getElementById('name');
-      const p = document.getElementById('phone');
-      const tip = document.getElementById('tooltip');
-      const phoneDigits = p.value.replace(/\D/g, '').length;
-      let msg = [];
-      if(n.value.length <= 2) { n.classList.add('error'); msg.push("Imię"); }
-      if(phoneDigits < 9) { p.classList.add('error'); msg.push("9 cyfr telefonu"); }
-      tip.innerText = "Podaj: " + msg.join(" oraz ");
-      tip.style.display = "block";
+    // --- REZERWACJA ---
+    function toggleForm(s) { document.getElementById('formOverlay').classList.toggle('open', s); }
+    function valF() { const n = document.getElementById('fname').value, p = document.getElementById('fphone').value; document.getElementById('subBtn').classList.toggle('active', n.length > 2 && p.length >= 9); }
+    function sendF() {
+        const btn = document.getElementById('subBtn'); if(!btn.classList.contains('active')) return; btn.innerText = "WYSYŁANIE...";
+        fetch('https://make.com', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({imie: document.getElementById('fname').value, tel: document.getElementById('fphone').value}) })
+        .then(() => { btn.innerText = "WYSŁANO!"; setTimeout(() => location.reload(), 2000); });
     }
-  }
 
-  function clearErrors() { document.querySelectorAll('input').forEach(i => i.classList.remove('error')); document.getElementById('tooltip').style.display = "none"; }
+    // --- PIANINO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let currentInst = 'piano', currentSong = null, step = 0;
+    const notesP = ['G','G#','A','A#','H','C','C#','D','D#','E','F','F#'];
+    const songs = [{notes:[5,9,12,12,7,10,12,10,9,7,5]}, {notes:[12,9,9,10,7,7,5]}];
 
-  function wyslij() {
-    const btn = document.getElementById('subBtn');
-    if(!btn.classList.contains('active')) return;
-    btn.innerText = "WYSYŁANIE...";
-    btn.style.pointerEvents = "none";
+    function playNote(f, idx) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.type = currentInst === 'piano' ? 'sine' : 'sawtooth';
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 1);
+        if (currentSong !== null && idx === songs[currentSong].notes[step]) { step++; updateH(); }
+    }
+    function updateH() { document.querySelectorAll('.key').forEach(k => k.classList.remove('next-note')); if(currentSong !== null && step < songs[currentSong].notes.length) document.querySelectorAll('.key')[songs[currentSong].notes[step]].classList.add('next-note'); }
+    function toggleSong(i) { currentSong = currentSong === i ? null : i; step = 0; updateH(); }
+    function changeInst(i) { currentInst = i; document.getElementById('p-btn').classList.toggle('active', i==='piano'); document.getElementById('h-btn').classList.toggle('active', i==='harpsi'); }
 
-    const dane = {
-        typ: "Rezerwacja Terminu",
-        miejsce: isStudio ? "W studio" : "U ucznia",
-        pianino: isStudio ? "N/A" : (hasPiano ? "Tak" : "Brak"),
-        imie: document.getElementById('name').value,
-        telefon: document.getElementById('phone').value,
-        wiadomosc: document.getElementById('msg').value,
-        cena: document.getElementById('price-val').innerText
-    };
+    for (let i = 0; i < 25; i++) {
+        const key = document.createElement('div'), isB = notesP[i%12].includes('#');
+        key.className = `key ${isB ? 'black' : 'white'}`;
+        key.innerHTML = `<span>${notesP[i%12]}</span>`;
+        key.onmousedown = () => { key.classList.add('playing'); playNote(196 * Math.pow(2, i/12), i); };
+        key.onmouseup = () => key.classList.remove('playing');
+        document.getElementById('pianoBody').appendChild(key);
+    }
 
-    fetch(hook, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dane) })
-    .then(res => { 
-      if(res.ok) { 
-        btn.innerText = "WYSŁANO!"; 
-        btn.style.background = "#22c55e";
-        setTimeout(() => { 
-          toggleForm(false); 
-          // Reset pól zamiast reloadu:
-          document.getElementById('name').value = "";
-          document.getElementById('phone').value = "";
-          document.getElementById('msg').value = "";
-          btn.innerText = "WYŚLIJ ZGŁOSZENIE";
-          btn.style.background = "";
-          btn.style.pointerEvents = "auto";
-          btn.classList.remove('active');
-        }, 2000); 
-      } 
+    // --- ANIMACJE ---
+    window.addEventListener('load', () => {
+        document.getElementById('sliderMain').classList.add('revealed');
+        const obs = new IntersectionObserver((es) => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('is-visible'); }), {threshold: 0.5});
+        document.querySelectorAll('.tile').forEach(t => obs.observe(t));
+        const bObs = new IntersectionObserver((es) => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('active'); }), {threshold: 0.1});
+        bObs.observe(document.getElementById('bentoBox'));
     });
-  }
-
-  const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); }); });
-  observer.observe(document.querySelector('.main-section'));
 </script>
-
 </body>
 </html>
