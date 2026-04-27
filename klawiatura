@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pianino Edukacyjne Premium</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            /* DESKTOP */
+            --key-w: 65px;
+            --key-h: 280px;
+            --black-w: 42px;
+            --black-h: 170px;
+            --black-m: -21px;
+            --font-label: 13px;
+            --gold: #d4af37;
+            --navy: #1e3a8a;
+        }
+
+        /* TABLET */
+        @media (max-width: 1024px) {
+            :root { --key-w: 50px; --key-h: 220px; --black-w: 32px; --black-h: 130px; --black-m: -16px; --font-label: 11px; }
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            :root {
+                --key-w: 32px;
+                --key-h: 140px;
+                --black-w: 20px;
+                --black-h: 85px;
+                --black-m: -10px;
+                --font-label: 8px;
+            }
+            body { padding: 10px; }
+            .controls-wrapper { padding: 10px !important; gap: 8px !important; }
+            .btn { padding: 6px 12px !important; font-size: 0.75rem !important; }
+        }
+
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            min-height: 100vh;
+        }
+
+        .controls-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            margin-bottom: 40px;
+            border: 1px solid #edf2f7;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn.active { background: var(--navy); color: white; }
+        .btn-song.active { background: #3b82f6; border-color: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+
+        .volume-container { display: flex; align-items: center; gap: 10px; }
+        input[type=range] { cursor: pointer; accent-color: var(--navy); width: 100px; }
+
+        .piano-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding: 20px 0;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .piano-container::-webkit-scrollbar { display: none; }
+
+        .piano { display: flex; position: relative; margin: 0 auto; padding: 0 20px; }
+
+        .key {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
+            padding-bottom: 15px;
+            transition: transform 0.1s, background 0.1s;
+            position: relative;
+        }
+
+        .key span { font-size: var(--font-label); font-weight: 800; pointer-events: none; text-transform: uppercase; }
+
+        /* MODES */
+        .piano-mode .white { width: var(--key-w); height: var(--key-h); background: white; border-radius: 0 0 8px 8px; z-index: 1; }
+        .piano-mode .white span { color: #94a3b8; }
+        .piano-mode .black { width: var(--black-w); height: var(--black-h); background: #1e293b; margin: 0 var(--black-m); z-index: 2; border-radius: 0 0 5px 5px; border: none; }
+        .piano-mode .black span { color: white; margin-bottom: 10px; }
+
+        .harpsi-mode .white { width: var(--key-w); height: var(--key-h); background: #2d3748; z-index: 1; border-color: #1a202c; }
+        .harpsi-mode .white span { color: #718096; }
+        .harpsi-mode .black { width: var(--black-w); height: var(--black-h); background: var(--gold); margin: 0 var(--black-m); z-index: 2; border: none; }
+        .harpsi-mode .black span { color: #1a202c; margin-bottom: 10px; }
+
+        /* INTERACTION */
+        .key.next-note { 
+            background: #3b82f6 !important; 
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); 
+            z-index: 3; 
+            transform: translateY(-8px); 
+            border-color: #2563eb;
+        }
+        .key.next-note span { color: white !important; }
+
+        .key:active, .key.playing { background: #f1f5f9 !important; transform: translateY(4px); }
+        .piano-mode .black:active, .piano-mode .black.playing { background: #0f172a !important; }
+
+        #status { font-weight: 600; color: #64748b; margin-top: 25px; font-size: 1.1rem; text-align: center; letter-spacing: 0.5px; }
+        .sep { width: 1px; height: 30px; background: #e2e8f0; }
+    </style>
+</head>
+<body class="piano-mode">
+
+    <div class="controls-wrapper">
+        <button class="btn active" id="p-btn" onclick="changeInst('piano')">Pianino</button>
+        <button class="btn" id="h-btn" onclick="changeInst('harpsi')">Klawesyn</button>
+        <div class="sep"></div>
+        <div class="volume-container">
+            <span style="font-size: 1.2rem;">🔊</span>
+            <input type="range" id="volume" min="0" max="1" step="0.05" value="0.4">
+        </div>
+        <div class="sep"></div>
+        <button class="btn btn-song" id="s0" onclick="toggleSong(0)">🍎 Jabłuszko</button>
+        <button class="btn btn-song" id="s1" onclick="toggleSong(1)">🐱 Kotek</button>
+        <button class="btn btn-song" id="s2" onclick="toggleSong(2)">👨‍🌾 Janie</button>
+    </div>
+
+    <div class="piano-container">
+        <div class="piano" id="piano"></div>
+    </div>
+
+    <div id="status">Wybierz utwór, aby rozpocząć naukę</div>
+
+<script>
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    let currentInst = 'piano';
+    let currentSong = null;
+    let step = 0;
+
+    const songs = [
+        { name: "Czerwone jabłuszko", notes: [5, 9, 12, 12, 7, 10, 12, 10, 9, 7, 5, 12, 5, 9, 12, 12, 7, 10, 12, 10, 9, 7, 9, 5] },
+        { name: "Wlazł kotek", notes: [12, 9, 9, 10, 7, 7, 5, 9, 12, 12, 9, 9, 10, 7, 7, 5, 9, 5, 5, 9, 9, 10, 7, 7, 5, 9, 12, 12, 9, 9, 10, 7, 7, 5, 9, 5] },
+        { name: "Panie Janie", notes: [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 9, 10, 12, 12, 14, 12, 10, 9, 5, 12, 14, 12, 10, 9, 5, 5, 0, 5, 5, 0, 5] }
+    ];
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function playSound(freq, index) {
+        initAudio();
+        
+        // Logika piosenki
+        if (currentSong !== null && index === songs[currentSong].notes[step]) {
+            step++;
+            if (step >= songs[currentSong].notes.length) {
+                document.getElementById('status').innerText = "🎉 Brawo! Mistrzowska gra!";
+                const sIndex = currentSong;
+                setTimeout(() => toggleSong(sIndex), 1500);
+            } else { 
+                updateHighlight(); 
+            }
+        }
+
+        const vol = document.getElementById('volume').value;
+        const now = audioCtx.currentTime;
+        const gain = audioCtx.createGain();
+        
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(vol, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+
+        const osc = audioCtx.createOscillator();
+        osc.type = (currentInst === 'piano') ? 'triangle' : 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(now + 1.2);
+    }
+
+    function toggleSong(index) {
+        if (currentSong === index) {
+            currentSong = null; 
+            step = 0;
+            document.querySelectorAll('.btn-song').forEach(b => b.classList.remove('active'));
+            document.getElementById('status').innerText = "Tryb wolnej gry";
+        } else {
+            document.querySelectorAll('.btn-song').forEach(b => b.classList.remove('active'));
+            currentSong = index; 
+            step = 0;
+            document.getElementById(`s${index}`).classList.add('active');
+            document.getElementById('status').innerText = "Graj podświetlone klawisze: " + songs[index].name;
+        }
+        updateHighlight();
+    }
+
+    function updateHighlight() {
+        document.querySelectorAll('.key').forEach(k => k.classList.remove('next-note'));
+        if (currentSong !== null) {
+            const target = songs[currentSong].notes[step];
+            const keys = document.querySelectorAll('.key');
+            if (keys[target]) keys[target].classList.add('next-note');
+        }
+    }
+
+    function changeInst(inst) {
+        currentInst = inst;
+        document.body.className = (inst === 'piano') ? 'piano-mode' : 'harpsi-mode';
+        document.getElementById('p-btn').classList.toggle('active', inst === 'piano');
+        document.getElementById('h-btn').classList.toggle('active', inst === 'harpsi');
+    }
+
+    const notesPattern = ['G', 'G#', 'A', 'A#', 'H', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#'];
+    const startFreq = 195.997; 
+    const pianoElement = document.getElementById('piano');
+
+    for (let i = 0; i < 25; i++) {
+        const noteIndex = i % 12;
+        let noteName = notesPattern[noteIndex];
+        const freq = startFreq * Math.pow(2, i / 12);
+        
+        const key = document.createElement('div');
+        const isBlack = noteName.includes('#');
+        key.className = `key ${isBlack ? 'black' : 'white'}`;
+        
+        let label = (i < 5) ? noteName.toLowerCase() : (i < 17 ? noteName.toUpperCase() + "¹" : noteName.toUpperCase() + "²");
+        key.innerHTML = `<span>${label}</span>`;
+        
+        // Myszka
+        key.addEventListener('mousedown', (e) => { 
+            e.preventDefault(); 
+            key.classList.add('playing'); 
+            playSound(freq, i); 
+        });
+        window.addEventListener('mouseup', () => key.classList.remove('playing'));
+        
+        // Dotyk (Mobile)
+        key.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            initAudio();
+            key.classList.add('playing'); 
+            playSound(freq, i); 
+        }, {passive: false});
+        key.addEventListener('touchend', () => key.classList.remove('playing'));
+        
+        pianoElement.appendChild(key);
+    }
+</script>
+</body>
+</html>
