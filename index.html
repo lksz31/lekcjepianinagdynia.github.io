@@ -6,6 +6,165 @@
 <title>Lekcje Pianina – Łukasz Ganczarek</title>
 <link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap)" rel="stylesheet">
 <style>
+  /* =========================================================
+   OKNA / FORMULARZE — PRZYWRÓCONA FUNKCJONALNOŚĆ
+   ========================================================= */
+.booking-section,
+.bento-footer {
+  position: relative;
+  overflow: hidden;
+}
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: white;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  color: var(--navy, #1e3a8a);
+  clip-path: circle(0% at 50% 90%);
+  transition: clip-path 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+  overflow-y: auto;
+}
+.modal-overlay.open {
+  clip-path: circle(150% at 50% 90%);
+}
+.footer-modal {
+  clip-path: circle(0% at 50% 50%);
+}
+.footer-modal.open {
+  clip-path: circle(150% at 50% 50%);
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  font-size: 1.8rem;
+  color: var(--navy, #1e3a8a);
+  cursor: pointer;
+  font-weight: 900;
+  z-index: 110;
+}
+.modal-content {
+  width: 100%;
+  max-width: 560px;
+  text-align: center;
+}
+.modal-split {
+  width: 94%;
+  max-width: 860px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 22px;
+  align-items: center;
+}
+.modal-left h3,
+.modal-content h3 {
+  margin: 0 0 14px;
+  color: var(--navy, #1e3a8a);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+}
+.modal-price {
+  background: #f9fbfe;
+  border: 2px dashed var(--gold, #d4af37);
+  border-radius: 15px;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+.modal-price span {
+  font-weight: 900;
+  font-size: 1.35rem;
+}
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.modal-tile {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.25s;
+  font-size: 0.85rem;
+  color: #333;
+}
+.modal-tile.selected {
+  border-color: var(--blue, #3b82f6);
+  background: #f0f7ff;
+}
+.modal-form {
+  background: var(--navy, #1e3a8a);
+  border-radius: 28px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  transition: 0.25s;
+}
+.modal-form input.error {
+  border-color: #ff4d4d !important;
+  background: #fff5f5;
+}
+.modal-submit {
+  width: 100%;
+  background: #ccc;
+  color: #666;
+  border: none;
+  padding: 15px;
+  border-radius: 50px;
+  font-weight: 900;
+  cursor: not-allowed;
+  transition: 0.25s;
+}
+.modal-submit.active {
+  background: var(--gold, #d4af37);
+  color: #000;
+  cursor: pointer;
+}
+.modal-tip {
+  display: none;
+  position: absolute;
+  bottom: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff4d4d;
+  color: white;
+  padding: 7px 13px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  width: 230px;
+  text-align: center;
+  z-index: 10;
+}
+@media (max-width: 850px) {
+  .modal-split {
+    grid-template-columns: 1fr;
+    padding: 35px 0 20px;
+  }
+  .modal-overlay {
+    align-items: flex-start;
+  }
+}
 /* ------------------------------------------------------ */
 /*  RESET & GLOBAL                                         */
 /* ------------------------------------------------------ */
@@ -138,68 +297,185 @@ body {
 /* ------------------------------------------------------ */
 /*  KALENDARZ                                              */
 /* ------------------------------------------------------ */
-.calendar-box {
-  background: #1e3a8a;
-  padding: 35px;
-  border-radius: 25px;
-  color: white;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  margin-bottom: 60px;
-}
-.calendar-box h2 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-family: 'Playfair Display';
-}
-.calendar-box iframe {
-  width: 100%;
-  height: 500px;
-  border-radius: 20px;
-  border: none;
-  filter: invert(92%) hue-rotate(190deg);
-}
-.btn-primary {
-  margin: 20px auto 0;
-  display: block;
-  background: #d4af37;
-  color: black;
-  padding: 14px 40px;
-  border-radius: 50px;
-  border: none;
-  font-weight: 700;
-  cursor: pointer;
-}
+<section class="booking-section" id="booking">
+  <h2>Terminy i Miejsce</h2>
+  <div class="calendar-frame">
+    <iframe src="[calendar.google.com](https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com)"></iframe>
+    <button class="btn-open-form" type="button" onclick="bookingToggleForm(true)">
+      ZAREZERWUJ TERMIN
+    </button>
+  </div>
+  <div class="modal-overlay" id="bookingOverlay">
+    <span class="modal-close" onclick="bookingToggleForm(false)">✕</span>
+    <div class="modal-content">
+      <h3>Szczegóły rezerwacji</h3>
+      <div class="modal-price">
+        <span id="booking-price">99 zł / h</span>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-tile selected" id="booking-loc-studio" onclick="bookingSetLoc('studio')">
+          <b>W studio</b><br><small>Gdynia Mały Kack</small>
+        </div>
+        <div class="modal-tile" id="booking-loc-uczen" onclick="bookingSetLoc('uczen')">
+          <b>U ucznia</b><br><small>Dojazd do Ciebie</small>
+        </div>
+      </div>
+      <div id="booking-piano-options" style="display:none;">
+        <div class="modal-grid">
+          <div class="modal-tile selected" id="booking-piano-yes" onclick="bookingSetPiano(true)">
+            <b>Mam pianino</b>
+          </div>
+          <div class="modal-tile" id="booking-piano-no" onclick="bookingSetPiano(false)">
+            <b>Nie mam</b>
+          </div>
+        </div>
+      </div>
+      <div class="modal-form" id="booking-form-box">
+        <div class="modal-tip" id="booking-tip"></div>
+        <input type="text" id="booking-name" placeholder="Twoje Imię" oninput="bookingValidate()">
+        <input type="tel" id="booking-phone" placeholder="Numer telefonu (min. 9 cyfr)" oninput="bookingValidate()">
+        <textarea id="booking-msg" placeholder="Dodatkowe informacje..." oninput="bookingValidate()"></textarea>
+        <button class="modal-submit" id="booking-submit"
+          onclick="bookingSend()"
+          onmouseenter="bookingShowMissing()"
+          onmouseleave="bookingClearErrors()">
+          WYŚLIJ ZGŁOSZENIE
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
 /* ------------------------------------------------------ */
 /*  STOPKA                                                 */
 /* ------------------------------------------------------ */
-footer {
-  background: #000;
-  color: white;
-  padding: 40px;
-  border-radius: 25px 25px 0 0;
-}
-footer .footer-grid {
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr 1fr;
-  gap: 25px;
-}
-footer h4 {
-  margin-bottom: 10px;
-  font-family: 'Playfair Display';
-}
-.footer-logo { width: 120px; margin-bottom: 15px; }
-footer .btn-small {
-  background: #d4af37;
-  padding: 10px 25px;
-  border-radius: 40px;
-  color: black;
-  font-weight: 700;
-  display: inline-block;
-  margin-top: 10px;
-}
-</style>
-</head>
-<body>
+<footer class="bento-footer">
+  <div class="grid-container">
+    <div class="branding">
+      <div class="logo-box">
+        <img src="[imgur.com](https://imgur.com/7HNwsrN.png)" alt="Logo">
+      </div>
+      <button class="cta-button" type="button" onclick="footerToggleOverlay('lessonOverlay', true)">
+        UMÓW LEKCJĘ PRÓBNĄ
+      </button>
+    </div>
+    <div>
+      <h4>Kontakt</h4>
+      <p style="margin-bottom: 5px;">
+        <a href="tel:514338875" class="phone-link">📞 514 338 875</a>
+      </p>
+      <ul class="nav-links">
+        <li><span onclick="footerToggleOverlay('emailOverlay', true)">📩 Wyślij e-mail</span></li>
+        <li><span onclick="footerToggleOverlay('waOverlay', true)">💬 WhatsApp</span></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Podstrony</h4>
+      <ul class="nav-links">
+        <li><a href="[lekcjepianinagdynia.com](https://lekcjepianinagdynia.com)">• Strona Główna</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Ogłoszenia</h4>
+      <ul class="nav-links">
+        <li>
+          <a href="[buki.org.pl](https://buki.org.pl/user-123621/)" target="_blank">• Profil Buki.org</a>
+        </li>
+        <li>
+          <a href="[superprof.pl](https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html)" target="_blank">• Profil Superprof.pl</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom-area">
+    <div class="footer-copyright-text">
+      © 2026 Łukasz Ganczarek – Lekcje Pianina Gdynia
+    </div>
+  </div>
+  <!-- MODAL: LEKCJA PRÓBNA -->
+  <div class="modal-overlay footer-modal" id="lessonOverlay">
+    <span class="modal-close" onclick="footerToggleOverlay('lessonOverlay', false)">✕</span>
+    <div class="modal-split">
+      <div class="modal-left">
+        <h3>Lekcja próbna</h3>
+        <div class="modal-price">
+          <span id="footer-price">99 zł / h</span>
+        </div>
+        <div class="modal-tile selected" id="footer-loc-studio" onclick="footerSetLoc('studio')">
+          <b>W studio</b>
+        </div>
+        <div class="modal-tile" id="footer-loc-uczen" onclick="footerSetLoc('uczen')">
+          <b>U ucznia</b>
+        </div>
+        <div id="footer-piano-options" style="display:none;margin-top:10px;">
+          <div class="modal-grid">
+            <div class="modal-tile selected" id="footer-piano-yes" onclick="footerSetPiano(true)">
+              <b>Mam pianino</b>
+            </div>
+            <div class="modal-tile" id="footer-piano-no" onclick="footerSetPiano(false)">
+              <b>Nie mam pianina</b>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-form" id="footer-lesson-form">
+        <div class="modal-tip"></div>
+        <input type="text" id="footer-lesson-name" placeholder="Twoje Imię" oninput="footerValidate('lesson')">
+        <input type="tel" id="footer-lesson-phone" placeholder="Numer telefonu (min. 9 cyfr)" oninput="footerValidate('lesson')">
+        <textarea id="footer-lesson-msg" placeholder="Wiadomość..."></textarea>
+        <button class="modal-submit" id="footer-lesson-submit"
+          onclick="footerSend('lesson')"
+          onmouseenter="footerShowErr('footer-lesson-name','footer-lesson-phone','footer-lesson-form')"
+          onmouseleave="footerHideErr('footer-lesson-form')">
+          WYŚLIJ PROŚBĘ
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL: EMAIL -->
+  <div class="modal-overlay footer-modal" id="emailOverlay">
+    <span class="modal-close" onclick="footerToggleOverlay('emailOverlay', false)">✕</span>
+    <div class="modal-split">
+      <div class="modal-left">
+        <h3>Napisz e-mail</h3>
+        <div class="modal-tile selected">📩 lukaszgkorepetycje@gmail.com</div>
+      </div>
+      <div class="modal-form" id="footer-email-form">
+        <div class="modal-tip"></div>
+        <input type="text" id="footer-email-name" placeholder="Twoje Imię" oninput="footerValidate('email')">
+        <input type="email" id="footer-email-contact" placeholder="Twój e-mail" oninput="footerValidate('email')">
+        <textarea id="footer-email-msg" placeholder="Treść zapytania..."></textarea>
+        <button class="modal-submit" id="footer-email-submit"
+          onclick="footerSend('email')"
+          onmouseenter="footerShowErr('footer-email-name','footer-email-contact','footer-email-form')"
+          onmouseleave="footerHideErr('footer-email-form')">
+          WYŚLIJ WIADOMOŚĆ
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL: WHATSAPP -->
+  <div class="modal-overlay footer-modal" id="waOverlay">
+    <span class="modal-close" onclick="footerToggleOverlay('waOverlay', false)">✕</span>
+    <div class="modal-split">
+      <div class="modal-left">
+        <h3>WhatsApp</h3>
+        <p>Zostaw numer, odezwę się!</p>
+      </div>
+      <div class="modal-form" id="footer-wa-form">
+        <div class="modal-tip"></div>
+        <input type="text" id="footer-wa-name" placeholder="Twoje Imię" oninput="footerValidate('wa')">
+        <input type="tel" id="footer-wa-phone" placeholder="Numer telefonu (min. 9 cyfr)" oninput="footerValidate('wa')">
+        <textarea id="footer-wa-msg" placeholder="Wiadomość..."></textarea>
+        <button class="modal-submit" id="footer-wa-submit"
+          onclick="footerSend('wa')"
+          onmouseenter="footerShowErr('footer-wa-name','footer-wa-phone','footer-wa-form')"
+          onmouseleave="footerHideErr('footer-wa-form')">
+          POPROŚ O KONTAKT
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>
 <!-- ------------------------------------------------------ -->
 <!-- HERO -->
 <!-- ------------------------------------------------------ -->
@@ -321,6 +597,263 @@ footer .btn-small {
 <script>
 document.getElementById("piano").innerHTML =
   "<div style='padding-top:55px; color:#94a3b8;'>[Interaktywne pianino – funkcjonalność do podłączenia]</div>";
+</script>
+  <script>
+/* =========================================================
+   WSPÓLNY WEBHOOK — TWÓJ LINK
+   ========================================================= */
+const PERSONAL_WEBHOOK = '[hook.eu1.make.com](https://hook.eu1.make.com/d62azmfruksckfjj8gtwyxjvxt9aqdis)';
+/* =========================================================
+   FORMULARZ REZERWACJI — SEKCJA KALENDARZA
+   ========================================================= */
+let bookingIsStudio = true;
+let bookingHasPiano = true;
+function bookingToggleForm(show) {
+  document.getElementById('bookingOverlay').classList.toggle('open', show);
+}
+function bookingSetLoc(loc) {
+  bookingIsStudio = loc === 'studio';
+  document.getElementById('booking-loc-studio').classList.toggle('selected', bookingIsStudio);
+  document.getElementById('booking-loc-uczen').classList.toggle('selected', !bookingIsStudio);
+  document.getElementById('booking-piano-options').style.display = bookingIsStudio ? 'none' : 'block';
+  bookingUpdatePrice();
+}
+function bookingSetPiano(value) {
+  bookingHasPiano = value;
+  document.getElementById('booking-piano-yes').classList.toggle('selected', bookingHasPiano);
+  document.getElementById('booking-piano-no').classList.toggle('selected', !bookingHasPiano);
+  bookingUpdatePrice();
+}
+function bookingUpdatePrice() {
+  const price = bookingIsStudio ? 99 : (bookingHasPiano ? 99 : 119);
+  document.getElementById('booking-price').innerText = price + ' zł / h';
+  bookingValidate();
+}
+function bookingValidate() {
+  const name = document.getElementById('booking-name').value.trim();
+  const phoneDigits = document.getElementById('booking-phone').value.replace(/\D/g, '');
+  const btn = document.getElementById('booking-submit');
+  btn.classList.toggle('active', name.length > 2 && phoneDigits.length >= 9);
+  if (name.length > 2 && phoneDigits.length >= 9) {
+    document.getElementById('booking-tip').style.display = 'none';
+  }
+}
+function bookingShowMissing() {
+  const btn = document.getElementById('booking-submit');
+  if (btn.classList.contains('active')) return;
+  const name = document.getElementById('booking-name');
+  const phone = document.getElementById('booking-phone');
+  const tip = document.getElementById('booking-tip');
+  const missing = [];
+  if (name.value.trim().length <= 2) {
+    name.classList.add('error');
+    missing.push('Imię');
+  }
+  if (phone.value.replace(/\D/g, '').length < 9) {
+    phone.classList.add('error');
+    missing.push('9 cyfr telefonu');
+  }
+  tip.innerText = 'Podaj: ' + missing.join(' oraz ');
+  tip.style.display = 'block';
+}
+function bookingClearErrors() {
+  document.querySelectorAll('#booking-form-box input').forEach(input => input.classList.remove('error'));
+  document.getElementById('booking-tip').style.display = 'none';
+}
+function bookingSend() {
+  const btn = document.getElementById('booking-submit');
+  if (!btn.classList.contains('active')) return;
+  btn.innerText = 'WYSYŁANIE...';
+  btn.style.pointerEvents = 'none';
+  const data = {
+    typ: 'Rezerwacja Terminu',
+    miejsce: bookingIsStudio ? 'W studio' : 'U ucznia',
+    pianino: bookingIsStudio ? 'N/A' : (bookingHasPiano ? 'Tak' : 'Brak'),
+    imie: document.getElementById('booking-name').value,
+    telefon: document.getElementById('booking-phone').value,
+    wiadomosc: document.getElementById('booking-msg').value,
+    cena: document.getElementById('booking-price').innerText
+  };
+  fetch(PERSONAL_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Błąd wysyłki');
+    btn.innerText = 'WYSŁANO!';
+    btn.style.background = '#22c55e';
+    setTimeout(() => {
+      bookingToggleForm(false);
+      document.getElementById('booking-name').value = '';
+      document.getElementById('booking-phone').value = '';
+      document.getElementById('booking-msg').value = '';
+      btn.innerText = 'WYŚLIJ ZGŁOSZENIE';
+      btn.style.background = '';
+      btn.style.pointerEvents = 'auto';
+      btn.classList.remove('active');
+    }, 2000);
+  })
+  .catch(() => {
+    btn.innerText = 'SPRÓBUJ PONOWNIE';
+    btn.style.background = '#ef4444';
+    btn.style.color = 'white';
+    btn.style.pointerEvents = 'auto';
+  });
+}
+/* =========================================================
+   FORMULARZE STOPKI
+   ========================================================= */
+let footerIsStudio = true;
+let footerHasPiano = true;
+function footerToggleOverlay(id, show) {
+  document.getElementById(id).classList.toggle('open', show);
+}
+function footerSetLoc(loc) {
+  footerIsStudio = loc === 'studio';
+  document.getElementById('footer-loc-studio').classList.toggle('selected', footerIsStudio);
+  document.getElementById('footer-loc-uczen').classList.toggle('selected', !footerIsStudio);
+  document.getElementById('footer-piano-options').style.display = footerIsStudio ? 'none' : 'block';
+  footerUpdatePrice();
+}
+function footerSetPiano(value) {
+  footerHasPiano = value;
+  document.getElementById('footer-piano-yes').classList.toggle('selected', footerHasPiano);
+  document.getElementById('footer-piano-no').classList.toggle('selected', !footerHasPiano);
+  footerUpdatePrice();
+}
+function footerUpdatePrice() {
+  const price = footerIsStudio ? 99 : (footerHasPiano ? 99 : 119);
+  document.getElementById('footer-price').innerText = price + ' zł / h';
+}
+function footerValidate(type) {
+  let name;
+  let contact;
+  let btn;
+  if (type === 'lesson') {
+    name = document.getElementById('footer-lesson-name');
+    contact = document.getElementById('footer-lesson-phone');
+    btn = document.getElementById('footer-lesson-submit');
+  }
+  if (type === 'email') {
+    name = document.getElementById('footer-email-name');
+    contact = document.getElementById('footer-email-contact');
+    btn = document.getElementById('footer-email-submit');
+  }
+  if (type === 'wa') {
+    name = document.getElementById('footer-wa-name');
+    contact = document.getElementById('footer-wa-phone');
+    btn = document.getElementById('footer-wa-submit');
+  }
+  const isNameOk = name.value.trim().length > 2;
+  const isContactOk = type === 'email'
+    ? contact.value.includes('@')
+    : contact.value.replace(/\D/g, '').length >= 9;
+  btn.classList.toggle('active', isNameOk && isContactOk);
+}
+function footerShowErr(nameId, contactId, formId) {
+  const form = document.getElementById(formId);
+  const name = document.getElementById(nameId);
+  const contact = document.getElementById(contactId);
+  const btn = form.querySelector('.modal-submit');
+  const tip = form.querySelector('.modal-tip');
+  if (btn.classList.contains('active')) return;
+  const isEmail = contact.type === 'email';
+  const isNameInvalid = name.value.trim().length <= 2;
+  const isContactInvalid = isEmail
+    ? !contact.value.includes('@')
+    : contact.value.replace(/\D/g, '').length < 9;
+  const missing = [];
+  if (isNameInvalid) {
+    name.classList.add('error');
+    missing.push('Imię');
+  }
+  if (isContactInvalid) {
+    contact.classList.add('error');
+    missing.push(isEmail ? 'E-mail' : '9 cyfr tel.');
+  }
+  tip.innerText = 'Podaj: ' + missing.join(' oraz ');
+  tip.style.display = 'block';
+}
+function footerHideErr(formId) {
+  const form = document.getElementById(formId);
+  form.querySelectorAll('input').forEach(input => input.classList.remove('error'));
+  form.querySelector('.modal-tip').style.display = 'none';
+}
+function footerSend(type) {
+  let nameId;
+  let contactId;
+  let msgId;
+  let formId;
+  let overlayId;
+  let buttonId;
+  if (type === 'lesson') {
+    nameId = 'footer-lesson-name';
+    contactId = 'footer-lesson-phone';
+    msgId = 'footer-lesson-msg';
+    formId = 'footer-lesson-form';
+    overlayId = 'lessonOverlay';
+    buttonId = 'footer-lesson-submit';
+  }
+  if (type === 'email') {
+    nameId = 'footer-email-name';
+    contactId = 'footer-email-contact';
+    msgId = 'footer-email-msg';
+    formId = 'footer-email-form';
+    overlayId = 'emailOverlay';
+    buttonId = 'footer-email-submit';
+  }
+  if (type === 'wa') {
+    nameId = 'footer-wa-name';
+    contactId = 'footer-wa-phone';
+    msgId = 'footer-wa-msg';
+    formId = 'footer-wa-form';
+    overlayId = 'waOverlay';
+    buttonId = 'footer-wa-submit';
+  }
+  const btn = document.getElementById(buttonId);
+  if (!btn.classList.contains('active')) return;
+  btn.innerText = 'WYSYŁANIE...';
+  btn.style.pointerEvents = 'none';
+  const payload = {
+    typ: type === 'lesson' ? 'Lekcja Próbna' : (type === 'email' ? 'Email' : 'WhatsApp'),
+    imie: document.getElementById(nameId).value,
+    kontakt: document.getElementById(contactId).value,
+    wiadomosc: document.getElementById(msgId).value,
+    miejsce: type === 'lesson' ? (footerIsStudio ? 'W studio' : 'U ucznia') : 'N/A',
+    cena: type === 'lesson' ? document.getElementById('footer-price').innerText : 'N/A',
+    pianino: type === 'lesson' ? (footerIsStudio ? 'N/A' : (footerHasPiano ? 'Uczeń posiada' : 'Brak - dowóz')) : 'N/A'
+  };
+  fetch(PERSONAL_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Błąd wysyłki');
+    btn.innerText = 'WYSŁANO!';
+    btn.style.background = '#22c55e';
+    setTimeout(() => {
+      footerToggleOverlay(overlayId, false);
+      document.querySelectorAll(`#${formId} input, #${formId} textarea`).forEach(input => {
+        input.value = '';
+      });
+      btn.classList.remove('active');
+      btn.innerText = type === 'wa'
+        ? 'POPROŚ O KONTAKT'
+        : (type === 'email' ? 'WYŚLIJ WIADOMOŚĆ' : 'WYŚLIJ PROŚBĘ');
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.pointerEvents = 'auto';
+    }, 2000);
+  })
+  .catch(() => {
+    btn.innerText = 'SPRÓBUJ PONOWNIE';
+    btn.style.background = '#ef4444';
+    btn.style.color = 'white';
+    btn.style.pointerEvents = 'auto';
+  });
+}
 </script>
 </body>
 </html>
