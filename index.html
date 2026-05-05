@@ -1140,153 +1140,95 @@
   </div>
 </section>
 <!-- ===================== SEKCJA: BRIEFY DLA UCZNIÓW ===================== -->
-<!-- Wklej tę sekcję gdziekolwiek na stronie, np. przed stopką -->
  
 <section style="padding:80px 5%; background:#f8fafc;" id="briefy">
   <div style="max-width:600px; margin:0 auto; text-align:center;">
- 
-    <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:10px;font-family:'Poppins',sans-serif;">
-      Strefa Ucznia
-    </div>
- 
-    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);color:#1e3a8a;margin:0 0 16px;">
-      Materiały do lekcji
-    </h2>
- 
-    <p style="color:#64748b;font-size:0.95rem;line-height:1.7;margin:0 0 40px;font-family:'Poppins',sans-serif;">
-      Wpisz kod otrzymany od nauczyciela, aby uzyskać dostęp do materiałów.
-    </p>
- 
-    <!-- POLE KODU -->
+    <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:10px;font-family:'Poppins',sans-serif;">Strefa Ucznia</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);color:#1e3a8a;margin:0 0 16px;">Materiały do lekcji</h2>
+    <p style="color:#64748b;font-size:0.95rem;line-height:1.7;margin:0 0 40px;font-family:'Poppins',sans-serif;">Wpisz kod otrzymany od nauczyciela, aby uzyskać dostęp do materiałów.</p>
     <div style="background:white;border-radius:24px;padding:32px;box-shadow:0 0 30px rgba(0,0,0,0.07);border:1px solid #f0f0f0;">
- 
       <div style="display:flex;gap:10px;margin-bottom:16px;">
-        <input
-          id="brief-code-input"
-          type="text"
-          placeholder="Wpisz kod"
-          oninput="briefCheck()"
-          style="flex:1;padding:14px 18px;border:2px solid #e2e8f0;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.95rem;color:#1e3a8a;outline:none;text-transform:uppercase;letter-spacing:0.05em;transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#1e3a8a'"
-          onblur="this.style.borderColor='#e2e8f0'"
-        >
-        <button
-          onclick="briefCheck(true)"
+        <input id="brief-code-input" type="text" placeholder="Wpisz kod" oninput="briefCheck()"
+          style="flex:1;padding:14px 18px;border:2px solid #e2e8f0;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.95rem;color:#1e3a8a;outline:none;letter-spacing:0.03em;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='#1e3a8a'" onblur="this.style.borderColor='#e2e8f0'">
+        <button onclick="briefCheck(true)"
           style="padding:14px 28px;background:#1e3a8a;color:white;border:none;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;white-space:nowrap;"
-          onmouseover="this.style.background='#d4af37'"
-          onmouseout="this.style.background='#1e3a8a'"
-        >
-          Sprawdź
-        </button>
+          onmouseover="this.style.background='#d4af37'" onmouseout="this.style.background='#1e3a8a'">Sprawdź</button>
       </div>
- 
-      <!-- WYNIK -->
       <div id="brief-result" style="display:none;"></div>
- 
     </div>
- 
   </div>
 </section>
  
 <script>
-// =====================================================================
-// TUTAJ DEFINIUJESZ KODY I LINKI DO BRIEFÓW
-// Format: "KOD": { title: "Tytuł", url: "link do pliku HTML" }
-// Możesz dodawać kolejne wpisy po przecinku
-// =====================================================================
 const BRIEFS = {
   "AgataS": [
-     { title: "Brief No. 1. – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
-  { title: "Brief No. 2...", subtitle: "...", url: "https://..." }
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" },
+    { title: "Brief No. 2 – Starożytna Grecja", subtitle: "Muzyka jako element filozofii i wychowania", url: "https://lekcjepianinagdynia.pl/brief-02.html" }
   ],
-   "MAGDALENAR": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "JOANNAP": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "BARTOSZM": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "ARKADIUSZK": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "MARCELINAG": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "MONIKA": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "ŁUKASZP": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "MAGDALENAP": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-   "ADAMS": {
-    title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu",
-    subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach",
-    url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html"
-  },
-  // Dodaj kolejne briefy tutaj...
+  "MagdalenaR": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "JoannaP": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "BartekM": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "ArkadiuszK": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "MarcelinaG": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "Monika": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "LukaszP": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "MagdalenaP": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ],
+  "AdamS": [
+    { title: "Brief No. 1 – Starożytność: Dolina Mezopotamii i Egiptu", subtitle: "Postrzeganie muzyki w pierwszych cywilizacjach", url: "https://lekcjepianinagdynia.pl/brief-01-xZBoqbW9FZfZDw.html" }
+  ]
 };
  
 function briefCheck(submit) {
   const input = document.getElementById('brief-code-input');
   const result = document.getElementById('brief-result');
-  const code = input.value.trim().toUpperCase();
+  const code = input.value.trim();
  
-  if (!submit && code.length < 7) {
-    result.style.display = 'none';
-    return;
-  }
+  if (!submit && code.length < 4) { result.style.display = 'none'; return; }
  
-  if (BRIEFS[code]) {
-    const brief = BRIEFS[code];
-    result.style.display = 'block';
-    result.innerHTML = `
-      <a href="${brief.url}" target="_blank"
-         style="display:flex;align-items:center;gap:14px;background:#f0f7ff;border:1.5px solid #1e3a8a;border-radius:16px;padding:16px 20px;text-decoration:none;transition:0.3s;text-align:left;"
-         onmouseover="this.style.background='#dbeafe'"
-         onmouseout="this.style.background='#f0f7ff'">
-        <div style="width:44px;height:44px;background:#1e3a8a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.2rem;">📄</div>
+  const matchedKey = Object.keys(BRIEFS).find(k => k.toLowerCase() === code.toLowerCase());
+ 
+  if (matchedKey) {
+    const briefs = BRIEFS[matchedKey];
+    const cards = briefs.map((b, i) => `
+      <a href="${b.url}" target="_blank"
+         style="display:flex;align-items:center;gap:14px;background:#f0f7ff;border:1.5px solid #1e3a8a;border-radius:16px;padding:16px 20px;text-decoration:none;text-align:left;${i < briefs.length-1 ? 'margin-bottom:10px;' : ''}"
+         onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f7ff'">
+        <div style="width:44px;height:44px;background:#1e3a8a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">&#128196;</div>
         <div style="flex:1;">
-          <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:3px;">${brief.title}</div>
-          <div style="font-family:'Poppins',sans-serif;font-size:0.8rem;color:#64748b;">${brief.subtitle}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:3px;">${b.title}</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:0.8rem;color:#64748b;">${b.subtitle}</div>
         </div>
-        <div style="color:#1e3a8a;font-size:1.1rem;flex-shrink:0;">→</div>
-      </a>
-      <p style="font-family:'Poppins',sans-serif;font-size:0.75rem;color:#94a3b8;margin:10px 0 0;text-align:center;">Kliknij kartę, aby otworzyć materiał</p>
-    `;
-  } else if (submit || code.length >= 7) {
+        <div style="color:#1e3a8a;font-size:1.1rem;">&#8594;</div>
+      </a>`).join('');
+ 
     result.style.display = 'block';
-    result.innerHTML = `
-      <div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:'Poppins',sans-serif;font-size:0.9rem;color:#dc2626;">
-        ✕ Nieprawidłowy kod. Sprawdź kod otrzymany od nauczyciela.
-      </div>
-    `;
+    result.innerHTML =
+      '<div style="font-family:\'Poppins\',sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:12px;text-align:left;">Twoje materia&#322;y (' + briefs.length + ')</div>' +
+      cards +
+      '<p style="font-family:\'Poppins\',sans-serif;font-size:0.75rem;color:#94a3b8;margin:12px 0 0;text-align:center;">Kliknij kart&#281;, aby otworzy&#263; materia&#322;</p>';
+  } else if (submit || code.length >= 4) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#10005; Nieprawid&#322;owy kod. Sprawd&#378; kod otrzymany od nauczyciela.</div>';
   }
 }
  
-// Obsługa Enter
 document.getElementById('brief-code-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') briefCheck(true);
 });
