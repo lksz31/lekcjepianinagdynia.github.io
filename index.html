@@ -411,15 +411,15 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
     background: white;
     border: 1px solid #f0f0f0;
     border-radius: 50%;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     cursor: pointer;
     z-index: 10;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--navy);
     display: flex;
     align-items: center;
@@ -428,8 +428,9 @@
   }
  
   .nav-btn:hover { background: var(--navy); color: white; }
-  .prev-btn { left: 15px; }
-  .next-btn { right: 15px; }
+  /* 3 kafelki × 340px + 2 przerwy × 28px = 1108px, połowa = 554px od środka */
+  .prev-btn { left: calc(50% - 554px - 36px); }
+  .next-btn { right: calc(50% - 554px - 36px); }
  
   /* ===================== POMOCE DYDAKTYCZNE ===================== */
   .pomoce-section {
@@ -468,6 +469,7 @@
   .pomoce-grid.active .pomoce-card:nth-child(3) { transition-delay: 0.2s; }
   .pomoce-grid.active .pomoce-card:nth-child(4) { transition-delay: 0.3s; }
   .pomoce-grid.active .pomoce-card:nth-child(5) { transition-delay: 0.4s; }
+  .pomoce-grid.active .pomoce-card:nth-child(6) { transition-delay: 0.5s; }
   .pomoce-grid.active .pomoce-card { opacity: 1; transform: translateY(0); }
  
   .pomoce-card:hover {
@@ -1054,6 +1056,13 @@
         <span class="tag-pill">Autorski</span>
         <h4>Podręcznik do gry na pianinie</h4>
         <p>Własny podręcznik napisany z myślą o moich uczniach — łączy teorię z praktyką, prowadzi krok po kroku od pierwszego dźwięku do samodzielnej gry. Dostosowany do polskich realiów i repertuaru.</p>
+      </div>
+ 
+      <div class="pomoce-card">
+        <div class="pomoce-icon">🚗</div>
+        <span class="tag-pill">Dojazd</span>
+        <h4>Dowóz instrumentu na zajęcia</h4>
+        <p>Nie masz pianina w domu? Przywiozę instrument na lekcję do Ciebie. Dzięki temu możesz zacząć naukę od pierwszego dnia — bez potrzeby kupowania sprzętu na próbę.</p>
       </div>
  
     </div>
