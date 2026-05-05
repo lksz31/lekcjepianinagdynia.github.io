@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief No. 1 – Starożytność | Historia Postrzegania Muzyki</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Sans:wght@300;400;500&display=swap');
+ 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  :root {
+    --blue: #1a3a7a;
+    --blue-mid: #1a5fa8;
+    --blue-light: #e8f0fb;
+    --ink: #1a1a22;
+    --ink-mid: #3d3d4a;
+    --ink-light: #7a7a8a;
+    --rule: #d0d4dc;
+    --bg: #faf9f6;
+    --paper: #ffffff;
+    --accent: #c8a84b;
+  }
+ 
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+ 
+  /* ── Header ── */
+  .site-header {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 2rem;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    gap: 1rem;
+  }
+  .header-left { display: flex; align-items: center; gap: 1rem; }
+  .logo-img {
+    width: 56px; height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .series-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 2px;
+  }
+  .series-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+  .header-right {
+    text-align: right;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.5;
+  }
+  .header-right a { color: var(--blue-mid); text-decoration: none; }
+  .header-right a:hover { text-decoration: underline; }
+ 
+  /* ── Hero / Title area ── */
+  .hero {
+    background: var(--paper);
+    border-bottom: 3px solid var(--blue);
+    padding: 3rem 2rem 2.5rem;
+  }
+  .hero-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .brief-number {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-mid);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .brief-number::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 2px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 1rem;
+  }
+  .hero-lead {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.15rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--ink-mid);
+    max-width: 620px;
+    line-height: 1.6;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--accent);
+  }
+ 
+  /* ── Main content ── */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+ 
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  @media (max-width: 640px) {
+    .columns { grid-template-columns: 1fr; }
+  }
+ 
+  .columns p + p { margin-top: 1rem; }
+ 
+  p { margin-bottom: 1rem; text-align: justify; }
+  p:last-child { margin-bottom: 0; }
+ 
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+ 
+  /* ── Map / figure ── */
+  .figure {
+    margin: 0 0 1.5rem;
+    background: var(--blue-light);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+  .figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .figure figcaption {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    color: var(--ink-light);
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--rule);
+    text-align: center;
+    font-style: italic;
+  }
+ 
+  /* ── Pull quote ── */
+  .pullquote {
+    margin: 2rem 0;
+    padding: 1.5rem 1.75rem;
+    background: var(--blue-light);
+    border-left: 4px solid var(--blue);
+    border-radius: 0 8px 8px 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-style: italic;
+    color: var(--blue);
+    line-height: 1.55;
+  }
+ 
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+ 
+  /* ── Sources ── */
+  .sources {
+    background: var(--paper);
+    border-top: 1px solid var(--rule);
+    padding: 2rem;
+  }
+  .sources-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .sources-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    margin-bottom: 0.75rem;
+  }
+  .sources ol {
+    padding-left: 1.5rem;
+    font-size: 13px;
+    color: var(--ink-mid);
+    line-height: 1.6;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sources ol li + li { margin-top: 0.4rem; }
+  .sources a { color: var(--blue-mid); }
+ 
+  /* ── Footer ── */
+  .site-footer {
+    background: var(--blue);
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    padding: 1rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11.5px;
+    letter-spacing: 0.05em;
+  }
+  .site-footer a { color: rgba(255,255,255,0.7); text-decoration: none; }
+</style>
+</head>
+<body>
+ 
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <img class="logo-img"
+           src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCABQAFADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDjaKKK+qPLCiiigAoopDmkAtFFIaAFopAc0tABRSUjZobsAbqA3FLFBJPNHAi7pJWCKucZJOB+tamseFtY0GGObU7UQpI5RMSK2TjPY1j7T3rX1L5dLmWCCM0d+tIMu6xoCzMQAB1JPAFdbqXw21jTNKlv5Li1lMEfmSwRsdyL36jBxz+XFE60ItKTBQb1RTs/DSXmjQ3YuWjnuA5jVtmwkOEVeu7LHOMDHFVNV0C608S3KozWayFUkJGSucKxHYNjg9+KySWKh2ztX5Vz0Ge1bGmeIr+zRLeW4zAGG0vGJDBjjcoPBIUnAOQM1Pv3uncfumQPelrb8S6Wlm671vCyW11ITHsX90oxkKrHBY98gbewzisPNawmo"
+           alt="Lekcje Pianina">
+      <div>
+        <div class="series-label">Seria</div>
+        <div class="series-title">Historia Postrzegania Muzyki</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <strong>Łukasz Ganczarek</strong><br>
+      <a href="https://lekcjepianinagdynia.pl">lekcjepianinagdynia.pl</a>
+    </div>
+  </div>
+</header>
+ 
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="brief-number">Brief No. 1</div>
+    <h1>Starożytność – Dolina Mezopotamii i Egiptu</h1>
+    <p class="hero-lead">Postrzeganie muzyki w pierwszych cywilizacjach doliny Eufratu, Tygrysu i Nilu.</p>
+  </div>
+</div>
+ 
+<!-- CONTENT -->
+<main class="content">
+ 
+  <div class="columns">
+    <div>
+      <p>Choć pismo wynaleźli Sumerowie, muzykę przekazywali ustnie. Dzięki temu mogła ona w sposób naturalny i organiczny podlegać zmianom. <strong>Wierzono, że muzyka jest ściśle powiązana z kosmosem</strong> i odzwierciedla jego porządek. Podczas śpiewu często klaskano w dłonie, podkreślając rytm. Przeważały niewielkie zespoły wykonawcze; większe zespoły pojawiały się głównie podczas corocznych świąt.</p>
+ 
+      <p>U Sumerów muzyki uczono początkowo w szkołach przyświątynnych, a później również na dworach. W starożytności wykorzystywano ją przede wszystkim do celów liturgicznych — wykonywali ją głównie kapłani podczas obrzędów religijnych. W szkołach oprócz muzyki nauczano pisma klinowego, teologii, kosmologii, wiedzy o zaklęciach, o demonach a także zasady składania ofiar.</p>
+    </div>
+ 
+    <div>
+      <figure class="figure">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Mesopotamia_in_the_3rd_millennium_BC.svg/600px-Mesopotamia_in_the_3rd_millennium_BC.svg.png"
+             alt="Mapa Mezopotamii III–II tysiąclecie p.n.e."
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <div style="display:none; padding:2rem; text-align:center; color:#7a7a8a; font-family:'DM Sans',sans-serif; font-size:13px;">
+          [Mapa: Mezopotamia III–II tysiąclecie p.n.e.]
+        </div>
+        <figcaption>Źródło: K. Chariza i zespół, ZPE (CC BY 3.0).</figcaption>
+      </figure>
+    </div>
+  </div>
+ 
+  <div class="pullquote">
+    Muzyka była ściśle powiązana z kosmosem i odzwierciedlała jego porządek — grając, kapłani uczestniczyli w harmonii wszechświata.
+  </div>
+ 
+  <p>W kulturach <strong>Sumerów, Egiptu i Babilonii</strong> najważniejszą rolę odgrywała muzyka wokalna. Śpiew był podstawową formą ekspresji muzycznej, a instrumenty pełniły funkcję towarzyszącą. Używano zarówno instrumentów perkusyjnych — niektóre z nich były tak wielkie jak człowiek. Niekiedy zdarzało się, że grało na nich dwóch muzyków, a trzeci podtrzymywał instrument — jak i instrumentów melodycznych, takich jak aulosy, harfy, fletnie Pana, kitary czy lutnie.</p>
+ 
+</main>
+ 
+<!-- SOURCES -->
+<div class="sources">
+  <div class="sources-inner">
+    <div class="sources-label">Źródła</div>
+    <ol>
+      <li>Józef M. Chomiński, Krystyna Wilkowska-Chomińska, <em>Historia muzyki</em>, cz. 1 (Kraków: Polskie Wydawnictwo Muzyczne, 1989), s. 32–41.</li>
+      <li>Krystian Chariza i zespół, <em>Mezopotamia w III–II tysiącleciu p.n.e.</em>, online: <a href="https://zpe.gov.pl/a/cywilizacja-mezopotamii/DfWJbRHFi" target="_blank">zpe.gov.pl</a> [dostęp: 14.08.2016]</li>
+    </ol>
+  </div>
+</div>
+ 
+<!-- FOOTER -->
+<footer class="site-footer">
+  © 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone. &nbsp;|&nbsp;
+  <a href="https://lekcjepianinagdynia.pl">lekcjepianinagdynia.pl</a>
+</footer>
+ 
+</body>
+</html>
+ 
