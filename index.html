@@ -570,6 +570,37 @@
   .modal-submit { background: var(--gold); color: white; border: none; padding: 14px; border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Poppins', sans-serif; width: 100%; font-size: 0.9rem; }
   @media(max-width:600px) { .footer-modal { grid-template-columns: 1fr; } }
  
+ 
+  /* PDF MODAL */
+  .pdf-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,20,60,0.85);
+    backdrop-filter: blur(6px);
+    z-index: 3000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .pdf-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .pdf-modal {
+    background: white; border-radius: 24px;
+    width: 90%; max-width: 860px; height: 88vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    transform: translateY(20px); transition: transform 0.3s;
+  }
+  .pdf-modal-overlay.open .pdf-modal { transform: translateY(0); }
+  .pdf-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px; border-bottom: 1px solid #e8eaee;
+    font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--navy);
+  }
+  .pdf-modal-close {
+    background: none; border: none; font-size: 1.4rem;
+    color: #94a3b8; cursor: pointer; transition: color 0.2s;
+  }
+  .pdf-modal-close:hover { color: var(--navy); }
+  .pdf-modal iframe { flex: 1; border: none; width: 100%; }
+ 
   /* ANIMATIONS */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
@@ -640,8 +671,8 @@
     </div>
     <div class="card">
       <h3>Opinie</h3>
-      <a href="#" target="_blank" class="opinion-btn">📄 Opinia prof. J. Ratza</a>
-      <a href="#" target="_blank" class="opinion-btn">📄 Opinia prof. T. Miczki</a>
+      <button onclick="openPDF('https://lekcjepianinagdynia.pl/opinia%20Ratz.pdf', 'Opinia prof. J. Ratza')" class="opinion-btn">📄 Opinia prof. J. Ratza</button>
+      <button onclick="openPDF('https://lekcjepianinagdynia.pl/opinia%20Miczka.pdf', 'Opinia prof. T. Miczki')" class="opinion-btn">📄 Opinia prof. T. Miczki</button>
     </div>
     <div class="card" style="background: var(--gold); border: none; box-shadow: 0 10px 30px rgba(212,175,55,0.3);">
       <h3 style="color: white; font-family: 'Playfair Display', serif;">Edukacja</h3>
@@ -997,6 +1028,32 @@ function updatePrice(){document.getElementById('price-val').innerText=(!isStudio
 function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9);}
 function wyslij(){if(!document.getElementById('subBtn').classList.contains('active'))return;const s=document.getElementById('res-status');s.innerText="Wysyłanie...";s.style.color="var(--navy)";setTimeout(()=>{s.innerText="Dziękujemy! Skontaktujemy się wkrótce.";s.style.color="#22c55e";setTimeout(()=>{toggleForm(false);s.innerText="";document.getElementById('res-name').value="";document.getElementById('res-phone').value="";document.getElementById('res-msg').value="";},2500);},1500);}
 </script>
+ 
+<!-- PDF MODAL -->
+<div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePDF()">
+  <div class="pdf-modal">
+    <div class="pdf-modal-header">
+      <span id="pdf-title">Opinia</span>
+      <button class="pdf-modal-close" onclick="closePDF()">✕</button>
+    </div>
+    <iframe id="pdf-frame" src="" title="Opinia"></iframe>
+  </div>
+</div>
+ 
+<script>
+function openPDF(url, title) {
+  document.getElementById('pdf-title').innerText = title;
+  document.getElementById('pdf-frame').src = url;
+  document.getElementById('pdfModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePDF() {
+  document.getElementById('pdfModal').classList.remove('open');
+  document.getElementById('pdf-frame').src = '';
+  document.body.style.overflow = '';
+}
+</script>
+ 
 </body>
 </html>
  
