@@ -1164,6 +1164,52 @@
 <script>
 const WEBHOOK_URL = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
  
+// Rate limiting — max 3 zapytania na minutę, timeout 5 minut
+const RATE_LIMIT = 3;
+const RATE_WINDOW = 60 * 1000;      // 1 minuta
+const TIMEOUT_DURATION = 5 * 60 * 1000; // 5 minut
+ 
+function getRateData() {
+  const raw = sessionStorage.getItem('brief_rate');
+  return raw ? JSON.parse(raw) : { count: 0, windowStart: Date.now(), blockedUntil: null };
+}
+ 
+function saveRateData(data) {
+  sessionStorage.setItem('brief_rate', JSON.stringify(data));
+}
+ 
+function checkRateLimit() {
+  const now = Date.now();
+  const data = getRateData();
+ 
+  // Sprawdź czy jest aktywny timeout
+  if (data.blockedUntil && now < data.blockedUntil) {
+    const remaining = Math.ceil((data.blockedUntil - now) / 1000);
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    return { allowed: false, message: `Zbyt wiele prób. Spróbuj ponownie za ${minutes}:${seconds.toString().padStart(2,'0')}.` };
+  }
+ 
+  // Reset okna jeśli minęła minuta
+  if (now - data.windowStart > RATE_WINDOW) {
+    data.count = 0;
+    data.windowStart = now;
+    data.blockedUntil = null;
+  }
+ 
+  // Sprawdź limit
+  if (data.count >= RATE_LIMIT) {
+    data.blockedUntil = now + TIMEOUT_DURATION;
+    saveRateData(data);
+    return { allowed: false, message: 'Zbyt wiele prób. Dostęp zablokowany na 5 minut.' };
+  }
+ 
+  // Zwiększ licznik
+  data.count++;
+  saveRateData(data);
+  return { allowed: true };
+}
+ 
 async function sprawdzKod() {
   const input = document.getElementById('brief-code-input');
   const result = document.getElementById('brief-result');
@@ -1173,6 +1219,14 @@ async function sprawdzKod() {
   if (kod.length < 7) {
     result.style.display = 'block';
     result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">Nieprawidłowy kod.</div>';
+    return;
+  }
+ 
+  // Sprawdź rate limit
+  const rate = checkRateLimit();
+  if (!rate.allowed) {
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#9203; ' + rate.message + '</div>';
     return;
   }
  
