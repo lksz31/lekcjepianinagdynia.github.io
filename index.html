@@ -660,8 +660,8 @@
       </div>
     </div>
     <div class="card">
-      <a href="https://youtube.com" target="_blank" class="video-link">
-        <img src="https://i.imgur.com/lkRJTJq.png" alt="Obejrzyj film">
+      <a href="https://www.youtube.com/watch?v=nvP6gnRWJ8c" target="_blank" class="video-link">
+        <img src="https://img.youtube.com/vi/nvP6gnRWJ8c/hqdefault.jpg" alt="Obejrzyj film">
       </a>
       <h3>Media</h3>
       <ul class="links-list">
@@ -995,7 +995,8 @@ window.addEventListener('load',()=>{ resetSlider(); setTimeout(()=>sliderContain
 window.onresize = resetSlider;
 document.getElementById('next').onclick = ()=>slider.scrollBy({left:step,behavior:'smooth'});
 document.getElementById('prev').onclick = ()=>slider.scrollBy({left:-step,behavior:'smooth'});
-new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7}).observe.apply(null,[...document.querySelectorAll('.tile')].map(t=>(new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7}).observe(t),t)));
+const tileObs = new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7});
+document.querySelectorAll('.tile').forEach(t=>tileObs.observe(t));
  
 // ===================== PIANINO =====================
 const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
