@@ -6,7 +6,7 @@
 <title>Łukasz Ganczarek – Lekcje Pianina Gdynia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
  
 <style>
   :root {
@@ -20,450 +20,254 @@
   * { box-sizing: border-box; }
  
   body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     background: #ffffff;
     font-family: 'Poppins', sans-serif;
     color: var(--text);
     overflow-x: hidden;
   }
  
-  /* ===================== HERO ===================== */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 60px 20px;
-    position: relative;
-    background: white;
-  }
- 
-  .hero-badge {
-    background: var(--gold);
-    color: white;
-    padding: 6px 20px;
+  /* NAV */
+  .site-nav {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
     border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 20px;
-    display: inline-block;
-    opacity: 0;
-    animation: fadeUp 0.8s ease forwards 0.2s;
+    padding: 10px 30px;
+    display: flex; gap: 25px;
+    z-index: 1000;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    font-size: 0.85rem; font-weight: 600;
   }
+  .site-nav a { color: var(--navy); text-decoration: none; transition: 0.3s; }
+  .site-nav a:hover { color: var(--gold); }
+  .site-nav a.nav-highlight {
+    background: var(--navy); color: white;
+    padding: 4px 16px; border-radius: 50px;
+    font-size: 0.8rem;
+  }
+  .site-nav a.nav-highlight:hover { background: var(--gold); color: white; }
+  @media (max-width: 600px) { .site-nav { display: none; } }
  
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 60px 20px;
+    position: relative; background: white;
+  }
+  .hero-badge {
+    background: var(--gold); color: white;
+    padding: 6px 20px; border-radius: 50px;
+    font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 20px; display: inline-block;
+    opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s;
+  }
   .hero h1 {
     font-family: 'Playfair Display', serif;
     font-size: clamp(2.5rem, 6vw, 5rem);
-    color: var(--navy);
-    margin: 0 0 20px 0;
-    line-height: 1.1;
-    opacity: 0;
+    color: var(--navy); margin: 0 0 20px 0;
+    line-height: 1.1; opacity: 0;
     animation: fadeUp 0.8s ease forwards 0.4s;
   }
- 
-  .hero h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
- 
+  .hero h1 em { font-style: italic; color: var(--gold); }
   .hero-sub {
-    font-size: 1.05rem;
-    color: #64748b;
-    max-width: 520px;
-    line-height: 1.7;
-    margin: 0 auto 40px;
-    opacity: 0;
+    font-size: 1.05rem; color: #64748b;
+    max-width: 520px; line-height: 1.7;
+    margin: 0 auto 40px; opacity: 0;
     animation: fadeUp 0.8s ease forwards 0.6s;
   }
- 
   .hero-btns {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-    opacity: 0;
+    display: flex; gap: 15px; flex-wrap: wrap;
+    justify-content: center; opacity: 0;
     animation: fadeUp 0.8s ease forwards 0.8s;
   }
- 
   .btn-primary {
-    background: var(--navy);
-    color: white;
-    padding: 15px 35px;
-    border-radius: 50px;
-    font-weight: 700;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: 0.3s;
-    display: inline-block;
+    background: var(--navy); color: white;
+    padding: 15px 35px; border-radius: 50px;
+    font-weight: 700; text-decoration: none;
+    font-size: 0.9rem; transition: 0.3s; display: inline-block;
   }
   .btn-primary:hover { background: var(--gold); transform: translateY(-2px); }
- 
   .btn-outline {
-    background: transparent;
-    color: var(--navy);
-    padding: 15px 35px;
-    border-radius: 50px;
-    font-weight: 700;
-    text-decoration: none;
-    font-size: 0.9rem;
-    border: 2px solid var(--navy);
-    transition: 0.3s;
-    display: inline-block;
+    background: transparent; color: var(--navy);
+    padding: 15px 35px; border-radius: 50px;
+    font-weight: 700; text-decoration: none;
+    font-size: 0.9rem; border: 2px solid var(--navy);
+    transition: 0.3s; display: inline-block;
   }
   .btn-outline:hover { background: var(--navy); color: white; transform: translateY(-2px); }
- 
   .scroll-hint {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #94a3b8;
-    font-size: 0.8rem;
-    animation: bounce 2s infinite;
-    opacity: 0;
+    position: absolute; bottom: 30px; left: 50%;
+    transform: translateX(-50%); color: #94a3b8;
+    font-size: 0.8rem; opacity: 0;
     animation: bounce 2s infinite 1.5s, fadeUp 0.8s ease forwards 1.2s;
   }
  
-  /* ===================== SECTION WRAPPER ===================== */
-  .section {
-    padding: 80px 5%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
- 
+  /* SECTIONS */
+  .section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
   .section-label {
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--gold);
-    margin-bottom: 10px;
+    font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--gold); margin-bottom: 10px;
   }
- 
   .section-title {
     font-family: 'Playfair Display', serif;
     font-size: clamp(1.8rem, 4vw, 2.8rem);
-    color: var(--navy);
-    margin: 0 0 40px 0;
+    color: var(--navy); margin: 0 0 40px 0;
   }
  
-  /* ===================== BENTO GRID ===================== */
-  .bento-container {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 25px;
-  }
- 
+  /* BENTO */
+  .bento-container { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; }
   .flip-card {
-    background-color: transparent;
-    perspective: 1000px;
-    min-height: 350px;
-    opacity: 0;
-    transform: translateY(40px);
+    background-color: transparent; perspective: 1000px;
+    min-height: 350px; opacity: 0; transform: translateY(40px);
     transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
- 
   .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    position: relative; width: 100%; height: 100%;
     transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
   }
- 
   .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
- 
   .card-front, .card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 40px;
-    box-sizing: border-box;
-    border: 1px solid var(--border);
-    box-shadow: 0 0 25px rgba(0,0,0,0.08);
+    position: absolute; width: 100%; height: 100%;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+    border-radius: 40px; box-sizing: border-box;
+    border: 1px solid var(--border); box-shadow: 0 0 25px rgba(0,0,0,0.08);
   }
- 
   .card-front {
-    background: white;
-    z-index: 2;
-    padding: 35px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    background: white; z-index: 2; padding: 35px;
+    display: flex; flex-direction: column; justify-content: center;
   }
- 
   .card-back {
-    background: #f8fafc;
-    transform: rotateY(180deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    background: #f8fafc; transform: rotateY(180deg);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
   }
- 
-  .card-back img {
-    width: 85%;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  }
- 
+  .card-back img { width: 85%; height: auto; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
   .card {
-    background: white;
-    border-radius: 40px;
-    padding: 35px;
-    border: 1px solid var(--border);
-    box-shadow: 0 0 25px rgba(0,0,0,0.08);
-    opacity: 0;
-    transform: translateY(40px);
+    background: white; border-radius: 40px; padding: 35px;
+    border: 1px solid var(--border); box-shadow: 0 0 25px rgba(0,0,0,0.08);
+    opacity: 0; transform: translateY(40px);
     transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
- 
   .bento-container.active .card,
   .bento-container.active .flip-card { opacity: 1; transform: translateY(0); }
   .bento-container.active .card:nth-child(2) { transition-delay: 0.1s; }
   .bento-container.active .card:nth-child(3) { transition-delay: 0.2s; }
   .bento-container.active .card:nth-child(4) { transition-delay: 0.3s; }
- 
   .tags-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
- 
   .tag-wrapper { position: relative; display: inline-block; }
- 
   .tag {
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 8px 18px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-    transition: 0.3s;
-    cursor: help;
+    border: 1px solid var(--gold); color: var(--gold);
+    padding: 8px 18px; border-radius: 50px;
+    font-size: 0.75rem; font-weight: 600;
+    display: inline-block; transition: 0.3s; cursor: help;
   }
- 
   .tag-note {
-    visibility: hidden;
-    width: 250px;
-    background: var(--navy);
-    color: white;
-    text-align: left;
-    border-radius: 15px;
-    padding: 15px;
-    position: absolute;
-    z-index: 100;
-    bottom: 140%;
-    left: 50%;
-    transform: translateX(-50%);
+    visibility: hidden; width: 250px; background: var(--navy);
+    color: white; text-align: left; border-radius: 15px;
+    padding: 15px; position: absolute; z-index: 100;
+    bottom: 140%; left: 50%; transform: translateX(-50%);
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    font-size: 0.75rem;
-    line-height: 1.4;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
+    font-size: 0.75rem; line-height: 1.4; opacity: 0;
+    transition: opacity 0.3s, transform 0.3s; pointer-events: none;
   }
- 
   .tag-note::after {
-    content: "";
-    position: absolute;
-    top: 100%; left: 50%;
-    margin-left: -8px;
-    border-width: 8px;
-    border-style: solid;
+    content: ""; position: absolute; top: 100%; left: 50%;
+    margin-left: -8px; border-width: 8px; border-style: solid;
     border-color: var(--navy) transparent transparent transparent;
   }
- 
   .tag-wrapper:hover .tag-note { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(-10px); }
   .tag-wrapper:hover .tag { background: white; color: var(--navy); border-color: white; }
- 
   .video-link {
-    display: block;
-    width: 100%;
-    max-width: 320px;
-    margin: 0 auto 20px;
-    aspect-ratio: 16/9;
-    border-radius: 20px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--border);
+    display: block; width: 100%; max-width: 320px;
+    margin: 0 auto 20px; aspect-ratio: 16/9;
+    border-radius: 20px; overflow: hidden;
+    position: relative; border: 1px solid var(--border);
   }
- 
   .video-link img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
   .video-link:hover img { transform: scale(1.05); }
- 
   .badge {
-    background: var(--gold);
-    color: white;
-    padding: 6px 16px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    display: inline-block;
-    margin-bottom: 15px;
+    background: var(--gold); color: white; padding: 6px 16px;
+    border-radius: 50px; font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; display: inline-block; margin-bottom: 15px;
   }
- 
   .bento-container h2, .bento-container h3 {
-    font-family: 'Playfair Display', serif;
-    color: var(--navy);
-    margin: 0 0 15px 0;
-    font-size: 1.8rem;
+    font-family: 'Playfair Display', serif; color: var(--navy);
+    margin: 0 0 15px 0; font-size: 1.8rem;
   }
- 
   .bio-text { font-size: 0.95rem; line-height: 1.6; color: #475569; }
   .highlight { color: var(--navy); font-weight: 600; }
- 
   .links-list { list-style: none; padding: 0; margin-top: 15px; }
   .links-list li { margin-bottom: 10px; font-size: 0.85rem; color: #64748b; }
   .links-list a { color: var(--navy); text-decoration: none; font-weight: 600; transition: 0.3s; }
   .links-list a:hover { color: var(--gold); }
- 
   .opinion-btn {
-    display: block;
-    background: #f8fafc;
-    padding: 12px 18px;
-    border-radius: 15px;
-    margin-bottom: 10px;
-    text-decoration: none;
-    color: #475569;
-    font-size: 0.85rem;
-    border: 1px solid var(--border);
-    transition: 0.3s;
-    text-align: center;
+    display: block; background: #f8fafc; padding: 12px 18px;
+    border-radius: 15px; margin-bottom: 10px; text-decoration: none;
+    color: #475569; font-size: 0.85rem; border: 1px solid var(--border);
+    transition: 0.3s; text-align: center;
   }
   .opinion-btn:hover { background: white; border-color: var(--gold); color: var(--navy); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
  
-  /* ===================== SLIDER ===================== */
-  .slider-section {
-    padding: 80px 0;
-    background: white;
-  }
- 
-  .slider-section .section-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 5%;
-  }
- 
+  /* SLIDER */
+  .slider-section { padding: 80px 0; background: white; }
+  .slider-section .section-inner { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
   .slider-container {
-    width: 100%;
-    max-width: 1240px;
-    margin: 0 auto;
-    position: relative;
-    opacity: 0;
-    transition: opacity 1.5s ease-in-out;
+    width: 100%; max-width: 1240px; margin: 0 auto;
+    position: relative; opacity: 0; transition: opacity 1.5s ease-in-out;
     -webkit-mask-image: linear-gradient(to right, transparent, black 18%, black 82%, transparent);
     mask-image: linear-gradient(to right, transparent, black 18%, black 82%, transparent);
   }
- 
   .slider-container.revealed { opacity: 1; }
- 
   .tiles-wrapper {
-    display: flex;
-    align-items: stretch;
-    gap: 28px;
-    padding: 60px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
+    display: flex; align-items: stretch; gap: 28px; padding: 60px 0;
+    overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth;
   }
- 
   .tiles-wrapper::-webkit-scrollbar { display: none; }
- 
   .tile {
-    flex: 0 0 340px;
-    background: white;
-    padding: 40px 36px;
-    border-radius: 32px;
-    box-sizing: border-box;
-    box-shadow: 0 0 25px rgba(0,0,0,0.06);
-    border: 1px solid #f0f0f0;
-    height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
+    flex: 0 0 340px; background: white; padding: 40px 36px;
+    border-radius: 32px; box-sizing: border-box;
+    box-shadow: 0 0 25px rgba(0,0,0,0.06); border: 1px solid #f0f0f0;
+    height: 200px; display: flex; flex-direction: column;
+    justify-content: center; text-align: center;
     transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s, filter 1s, box-shadow 1s;
-    opacity: 0.15;
-    transform: scale(0.92);
-    filter: blur(4px);
+    opacity: 0.15; transform: scale(0.92); filter: blur(4px);
   }
- 
   .tile.is-visible {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0px);
-    box-shadow: 0 20px 50px rgba(30,58,138,0.1);
-    border-color: #e5e7eb;
+    opacity: 1; transform: scale(1); filter: blur(0px);
+    box-shadow: 0 20px 50px rgba(30,58,138,0.1); border-color: #e5e7eb;
   }
- 
   .tile h3 { font-family: 'Playfair Display', serif; color: var(--navy); font-size: 1.4rem; margin: 0 0 10px 0; }
   .tile p { color: #64748b; font-size: 0.88rem; line-height: 1.6; margin: 0; }
   .tile .highlight { color: var(--gold); font-weight: 600; }
- 
   .nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 52px;
-    height: 52px;
-    background: white;
-    border: 1px solid #f0f0f0;
-    border-radius: 50%;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 52px; height: 52px; background: white;
+    border: 1px solid #f0f0f0; border-radius: 50%;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    cursor: pointer;
-    z-index: 10;
-    font-size: 1.1rem;
-    color: var(--navy);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
+    cursor: pointer; z-index: 10; font-size: 1.1rem; color: var(--navy);
+    display: flex; align-items: center; justify-content: center; transition: 0.3s;
   }
- 
   .nav-btn:hover { background: var(--navy); color: white; }
-  /* 3 kafelki × 340px + 2 przerwy × 28px = 1108px, połowa = 554px od środka */
   .prev-btn { left: calc(50% - 554px - 36px); }
   .next-btn { right: calc(50% - 554px - 36px); }
  
-  /* ===================== POMOCE DYDAKTYCZNE ===================== */
-  .pomoce-section {
-    padding: 80px 5%;
-    background: #f8fafc;
-  }
- 
-  .pomoce-section .section-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
- 
-  .pomoce-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 40px;
-  }
- 
+  /* POMOCE */
+  .pomoce-section { padding: 80px 5%; background: #f8fafc; }
+  .pomoce-section .section-inner { max-width: 1100px; margin: 0 auto; }
+  .pomoce-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
   .pomoce-card {
-    background: white;
-    border-radius: 28px;
-    padding: 30px 28px;
-    border: 1px solid var(--border);
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    opacity: 0;
-    transform: translateY(30px);
+    background: white; border-radius: 28px; padding: 30px 28px;
+    border: 1px solid var(--border); box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; gap: 10px;
+    opacity: 0; transform: translateY(30px);
     transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
- 
   .pomoce-grid.active .pomoce-card:nth-child(1) { transition-delay: 0s; }
   .pomoce-grid.active .pomoce-card:nth-child(2) { transition-delay: 0.1s; }
   .pomoce-grid.active .pomoce-card:nth-child(3) { transition-delay: 0.2s; }
@@ -471,434 +275,311 @@
   .pomoce-grid.active .pomoce-card:nth-child(5) { transition-delay: 0.4s; }
   .pomoce-grid.active .pomoce-card:nth-child(6) { transition-delay: 0.5s; }
   .pomoce-grid.active .pomoce-card { opacity: 1; transform: translateY(0); }
- 
-  .pomoce-card:hover {
-    box-shadow: 0 12px 40px rgba(30,58,138,0.1);
-    border-color: #e5e7eb;
-    transform: translateY(-4px) !important;
-  }
- 
-  .pomoce-icon {
-    font-size: 1.8rem;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
- 
-  .pomoce-card h4 {
-    font-family: 'Playfair Display', serif;
-    color: var(--navy);
-    font-size: 1.05rem;
-    margin: 0;
-  }
- 
-  .pomoce-card p {
-    color: #64748b;
-    font-size: 0.85rem;
-    line-height: 1.6;
-    margin: 0;
-  }
- 
+  .pomoce-card:hover { box-shadow: 0 12px 40px rgba(30,58,138,0.1); border-color: #e5e7eb; transform: translateY(-4px) !important; }
+  .pomoce-icon { font-size: 1.8rem; line-height: 1; margin-bottom: 4px; }
+  .pomoce-card h4 { font-family: 'Playfair Display', serif; color: var(--navy); font-size: 1.05rem; margin: 0; }
+  .pomoce-card p { color: #64748b; font-size: 0.85rem; line-height: 1.6; margin: 0; }
   .pomoce-card .tag-pill {
-    display: inline-block;
-    background: #f0f7ff;
-    color: var(--navy);
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 50px;
-    border: 1px solid #dbeafe;
-    width: fit-content;
+    display: inline-block; background: #f0f7ff; color: var(--navy);
+    font-size: 0.72rem; font-weight: 700; padding: 4px 12px;
+    border-radius: 50px; border: 1px solid #dbeafe; width: fit-content;
   }
+  @media (max-width: 850px) { .pomoce-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 550px) { .pomoce-grid { grid-template-columns: 1fr; } }
  
-  @media (max-width: 850px) {
-    .pomoce-grid { grid-template-columns: 1fr 1fr; }
-  }
- 
-  @media (max-width: 550px) {
-    .pomoce-grid { grid-template-columns: 1fr; }
-  }
- 
-  /* ===================== PIANINO ===================== */
-  .piano-section {
-    background: #f8fafc;
-    padding: 80px 5%;
-  }
- 
-  .piano-section .section-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-  }
- 
+  /* PIANINO */
+  .piano-section { background: #f8fafc; padding: 80px 5%; }
+  .piano-section .section-inner { max-width: 1000px; margin: 0 auto; }
   .controls-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    padding: 15px 25px;
-    border-radius: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    margin-bottom: 30px;
-    border: 1px solid #f0f0f0;
+    display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+    justify-content: center; background: white; padding: 15px 25px;
+    border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin-bottom: 30px; border: 1px solid #f0f0f0;
   }
- 
   .p-btn {
-    padding: 8px 18px;
-    border-radius: 50px;
-    border: 2px solid var(--navy);
-    background: white;
-    color: var(--navy);
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s;
-    font-size: 0.85rem;
-    font-family: 'Poppins', sans-serif;
+    padding: 8px 18px; border-radius: 50px; border: 2px solid var(--navy);
+    background: white; color: var(--navy); font-weight: 700;
+    cursor: pointer; transition: 0.2s; font-size: 0.85rem; font-family: 'Poppins', sans-serif;
   }
- 
   .p-btn.active { background: var(--navy); color: white; }
   .p-btn.song-btn.active { background: var(--blue); border-color: var(--blue); color: white; }
- 
-  .volume-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--navy);
-    font-weight: 700;
-    font-size: 0.85rem;
-  }
- 
+  .volume-container { display: flex; align-items: center; gap: 10px; color: var(--navy); font-weight: 700; font-size: 0.85rem; }
   input[type=range] { cursor: pointer; accent-color: var(--navy); }
- 
-  .piano-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    overflow-x: auto;
-    padding: 20px 0;
-    scrollbar-width: none;
-  }
- 
+  .piano-container { width: 100%; display: flex; justify-content: center; overflow-x: auto; padding: 20px 0; scrollbar-width: none; }
   .piano { display: flex; position: relative; }
- 
-  .piano-key {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    cursor: pointer;
-    border: 1px solid #333;
-    box-sizing: border-box;
-    padding-bottom: 15px;
-    transition: 0.1s;
-  }
- 
+  .piano-key { display: flex; align-items: flex-end; justify-content: center; cursor: pointer; border: 1px solid #333; box-sizing: border-box; padding-bottom: 15px; transition: 0.1s; }
   .piano-key span { font-size: 11px; font-weight: 800; pointer-events: none; }
- 
   body.piano-mode .piano-key.white { width: 50px; height: 210px; background: white; border-radius: 0 0 5px 5px; }
   body.piano-mode .piano-key.white span { color: #94a3b8; }
   body.piano-mode .piano-key.black { width: 32px; height: 125px; background: #111; margin: 0 -16px; z-index: 2; border-radius: 0 0 3px 3px; }
   body.piano-mode .piano-key.black span { color: white; }
- 
   body.harpsi-mode .piano-key.white { width: 42px; height: 190px; background: #1a1a1a; }
   body.harpsi-mode .piano-key.white span { color: #555; }
   body.harpsi-mode .piano-key.black { width: 28px; height: 105px; background: var(--gold); margin: 0 -14px; z-index: 2; }
   body.harpsi-mode .piano-key.black span { color: black; }
- 
   .piano-key.next-note { background: var(--blue) !important; box-shadow: inset 0 0 15px rgba(255,255,255,0.6); transform: translateY(-8px); }
   .piano-key.next-note span { color: white !important; }
   .piano-key:active, .piano-key.playing { transform: translateY(5px); filter: brightness(1.2); }
- 
   #piano-status { font-weight: 700; color: #94a3b8; margin-top: 10px; font-size: 0.9rem; text-align: center; }
  
-  /* ===================== TERMINY ===================== */
-  .terminy-section {
-    padding: 80px 5%;
-    background: white;
-  }
- 
-  .terminy-section .section-inner {
-    max-width: 900px;
-    margin: 0 auto;
-  }
- 
+  /* TERMINY */
+  .terminy-section { padding: 80px 5%; background: white; }
+  .terminy-section .section-inner { max-width: 900px; margin: 0 auto; }
   .apple-card {
-    background: var(--navy);
-    border-radius: 50px;
-    padding: 50px 30px;
-    position: relative;
-    overflow: hidden;
+    background: var(--navy); border-radius: 50px; padding: 50px 30px;
+    position: relative; overflow: hidden;
     box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 1s ease-out;
+    opacity: 0; transform: translateY(30px); transition: all 1s ease-out;
   }
- 
   .apple-card.active { opacity: 1; transform: translateY(0); }
- 
-  .apple-card-title {
-    font-family: 'Playfair Display', serif;
-    text-align: center;
-    font-size: 2.3rem;
-    color: var(--gold);
-    margin-bottom: 35px;
-  }
- 
+  .apple-card-title { font-family: 'Playfair Display', serif; text-align: center; font-size: 2.3rem; color: var(--gold); margin-bottom: 35px; }
   @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); }
     70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); }
     100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
   }
- 
   .btn-open-form {
-    display: block;
-    width: fit-content;
-    margin: 25px auto 0;
-    background: var(--gold);
-    color: var(--navy);
-    padding: 15px 45px;
-    border-radius: 50px;
-    font-weight: 800;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    animation: pulse 2s infinite;
-    transition: transform 0.3s;
+    display: block; width: fit-content; margin: 25px auto 0;
+    background: var(--gold); color: var(--navy); padding: 15px 45px;
+    border-radius: 50px; font-weight: 800; border: none; cursor: pointer;
+    text-decoration: none; font-family: 'Poppins', sans-serif; font-size: 0.9rem;
+    animation: pulse 2s infinite; transition: transform 0.3s;
   }
- 
   .btn-open-form:hover { transform: scale(1.05); }
- 
   .form-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: white;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    box-sizing: border-box;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: white; z-index: 100;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px; box-sizing: border-box;
     clip-path: circle(0% at 50% 90%);
     transition: clip-path 0.8s cubic-bezier(0.7, 0, 0.3, 1);
   }
- 
   .form-overlay.open { clip-path: circle(150% at 50% 90%); }
- 
-  .close-btn {
-    position: absolute; top: 20px; right: 30px;
-    font-size: 1.5rem; color: var(--navy); cursor: pointer; font-weight: bold;
-    background: none; border: none; font-family: 'Poppins', sans-serif;
-  }
- 
+  .close-btn { position: absolute; top: 20px; right: 30px; font-size: 1.5rem; color: var(--navy); cursor: pointer; font-weight: bold; background: none; border: none; font-family: 'Poppins', sans-serif; }
   .form-content { width: 100%; max-width: 550px; text-align: center; color: var(--navy); }
- 
   .price-tag { background: #f9fbfe; border: 2px dashed var(--gold); border-radius: 15px; padding: 10px; margin-bottom: 15px; }
- 
   .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
- 
-  .form-tile {
-    background: #fff; border: 1px solid #eee; border-radius: 20px; padding: 12px;
-    text-align: left; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
-  }
+  .form-tile { background: #fff; border: 1px solid #eee; border-radius: 20px; padding: 12px; text-align: left; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
   .form-tile.selected { border-color: var(--blue); background: #f0f7ff; }
- 
   #piano-options { display: none; margin-top: -5px; margin-bottom: 15px; animation: fadeIn 0.4s; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
- 
   .contact-box { background: var(--navy); border-radius: 25px; padding: 20px; }
   .contact-box input, .contact-box textarea {
     width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 12px;
     border: 1px solid #ddd; font-family: 'Poppins', sans-serif; box-sizing: border-box; font-size: 0.85rem;
   }
   .contact-box textarea { height: 60px; resize: none; }
- 
-  .btn-submit {
-    width: 100%; background: #ccc; color: #666; border: none; padding: 12px;
-    border-radius: 50px; font-weight: 800; cursor: not-allowed; transition: 0.3s;
-    font-family: 'Poppins', sans-serif; font-size: 0.9rem;
-  }
+  .btn-submit { width: 100%; background: #ccc; color: #666; border: none; padding: 12px; border-radius: 50px; font-weight: 800; cursor: not-allowed; transition: 0.3s; font-family: 'Poppins', sans-serif; font-size: 0.9rem; }
   .btn-submit.active { background: var(--gold); color: white; cursor: pointer; }
- 
   .info-card { background: rgba(255,255,255,0.05); border-radius: 35px; padding: 20px; }
   .info-card iframe { width: 100%; height: 400px; border-radius: 20px; border: none; filter: invert(92%) hue-rotate(190deg); }
  
-  /* ===================== STOPKA ===================== */
-  .footer-section {
-    padding: 60px 5%;
-    background: white;
-  }
- 
-  .bento-footer {
-    background: #000;
-    color: white;
-    border-radius: 40px;
-    padding: 50px 40px;
-    max-width: 1100px;
-    margin: 0 auto;
+  /* ===================== BRIEFY — NOWY STYL ===================== */
+  .briefy-section {
+    padding: 100px 5%;
+    background: var(--navy);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
   }
- 
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr 1fr 1fr;
-    gap: 30px;
+  .briefy-section::before {
+    content: '♪';
+    position: absolute;
+    font-size: 20rem;
+    color: rgba(255,255,255,0.03);
+    top: -40px; right: -40px;
+    font-family: serif;
+    pointer-events: none;
   }
- 
-  .branding {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  .briefy-inner {
+    max-width: 580px;
+    margin: 0 auto;
     text-align: center;
+    position: relative;
+    z-index: 1;
   }
- 
-  .logo-box img { width: 140px; border-radius: 20px; margin-bottom: 20px; }
- 
-  .footer-grid h4 {
+  .briefy-label {
+    font-size: 0.72rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--gold); margin-bottom: 12px;
+  }
+  .briefy-title {
     font-family: 'Playfair Display', serif;
-    color: var(--gold);
-    font-size: 1.2rem;
-    margin: 0 0 20px 0;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: white; margin: 0 0 12px; line-height: 1.2;
   }
- 
-  .cta-button {
-    display: inline-block;
-    background: var(--gold);
-    color: #000;
-    font-weight: 700;
-    padding: 15px 25px;
+  .briefy-subtitle {
+    font-size: 0.95rem; color: rgba(255,255,255,0.55);
+    margin: 0 0 40px; line-height: 1.7;
+    font-weight: 300;
+  }
+  .briefy-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 24px;
+    padding: 32px;
+    backdrop-filter: blur(10px);
+  }
+  .briefy-input-row {
+    display: flex; gap: 10px; margin-bottom: 16px;
+  }
+  .briefy-input {
+    flex: 1; padding: 14px 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.15);
     border-radius: 50px;
-    text-decoration: none;
-    width: 100%;
-    max-width: 240px;
-    border: none;
-    cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    animation: pulse 2s infinite;
-    transition: all 0.3s;
+    font-size: 0.95rem; color: white;
+    outline: none; transition: border-color 0.2s;
+    letter-spacing: 0.03em;
   }
- 
-  .nav-links-footer { list-style: none; padding: 0; margin: 0; }
-  .nav-links-footer li { margin-bottom: 12px; }
-  .nav-links-footer span, .nav-links-footer a {
-    color: #888; text-decoration: none; font-size: 0.9rem; transition: 0.3s; cursor: pointer;
+  .briefy-input::placeholder { color: rgba(255,255,255,0.35); }
+  .briefy-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.12); }
+  .briefy-btn {
+    padding: 14px 28px;
+    background: var(--gold); color: #1a1a2e;
+    border: none; border-radius: 50px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: 0.3s; white-space: nowrap;
   }
-  .nav-links-footer span:hover, .nav-links-footer a:hover { color: white; }
- 
-  .footer-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: white; z-index: 100;
+  .briefy-btn:hover { background: white; transform: translateY(-1px); }
+  #brief-result { display: none; }
+  .brief-card-link {
+    display: flex; align-items: center; gap: 14px;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: 16px; padding: 16px 20px;
+    text-decoration: none; text-align: left;
+    transition: all 0.2s; margin-bottom: 10px;
+  }
+  .brief-card-link:hover { background: rgba(255,255,255,0.14); border-color: var(--gold); }
+  .brief-card-link:last-child { margin-bottom: 0; }
+  .brief-card-icon {
+    width: 44px; height: 44px;
+    background: var(--gold); border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    clip-path: circle(0% at 50% 50%);
-    transition: clip-path 0.8s cubic-bezier(0.7, 0, 0.3, 1);
-    color: var(--navy);
-    border-radius: 40px;
+    flex-shrink: 0; font-size: 1.1rem;
+  }
+  .brief-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: white; margin-bottom: 3px; }
+  .brief-card-sub { font-family: 'Poppins', sans-serif; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+  .brief-card-arrow { color: var(--gold); font-size: 1.1rem; flex-shrink: 0; }
+  .brief-error {
+    background: rgba(220,38,38,0.15);
+    border: 1.5px solid rgba(220,38,38,0.4);
+    border-radius: 16px; padding: 14px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem; color: #fca5a5;
+  }
+  .brief-meta {
+    font-family: 'Poppins', sans-serif; font-size: 0.72rem;
+    color: rgba(255,255,255,0.3); margin-bottom: 14px;
+    text-align: left; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
   }
  
-  .footer-overlay.open { clip-path: circle(150% at 50% 50%); }
- 
-  .form-split {
+  /* ===================== NOWA STOPKA ===================== */
+  .site-footer {
+    background: white;
+    border-top: 1px solid #e8eaee;
+    padding: 0 2rem;
+    font-family: 'Poppins', sans-serif;
+  }
+  .footer-main {
+    max-width: 1100px; margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 30px;
-    width: 90%;
-    max-width: 850px;
+    grid-template-columns: 1.4fr 1fr 1fr auto;
+    gap: 3rem; padding: 3rem 0 2.5rem;
     align-items: start;
   }
+  @media(max-width:900px) { .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; } .footer-cta-col { grid-column: span 2; } }
+  @media(max-width:560px) { .footer-main { grid-template-columns: 1fr; } .footer-cta-col { grid-column: span 1; } }
  
-  .form-left h3 { margin: 0 0 10px 0; font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--navy); }
-  .f-tile {
-    background: #fff; border: 1px solid #eee; border-radius: 15px; padding: 12px;
+  .footer-brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; }
+  .footer-logo { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+  .footer-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #1a1a22; }
+  .footer-tagline { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8a8a9a; margin-top: 2px; }
+  .footer-rule { height: 2px; background: linear-gradient(to right, #1e3a8a 28px, #e0e3ea 28px); margin-bottom: 1.1rem; }
+  .footer-contacts { display: flex; flex-direction: column; gap: 7px; }
+  .footer-contact-row { display: flex; align-items: baseline; gap: 14px; }
+  .footer-contact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; min-width: 38px; }
+  .footer-contact-val { font-size: 13px; color: var(--navy); text-decoration: none; }
+  .footer-contact-val:hover { color: var(--gold); }
+ 
+  .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
+  .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a { font-size: 13.5px; color: #3d3d4a; text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--navy); }
+ 
+  .footer-cta-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+  .footer-cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--navy); color: white;
+    padding: 14px 28px; border-radius: 50px;
+    font-family: 'Poppins', sans-serif; font-weight: 700;
+    font-size: 0.85rem; border: none; cursor: pointer;
+    transition: all 0.3s; animation: pulse 2s infinite;
+    white-space: nowrap;
+  }
+  .footer-cta-btn:hover { background: var(--gold); transform: translateY(-2px); }
+ 
+  .footer-bottom {
+    border-top: 1px solid #e8eaee; padding: 0.85rem 0;
+    max-width: 1100px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 11px; color: #c0c0cc; }
+  .footer-location { font-size: 12px; color: #aaa; }
+ 
+  /* MODAL STOPKA */
+  .footer-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,20,60,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .footer-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .footer-modal {
+    background: white; border-radius: 32px;
+    padding: 40px; width: 90%; max-width: 700px;
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px;
+    transform: translateY(20px); transition: transform 0.3s;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .footer-modal-overlay.open .footer-modal { transform: translateY(0); }
+  .modal-close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; font-size: 1.4rem;
+    color: var(--navy); cursor: pointer; font-weight: bold;
+  }
+  .modal-left h3 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--navy); margin: 0 0 16px; }
+  .modal-price { background: #f9fbfe; border: 2px dashed var(--gold); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; text-align: center; }
+  .modal-price span { font-weight: 800; font-size: 1.4rem; color: var(--navy); }
+  .m-tile {
+    background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 12px;
     margin-bottom: 10px; cursor: pointer; transition: 0.3s; font-size: 0.85rem; color: var(--navy);
   }
-  .f-tile.selected { border-color: var(--blue); background: #f0f7ff; }
- 
-  #f-piano-box { display: none; margin-top: 15px; animation: slideIn 0.4s; }
-  @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
- 
-  .form-right {
-    background: var(--navy); border-radius: 35px; padding: 25px;
-    display: flex; flex-direction: column; gap: 10px;
-  }
-  .form-right input, .form-right textarea {
+  .m-tile.selected { border-color: var(--blue); background: #f0f7ff; }
+  #m-piano-box { display: none; margin-top: 10px; }
+  .modal-right { background: var(--navy); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .modal-right input, .modal-right textarea {
     width: 100%; padding: 12px; border-radius: 12px; border: none;
     font-family: 'Poppins', sans-serif; font-size: 0.85rem; box-sizing: border-box;
   }
-  .form-right textarea { height: 80px; resize: none; }
-  .form-right .btn-submit-f {
-    background: var(--gold); color: white; border: none; padding: 15px;
-    border-radius: 50px; font-weight: 800; cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-  }
+  .modal-right textarea { height: 80px; resize: none; }
+  .modal-submit { background: var(--gold); color: white; border: none; padding: 14px; border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Poppins', sans-serif; width: 100%; font-size: 0.9rem; }
+  @media(max-width:600px) { .footer-modal { grid-template-columns: 1fr; } }
  
-  .footer-copy {
-    margin-top: 40px; padding-top: 20px;
-    border-top: 1px solid #1a1a1a;
-    text-align: center; font-size: 0.8rem; color: #444;
-  }
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
  
-  /* ===================== ANIMATIONS ===================== */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
- 
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(-8px); }
-  }
- 
-  /* ===================== RESPONSIVE ===================== */
+  /* RESPONSIVE */
   @media (max-width: 850px) {
     .bento-container { grid-template-columns: 1fr; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
-    .branding { grid-column: span 2; }
-    .form-split { grid-template-columns: 1fr; overflow-y: auto; height: 90%; padding-top: 20px; }
     .tag-note { width: 200px; left: 0; transform: none; }
     .tag-wrapper:hover .tag-note { transform: translateY(-10px); }
     .tag-note::after { left: 20px; }
-  }
- 
-  @media (max-width: 600px) {
-    .footer-grid { grid-template-columns: 1fr; }
-    .branding { grid-column: span 1; }
-    .bento-footer { padding: 35px 20px; }
-  }
- 
-  /* Nav */
-  .site-nav {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 10px 30px;
-    display: flex;
-    gap: 25px;
-    z-index: 1000;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
- 
-  .site-nav a {
-    color: var(--navy);
-    text-decoration: none;
-    transition: 0.3s;
-  }
- 
-  .site-nav a:hover { color: var(--gold); }
- 
-  @media (max-width: 600px) {
-    .site-nav { display: none; }
   }
 </style>
 </head>
@@ -910,10 +591,11 @@
   <a href="#oferta">Oferta</a>
   <a href="#pianino">Pianino</a>
   <a href="#terminy">Terminy</a>
+  <a href="#briefy" class="nav-highlight">Materiały</a>
   <a href="#kontakt">Kontakt</a>
 </nav>
  
-<!-- ===================== HERO ===================== -->
+<!-- HERO -->
 <section class="hero">
   <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
   <h1>Lekcje pianina<br>z <em>pasją</em></h1>
@@ -925,13 +607,11 @@
   <div class="scroll-hint">↓ Przewiń w dół</div>
 </section>
  
-<!-- ===================== BENTO GRID ===================== -->
+<!-- BENTO GRID -->
 <section class="section" id="o-mnie">
   <div class="section-label">Nauczyciel</div>
   <h2 class="section-title">Poznajmy się</h2>
- 
   <div class="bento-container" id="bentoBox">
- 
     <div class="flip-card">
       <div class="flip-card-inner">
         <div class="card-front">
@@ -948,7 +628,6 @@
         </div>
       </div>
     </div>
- 
     <div class="card">
       <a href="https://youtube.com" target="_blank" class="video-link">
         <img src="https://i.imgur.com/lkRJTJq.png" alt="Obejrzyj film">
@@ -959,50 +638,31 @@
         <li><span>🔗</span> <a href="https://szkolamuzgdynia.pl" target="_blank">Szkoła im. Z. Noskowskiego</a></li>
       </ul>
     </div>
- 
     <div class="card">
       <h3>Opinie</h3>
       <a href="#" target="_blank" class="opinion-btn">📄 Opinia prof. J. Ratza</a>
       <a href="#" target="_blank" class="opinion-btn">📄 Opinia prof. T. Miczki</a>
     </div>
- 
     <div class="card" style="background: var(--gold); border: none; box-shadow: 0 10px 30px rgba(212,175,55,0.3);">
       <h3 style="color: white; font-family: 'Playfair Display', serif;">Edukacja</h3>
       <p style="font-size: 0.8rem; color: white; opacity: 0.9; margin-bottom: 15px;">Zakres lekcji (najedź na hasło):</p>
       <div class="tags-container">
-        <div class="tag-wrapper">
-          <span class="tag" style="color: white; border-color: white;">Formy muzyczne</span>
-          <div class="tag-note"><b>Formy muzyczne:</b> Nauka o budowie utworów. Zrozumiesz architekturę muzyki, co ułatwia szybszą naukę gry z pamięci.</div>
-        </div>
-        <div class="tag-wrapper">
-          <span class="tag" style="color: white; border-color: white;">Harmonia</span>
-          <div class="tag-note"><b>Harmonia:</b> Sztuka łączenia akordów. Nauczysz się samodzielnie dobierać akompaniament do ulubionych piosenek.</div>
-        </div>
-        <div class="tag-wrapper">
-          <span class="tag" style="color: white; border-color: white;">Kształcenie słuchu</span>
-          <div class="tag-note"><b>Kształcenie słuchu:</b> Trening rozpoznawania dźwięków. Pozwala grać melodie "ze słuchu" bez potrzeby zaglądania w nuty.</div>
-        </div>
-        <div class="tag-wrapper">
-          <span class="tag" style="color: white; border-color: white;">Zasady muzyki</span>
-          <div class="tag-note"><b>Zasady muzyki:</b> Fundament każdego muzyka — rytm, metrum, nuty, klucze i dynamika. To alfabet, bez którego nie da się czytać ani pisać muzyki.</div>
-        </div>
-        <div class="tag-wrapper">
-          <span class="tag" style="color: white; border-color: white;">Historia muzyki</span>
-          <div class="tag-note"><b>Historia muzyki:</b> Podróż od baroku przez klasycyzm i romantyzm aż po współczesność. Zrozumiesz, skąd pochodzi muzyka, którą grasz i kochasz.</div>
-        </div>
+        <div class="tag-wrapper"><span class="tag" style="color: white; border-color: white;">Formy muzyczne</span><div class="tag-note"><b>Formy muzyczne:</b> Nauka o budowie utworów. Zrozumiesz architekturę muzyki, co ułatwia szybszą naukę gry z pamięci.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color: white; border-color: white;">Harmonia</span><div class="tag-note"><b>Harmonia:</b> Sztuka łączenia akordów. Nauczysz się samodzielnie dobierać akompaniament do ulubionych piosenek.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color: white; border-color: white;">Kształcenie słuchu</span><div class="tag-note"><b>Kształcenie słuchu:</b> Trening rozpoznawania dźwięków. Pozwala grać melodie "ze słuchu" bez potrzeby zaglądania w nuty.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color: white; border-color: white;">Zasady muzyki</span><div class="tag-note"><b>Zasady muzyki:</b> Fundament każdego muzyka — rytm, metrum, nuty, klucze i dynamika.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color: white; border-color: white;">Historia muzyki</span><div class="tag-note"><b>Historia muzyki:</b> Podróż od baroku przez klasycyzm i romantyzm aż po współczesność.</div></div>
       </div>
     </div>
- 
   </div>
 </section>
  
-<!-- ===================== SLIDER ===================== -->
+<!-- SLIDER -->
 <section class="slider-section" id="oferta">
   <div class="section-inner">
     <div class="section-label">Szczegóły oferty</div>
     <h2 class="section-title">Co oferuję</h2>
   </div>
- 
   <div style="position: relative;">
     <div class="slider-container" id="mainContainer">
       <div class="tiles-wrapper" id="slider"></div>
@@ -1012,111 +672,61 @@
   </div>
 </section>
  
-<!-- ===================== POMOCE DYDAKTYCZNE ===================== -->
+<!-- POMOCE -->
 <section class="pomoce-section">
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
     <h2 class="section-title">Autorskie pomoce dydaktyczne</h2>
-    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">
-      Lekcje prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii. Każda pomoc jest dobrana do wieku i potrzeb ucznia.
-    </p>
- 
+    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii.</p>
     <div class="pomoce-grid" id="pomoceGrid">
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">📚</div>
-        <span class="tag-pill">Tradycyjne</span>
-        <h4>Książki i podręczniki</h4>
-        <p>Starannie dobrane pozycje dostosowane do poziomu ucznia — od podstawowych metod dla dzieci po zaawansowane opracowania dla dorosłych.</p>
-      </div>
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">📱</div>
-        <span class="tag-pill">Technologia</span>
-        <h4>Tablet i aplikacje</h4>
-        <p>Korzystamy z <strong>Simply Piano</strong> — do nauki grania ze słuchu i z nut w przyjazny, gamifikowany sposób, oraz <strong>forScore</strong> — cyfrowego pulpitu na nuty, który zastępuje stosy papierowych partytur.</p>
-      </div>
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">✉️</div>
-        <span class="tag-pill">Co miesiąc</span>
-        <h4>Briefy — wiedza co miesiąc</h4>
-        <p>Autorskie opracowania wysyłane do uczniów co miesiąc: ciekawostki muzyczne, historia kompozytorów, teoria podana w przystępny sposób. Nauka trwa też między lekcjami.</p>
-      </div>
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">🎨</div>
-        <span class="tag-pill">Bez nut</span>
-        <h4>Ilustracje do nauki beznutowej</h4>
-        <p>Autorskie ilustracje, które pozwalają uczyć się muzyki zanim dziecko opanuje czytanie nut. Kolory, kształty i obrazki zamiast pięciolinii — idealne dla najmłodszych.</p>
-      </div>
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">🎹</div>
-        <span class="tag-pill">Autorski</span>
-        <h4>Podręcznik do gry na pianinie</h4>
-        <p>Własny podręcznik napisany z myślą o moich uczniach — łączy teorię z praktyką, prowadzi krok po kroku od pierwszego dźwięku do samodzielnej gry. Dostosowany do polskich realiów i repertuaru.</p>
-      </div>
- 
-      <div class="pomoce-card">
-        <div class="pomoce-icon">🚗</div>
-        <span class="tag-pill">Dojazd</span>
-        <h4>Dowóz instrumentu na zajęcia</h4>
-        <p>Nie masz pianina w domu? Przywiozę instrument na lekcję do Ciebie. Dzięki temu możesz zacząć naukę od pierwszego dnia — bez potrzeby kupowania sprzętu na próbę.</p>
-      </div>
- 
+      <div class="pomoce-card"><div class="pomoce-icon">📚</div><span class="tag-pill">Tradycyjne</span><h4>Książki i podręczniki</h4><p>Starannie dobrane pozycje dostosowane do poziomu ucznia.</p></div>
+      <div class="pomoce-card"><div class="pomoce-icon">📱</div><span class="tag-pill">Technologia</span><h4>Tablet i aplikacje</h4><p>Simply Piano i forScore — nauka ze słuchu i cyfrowe nuty.</p></div>
+      <div class="pomoce-card"><div class="pomoce-icon">✉️</div><span class="tag-pill">Co miesiąc</span><h4>Briefy — wiedza co miesiąc</h4><p>Autorskie opracowania: historia muzyki, teoria, ciekawostki.</p></div>
+      <div class="pomoce-card"><div class="pomoce-icon">🎨</div><span class="tag-pill">Bez nut</span><h4>Ilustracje do nauki beznutowej</h4><p>Kolory i obrazki zamiast pięciolinii — idealne dla najmłodszych.</p></div>
+      <div class="pomoce-card"><div class="pomoce-icon">🎹</div><span class="tag-pill">Autorski</span><h4>Podręcznik do gry na pianinie</h4><p>Od pierwszego dźwięku do samodzielnej gry.</p></div>
+      <div class="pomoce-card"><div class="pomoce-icon">🚗</div><span class="tag-pill">Dojazd</span><h4>Dowóz instrumentu na zajęcia</h4><p>Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.</p></div>
     </div>
   </div>
 </section>
  
-<!-- ===================== PIANINO ===================== -->
+<!-- PIANINO -->
 <section class="piano-section" id="pianino">
   <div class="section-inner">
     <div class="section-label">Interaktywne</div>
     <h2 class="section-title" style="color: var(--navy);">Wypróbuj pianino</h2>
- 
     <div class="controls-wrapper">
       <button class="p-btn active" id="p-btn" onclick="changeInst('piano')">Pianino</button>
       <button class="p-btn" id="h-btn" onclick="changeInst('harpsi')">Klawesyn</button>
       <div style="width:1px;height:30px;background:#e2e8f0;"></div>
       <div class="volume-container">
-        <span>🔈</span>
-        <input type="range" id="volume" min="0" max="1" step="0.05" value="0.4">
-        <span>🔊</span>
+        <span>🔈</span><input type="range" id="volume" min="0" max="1" step="0.05" value="0.4"><span>🔊</span>
       </div>
       <div style="width:1px;height:30px;background:#e2e8f0;"></div>
       <button class="p-btn song-btn" id="s0" onclick="toggleSong(0)">🍎 Jabłuszko</button>
       <button class="p-btn song-btn" id="s1" onclick="toggleSong(1)">🐱 Kotek</button>
       <button class="p-btn song-btn" id="s2" onclick="toggleSong(2)">👨‍🌾 Janie</button>
     </div>
- 
-    <div class="piano-container">
-      <div class="piano" id="piano"></div>
-    </div>
+    <div class="piano-container"><div class="piano" id="piano"></div></div>
     <div id="piano-status">Wybierz utwór i graj podświetlone klawisze</div>
   </div>
 </section>
  
-<!-- ===================== TERMINY ===================== -->
+<!-- TERMINY -->
 <section class="terminy-section" id="terminy">
   <div class="section-inner">
     <div class="section-label">Kalendarz</div>
     <h2 class="section-title">Terminy i Miejsce</h2>
- 
     <div class="apple-card" id="appleLocation">
       <h2 class="apple-card-title">Wolne Terminy</h2>
       <div class="info-card">
         <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com"></iframe>
         <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
       </div>
- 
       <div class="form-overlay" id="formOverlay">
         <button class="close-btn" onclick="toggleForm(false)">✕</button>
         <div class="form-content">
           <h3 style="margin-top:0;margin-bottom:10px;color:var(--navy);font-family:'Playfair Display',serif;">Szczegóły rezerwacji</h3>
-          <div class="price-tag">
-            <span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span>
-          </div>
+          <div class="price-tag"><span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span></div>
           <div class="bento-grid">
             <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
             <div class="form-tile" id="loc-uczen" onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
@@ -1139,487 +749,254 @@
     </div>
   </div>
 </section>
-<!-- ===================== SEKCJA: BRIEFY DLA UCZNIÓW ===================== -->
-<!-- Wklej tę sekcję na stronie przed stopką -->
  
-<section style="padding:80px 5%; background:#f8fafc;" id="briefy">
-  <div style="max-width:600px; margin:0 auto; text-align:center;">
-    <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:10px;font-family:'Poppins',sans-serif;">Strefa Ucznia</div>
-    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);color:#1e3a8a;margin:0 0 16px;">Materiały do lekcji</h2>
-    <p style="color:#64748b;font-size:0.95rem;line-height:1.7;margin:0 0 40px;font-family:'Poppins',sans-serif;">Wpisz kod ucznia, aby uzyskać dostęp do materiałów.</p>
-    <div style="background:white;border-radius:24px;padding:32px;box-shadow:0 0 30px rgba(0,0,0,0.07);border:1px solid #f0f0f0;">
-      <div style="display:flex;gap:10px;margin-bottom:16px;">
-        <input id="brief-code-input" type="tel" placeholder="Kod ucznia"
-          style="flex:1;padding:14px 18px;border:2px solid #e2e8f0;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.95rem;color:#1e3a8a;outline:none;letter-spacing:0.03em;transition:border-color 0.2s;"
-          onfocus="this.style.borderColor='#1e3a8a'" onblur="this.style.borderColor='#e2e8f0'">
-        <button onclick="sprawdzKod()" id="brief-btn"
-          style="padding:14px 28px;background:#1e3a8a;color:white;border:none;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;white-space:nowrap;"
-          onmouseover="this.style.background='#d4af37'" onmouseout="this.style.background='#1e3a8a'">Sprawdź</button>
+<!-- ===================== BRIEFY ===================== -->
+<section class="briefy-section" id="briefy">
+  <div class="briefy-inner">
+    <div class="briefy-label">Strefa ucznia</div>
+    <h2 class="briefy-title">Materiały do lekcji</h2>
+    <p class="briefy-subtitle">Wpisz kod ucznia, aby uzyskać dostęp do swoich materiałów muzycznych.</p>
+    <div class="briefy-card">
+      <div class="briefy-input-row">
+        <input id="brief-code-input" type="tel" placeholder="Kod ucznia" class="briefy-input"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+        <button onclick="sprawdzKod()" id="brief-btn" class="briefy-btn">Sprawdź</button>
       </div>
-      <div id="brief-result" style="display:none;"></div>
+      <div id="brief-result"></div>
     </div>
   </div>
 </section>
  
-<script>
-const WEBHOOK_URL = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
+<!-- ===================== STOPKA ===================== -->
+<footer class="site-footer" id="kontakt">
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-row">
+        <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo">
+        <div>
+          <div class="footer-name">Łukasz Ganczarek</div>
+          <div class="footer-tagline">Nauka gry na pianinie</div>
+        </div>
+      </div>
+      <div class="footer-rule"></div>
+      <div class="footer-contacts">
+        <div class="footer-contact-row">
+          <span class="footer-contact-label">Tel</span>
+          <a href="tel:514338875" class="footer-contact-val">514 338 875</a>
+        </div>
+        <div class="footer-contact-row">
+          <span class="footer-contact-label">Email</span>
+          <a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-contact-val">lukaszgkorepetycje@gmail.com</a>
+        </div>
+        <div class="footer-contact-row">
+          <span class="footer-contact-label">WWW</span>
+          <a href="https://lekcjepianinagdynia.pl" class="footer-contact-val">lekcjepianinagdynia.pl</a>
+        </div>
+        <div class="footer-contact-row">
+          <span class="footer-contact-label">WA</span>
+          <a href="https://wa.me/48514338875" target="_blank" class="footer-contact-val">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Nawigacja</div>
+      <ul class="footer-links">
+        <li><a href="#">Strona główna</a></li>
+        <li><a href="#o-mnie">O mnie</a></li>
+        <li><a href="#oferta">Oferta</a></li>
+        <li><a href="#pianino">Pianino</a></li>
+        <li><a href="#terminy">Wolne terminy</a></li>
+        <li><a href="#briefy">Materiały ucznia</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Ogłoszenia</div>
+      <ul class="footer-links">
+        <li><a href="https://buki.org.pl/user-123621/" target="_blank">Profil Buki.org</a></li>
+        <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">Profil Superprof</a></li>
+      </ul>
+    </div>
+    <div class="footer-cta-col">
+      <button class="footer-cta-btn" onclick="openLessonModal()">
+        🎹 Umów lekcję próbną
+      </button>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="footer-bottom">
+      <span class="footer-location">♪ Gdynia · online</span>
+      <span class="footer-copy">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </div>
+</footer>
  
-// Rate limiting — max 3 zapytania na minutę, timeout 5 minut
-const RATE_LIMIT = 3;
-const RATE_WINDOW = 60 * 1000;      // 1 minuta
-const TIMEOUT_DURATION = 5 * 60 * 1000; // 5 minut
+<!-- MODAL LEKCJA PRÓBNA -->
+<div class="footer-modal-overlay" id="lessonModal" onclick="if(event.target===this)closeLessonModal()">
+  <div class="footer-modal" style="position:relative;">
+    <button class="modal-close" onclick="closeLessonModal()">✕</button>
+    <div class="modal-left">
+      <h3>Lekcja próbna</h3>
+      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
+      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+      <div id="m-piano-box">
+        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
+          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <input type="text" placeholder="Twoje imię">
+      <input type="tel" placeholder="Numer telefonu">
+      <textarea placeholder="Wiadomość (wiek ucznia, preferowane godziny...)"></textarea>
+      <button class="modal-submit">WYŚLIJ PROŚBĘ</button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// ===================== BRIEFY =====================
+const WEBHOOK_URL = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
+const RATE_LIMIT = 3, RATE_WINDOW = 60000, TIMEOUT_DURATION = 300000;
  
 function getRateData() {
-  const raw = sessionStorage.getItem('brief_rate');
-  return raw ? JSON.parse(raw) : { count: 0, windowStart: Date.now(), blockedUntil: null };
+  try { return JSON.parse(sessionStorage.getItem('brief_rate')) || { count:0, windowStart:Date.now(), blockedUntil:null }; }
+  catch(e) { return { count:0, windowStart:Date.now(), blockedUntil:null }; }
 }
- 
-function saveRateData(data) {
-  sessionStorage.setItem('brief_rate', JSON.stringify(data));
-}
- 
+function saveRateData(d) { try { sessionStorage.setItem('brief_rate', JSON.stringify(d)); } catch(e){} }
 function checkRateLimit() {
-  const now = Date.now();
-  const data = getRateData();
- 
-  // Sprawdź czy jest aktywny timeout
-  if (data.blockedUntil && now < data.blockedUntil) {
-    const remaining = Math.ceil((data.blockedUntil - now) / 1000);
-    const minutes = Math.floor(remaining / 60);
-    const seconds = remaining % 60;
-    return { allowed: false, message: `Zbyt wiele prób. Spróbuj ponownie za ${minutes}:${seconds.toString().padStart(2,'0')}.` };
+  const now = Date.now(), d = getRateData();
+  if (d.blockedUntil && now < d.blockedUntil) {
+    const rem = Math.ceil((d.blockedUntil - now) / 1000);
+    return { allowed:false, message:`Zbyt wiele prób. Spróbuj za ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}.` };
   }
- 
-  // Reset okna jeśli minęła minuta
-  if (now - data.windowStart > RATE_WINDOW) {
-    data.count = 0;
-    data.windowStart = now;
-    data.blockedUntil = null;
+  if (now - d.windowStart > RATE_WINDOW) { d.count=0; d.windowStart=now; d.blockedUntil=null; }
+  if (d.count >= RATE_LIMIT) {
+    d.blockedUntil = now + TIMEOUT_DURATION; saveRateData(d);
+    return { allowed:false, message:'Zbyt wiele prób. Dostęp zablokowany na 5 minut.' };
   }
+  d.count++; saveRateData(d); return { allowed:true };
+}
  
-  // Sprawdź limit
-  if (data.count >= RATE_LIMIT) {
-    data.blockedUntil = now + TIMEOUT_DURATION;
-    saveRateData(data);
-    return { allowed: false, message: 'Zbyt wiele prób. Dostęp zablokowany na 5 minut.' };
-  }
- 
-  // Zwiększ licznik
-  data.count++;
-  saveRateData(data);
-  return { allowed: true };
+function showBriefError(msg) {
+  const r = document.getElementById('brief-result');
+  r.style.display = 'block';
+  r.innerHTML = `<div class="brief-error">✕ ${msg}</div>`;
 }
  
 async function sprawdzKod() {
   const input = document.getElementById('brief-code-input');
   const result = document.getElementById('brief-result');
   const btn = document.getElementById('brief-btn');
-  const kod = input.value.trim().replace(/\s+/g, '');
- 
-  if (kod.length < 7) {
-    result.style.display = 'block';
-    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">Nieprawidłowy kod.</div>';
-    return;
-  }
- 
-  // Sprawdź rate limit
+  const kod = input.value.trim().replace(/\s+/g,'');
+  if (kod.length < 7) { showBriefError('Nieprawidłowy kod.'); return; }
   const rate = checkRateLimit();
-  if (!rate.allowed) {
-    result.style.display = 'block';
-    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#9203; ' + rate.message + '</div>';
-    return;
-  }
- 
-  btn.innerText = '...';
-  btn.style.background = '#94a3b8';
-  btn.style.cursor = 'not-allowed';
+  if (!rate.allowed) { showBriefError('⏳ ' + rate.message); return; }
+  btn.innerText = '...'; btn.style.opacity = '0.6'; btn.style.cursor = 'not-allowed';
   result.style.display = 'none';
- 
   try {
     const response = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ kod: kod })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ kod })
     });
- 
     const data = await response.json();
- 
-    btn.innerText = 'Sprawdź';
-    btn.style.background = '#1e3a8a';
-    btn.style.cursor = 'pointer';
- 
+    btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
     if (data.status === 'ok' && data.briefy && data.briefy.length > 0) {
-      const cards = data.briefy.map((b, i) => `
-        <a href="${b.url}" target="_blank"
-           style="display:flex;align-items:center;gap:14px;background:#f0f7ff;border:1.5px solid #1e3a8a;border-radius:16px;padding:16px 20px;text-decoration:none;text-align:left;${i < data.briefy.length-1 ? 'margin-bottom:10px;' : ''}"
-           onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f7ff'">
-          <div style="width:44px;height:44px;background:#1e3a8a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">&#128196;</div>
+      const cards = data.briefy.map(b => `
+        <a href="${b.url}" target="_blank" class="brief-card-link">
+          <div class="brief-card-icon">📄</div>
           <div style="flex:1;">
-            <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:3px;">${b.title}</div>
-            <div style="font-family:'Poppins',sans-serif;font-size:0.8rem;color:#64748b;">${b.subtitle}</div>
+            <div class="brief-card-title">${b.title}</div>
+            <div class="brief-card-sub">${b.subtitle}</div>
           </div>
-          <div style="color:#1e3a8a;font-size:1.1rem;">&#8594;</div>
+          <div class="brief-card-arrow">→</div>
         </a>`).join('');
- 
       result.style.display = 'block';
-      result.innerHTML =
-        '<div style="font-family:\'Poppins\',sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:12px;text-align:left;">Twoje materia&#322;y (' + data.briefy.length + ')</div>' +
-        cards +
-        '<p style="font-family:\'Poppins\',sans-serif;font-size:0.75rem;color:#94a3b8;margin:12px 0 0;text-align:center;">Kliknij kart&#281;, aby otworzy&#263; materia&#322;</p>';
- 
-    } else {
-      result.style.display = 'block';
-      result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#10005; Kod jest niew&#322;a&#347;ciwy lub nieaktywny.</div>';
-    }
- 
-  } catch(err) {
-    btn.innerText = 'Sprawdź';
-    btn.style.background = '#1e3a8a';
-    btn.style.cursor = 'pointer';
-    result.style.display = 'block';
-    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#9888; B&#322;&#261;d po&#322;&#261;czenia. Spr&#243;buj ponownie.</div>';
+      result.innerHTML = `<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
+    } else { showBriefError('Kod jest niewłaściwy lub nieaktywny.'); }
+  } catch(e) {
+    btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+    showBriefError('Błąd połączenia. Spróbuj ponownie.');
   }
 }
+document.getElementById('brief-code-input').addEventListener('keydown', e => { if(e.key==='Enter') sprawdzKod(); });
  
-document.getElementById('brief-code-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') sprawdzKod();
-});
-</script>
-<!-- ===================== KONIEC SEKCJI BRIEFY ===================== -->
+// ===================== MODAL LEKCJA PRÓBNA =====================
+function openLessonModal() { document.getElementById('lessonModal').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeLessonModal() { document.getElementById('lessonModal').classList.remove('open'); document.body.style.overflow=''; }
+let mLoc='s', mPiano=true;
+function mSetLoc(t) {
+  mLoc=t;
+  document.getElementById('m-l-s').classList.toggle('selected',t==='s');
+  document.getElementById('m-l-u').classList.toggle('selected',t==='u');
+  document.getElementById('m-piano-box').style.display = t==='u'?'block':'none';
+  mUpdatePrice();
+}
+function mSetPiano(v) {
+  mPiano=v;
+  document.getElementById('m-p-y').classList.toggle('selected',v);
+  document.getElementById('m-p-n').classList.toggle('selected',!v);
+  mUpdatePrice();
+}
+function mUpdatePrice() { document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h'; }
  
+// ===================== BENTO / ANIMATIONS =====================
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('bentoBox'));
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('pomoceGrid'));
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('appleLocation'));
  
-<!-- ===================== STOPKA ===================== -->
-<footer class="footer-section" id="kontakt">
-  <div class="bento-footer">
-    <div class="footer-grid">
- 
-      <div class="branding">
-        <div class="logo-box">
-          <img src="https://imgur.com/7HNwsrN.png" alt="Logo Łukasz Ganczarek">
-        </div>
-        <button class="cta-button" onclick="toggleOverlay('lessonOverlay', true)">UMÓW LEKCJĘ PRÓBNĄ</button>
-      </div>
- 
-      <div>
-        <h4>Kontakt</h4>
-        <p style="font-weight:600;font-size:1.1rem;margin-bottom:5px;color:white;">📞 514 338 875</p>
-        <ul class="nav-links-footer">
-          <li><span onclick="toggleOverlay('emailOverlay', true)">📩 Wyślij e-mail</span></li>
-          <li><span onclick="toggleOverlay('waOverlay', true)">💬 WhatsApp</span></li>
-        </ul>
-      </div>
- 
-      <div>
-        <h4>Podstrony</h4>
-        <ul class="nav-links-footer">
-          <li><a href="#">• Strona Główna</a></li>
-          <li><a href="#terminy">• Wolne Terminy</a></li>
-        </ul>
-      </div>
- 
-      <div>
-        <h4>Ogłoszenia</h4>
-        <ul class="nav-links-footer">
-          <li><a href="https://buki.org.pl/user-123621/" target="_blank">• Profil Buki.org</a></li>
-          <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">• Profil Superprof</a></li>
-        </ul>
-      </div>
- 
-    </div>
- 
-    <!-- MODAL: LEKCJA PRÓBNA -->
-    <div class="footer-overlay" id="lessonOverlay">
-      <span class="close-btn" style="color:var(--navy);" onclick="toggleOverlay('lessonOverlay', false)">✕</span>
-      <div class="form-split">
-        <div class="form-left">
-          <h3>Lekcja próbna</h3>
-          <div class="price-tag" style="background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:10px;margin-bottom:20px;text-align:center;">
-            <span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="f-price">99 zł / h</span>
-          </div>
-          <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
-          <div class="f-tile selected" id="f-l-s" onclick="fSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-          <div class="f-tile" id="f-l-u" onclick="fSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-          <div id="f-piano-box">
-            <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Czy masz pianino?</p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div class="f-tile selected" id="f-p-y" onclick="fSetPiano(true)" style="margin:0;"><b>Mam</b></div>
-              <div class="f-tile" id="f-p-n" onclick="fSetPiano(false)" style="margin:0;"><b>Nie mam</b></div>
-            </div>
-          </div>
-        </div>
-        <div class="form-right">
-          <input type="text" placeholder="Twoje Imię">
-          <input type="tel" placeholder="Numer telefonu">
-          <textarea placeholder="Wiadomość (np. wiek ucznia, preferowane godziny)"></textarea>
-          <button class="btn-submit-f">WYŚLIJ PROŚBĘ</button>
-        </div>
-      </div>
-    </div>
- 
-    <!-- MODAL: EMAIL -->
-    <div class="footer-overlay" id="emailOverlay">
-      <span class="close-btn" style="color:var(--navy);" onclick="toggleOverlay('emailOverlay', false)">✕</span>
-      <div class="form-split">
-        <div class="form-left">
-          <h3>Napisz e-mail</h3>
-          <div class="f-tile selected">📩 lukaszgkorepetycje@gmail.com</div>
-        </div>
-        <div class="form-right">
-          <input type="email" placeholder="Twój adres e-mail">
-          <textarea placeholder="Treść zapytania..."></textarea>
-          <button class="btn-submit-f">WYŚLIJ WIADOMOŚĆ</button>
-        </div>
-      </div>
-    </div>
- 
-    <!-- MODAL: WHATSAPP -->
-    <div class="footer-overlay" id="waOverlay">
-      <span class="close-btn" style="color:var(--navy);" onclick="toggleOverlay('waOverlay', false)">✕</span>
-      <div class="form-split">
-        <div class="form-left">
-          <h3>WhatsApp</h3>
-          <p style="color:var(--navy);">Zostaw swój numer, abym mógł się z Tobą skontaktować przez WhatsApp.</p>
-        </div>
-        <div class="form-right">
-          <input type="tel" placeholder="Twój numer telefonu">
-          <textarea placeholder="W czym mogę pomóc?"></textarea>
-          <button class="btn-submit-f">WYŚLIJ NA WHATSAPP</button>
-        </div>
-      </div>
-    </div>
- 
-    <div class="footer-copy">
-      © 2026 Łukasz Ganczarek – Lekcje Pianina Gdynia.
-    </div>
-  </div>
-</footer>
- 
-<!-- ===================== JAVASCRIPT ===================== -->
-<script>
-// ---- BENTO GRID ANIMATION ----
-const bentoObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-}, { threshold: 0.1 });
-bentoObs.observe(document.getElementById('bentoBox'));
- 
-const pomoceObs = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-}, { threshold: 0.1 });
-pomoceObs.observe(document.getElementById('pomoceGrid'));
- 
-// ---- SLIDER ----
+// ===================== SLIDER =====================
 const slider = document.getElementById('slider');
 const sliderContainer = document.getElementById('mainContainer');
 const step = 368;
- 
 const sliderContent = `
   <div class="tile"><h3>Instrument</h3><p>Nie masz instrumentu? <span class="highlight">Dowieziemy pianino do Ciebie</span> (+20 zł / h) lub zapraszamy na lekcje w studio.</p></div>
   <div class="tile"><h3>Dydaktyka</h3><p>Pracujemy na <span class="highlight">autorskich</span> pomocach dydaktycznych dopasowanych do ucznia.</p></div>
   <div class="tile"><h3>Koszt</h3><p>Za zajęcia zapłacicie standardowo <span class="highlight">99 zł / h</span>.</p></div>
   <div class="tile"><h3>Dla kogo</h3><p>Zapraszamy wszystkich pasjonatów <span class="highlight">od 6 roku życia</span> wzwyż.</p></div>
-  <div class="tile"><h3>Miejsce</h3><p>Lekcje w <span class="highlight">Gdyni (Mały Kack)</span> lub z dojazdem na terenie <span class="highlight">Gdyni i Sopotu</span>.</p></div>
-`;
- 
+  <div class="tile"><h3>Miejsce</h3><p>Lekcje w <span class="highlight">Gdyni (Mały Kack)</span> lub z dojazdem na terenie <span class="highlight">Gdyni i Sopotu</span>.</p></div>`;
 slider.innerHTML = sliderContent.repeat(8);
- 
-const resetSlider = () => {
-  const allTiles = document.querySelectorAll('.tile');
-  const target = allTiles[10 * 5];
-  if (target) {
-    slider.scrollLeft = target.offsetLeft - (window.innerWidth / 2) + (target.offsetWidth / 2);
-  }
-};
- 
-window.addEventListener('load', () => {
-  resetSlider();
-  setTimeout(() => sliderContainer.classList.add('revealed'), 100);
-});
+const resetSlider = () => { const t=document.querySelectorAll('.tile')[10*5]; if(t) slider.scrollLeft=t.offsetLeft-(window.innerWidth/2)+(t.offsetWidth/2); };
+window.addEventListener('load',()=>{ resetSlider(); setTimeout(()=>sliderContainer.classList.add('revealed'),100); });
 window.onresize = resetSlider;
+document.getElementById('next').onclick = ()=>slider.scrollBy({left:step,behavior:'smooth'});
+document.getElementById('prev').onclick = ()=>slider.scrollBy({left:-step,behavior:'smooth'});
+new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7}).observe.apply(null,[...document.querySelectorAll('.tile')].map(t=>(new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7}).observe(t),t)));
  
-document.getElementById('next').onclick = () => slider.scrollBy({ left: step, behavior: 'smooth' });
-document.getElementById('prev').onclick = () => slider.scrollBy({ left: -step, behavior: 'smooth' });
- 
-const tileObs = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    entry.target.classList.toggle('is-visible', entry.isIntersecting && entry.intersectionRatio > 0.7);
-  });
-}, { root: slider, threshold: 0.7 });
- 
-document.querySelectorAll('.tile').forEach(t => tileObs.observe(t));
- 
-// ---- PIANINO ----
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let currentInst = 'piano';
-let currentSong = null;
-let songStep = 0;
- 
-const songs = [
-  { name: "Czerwone jabłuszko", notes: [5, 9, 12, 12, 7, 10, 12, 10, 9, 7, 5, 12, 5, 9, 12, 12, 7, 10, 12, 10, 9, 7, 9, 5] },
-  { name: "Wlazł kotek", notes: [12, 9, 9, 10, 7, 7, 5, 9, 12, 12, 9, 9, 10, 7, 7, 5, 9, 5, 5, 9, 9, 10, 7, 7, 5, 9, 12, 12, 9, 9, 10, 7, 7, 5, 9, 5] },
-  { name: "Panie Janie", notes: [5, 7, 9, 5, 5, 7, 9, 5, 9, 10, 12, 9, 10, 12, 12, 14, 12, 10, 9, 5, 12, 14, 12, 10, 9, 5, 5, 0, 5, 5, 0, 5] }
+// ===================== PIANINO =====================
+const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+let currentInst='piano', currentSong=null, songStep=0;
+const songs=[
+  {name:"Czerwone jabłuszko",notes:[5,9,12,12,7,10,12,10,9,7,5,12,5,9,12,12,7,10,12,10,9,7,9,5]},
+  {name:"Wlazł kotek",notes:[12,9,9,10,7,7,5,9,12,12,9,9,10,7,7,5,9,5,5,9,9,10,7,7,5,9,12,12,9,9,10,7,7,5,9,5]},
+  {name:"Panie Janie",notes:[5,7,9,5,5,7,9,5,9,10,12,9,10,12,12,14,12,10,9,5,12,14,12,10,9,5,5,0,5,5,0,5]}
 ];
- 
-function playSound(freq, index) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  if (currentSong !== null && index === songs[currentSong].notes[songStep]) {
-    songStep++;
-    if (songStep >= songs[currentSong].notes.length) {
-      document.getElementById('piano-status').innerText = "Brawo! Ukończono utwór!";
-      toggleSong(currentSong);
-    } else { updateHighlight(); }
-  }
-  const vol = document.getElementById('volume').value;
-  const now = audioCtx.currentTime;
-  const gain = audioCtx.createGain();
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(vol, now + 0.01);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
-  const osc = audioCtx.createOscillator();
-  osc.type = currentInst === 'piano' ? 'triangle' : 'sawtooth';
-  osc.frequency.setValueAtTime(freq, now);
-  osc.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(); osc.stop(now + 1.5);
+function playSound(freq,index) {
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  if(currentSong!==null&&index===songs[currentSong].notes[songStep]){songStep++;if(songStep>=songs[currentSong].notes.length){document.getElementById('piano-status').innerText="Brawo! Ukończono utwór!";toggleSong(currentSong);}else{updateHighlight();}}
+  const vol=document.getElementById('volume').value,now=audioCtx.currentTime;
+  const gain=audioCtx.createGain();gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime(vol,now+0.01);gain.gain.exponentialRampToValueAtTime(0.01,now+1.5);
+  const osc=audioCtx.createOscillator();osc.type=currentInst==='piano'?'triangle':'sawtooth';osc.frequency.setValueAtTime(freq,now);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(now+1.5);
 }
+function toggleSong(i){if(currentSong===i){currentSong=null;songStep=0;document.getElementById('s'+i).classList.remove('active');document.getElementById('piano-status').innerText="Tryb wolnej gry";}else{document.querySelectorAll('.song-btn').forEach(b=>b.classList.remove('active'));currentSong=i;songStep=0;document.getElementById('s'+i).classList.add('active');document.getElementById('piano-status').innerText="Nauka: "+songs[i].name;}updateHighlight();}
+function updateHighlight(){document.querySelectorAll('.piano-key').forEach(k=>k.classList.remove('next-note'));if(currentSong!==null){const keys=document.querySelectorAll('.piano-key');const t=songs[currentSong].notes[songStep];if(keys[t])keys[t].classList.add('next-note');}}
+function changeInst(inst){currentInst=inst;document.body.className=inst==='piano'?'piano-mode':'harpsi-mode';document.getElementById('p-btn').classList.toggle('active',inst==='piano');document.getElementById('h-btn').classList.toggle('active',inst==='harpsi');}
+const notesPattern=['G','G#','A','A#','H','C','C#','D','D#','E','F','F#'];
+const piano=document.getElementById('piano');
+for(let i=0;i<25;i++){const noteIndex=i%12;const noteName=notesPattern[noteIndex];const freq=195.997*Math.pow(2,i/12);let label=i<5?noteName.toLowerCase():i<17?noteName.toUpperCase()+'¹':noteName.toUpperCase()+'²';const key=document.createElement('div');key.className=`piano-key ${noteName.includes('#')?'black':'white'}`;key.innerHTML=`<span>${label}</span>`;key.onmousedown=key.ontouchstart=(e)=>{e.preventDefault();playSound(freq,i);key.classList.add('playing');setTimeout(()=>key.classList.remove('playing'),150);};piano.appendChild(key);}
  
-function toggleSong(index) {
-  if (currentSong === index) {
-    currentSong = null; songStep = 0;
-    document.getElementById(`s${index}`).classList.remove('active');
-    document.getElementById('piano-status').innerText = "Tryb wolnej gry";
-  } else {
-    document.querySelectorAll('.song-btn').forEach(b => b.classList.remove('active'));
-    currentSong = index; songStep = 0;
-    document.getElementById(`s${index}`).classList.add('active');
-    document.getElementById('piano-status').innerText = "Nauka: " + songs[index].name;
-  }
-  updateHighlight();
-}
- 
-function updateHighlight() {
-  document.querySelectorAll('.piano-key').forEach(k => k.classList.remove('next-note'));
-  if (currentSong !== null) {
-    const keys = document.querySelectorAll('.piano-key');
-    const target = songs[currentSong].notes[songStep];
-    if (keys[target]) keys[target].classList.add('next-note');
-  }
-}
- 
-function changeInst(inst) {
-  currentInst = inst;
-  document.body.className = inst === 'piano' ? 'piano-mode' : 'harpsi-mode';
-  document.getElementById('p-btn').classList.toggle('active', inst === 'piano');
-  document.getElementById('h-btn').classList.toggle('active', inst === 'harpsi');
-}
- 
-const notesPattern = ['G', 'G#', 'A', 'A#', 'H', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#'];
-const piano = document.getElementById('piano');
- 
-for (let i = 0; i < 25; i++) {
-  const noteIndex = i % 12;
-  const noteName = notesPattern[noteIndex];
-  const freq = 195.997 * Math.pow(2, i / 12);
-  let label = '';
-  if (i < 5) label = noteName.toLowerCase();
-  else if (i < 17) label = noteName.toUpperCase() + '¹';
-  else label = noteName.toUpperCase() + '²';
- 
-  const key = document.createElement('div');
-  key.className = `piano-key ${noteName.includes('#') ? 'black' : 'white'}`;
-  key.innerHTML = `<span>${label}</span>`;
-  key.onmousedown = key.ontouchstart = (e) => {
-    e.preventDefault();
-    playSound(freq, i);
-    key.classList.add('playing');
-    setTimeout(() => key.classList.remove('playing'), 150);
-  };
-  piano.appendChild(key);
-}
- 
-// ---- FORMULARZ TERMINY ----
-let isStudio = true;
-let hasPiano = true;
- 
-function toggleForm(show) {
-  document.getElementById('formOverlay').classList.toggle('open', show);
-}
- 
-function setLoc(loc) {
-  isStudio = loc === 'studio';
-  document.getElementById('loc-studio').classList.toggle('selected', isStudio);
-  document.getElementById('loc-uczen').classList.toggle('selected', !isStudio);
-  document.getElementById('piano-options').style.display = isStudio ? 'none' : 'block';
-  updatePrice();
-}
- 
-function setPiano(val) {
-  hasPiano = val;
-  document.getElementById('piano-yes').classList.toggle('selected', hasPiano);
-  document.getElementById('piano-no').classList.toggle('selected', !hasPiano);
-  updatePrice();
-}
- 
-function updatePrice() {
-  document.getElementById('price-val').innerText = (!isStudio && !hasPiano ? 119 : 99) + ' zł / h';
-  val();
-}
- 
-function val() {
-  const n = document.getElementById('res-name').value;
-  const p = document.getElementById('res-phone').value;
-  document.getElementById('subBtn').classList.toggle('active', n.length > 2 && p.length >= 9);
-}
- 
-function wyslij() {
-  if (!document.getElementById('subBtn').classList.contains('active')) return;
-  const status = document.getElementById('res-status');
-  status.innerText = "Wysyłanie...";
-  status.style.color = "var(--navy)";
-  setTimeout(() => {
-    status.innerText = "Dziękujemy! Skontaktujemy się wkrótce.";
-    status.style.color = "#22c55e";
-    setTimeout(() => {
-      toggleForm(false);
-      status.innerText = "";
-      document.getElementById('res-name').value = "";
-      document.getElementById('res-phone').value = "";
-      document.getElementById('res-msg').value = "";
-    }, 2500);
-  }, 1500);
-}
- 
-const appleObs = new IntersectionObserver((es) => {
-  es.forEach(e => { if (e.isIntersecting) e.target.classList.add('active'); });
-}, { threshold: 0.1 });
-appleObs.observe(document.getElementById('appleLocation'));
- 
-// ---- FOOTER MODALE ----
-let fLoc = 's';
-let fPiano = true;
- 
-function toggleOverlay(id, show) {
-  document.getElementById(id).classList.toggle('open', show);
-}
- 
-function fSetLoc(type) {
-  fLoc = type;
-  document.getElementById('f-l-s').classList.toggle('selected', type === 's');
-  document.getElementById('f-l-u').classList.toggle('selected', type === 'u');
-  document.getElementById('f-piano-box').style.display = type === 'u' ? 'block' : 'none';
-  fUpdatePrice();
-}
- 
-function fSetPiano(val) {
-  fPiano = val;
-  document.getElementById('f-p-y').classList.toggle('selected', val);
-  document.getElementById('f-p-n').classList.toggle('selected', !val);
-  fUpdatePrice();
-}
- 
-function fUpdatePrice() {
-  document.getElementById('f-price').innerText = (fLoc === 'u' && !fPiano ? 119 : 99) + ' zł / h';
-}
+// ===================== TERMINY FORMULARZ =====================
+let isStudio=true,hasPiano=true;
+function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);}
+function setLoc(loc){isStudio=loc==='studio';document.getElementById('loc-studio').classList.toggle('selected',isStudio);document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);document.getElementById('piano-options').style.display=isStudio?'none':'block';updatePrice();}
+function setPiano(val){hasPiano=val;document.getElementById('piano-yes').classList.toggle('selected',hasPiano);document.getElementById('piano-no').classList.toggle('selected',!hasPiano);updatePrice();}
+function updatePrice(){document.getElementById('price-val').innerText=(!isStudio&&!hasPiano?119:99)+' zł / h';val();}
+function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9);}
+function wyslij(){if(!document.getElementById('subBtn').classList.contains('active'))return;const s=document.getElementById('res-status');s.innerText="Wysyłanie...";s.style.color="var(--navy)";setTimeout(()=>{s.innerText="Dziękujemy! Skontaktujemy się wkrótce.";s.style.color="#22c55e";setTimeout(()=>{toggleForm(false);s.innerText="";document.getElementById('res-name').value="";document.getElementById('res-phone').value="";document.getElementById('res-msg').value="";},2500);},1500);}
 </script>
- 
 </body>
 </html>
  
