@@ -883,7 +883,10 @@ async function sendToMake(payload) {
     body: JSON.stringify(payload)
   });
   if (!response.ok) throw new Error('HTTP ' + response.status);
-  return response;
+  
+  // Odczytaj odpowiedź z Make.com
+  const data = await response.json();
+  return data; // { status: "duplicate" } lub { status: "ok" }
 }
  
 // ============================================================
@@ -1015,27 +1018,18 @@ async function wyslij() {
   };
  
   try {
-    await sendToMake(payload);
-    s.innerText = "✅ Dziękujemy! Potwierdzenie wysłano na Twój email.";
-    s.style.color = "#22c55e";
-    showToast("✅ Zgłoszenie wysłane!");
-    setTimeout(() => {
-      toggleForm(false);
-      s.innerText = "";
-      document.getElementById('res-name').value = "";
-      document.getElementById('res-phone').value = "";
-      document.getElementById('res-email').value = "";
-      document.getElementById('res-msg').value = "";
-      btn.disabled = false;
-    }, 3000);
-  } catch(e) {
-    s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
-    s.style.color = "#ef4444";
-    btn.disabled = false;
-    btn.classList.add('active');
-    showToast("Błąd wysyłki. Spróbuj ponownie.", true);
-  }
+const result = await sendToMake(payload);
+
+if (result.status === 'duplicate') {
+  s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
+  s.style.color = "var(--gold)";
+  btn.disabled = false;
+  btn.classList.add('active');
+  return; // nie zamykaj formularza
 }
+
+// jeśli ok — normalny przepływ
+s.innerText = "✅ Dziękujemy! Potwierdzenie wysłano na Twój email.";
  
 // ============================================================
 // MODAL STOPKA — LEKCJA PRÓBNA
@@ -1062,65 +1056,74 @@ function mUpdatePrice() {
 }
  
 async function wyslijModal() {
-  const name    = document.getElementById('m-name').value.trim();
-  const phone   = document.getElementById('m-phone').value.trim();
-  const email   = document.getElementById('m-email').value.trim();
-  const message = document.getElementById('m-msg').value.trim();
-  const status  = document.getElementById('modal-status');
- 
+  const s = document.getElementById('modal-status');
+  const submitBtn = document.querySelector('.modal-submit');
+  
+  // walidacja
+  const name  = document.getElementById('m-name').value.trim();
+  const phone = document.getElementById('m-phone').value.trim();
+  const email = document.getElementById('m-email').value.trim();
   if (name.length < 2 || phone.length < 9 || !email.includes('@')) {
-    status.innerText = "⚠️ Wypełnij imię, telefon i email.";
-    status.style.color = "#ef4444";
+    s.innerText = "⚠️ Wypełnij imię, telefon i email.";
+    s.style.color = "#ef4444";
     return;
   }
- 
-  const submitBtn = document.querySelector('.modal-submit');
+
   submitBtn.disabled = true;
   submitBtn.innerText = "Wysyłanie...";
-  status.innerText = "";
- 
+  s.innerText = "";
+
   const location = mLoc === 's' ? "Studio — Gdynia Mały Kack" : "U ucznia — dojazd";
   const piano    = mLoc === 's' ? "—" : (mPiano ? "Tak" : "Nie — dowóz instrumentu");
   const price    = (mLoc === 'u' && !mPiano ? 119 : 99) + " zł/h";
   const date     = new Date().toLocaleString('pl-PL');
- 
+
   const payload = {
     typ: "lekcja-probna-modal",
     imie_nazwisko: name,
     telefon: phone,
     email: email,
-    tresc: message,
+    tresc: document.getElementById('m-msg').value.trim(),
     miejsce: location,
     pianino: piano,
     cena: price,
     data: date,
     owner_email: OWNER_EMAIL
   };
- 
+
   try {
-    await sendToMake(payload);
-    status.innerText = "✅ Wysłano! Sprawdź email.";
-    status.style.color = "#22c55e";
+    const result = await sendToMake(payload);
+
+    if (result.status === 'duplicate') {
+      s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
+      s.style.color = "var(--gold)";
+      submitBtn.disabled = false;
+      submitBtn.innerText = "WYŚLIJ PROŚBĘ";
+      return;
+    }
+
+    s.innerText = "✅ Wysłano! Sprawdź email.";
+    s.style.color = "#22c55e";
     submitBtn.innerText = "WYŚLIJ PROŚBĘ";
     showToast("✅ Prośba o lekcję próbną wysłana!");
     setTimeout(() => {
       closeLessonModal();
-      status.innerText = "";
+      s.innerText = "";
       document.getElementById('m-name').value = "";
       document.getElementById('m-phone').value = "";
       document.getElementById('m-email').value = "";
       document.getElementById('m-msg').value = "";
       submitBtn.disabled = false;
     }, 3000);
+
   } catch(e) {
-    status.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
-    status.style.color = "#ef4444";
+    s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
+    s.style.color = "#ef4444";
     submitBtn.innerText = "WYŚLIJ PROŚBĘ";
     submitBtn.disabled = false;
     showToast("Błąd. Spróbuj ponownie lub zadzwoń.", true);
   }
 }
- 
 // ============================================================
 // ANIMACJE SCROLL
 // ============================================================
