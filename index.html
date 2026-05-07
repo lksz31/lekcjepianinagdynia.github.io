@@ -426,18 +426,9 @@
   @media (max-width: 500px) { .info-card iframe { height: 280px; } }
  
   /* BRIEFY */
-  .briefy-section {
-    padding: 100px 5%;
-    background: var(--navy);
-    position: relative; overflow: hidden;
-  }
+  .briefy-section { padding: 100px 5%; background: var(--navy); position: relative; overflow: hidden; }
   @media (max-width: 600px) { .briefy-section { padding: 60px 4%; } }
-  .briefy-section::before {
-    content: '♪'; position: absolute;
-    font-size: 20rem; color: rgba(255,255,255,0.03);
-    top: -40px; right: -40px;
-    font-family: serif; pointer-events: none;
-  }
+  .briefy-section::before { content: '♪'; position: absolute; font-size: 20rem; color: rgba(255,255,255,0.03); top: -40px; right: -40px; font-family: serif; pointer-events: none; }
   .briefy-inner { max-width: 580px; margin: 0 auto; text-align: center; position: relative; z-index: 1; }
   .briefy-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 12px; }
   .briefy-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.6rem); color: white; margin: 0 0 12px; line-height: 1.2; }
@@ -445,12 +436,7 @@
   .briefy-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; padding: 28px; backdrop-filter: blur(10px); }
   .briefy-input-row { display: flex; gap: 10px; margin-bottom: 16px; }
   @media (max-width: 400px) { .briefy-input-row { flex-direction: column; } }
-  .briefy-input {
-    flex: 1; padding: 14px 18px;
-    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
-    border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 0.95rem; color: white;
-    outline: none; transition: border-color 0.2s;
-  }
+  .briefy-input { flex: 1; padding: 14px 18px; background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15); border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 0.95rem; color: white; outline: none; transition: border-color 0.2s; }
   .briefy-input::placeholder { color: rgba(255,255,255,0.35); }
   .briefy-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.12); }
   .briefy-btn { padding: 14px 24px; background: var(--gold); color: #1a1a2e; border: none; border-radius: 50px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.3s; white-space: nowrap; }
@@ -468,11 +454,7 @@
  
   /* STOPKA */
   .site-footer { background: white; border-top: 1px solid #e8eaee; padding: 0 5%; font-family: 'Poppins', sans-serif; }
-  .footer-main {
-    max-width: 1100px; margin: 0 auto;
-    display: grid; grid-template-columns: 1.4fr 1fr 1fr auto;
-    gap: 3rem; padding: 3rem 0 2.5rem; align-items: start;
-  }
+  .footer-main { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 3rem; padding: 3rem 0 2.5rem; align-items: start; }
   @media(max-width:900px) { .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; } .footer-cta-col { grid-column: span 2; } }
   @media(max-width:560px) { .footer-main { grid-template-columns: 1fr; padding: 2rem 0; } .footer-cta-col { grid-column: span 1; } }
   .footer-brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; }
@@ -526,14 +508,8 @@
   .pdf-modal-close:hover { color: var(--navy); }
   .pdf-modal iframe { flex: 1; border: none; width: 100%; }
  
-  /* TOAST NOTIFICATION */
-  .toast {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: #22c55e; color: white; padding: 14px 28px; border-radius: 50px;
-    font-weight: 700; font-size: 0.9rem; z-index: 9999;
-    opacity: 0; transition: all 0.4s; pointer-events: none; white-space: nowrap;
-    box-shadow: 0 10px 30px rgba(34,197,94,0.3);
-  }
+  /* TOAST */
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #22c55e; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: all 0.4s; pointer-events: none; white-space: nowrap; box-shadow: 0 10px 30px rgba(34,197,94,0.3); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.error { background: #ef4444; box-shadow: 0 10px 30px rgba(239,68,68,0.3); }
   @media (min-width: 701px) { .toast { bottom: 30px; } }
@@ -542,7 +518,7 @@
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
  
-  /* MOBILE CARD FIXES */
+  /* MOBILE FIXES */
   @media (max-width: 850px) {
     .tag-note { width: 180px; left: 0; transform: none; }
     .tag-wrapper:hover .tag-note { transform: translateY(-10px); }
@@ -553,7 +529,6 @@
 </head>
 <body class="piano-mode">
  
-<!-- NAWIGACJA DESKTOP -->
 <nav class="site-nav">
   <a href="#o-mnie">O mnie</a>
   <a href="#oferta">Oferta</a>
@@ -563,7 +538,6 @@
   <a href="#kontakt">Kontakt</a>
 </nav>
  
-<!-- NAWIGACJA MOBILE (bottom bar) -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
@@ -574,7 +548,6 @@
   </div>
 </nav>
  
-<!-- HERO -->
 <section class="hero">
   <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
   <h1>Lekcje pianina<br>z <em>pasją</em></h1>
@@ -586,7 +559,6 @@
   <div class="scroll-hint">↓ Przewiń w dół</div>
 </section>
  
-<!-- BENTO GRID -->
 <section class="section" id="o-mnie">
   <div class="section-label">Nauczyciel</div>
   <h2 class="section-title">Poznajmy się</h2>
@@ -637,7 +609,6 @@
   </div>
 </section>
  
-<!-- SLIDER -->
 <section class="slider-section" id="oferta">
   <div class="section-inner">
     <div class="section-label">Szczegóły oferty</div>
@@ -652,7 +623,6 @@
   </div>
 </section>
  
-<!-- POMOCE -->
 <section class="pomoce-section">
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
@@ -669,7 +639,6 @@
   </div>
 </section>
  
-<!-- PIANINO -->
 <section class="piano-section" id="pianino">
   <div class="section-inner">
     <div class="section-label">Interaktywne</div>
@@ -691,7 +660,6 @@
   </div>
 </section>
  
-<!-- TERMINY -->
 <section class="terminy-section" id="terminy">
   <div class="section-inner">
     <div class="section-label">Kalendarz</div>
@@ -731,7 +699,6 @@
   </div>
 </section>
  
-<!-- BRIEFY -->
 <section class="briefy-section" id="briefy">
   <div class="briefy-inner">
     <div class="briefy-label">Strefa ucznia</div>
@@ -748,7 +715,6 @@
   </div>
 </section>
  
-<!-- STOPKA -->
 <footer class="site-footer" id="kontakt">
   <div class="footer-main">
     <div>
@@ -761,22 +727,10 @@
       </div>
       <div class="footer-rule"></div>
       <div class="footer-contacts">
-        <div class="footer-contact-row">
-          <span class="footer-contact-label">Tel</span>
-          <a href="tel:514338875" class="footer-contact-val">514 338 875</a>
-        </div>
-        <div class="footer-contact-row">
-          <span class="footer-contact-label">Email</span>
-          <a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-contact-val">lukaszgkorepetycje@gmail.com</a>
-        </div>
-        <div class="footer-contact-row">
-          <span class="footer-contact-label">WWW</span>
-          <a href="https://lekcjepianinagdynia.pl" class="footer-contact-val">lekcjepianinagdynia.pl</a>
-        </div>
-        <div class="footer-contact-row">
-          <span class="footer-contact-label">WA</span>
-          <a href="https://wa.me/48514338875" target="_blank" class="footer-contact-val">WhatsApp</a>
-        </div>
+        <div class="footer-contact-row"><span class="footer-contact-label">Tel</span><a href="tel:514338875" class="footer-contact-val">514 338 875</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">Email</span><a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-contact-val">lukaszgkorepetycje@gmail.com</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">WWW</span><a href="https://lekcjepianinagdynia.pl" class="footer-contact-val">lekcjepianinagdynia.pl</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">WA</span><a href="https://wa.me/48514338875" target="_blank" class="footer-contact-val">WhatsApp</a></div>
       </div>
     </div>
     <div>
@@ -798,9 +752,7 @@
       </ul>
     </div>
     <div class="footer-cta-col">
-      <button class="footer-cta-btn" onclick="openLessonModal()">
-        🎹 Umów lekcję próbną
-      </button>
+      <button class="footer-cta-btn" onclick="openLessonModal()">🎹 Umów lekcję próbną</button>
     </div>
   </div>
   <div style="max-width:1100px;margin:0 auto;">
@@ -811,7 +763,6 @@
   </div>
 </footer>
  
-<!-- MODAL LEKCJA PRÓBNA -->
 <div class="footer-modal-overlay" id="lessonModal" onclick="if(event.target===this)closeLessonModal()">
   <div class="footer-modal">
     <button class="modal-close" onclick="closeLessonModal()">✕</button>
@@ -840,10 +791,8 @@
   </div>
 </div>
  
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
  
-<!-- PDF MODAL -->
 <div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePDF()">
   <div class="pdf-modal">
     <div class="pdf-modal-header">
@@ -858,9 +807,9 @@
 // ============================================================
 // KONFIGURACJA
 // ============================================================
-const FORM_WEBHOOK   = "https://hook.eu1.make.com/uijd56iir7osvthltco7pdmwhcn8vdb8";
-const BRIEF_WEBHOOK  = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
-const OWNER_EMAIL    = "lukaszgkorepetycje@gmail.com";
+const FORM_WEBHOOK  = "https://hook.eu1.make.com/uijd56iir7osvthltco7pdmwhcn8vdb8";
+const BRIEF_WEBHOOK = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
+const OWNER_EMAIL   = "lukaszgkorepetycje@gmail.com";
  
 // ============================================================
 // TOAST
@@ -874,7 +823,7 @@ function showToast(msg, isError = false) {
 }
  
 // ============================================================
-// WYSYŁKA DO MAKE.COM — główna funkcja
+// WYSYŁKA DO MAKE.COM
 // ============================================================
 async function sendToMake(payload) {
   const response = await fetch(FORM_WEBHOOK, {
@@ -883,17 +832,14 @@ async function sendToMake(payload) {
     body: JSON.stringify(payload)
   });
   if (!response.ok) throw new Error('HTTP ' + response.status);
-  
-  // Odczytaj odpowiedź z Make.com
   const data = await response.json();
-  return data; // { status: "duplicate" } lub { status: "ok" }
+  return data;
 }
  
 // ============================================================
 // BRIEFY
 // ============================================================
 const RATE_LIMIT = 3, RATE_WINDOW = 60000, TIMEOUT_DURATION = 300000;
- 
 function getRateData() {
   try { return JSON.parse(sessionStorage.getItem('brief_rate')) || { count:0, windowStart:Date.now(), blockedUntil:null }; }
   catch(e) { return { count:0, windowStart:Date.now(), blockedUntil:null }; }
@@ -938,10 +884,7 @@ async function sprawdzKod() {
       const cards = data.briefy.map(b => `
         <a href="${b.url}" target="_blank" class="brief-card-link">
           <div class="brief-card-icon">📄</div>
-          <div style="flex:1;">
-            <div class="brief-card-title">${b.title}</div>
-            <div class="brief-card-sub">${b.subtitle}</div>
-          </div>
+          <div style="flex:1;"><div class="brief-card-title">${b.title}</div><div class="brief-card-sub">${b.subtitle}</div></div>
           <div class="brief-card-arrow">→</div>
         </a>`).join('');
       result.style.display = 'block';
@@ -955,11 +898,12 @@ async function sprawdzKod() {
 document.getElementById('brief-code-input').addEventListener('keydown', e => { if(e.key==='Enter') sprawdzKod(); });
  
 // ============================================================
-// FORMULARZ — TERMINY (sekcja główna)
+// FORMULARZ — TERMINY
 // ============================================================
 let isStudio = true, hasPiano = true;
  
 function toggleForm(show) { document.getElementById('formOverlay').classList.toggle('open', show); }
+ 
 function setLoc(loc) {
   isStudio = loc === 'studio';
   document.getElementById('loc-studio').classList.toggle('selected', isStudio);
@@ -967,16 +911,19 @@ function setLoc(loc) {
   document.getElementById('piano-options').style.display = isStudio ? 'none' : 'block';
   updatePrice();
 }
+ 
 function setPiano(v) {
   hasPiano = v;
   document.getElementById('piano-yes').classList.toggle('selected', hasPiano);
   document.getElementById('piano-no').classList.toggle('selected', !hasPiano);
   updatePrice();
 }
+ 
 function updatePrice() {
   document.getElementById('price-val').innerText = (!isStudio && !hasPiano ? 119 : 99) + ' zł / h';
   val();
 }
+ 
 function val() {
   const n = document.getElementById('res-name').value;
   const p = document.getElementById('res-phone').value;
@@ -988,7 +935,7 @@ function val() {
 async function wyslij() {
   if (!document.getElementById('subBtn').classList.contains('active')) return;
  
-  const s = document.getElementById('res-status');
+  const s   = document.getElementById('res-status');
   const btn = document.getElementById('subBtn');
   s.innerText = "⏳ Wysyłanie...";
   s.style.color = "var(--navy)";
@@ -1018,26 +965,46 @@ async function wyslij() {
   };
  
   try {
-const result = await sendToMake(payload);
-
-if (result.status === 'duplicate') {
-  s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
-  s.style.color = "var(--gold)";
-  btn.disabled = false;
-  btn.classList.add('active');
-  return; // nie zamykaj formularza
+    const result = await sendToMake(payload);
+ 
+    if (result.status === 'duplicate') {
+      s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
+      s.style.color = "var(--gold)";
+      btn.disabled = false;
+      btn.classList.add('active');
+      return;
+    }
+ 
+    s.innerText = "✅ Dziękujemy! Potwierdzenie wysłano na Twój email.";
+    s.style.color = "#22c55e";
+    showToast("✅ Zgłoszenie wysłane!");
+    setTimeout(() => {
+      toggleForm(false);
+      s.innerText = "";
+      document.getElementById('res-name').value = "";
+      document.getElementById('res-phone').value = "";
+      document.getElementById('res-email').value = "";
+      document.getElementById('res-msg').value = "";
+      btn.disabled = false;
+    }, 3000);
+ 
+  } catch(e) {
+    s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
+    s.style.color = "#ef4444";
+    btn.disabled = false;
+    btn.classList.add('active');
+    showToast("Błąd wysyłki. Spróbuj ponownie.", true);
+  }
 }
-
-// jeśli ok — normalny przepływ
-s.innerText = "✅ Dziękujemy! Potwierdzenie wysłano na Twój email.";
  
 // ============================================================
-// MODAL STOPKA — LEKCJA PRÓBNA
+// MODAL — LEKCJA PRÓBNA
 // ============================================================
-function openLessonModal() { document.getElementById('lessonModal').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function openLessonModal()  { document.getElementById('lessonModal').classList.add('open');    document.body.style.overflow = 'hidden'; }
 function closeLessonModal() { document.getElementById('lessonModal').classList.remove('open'); document.body.style.overflow = ''; }
  
 let mLoc = 's', mPiano = true;
+ 
 function mSetLoc(t) {
   mLoc = t;
   document.getElementById('m-l-s').classList.toggle('selected', t === 's');
@@ -1045,39 +1012,41 @@ function mSetLoc(t) {
   document.getElementById('m-piano-box').style.display = t === 'u' ? 'block' : 'none';
   mUpdatePrice();
 }
+ 
 function mSetPiano(v) {
   mPiano = v;
   document.getElementById('m-p-y').classList.toggle('selected', v);
   document.getElementById('m-p-n').classList.toggle('selected', !v);
   mUpdatePrice();
 }
+ 
 function mUpdatePrice() {
   document.getElementById('m-price').innerText = (mLoc === 'u' && !mPiano ? 119 : 99) + ' zł / h';
 }
  
 async function wyslijModal() {
-  const s = document.getElementById('modal-status');
+  const s         = document.getElementById('modal-status');
   const submitBtn = document.querySelector('.modal-submit');
-  
-  // walidacja
+ 
   const name  = document.getElementById('m-name').value.trim();
   const phone = document.getElementById('m-phone').value.trim();
   const email = document.getElementById('m-email').value.trim();
+ 
   if (name.length < 2 || phone.length < 9 || !email.includes('@')) {
     s.innerText = "⚠️ Wypełnij imię, telefon i email.";
     s.style.color = "#ef4444";
     return;
   }
-
+ 
   submitBtn.disabled = true;
   submitBtn.innerText = "Wysyłanie...";
   s.innerText = "";
-
+ 
   const location = mLoc === 's' ? "Studio — Gdynia Mały Kack" : "U ucznia — dojazd";
   const piano    = mLoc === 's' ? "—" : (mPiano ? "Tak" : "Nie — dowóz instrumentu");
   const price    = (mLoc === 'u' && !mPiano ? 119 : 99) + " zł/h";
   const date     = new Date().toLocaleString('pl-PL');
-
+ 
   const payload = {
     typ: "lekcja-probna-modal",
     imie_nazwisko: name,
@@ -1090,10 +1059,10 @@ async function wyslijModal() {
     data: date,
     owner_email: OWNER_EMAIL
   };
-
+ 
   try {
     const result = await sendToMake(payload);
-
+ 
     if (result.status === 'duplicate') {
       s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
       s.style.color = "var(--gold)";
@@ -1101,7 +1070,7 @@ async function wyslijModal() {
       submitBtn.innerText = "WYŚLIJ PROŚBĘ";
       return;
     }
-
+ 
     s.innerText = "✅ Wysłano! Sprawdź email.";
     s.style.color = "#22c55e";
     submitBtn.innerText = "WYŚLIJ PROŚBĘ";
@@ -1115,7 +1084,7 @@ async function wyslijModal() {
       document.getElementById('m-msg').value = "";
       submitBtn.disabled = false;
     }, 3000);
-
+ 
   } catch(e) {
     s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
     s.style.color = "#ef4444";
@@ -1124,6 +1093,7 @@ async function wyslijModal() {
     showToast("Błąd. Spróbuj ponownie lub zadzwoń.", true);
   }
 }
+ 
 // ============================================================
 // ANIMACJE SCROLL
 // ============================================================
@@ -1156,7 +1126,7 @@ const tileObs = new IntersectionObserver(es=>es.forEach(e=>e.target.classList.to
 document.querySelectorAll('.tile').forEach(t=>tileObs.observe(t));
  
 // ============================================================
-// PIANINO INTERAKTYWNE
+// PIANINO
 // ============================================================
 const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
 let currentInst='piano', currentSong=null, songStep=0;
