@@ -879,17 +879,34 @@ async function sprawdzKod() {
       body: JSON.stringify({ kod })
     });
     const data = await response.json();
-    btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
-    if (data.status === 'ok' && data.briefy && data.briefy.length > 0) {
-      const cards = data.briefy.map(b => `
-        <a href="${b.url}" target="_blank" class="brief-card-link">
-          <div class="brief-card-icon">📄</div>
-          <div style="flex:1;"><div class="brief-card-title">${b.title}</div><div class="brief-card-sub">${b.subtitle}</div></div>
-          <div class="brief-card-arrow">→</div>
-        </a>`).join('');
-      result.style.display = 'block';
-      result.innerHTML = `<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
-    } else { showBriefError('Kod jest niewłaściwy lub nieaktywny.'); }
+if (data.status === 'ok' && data.briefy && data.briefy.length > 0) {
+  const cards = data.briefy.map(b => `
+    <a href="${b.url}" target="_blank" class="brief-card-link">
+      <div class="brief-card-icon">📄</div>
+      <div style="flex:1;">
+        <div class="brief-card-title">${b.title}</div>
+        <div class="brief-card-sub">${b.subtitle}</div>
+      </div>
+      <div class="brief-card-arrow">→</div>
+    </a>`).join('');
+  result.style.display = 'block';
+  result.innerHTML = `<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
+} else if (data.status === 'ok' && data.briefy && data.briefy.length === 0) {
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div style="
+      background: rgba(255,255,255,0.06);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 16px; padding: 20px 24px;
+      text-align: center; color: rgba(255,255,255,0.55);
+      font-size: 0.9rem; line-height: 1.6;
+    ">
+      🎵 Brak dostępnych materiałów na ten moment.<br>
+      <span style="font-size:0.8rem;">Materiały pojawiają się wraz z kolejnymi lekcjami.</span>
+    </div>`;
+} else {
+  showBriefError('Kod jest niewłaściwy lub nieaktywny.');
+}
   } catch(e) {
     btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
     showBriefError('Błąd połączenia. Spróbuj ponownie.');
