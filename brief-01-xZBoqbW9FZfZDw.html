@@ -40,33 +40,78 @@
   .header-inner {
     max-width: 960px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 0; gap: 1rem;
+    padding: 12px 0; gap: 1rem;
   }
   .header-left { display: flex; align-items: center; gap: 14px; }
   .logo-img {
-    width: 44px; height: 44px; border-radius: 10px;
+    width: 40px; height: 40px; border-radius: 10px;
     object-fit: cover; flex-shrink: 0;
     box-shadow: 0 4px 12px rgba(30,58,138,0.15);
   }
   .series-label {
-    font-size: 0.68rem; font-weight: 700;
+    font-size: 0.65rem; font-weight: 700;
     letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 2px;
+    color: var(--gold); margin-bottom: 1px;
   }
   .series-title {
     font-family: 'Playfair Display', serif;
-    font-size: 0.9rem; font-weight: 600; color: var(--navy);
+    font-size: 0.88rem; font-weight: 600; color: var(--navy);
   }
-  .header-right { text-align: right; font-size: 0.75rem; color: var(--text-mid); line-height: 1.5; }
-  .header-right strong { display: block; font-size: 0.8rem; color: var(--navy); font-weight: 600; }
-  .header-right a { color: var(--navy); text-decoration: none; font-weight: 500; }
-  .header-right a:hover { color: var(--gold); }
-  @media (max-width: 600px) { .header-right { display: none; } }
+ 
+  /* POWRÓT DO STRONY GŁÓWNEJ */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--navy); color: white;
+    padding: 8px 18px; border-radius: 50px;
+    font-size: 0.78rem; font-weight: 700;
+    text-decoration: none; transition: 0.25s;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .back-btn:hover { background: var(--gold); transform: translateY(-1px); }
+  .back-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  @media (max-width: 500px) { .back-btn span { display: none; } .back-btn { padding: 8px 12px; } }
+ 
+  /* ── MOBILE BOTTOM NAV ── */
+  .mobile-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.97);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 10px 0 env(safe-area-inset-bottom, 10px);
+    z-index: 1000;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.08);
+  }
+  .mobile-nav-inner {
+    display: flex; justify-content: space-around; align-items: center;
+  }
+  .mobile-nav a {
+    display: flex; flex-direction: column; align-items: center;
+    text-decoration: none; color: #94a3b8;
+    font-size: 0.58rem; font-weight: 600; gap: 3px;
+    transition: 0.2s;
+  }
+  .mobile-nav a .mn-icon { font-size: 1.15rem; }
+  .mobile-nav a:hover { color: var(--navy); }
+  .mobile-nav a.mn-home {
+    color: var(--navy);
+  }
+  .mobile-nav a.mn-cta {
+    background: var(--navy); color: white !important;
+    padding: 7px 14px; border-radius: 50px;
+    flex-direction: row; gap: 5px;
+    font-size: 0.68rem;
+  }
+  .mobile-nav a.mn-cta:hover { background: var(--gold); }
+  @media (max-width: 700px) {
+    .mobile-nav { display: block; }
+    body { padding-bottom: 70px; }
+  }
  
   /* ── HERO ── */
   .hero {
     background: var(--navy);
-    padding: 70px 5% 60px;
+    padding: 60px 5% 55px;
     position: relative; overflow: hidden;
   }
   .hero::before {
@@ -83,7 +128,7 @@
   .hero-inner { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
   .brief-badge {
     display: inline-flex; align-items: center; gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     opacity: 0; animation: fadeUp 0.7s ease forwards 0.1s;
   }
   .brief-badge-line { width: 32px; height: 2px; background: var(--gold); flex-shrink: 0; }
@@ -93,13 +138,13 @@
   }
   .hero h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.4rem);
-    color: white; line-height: 1.15; margin-bottom: 20px;
+    font-size: clamp(1.9rem, 5vw, 3.4rem);
+    color: white; line-height: 1.15; margin-bottom: 18px;
     opacity: 0; animation: fadeUp 0.7s ease forwards 0.25s;
   }
   .hero h1 em { font-style: italic; color: var(--gold); }
   .hero-lead {
-    font-size: clamp(0.9rem, 2vw, 1.05rem);
+    font-size: clamp(0.88rem, 2vw, 1.05rem);
     color: rgba(255,255,255,0.6); max-width: 560px;
     line-height: 1.7; font-weight: 300;
     padding-left: 18px; border-left: 3px solid var(--gold);
@@ -109,47 +154,51 @@
   /* ── ARTYKUŁ ── */
   .article-wrap {
     max-width: 960px; margin: 0 auto;
-    padding: 50px 5% 60px;
+    padding: 44px 5% 50px;
   }
  
-  /* biała karta opakowująca artykuł */
   .article-card {
     background: white;
     border-radius: 28px;
     border: 1px solid var(--border);
     box-shadow: 0 4px 28px rgba(0,0,0,0.07);
-    padding: 52px 60px;
+    padding: 50px 58px;
     opacity: 0; transform: translateY(24px);
     transition: opacity 0.8s cubic-bezier(0.2,0.8,0.2,1), transform 0.8s cubic-bezier(0.2,0.8,0.2,1);
   }
   .article-card.visible { opacity: 1; transform: translateY(0); }
-  @media (max-width: 700px) { .article-card { padding: 28px 24px; } }
+  @media (max-width: 700px) { .article-card { padding: 26px 22px; } }
  
-  /* mapa wpięta w tekst (float) */
+  /* mapa */
   .map-float {
     float: right;
     width: 44%;
-    margin: 6px 0 24px 32px;
-    border-radius: 16px;
+    margin: 4px 0 22px 30px;
+    border-radius: 14px;
     overflow: hidden;
     border: 1px solid var(--border);
     box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    background: #e8edf5;
   }
   .map-float img {
     width: 100%; display: block;
     filter: sepia(8%) contrast(1.08);
   }
+  /* SVG zastępczy gdy brak obrazu */
+  .map-svg-placeholder {
+    width: 100%; display: block;
+    aspect-ratio: 4/3;
+  }
   .map-float figcaption {
-    font-size: 0.72rem; color: var(--text-mid);
+    font-size: 0.7rem; color: var(--text-mid);
     padding: 8px 12px; text-align: center;
     font-style: italic; background: #f8fafc;
     border-top: 1px solid var(--border);
   }
   @media (max-width: 620px) {
-    .map-float { float: none; width: 100%; margin: 0 0 24px 0; }
+    .map-float { float: none; width: 100%; margin: 0 0 22px 0; }
   }
  
-  /* tytuł artykułu */
   .article-card .art-label {
     font-size: 0.68rem; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.15em;
@@ -157,23 +206,17 @@
   }
   .article-card h2 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    color: var(--navy); margin-bottom: 28px; line-height: 1.2;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    color: var(--navy); margin-bottom: 26px; line-height: 1.2;
   }
- 
-  /* tekst ciągły */
   .article-card p {
     font-size: 1rem; line-height: 1.9; color: var(--text);
-    margin-bottom: 20px; text-align: justify;
-    hyphens: auto;
+    margin-bottom: 20px; text-align: justify; hyphens: auto;
   }
   .article-card p:last-child { margin-bottom: 0; }
   .article-card strong { color: var(--navy); font-weight: 600; }
- 
-  /* clearfix po float */
   .clearfix::after { content: ''; display: table; clear: both; }
  
-  /* śródtytuł */
   .article-card h3 {
     font-family: 'Playfair Display', serif;
     font-size: 1.15rem; color: var(--navy);
@@ -183,7 +226,6 @@
     clear: both;
   }
  
-  /* cytat z lewą bordiurą (jak na screenie) */
   .blockquote {
     margin: 28px 0;
     padding: 16px 24px;
@@ -194,19 +236,14 @@
   }
   .blockquote p {
     font-family: 'Playfair Display', serif !important;
-    font-style: italic;
-    color: var(--navy) !important;
-    font-size: 1.05rem !important;
-    line-height: 1.65 !important;
-    margin: 0 !important;
-    text-align: left !important;
+    font-style: italic; color: var(--navy) !important;
+    font-size: 1.05rem !important; line-height: 1.65 !important;
+    margin: 0 !important; text-align: left !important;
   }
  
-  /* tagi na dole artykułu */
   .tags-section {
-    margin-top: 36px; padding-top: 28px;
-    border-top: 1px solid var(--border);
-    clear: both;
+    margin-top: 36px; padding-top: 26px;
+    border-top: 1px solid var(--border); clear: both;
   }
   .tags-label {
     font-size: 0.68rem; font-weight: 800;
@@ -215,20 +252,17 @@
   }
   .tags-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
   .tag {
-    border: 1.5px solid var(--navy);
-    color: var(--navy); padding: 5px 16px; border-radius: 50px;
+    border: 1.5px solid var(--navy); color: var(--navy);
+    padding: 5px 16px; border-radius: 50px;
     font-size: 0.75rem; font-weight: 600; transition: 0.2s; cursor: default;
   }
   .tag:hover { background: var(--navy); color: white; }
  
   /* źródła */
-  .sources-wrap {
-    max-width: 960px; margin: 0 auto; padding: 0 5% 50px;
-  }
+  .sources-wrap { max-width: 960px; margin: 0 auto; padding: 0 5% 50px; }
   .sources-inner {
     background: #f8fafc; border-radius: 20px;
-    border: 1px solid var(--border);
-    padding: 24px 32px;
+    border: 1px solid var(--border); padding: 24px 32px;
     opacity: 0; transform: translateY(16px);
     transition: opacity 0.7s 0.1s, transform 0.7s 0.1s;
   }
@@ -238,10 +272,7 @@
     text-transform: uppercase; letter-spacing: 0.15em;
     color: var(--gold); margin-bottom: 12px; display: block;
   }
-  .sources-inner ol {
-    padding-left: 18px; font-size: 0.8rem;
-    color: var(--text-mid); line-height: 1.8;
-  }
+  .sources-inner ol { padding-left: 18px; font-size: 0.8rem; color: var(--text-mid); line-height: 1.8; }
   .sources-inner ol li + li { margin-top: 4px; }
   .sources-inner a { color: var(--navy); font-weight: 500; }
   .sources-inner a:hover { color: var(--gold); }
@@ -280,12 +311,29 @@
         <div class="series-title">Historia Postrzegania Muzyki</div>
       </div>
     </div>
-    <div class="header-right">
-      <strong>Łukasz Ganczarek</strong>
-      <a href="https://lekcjepianinagdynia.pl">lekcjepianinagdynia.pl</a>
-    </div>
+    <!-- POWRÓT DO STRONY GŁÓWNEJ — widoczny przycisk -->
+    <a href="https://lekcjepianinagdynia.pl" class="back-btn">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Strona główna</span>
+    </a>
   </div>
 </header>
+ 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="https://lekcjepianinagdynia.pl" class="mn-home">
+      <span class="mn-icon">🏠</span>Główna
+    </a>
+    <a href="https://lekcjepianinagdynia.pl#briefy">
+      <span class="mn-icon">📚</span>Materiały
+    </a>
+    <a href="https://lekcjepianinagdynia.pl#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="https://lekcjepianinagdynia.pl#kontakt">
+      <span class="mn-icon">✉️</span>Kontakt
+    </a>
+  </div>
+</nav>
  
 <!-- HERO -->
 <div class="hero">
@@ -303,19 +351,51 @@
 <div class="article-wrap">
   <div class="article-card clearfix" id="article">
  
-    <!-- mapa wpięta w tekst po prawej -->
+    <span class="art-label">Starożytność · Mezopotamia i Egipt</span>
+    <h2>Muzyka jako język bogów i porządek kosmosu</h2>
+ 
+    <!-- MAPA — SVG zastępczy zawsze widoczny, plus próba załadowania zewnętrznej grafiki -->
     <figure class="map-float">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Mesopotamia.jpg/640px-Mesopotamia.jpg"
-           alt="Mapa Mezopotamii III–II tysiąclecie p.n.e."
-           onerror="this.style.minHeight='200px'; this.style.background='#e8edf7';">
-      <figcaption>Źródło: K. Chariza i zespół, ZPE (CC BY 3.0).</figcaption>
+      <svg class="map-svg-placeholder" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="300" fill="#d6e4f0"/>
+        <!-- morza -->
+        <ellipse cx="60" cy="80" rx="55" ry="40" fill="#a8c8e8" opacity="0.7"/>
+        <ellipse cx="340" cy="200" rx="60" ry="45" fill="#a8c8e8" opacity="0.7"/>
+        <text x="30" y="84" font-size="9" fill="#5580a0" font-family="sans-serif">Morze Śródziemne</text>
+        <text x="310" y="204" font-size="9" fill="#5580a0" font-family="sans-serif">Zat. Perska</text>
+        <!-- teren Mezopotamii -->
+        <polygon points="180,60 260,50 310,90 320,150 290,210 240,230 190,220 160,180 150,120" fill="#c8b87a" opacity="0.85"/>
+        <text x="210" y="140" font-size="11" fill="#5a4010" font-family="serif" font-weight="bold">MEZOPOTAMIA</text>
+        <!-- rzeki -->
+        <path d="M175,65 C180,100 175,140 185,180 C190,210 200,225 210,235" stroke="#4a8ab0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M255,55 C258,90 262,130 268,165 C272,190 275,210 268,228" stroke="#4a8ab0" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <text x="155" y="108" font-size="8" fill="#2a6090" font-family="sans-serif" transform="rotate(-75,155,108)">Eufrat</text>
+        <text x="272" y="108" font-size="8" fill="#2a6090" font-family="sans-serif" transform="rotate(-80,272,108)">Tygrys</text>
+        <!-- miasta -->
+        <circle cx="210" cy="185" r="4" fill="#c04020"/>
+        <text x="216" y="189" font-size="9" fill="#8b2010" font-family="sans-serif" font-weight="bold">Babilon</text>
+        <circle cx="230" cy="155" r="3" fill="#c04020"/>
+        <text x="236" y="159" font-size="8" fill="#8b2010" font-family="sans-serif">Nippur</text>
+        <circle cx="200" cy="215" r="3" fill="#c04020"/>
+        <text x="206" y="219" font-size="8" fill="#8b2010" font-family="sans-serif">Ur</text>
+        <!-- Egipt kierunek -->
+        <text x="50" y="160" font-size="10" fill="#7a6030" font-family="serif" font-style="italic">Egipt →</text>
+        <!-- legenda -->
+        <rect x="10" y="255" width="380" height="38" fill="white" opacity="0.7" rx="6"/>
+        <circle cx="26" cy="272" r="4" fill="#c04020"/>
+        <text x="34" y="276" font-size="9" fill="#334155" font-family="sans-serif">Miasta starożytne</text>
+        <line x1="120" y1="272" x2="140" y2="272" stroke="#4a8ab0" stroke-width="2.5"/>
+        <text x="144" y="276" font-size="9" fill="#334155" font-family="sans-serif">Rzeki (Tygrys, Eufrat)</text>
+        <rect x="260" y="266" width="14" height="10" fill="#c8b87a" rx="2"/>
+        <text x="278" y="276" font-size="9" fill="#334155" font-family="sans-serif">Mezopotamia</text>
+      </svg>
+      <figcaption>Mezopotamia — Tygrys i Eufrat, III–II tys. p.n.e.</figcaption>
     </figure>
  
     <p>Choć pismo wynaleźli Sumerowie, muzykę przekazywali ustnie. Dzięki temu mogła ona w sposób naturalny i organiczny podlegać zmianom. <strong>Wierzono, że muzyka jest ściśle powiązana z kosmosem</strong> i odzwierciedla jego porządek. Podczas śpiewu często klaskano w dłonie, podkreślając rytm. Przeważały niewielkie zespoły wykonawcze; większe zespoły pojawiały się głównie podczas corocznych świąt.</p>
  
     <p>U Sumerów muzyki uczono początkowo w szkołach przyświątynnych, a później również na dworach. W starożytności wykorzystywano ją przede wszystkim do celów liturgicznych — wykonywali ją głównie kapłani podczas obrzędów religijnych. W szkołach oprócz muzyki nauczano pisma klinowego, teologii, kosmologii, wiedzy o zaklęciach, o demonach a także zasady składania ofiar.</p>
  
-    <!-- cytat z lewą bordiurą -->
     <div class="blockquote">
       <p>Muzyka była ściśle powiązana z kosmosem i odzwierciedlała jego porządek — grając, kapłani uczestniczyli w harmonii wszechświata.</p>
     </div>
@@ -326,7 +406,6 @@
  
     <p>Skale i stroje były ściśle regulowane przez tradycję. Zmiana skali lub tonacji podczas ceremonii religijnej mogła uchodzić za bluźnierstwo. Muzyka była zatem nie tylko sztuką, lecz przede wszystkim rytuałem — językiem bogów i sferą sakralną dostępną tylko wtajemniczonym. Dopiero z czasem zaczęła przenikać na dwory i stawać się elementem życia świeckiego, zachowując jednak zawsze głęboki związek z porządkiem kosmicznym, który wyrażała od swoich początków.</p>
  
-    <!-- tagi instrumentów na dole artykułu -->
     <div class="tags-section">
       <span class="tags-label">Instrumentarium starożytne</span>
       <div class="tags-wrap">
@@ -385,3 +464,4 @@ const obs = new IntersectionObserver(entries => {
 </script>
 </body>
 </html>
+ 
