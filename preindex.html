@@ -931,7 +931,7 @@ async function sprawdzKod() {
   try {
     const response = await fetch(BRIEF_WEBHOOK, {
       method:  'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({ telefon }) // np. { "telefon": "514338875" }
     });
  
