@@ -844,38 +844,45 @@ async function sendToMake(payload) {
 // ============================================================
 // BRIEFY
 // ============================================================
-const RATE_LIMIT = 3, RATE_WINDOW = 60000, TIMEOUT_DURATION = 300000;
-function getRateData() {
-  try { return JSON.parse(sessionStorage.getItem('brief_rate')) || { count:0, windowStart:Date.now(), blockedUntil:null }; }
-  catch(e) { return { count:0, windowStart:Date.now(), blockedUntil:null }; }
+const BAD_LIMIT = 5, BLOCK_DURATION = 300000;
+
+function getAttempts() {
+  try { return JSON.parse(sessionStorage.getItem('brief_attempts')) || { bad:0, blockedUntil:null }; }
+  catch(e) { return { bad:0, blockedUntil:null }; }
 }
-function saveRateData(d) { try { sessionStorage.setItem('brief_rate', JSON.stringify(d)); } catch(e){} }
-function checkRateLimit() {
-  const now = Date.now(), d = getRateData();
-  if (d.blockedUntil && now < d.blockedUntil) {
-    const rem = Math.ceil((d.blockedUntil - now) / 1000);
-    return { allowed:false, message:`Zbyt wiele prób. Spróbuj za ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}.` };
+function saveAttempts(d) { try { sessionStorage.setItem('brief_attempts', JSON.stringify(d)); } catch(e){} }
+
+function isBlocked() {
+  const d = getAttempts();
+  if (d.blockedUntil && Date.now() < d.blockedUntil) {
+    const rem = Math.ceil((d.blockedUntil - Date.now()) / 1000);
+    return `Zbyt wiele błędnych prób. Spróbuj za ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}.`;
   }
-  if (now - d.windowStart > RATE_WINDOW) { d.count=0; d.windowStart=now; d.blockedUntil=null; }
-  if (d.count >= RATE_LIMIT) {
-    d.blockedUntil = now + TIMEOUT_DURATION; saveRateData(d);
-    return { allowed:false, message:'Zbyt wiele prób. Dostęp zablokowany na 5 minut.' };
-  }
-  d.count++; saveRateData(d); return { allowed:true };
+  if (d.blockedUntil && Date.now() >= d.blockedUntil) saveAttempts({ bad:0, blockedUntil:null });
+  return false;
 }
+function recordBadAttempt() {
+  const d = getAttempts();
+  d.bad = (d.bad || 0) + 1;
+  if (d.bad >= BAD_LIMIT) { d.blockedUntil = Date.now() + BLOCK_DURATION; d.bad = 0; }
+  saveAttempts(d);
+}
+function recordGoodAttempt() { saveAttempts({ bad:0, blockedUntil:null }); }
+
 function showBriefError(msg) {
   const r = document.getElementById('brief-result');
   r.style.display = 'block';
   r.innerHTML = `<div class="brief-error">✕ ${msg}</div>`;
 }
+
 async function sprawdzKod() {
   const input = document.getElementById('brief-code-input');
   const result = document.getElementById('brief-result');
   const btn = document.getElementById('brief-btn');
   const kod = input.value.trim().replace(/\s+/g,'');
   if (kod.length < 7) { showBriefError('Nieprawidłowy kod.'); return; }
-  const rate = checkRateLimit();
-  if (!rate.allowed) { showBriefError('⏳ ' + rate.message); return; }
+  const blocked = isBlocked();
+  if (blocked) { showBriefError('⏳ ' + blocked); return; }
   btn.innerText = '...'; btn.style.opacity = '0.6'; btn.style.cursor = 'not-allowed';
   result.style.display = 'none';
   try {
@@ -885,23 +892,33 @@ async function sprawdzKod() {
     });
     const data = await response.json();
     btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
-    if (data.status === 'ok' && data.briefy && data.briefy.length > 0) {
-      const cards = data.briefy.map(b => `
-        <a href="${b.url}" target="_blank" class="brief-card-link">
-          <div class="brief-card-icon">📄</div>
-          <div style="flex:1;"><div class="brief-card-title">${b.title}</div><div class="brief-card-sub">${b.subtitle}</div></div>
-          <div class="brief-card-arrow">→</div>
-        </a>`).join('');
-      result.style.display = 'block';
-      result.innerHTML = `<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
-    } else { showBriefError('Kod jest niewłaściwy lub nieaktywny.'); }
+    if (data.status === 'ok' && data.briefy !== undefined) {
+      recordGoodAttempt();
+      if (data.briefy.length > 0) {
+        const cards = data.briefy.map(b => `
+          <a href="${b.url}" target="_blank" class="brief-card-link">
+            <div class="brief-card-icon">📄</div>
+            <div style="flex:1;"><div class="brief-card-title">${b.title}</div><div class="brief-card-sub">${b.subtitle}</div></div>
+            <div class="brief-card-arrow">→</div>
+          </a>`).join('');
+        result.style.display = 'block';
+        result.innerHTML = `<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
+      } else {
+        result.style.display = 'block';
+        result.innerHTML = `<div style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:16px;padding:20px 24px;text-align:center;color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.6;">🎵 Brak dostępnych materiałów na ten moment.<br><span style="font-size:0.8rem;">Materiały pojawiają się wraz z kolejnymi lekcjami.</span></div>`;
+      }
+    } else {
+      recordBadAttempt();
+      const d = getAttempts();
+      const pozostalo = BAD_LIMIT - (d.bad || 0);
+      showBriefError(d.blockedUntil ? 'Kod jest nieprawidłowy. Dostęp zablokowany na 5 minut.' : `Kod jest niewłaściwy. Pozostało prób: ${pozostalo}`);
+    }
   } catch(e) {
     btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
     showBriefError('Błąd połączenia. Spróbuj ponownie.');
   }
 }
 document.getElementById('brief-code-input').addEventListener('keydown', e => { if(e.key==='Enter') sprawdzKod(); });
- 
 // ============================================================
 // FORMULARZ — TERMINY
 // ============================================================
