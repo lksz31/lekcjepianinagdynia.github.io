@@ -1,0 +1,100 @@
+<!-- ===================== SEKCJA: BRIEFY DLA UCZNIÓW (wersja Make.com) ===================== -->
+<!-- 
+  INSTRUKCJA SZYBKA:
+  1. Wklej swój URL webhooka z Make.com w miejscu WEBHOOK_URL poniżej
+  2. Wklej tę sekcję na stronę przed stopką
+-->
+ 
+<section style="padding:80px 5%; background:#f8fafc;" id="briefy">
+  <div style="max-width:600px; margin:0 auto; text-align:center;">
+    <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:10px;font-family:'Poppins',sans-serif;">Strefa Ucznia</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.4rem);color:#1e3a8a;margin:0 0 16px;">Materiały do lekcji</h2>
+    <p style="color:#64748b;font-size:0.95rem;line-height:1.7;margin:0 0 40px;font-family:'Poppins',sans-serif;">Wpisz kod otrzymany od nauczyciela, aby uzyskać dostęp do materiałów.</p>
+    <div style="background:white;border-radius:24px;padding:32px;box-shadow:0 0 30px rgba(0,0,0,0.07);border:1px solid #f0f0f0;">
+      <div style="display:flex;gap:10px;margin-bottom:16px;">
+        <input id="brief-code-input" type="text" placeholder="Wpisz kod"
+          style="flex:1;padding:14px 18px;border:2px solid #e2e8f0;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.95rem;color:#1e3a8a;outline:none;letter-spacing:0.03em;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='#1e3a8a'" onblur="this.style.borderColor='#e2e8f0'">
+        <button onclick="sprawdzKod()"
+          id="brief-btn"
+          style="padding:14px 28px;background:#1e3a8a;color:white;border:none;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;white-space:nowrap;"
+          onmouseover="this.style.background='#d4af37'" onmouseout="this.style.background='#1e3a8a'">Sprawdź</button>
+      </div>
+      <div id="brief-result" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+ 
+<script>
+// =====================================================================
+// WKLEJ TUTAJ URL WEBHOOKA Z MAKE.COM
+// (skopiuj z Make: Webhooks → Custom webhook → Copy address)
+// =====================================================================
+const WEBHOOK_URL = "WKLEJ_TUTAJ_URL_WEBHOOKA";
+ 
+async function sprawdzKod() {
+  const input = document.getElementById('brief-code-input');
+  const result = document.getElementById('brief-result');
+  const btn = document.getElementById('brief-btn');
+  const code = input.value.trim();
+ 
+  if (code.length < 3) return;
+ 
+  // Pokaż loading
+  btn.innerText = '...';
+  btn.style.background = '#94a3b8';
+  btn.style.cursor = 'not-allowed';
+  result.style.display = 'none';
+ 
+  try {
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kod: code })
+    });
+ 
+    const data = await response.json();
+ 
+    btn.innerText = 'Sprawdź';
+    btn.style.background = '#1e3a8a';
+    btn.style.cursor = 'pointer';
+ 
+    if (data.status === 'ok' && data.briefy && data.briefy.length > 0) {
+      const cards = data.briefy.map((b, i) => `
+        <a href="${b.url}" target="_blank"
+           style="display:flex;align-items:center;gap:14px;background:#f0f7ff;border:1.5px solid #1e3a8a;border-radius:16px;padding:16px 20px;text-decoration:none;text-align:left;${i < data.briefy.length-1 ? 'margin-bottom:10px;' : ''}"
+           onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f7ff'">
+          <div style="width:44px;height:44px;background:#1e3a8a;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;">&#128196;</div>
+          <div style="flex:1;">
+            <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:3px;">${b.title}</div>
+            <div style="font-family:'Poppins',sans-serif;font-size:0.8rem;color:#64748b;">${b.subtitle}</div>
+          </div>
+          <div style="color:#1e3a8a;font-size:1.1rem;">&#8594;</div>
+        </a>`).join('');
+ 
+      result.style.display = 'block';
+      result.innerHTML =
+        '<div style="font-family:\'Poppins\',sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:12px;text-align:left;">Twoje materia&#322;y (' + data.briefy.length + ')</div>' +
+        cards +
+        '<p style="font-family:\'Poppins\',sans-serif;font-size:0.75rem;color:#94a3b8;margin:12px 0 0;text-align:center;">Kliknij kart&#281;, aby otworzy&#263; materia&#322;</p>';
+ 
+    } else {
+      result.style.display = 'block';
+      result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#10005; Nieprawid&#322;owy kod. Sprawd&#378; kod otrzymany od nauczyciela.</div>';
+    }
+ 
+  } catch(err) {
+    btn.innerText = 'Sprawdź';
+    btn.style.background = '#1e3a8a';
+    btn.style.cursor = 'pointer';
+    result.style.display = 'block';
+    result.innerHTML = '<div style="background:#fff5f5;border:1.5px solid #fca5a5;border-radius:16px;padding:14px 20px;font-family:\'Poppins\',sans-serif;font-size:0.9rem;color:#dc2626;">&#9888; B&#322;&#261;d po&#322;&#261;czenia. Spr\u00f3buj ponownie.</div>';
+  }
+}
+ 
+document.getElementById('brief-code-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') sprawdzKod();
+});
+</script>
+<!-- ===================== KONIEC SEKCJI BRIEFY ===================== -->
+ 
