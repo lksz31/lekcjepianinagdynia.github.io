@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
- 
+
 <style>
   :root {
     --gold: #d4af37;
@@ -16,9 +16,9 @@
     --border: #f0f0f0;
     --text: #334155;
   }
- 
+
   * { box-sizing: border-box; }
- 
+
   body {
     margin: 0; padding: 0;
     background: #ffffff;
@@ -26,7 +26,7 @@
     color: var(--text);
     overflow-x: hidden;
   }
- 
+
   /* NAV */
   .site-nav {
     position: fixed; top: 20px; left: 50%;
@@ -51,7 +51,7 @@
   }
   .site-nav a.nav-highlight:hover { background: var(--gold); color: white; }
   @media (max-width: 700px) { .site-nav { display: none; } }
- 
+
   /* MOBILE BOTTOM NAV */
   .mobile-nav {
     display: none;
@@ -84,7 +84,7 @@
     .mobile-nav { display: block; }
     body { padding-bottom: 70px; }
   }
- 
+
   /* HERO */
   .hero {
     min-height: 100vh; display: flex; flex-direction: column;
@@ -142,7 +142,7 @@
     font-size: 0.8rem; opacity: 0;
     animation: bounce 2s infinite 1.5s, fadeUp 0.8s ease forwards 1.2s;
   }
- 
+
   /* SECTIONS */
   .section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
   @media (max-width: 600px) { .section { padding: 50px 4%; } }
@@ -156,7 +156,7 @@
     font-size: clamp(1.6rem, 4vw, 2.8rem);
     color: var(--navy); margin: 0 0 40px 0;
   }
- 
+
   /* BENTO */
   .bento-container { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 25px; }
   @media (max-width: 850px) { .bento-container { grid-template-columns: 1fr; gap: 16px; } }
@@ -253,7 +253,7 @@
     font-family: 'Poppins', sans-serif;
   }
   .opinion-btn:hover { background: white; border-color: var(--gold); color: var(--navy); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
- 
+
   /* SLIDER */
   .slider-section { padding: 80px 0; background: white; }
   @media (max-width: 600px) { .slider-section { padding: 50px 0; } }
@@ -303,7 +303,7 @@
   .prev-btn { left: calc(50% - 554px - 36px); }
   .next-btn { right: calc(50% - 554px - 36px); }
   @media (max-width: 1200px) { .prev-btn { left: 5px; } .next-btn { right: 5px; } }
- 
+
   /* POMOCE */
   .pomoce-section { padding: 80px 5%; background: #f8fafc; }
   @media (max-width: 600px) { .pomoce-section { padding: 50px 4%; } }
@@ -334,7 +334,7 @@
     font-size: 0.72rem; font-weight: 700; padding: 4px 12px;
     border-radius: 50px; border: 1px solid #dbeafe; width: fit-content;
   }
- 
+
   /* PIANINO */
   .piano-section { background: #f8fafc; padding: 80px 5%; }
   @media (max-width: 600px) { .piano-section { padding: 50px 4%; } }
@@ -370,7 +370,7 @@
   .piano-key.next-note span { color: white !important; }
   .piano-key:active, .piano-key.playing { transform: translateY(5px); filter: brightness(1.2); }
   #piano-status { font-weight: 700; color: #94a3b8; margin-top: 10px; font-size: 0.9rem; text-align: center; }
- 
+
   /* TERMINY */
   .terminy-section { padding: 80px 5%; background: white; }
   @media (max-width: 600px) { .terminy-section { padding: 50px 4%; } }
@@ -429,7 +429,7 @@
   .info-card { background: rgba(255,255,255,0.05); border-radius: 28px; padding: 18px; }
   .info-card iframe { width: 100%; height: 350px; border-radius: 16px; border: none; filter: invert(92%) hue-rotate(190deg); }
   @media (max-width: 500px) { .info-card iframe { height: 280px; } }
- 
+
   /* BRIEFY */
   .briefy-section { padding: 100px 5%; background: var(--navy); position: relative; overflow: hidden; }
   @media (max-width: 600px) { .briefy-section { padding: 60px 4%; } }
@@ -456,7 +456,7 @@
   .brief-card-arrow { color: var(--gold); font-size: 1.1rem; flex-shrink: 0; }
   .brief-error { background: rgba(220,38,38,0.15); border: 1.5px solid rgba(220,38,38,0.4); border-radius: 16px; padding: 14px 20px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; color: #fca5a5; }
   .brief-meta { font-family: 'Poppins', sans-serif; font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-bottom: 14px; text-align: left; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; }
- 
+
   /* STOPKA */
   .site-footer { background: white; border-top: 1px solid #e8eaee; padding: 0 5%; font-family: 'Poppins', sans-serif; }
   .footer-main { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 3rem; padding: 3rem 0 2.5rem; align-items: start; }
@@ -482,7 +482,7 @@
   .footer-bottom { border-top: 1px solid #e8eaee; padding: 0.85rem 0; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
   .footer-copy { font-size: 11px; color: #c0c0cc; }
   .footer-location { font-size: 12px; color: #aaa; }
- 
+
   /* MODAL STOPKA */
   .footer-modal-overlay { position: fixed; inset: 0; background: rgba(10,20,60,0.7); backdrop-filter: blur(6px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 16px; }
   .footer-modal-overlay.open { opacity: 1; pointer-events: all; }
@@ -502,7 +502,7 @@
   .modal-submit { background: var(--gold); color: white; border: none; padding: 14px; border-radius: 50px; font-weight: 800; cursor: pointer; font-family: 'Poppins', sans-serif; width: 100%; font-size: 0.9rem; transition: 0.3s; }
   .modal-submit:hover { opacity: 0.9; }
   #modal-status { color: #22c55e; font-size: 0.85rem; font-weight: 600; text-align: center; min-height: 20px; }
- 
+
   /* PDF MODAL */
   .pdf-modal-overlay { position: fixed; inset: 0; background: rgba(10,20,60,0.85); backdrop-filter: blur(6px); z-index: 3000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 12px; }
   .pdf-modal-overlay.open { opacity: 1; pointer-events: all; }
@@ -512,17 +512,17 @@
   .pdf-modal-close { background: none; border: none; font-size: 1.4rem; color: #94a3b8; cursor: pointer; transition: color 0.2s; }
   .pdf-modal-close:hover { color: var(--navy); }
   .pdf-modal iframe { flex: 1; border: none; width: 100%; }
- 
+
   /* TOAST */
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px); background: #22c55e; color: white; padding: 14px 28px; border-radius: 50px; font-weight: 700; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: all 0.4s; pointer-events: none; white-space: nowrap; box-shadow: 0 10px 30px rgba(34,197,94,0.3); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.error { background: #ef4444; box-shadow: 0 10px 30px rgba(239,68,68,0.3); }
   @media (min-width: 701px) { .toast { bottom: 30px; } }
- 
+
   /* ANIMATIONS */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-8px); } }
- 
+
   /* MOBILE FIXES */
   @media (max-width: 850px) {
     .tag-note { width: 180px; left: 0; transform: none; }
@@ -533,7 +533,7 @@
 </style>
 </head>
 <body class="piano-mode">
- 
+
 <nav class="site-nav">
   <a href="#o-mnie">O mnie</a>
   <a href="#oferta">Oferta</a>
@@ -542,7 +542,7 @@
   <a href="#briefy" class="nav-highlight">Materiały</a>
   <a href="#kontakt">Kontakt</a>
 </nav>
- 
+
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="#o-mnie"><span class="mn-icon">👨‍🦰</span>O mnie</a>
@@ -552,7 +552,7 @@
     <a href="#kontakt"><span class="mn-icon">✉️</span>Kontakt</a>
   </div>
 </nav>
- 
+
 <section class="hero">
   <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
   <h1>Lekcje pianina<br>z <em>pasją</em></h1>
@@ -563,7 +563,7 @@
   </div>
   <div class="scroll-hint">↓ Przewiń w dół</div>
 </section>
- 
+
 <section class="section" id="o-mnie">
   <div class="section-label">Nauczyciel</div>
   <h2 class="section-title">Poznajmy się</h2>
@@ -613,7 +613,7 @@
     </div>
   </div>
 </section>
- 
+
 <section class="slider-section" id="oferta">
   <div class="section-inner">
     <div class="section-label">Szczegóły oferty</div>
@@ -627,7 +627,7 @@
     <button class="nav-btn next-btn" id="next">❯</button>
   </div>
 </section>
- 
+
 <section class="pomoce-section" id="pomoce">
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
@@ -643,7 +643,7 @@
     </div>
   </div>
 </section>
- 
+
 <section class="piano-section" id="pianino">
   <div class="section-inner">
     <div class="section-label">Interaktywne</div>
@@ -664,7 +664,7 @@
     <div id="piano-status">Wybierz utwór i graj podświetlone klawisze</div>
   </div>
 </section>
- 
+
 <section class="terminy-section" id="terminy">
   <div class="section-inner">
     <div class="section-label">Kalendarz</div>
@@ -703,7 +703,7 @@
     </div>
   </div>
 </section>
- 
+
 <section class="briefy-section" id="briefy">
   <div class="briefy-inner">
     <div class="briefy-label">Strefa ucznia</div>
@@ -719,7 +719,7 @@
     </div>
   </div>
 </section>
- 
+
 <footer class="site-footer" id="kontakt">
   <div class="footer-main">
     <div>
@@ -767,7 +767,7 @@
     </div>
   </div>
 </footer>
- 
+
 <div class="footer-modal-overlay" id="lessonModal" onclick="if(event.target===this)closeLessonModal()">
   <div class="footer-modal">
     <button class="modal-close" onclick="closeLessonModal()">✕</button>
@@ -795,9 +795,9 @@
     </div>
   </div>
 </div>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePDF()">
   <div class="pdf-modal">
     <div class="pdf-modal-header">
@@ -807,7 +807,7 @@
     <iframe id="pdf-frame" src="" title="Opinia"></iframe>
   </div>
 </div>
- 
+
 <script>
 // ============================================================
 // KONFIGURACJA
@@ -815,7 +815,7 @@
 const FORM_WEBHOOK  = "https://hook.eu1.make.com/uijd56iir7osvthltco7pdmwhcn8vdb8";
 const BRIEF_WEBHOOK = "https://hook.eu1.make.com/faznirxen2tpagi3rqkpl2tloo9izb18";
 const OWNER_EMAIL   = "lukaszgkorepetycje@gmail.com";
- 
+
 // ============================================================
 // TOAST
 // ============================================================
@@ -826,7 +826,7 @@ function showToast(msg, isError = false) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 4000);
 }
- 
+
 // ============================================================
 // WYSYŁKA DO MAKE.COM
 // ============================================================
@@ -840,19 +840,19 @@ async function sendToMake(payload) {
   const data = await response.json();
   return data;
 }
- 
+
 // ============================================================
 // BRIEFY
 // ============================================================
 // Rate limiting — blokada po 5 złych próbach pod rząd, reset po dobrej
 const BAD_LIMIT = 5, BLOCK_DURATION = 300000; // 5 minut
- 
+
 function getAttempts() {
   try { return JSON.parse(sessionStorage.getItem('brief_attempts')) || { bad:0, blockedUntil:null }; }
   catch(e) { return { bad:0, blockedUntil:null }; }
 }
 function saveAttempts(d) { try { sessionStorage.setItem('brief_attempts', JSON.stringify(d)); } catch(e){} }
- 
+
 function isBlocked() {
   const d = getAttempts();
   if (d.blockedUntil && Date.now() < d.blockedUntil) {
@@ -865,7 +865,7 @@ function isBlocked() {
   }
   return false;
 }
- 
+
 function recordBadAttempt() {
   const d = getAttempts();
   d.bad = (d.bad || 0) + 1;
@@ -875,32 +875,32 @@ function recordBadAttempt() {
   }
   saveAttempts(d);
 }
- 
+
 function recordGoodAttempt() {
   // dobry kod — zeruj licznik złych prób
   saveAttempts({ bad:0, blockedUntil:null });
 }
- 
+
 function showBriefError(msg) {
   const r = document.getElementById('brief-result');
   r.style.display = 'block';
   r.innerHTML = `<div class="brief-error">✕ ${msg}</div>`;
 }
- 
+
 async function sprawdzKod() {
   const input = document.getElementById('brief-code-input');
   const result = document.getElementById('brief-result');
   const btn = document.getElementById('brief-btn');
   const kod = input.value.trim().replace(/\s+/g,'');
- 
+
   if (kod.length < 7) { showBriefError('Nieprawidłowy kod.'); return; }
- 
+
   const blocked = isBlocked();
   if (blocked) { showBriefError('⏳ ' + blocked); return; }
- 
+
   btn.innerText = '...'; btn.style.opacity = '0.6'; btn.style.cursor = 'not-allowed';
   result.style.display = 'none';
- 
+
   try {
     const response = await fetch(BRIEF_WEBHOOK, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -908,11 +908,11 @@ async function sprawdzKod() {
     });
     const data = await response.json();
     btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
- 
+
     if (data.status === 'ok' && data.briefy !== undefined) {
       // dobry kod — zeruj licznik
       recordGoodAttempt();
- 
+
       if (data.briefy.length > 0) {
         const cards = data.briefy.map(b => `
           <a href="${b.url}" target="_blank" class="brief-card-link">
@@ -954,14 +954,14 @@ async function sprawdzKod() {
   }
 }
 document.getElementById('brief-code-input').addEventListener('keydown', e => { if(e.key==='Enter') sprawdzKod(); });
- 
+
 // ============================================================
 // FORMULARZ — TERMINY
 // ============================================================
 let isStudio = true, hasPiano = true;
- 
+
 function toggleForm(show) { document.getElementById('formOverlay').classList.toggle('open', show); }
- 
+
 function setLoc(loc) {
   isStudio = loc === 'studio';
   document.getElementById('loc-studio').classList.toggle('selected', isStudio);
@@ -969,19 +969,19 @@ function setLoc(loc) {
   document.getElementById('piano-options').style.display = isStudio ? 'none' : 'block';
   updatePrice();
 }
- 
+
 function setPiano(v) {
   hasPiano = v;
   document.getElementById('piano-yes').classList.toggle('selected', hasPiano);
   document.getElementById('piano-no').classList.toggle('selected', !hasPiano);
   updatePrice();
 }
- 
+
 function updatePrice() {
   document.getElementById('price-val').innerText = (!isStudio && !hasPiano ? 119 : 99) + ' zł / h';
   val();
 }
- 
+
 function val() {
   const n = document.getElementById('res-name').value;
   const p = document.getElementById('res-phone').value;
@@ -989,17 +989,17 @@ function val() {
   const valid = n.length > 2 && p.length >= 9 && e.includes('@');
   document.getElementById('subBtn').classList.toggle('active', valid);
 }
- 
+
 async function wyslij() {
   if (!document.getElementById('subBtn').classList.contains('active')) return;
- 
+
   const s   = document.getElementById('res-status');
   const btn = document.getElementById('subBtn');
   s.innerText = "⏳ Wysyłanie...";
   s.style.color = "var(--navy)";
   btn.disabled = true;
   btn.classList.remove('active');
- 
+
   const name     = document.getElementById('res-name').value.trim();
   const phone    = document.getElementById('res-phone').value.trim();
   const email    = document.getElementById('res-email').value.trim();
@@ -1008,7 +1008,7 @@ async function wyslij() {
   const piano    = isStudio ? "—" : (hasPiano ? "Tak" : "Nie — dowóz instrumentu");
   const price    = (!isStudio && !hasPiano ? 119 : 99) + " zł/h";
   const date     = new Date().toLocaleString('pl-PL');
- 
+
   const payload = {
     typ: "rezerwacja-terminy",
     imie_nazwisko: name,
@@ -1021,10 +1021,10 @@ async function wyslij() {
     data: date,
     owner_email: OWNER_EMAIL
   };
- 
+
   try {
     const result = await sendToMake(payload);
- 
+
     if (result.status === 'duplicate') {
       s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
       s.style.color = "var(--gold)";
@@ -1032,7 +1032,7 @@ async function wyslij() {
       btn.classList.add('active');
       return;
     }
- 
+
     s.innerText = "✅ Dziękujemy! Potwierdzenie wysłano na Twój email.";
     s.style.color = "#22c55e";
     showToast("✅ Zgłoszenie wysłane!");
@@ -1045,7 +1045,7 @@ async function wyslij() {
       document.getElementById('res-msg').value = "";
       btn.disabled = false;
     }, 3000);
- 
+
   } catch(e) {
     s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
     s.style.color = "#ef4444";
@@ -1054,15 +1054,15 @@ async function wyslij() {
     showToast("Błąd wysyłki. Spróbuj ponownie.", true);
   }
 }
- 
+
 // ============================================================
 // MODAL — LEKCJA PRÓBNA
 // ============================================================
 function openLessonModal()  { document.getElementById('lessonModal').classList.add('open');    document.body.style.overflow = 'hidden'; }
 function closeLessonModal() { document.getElementById('lessonModal').classList.remove('open'); document.body.style.overflow = ''; }
- 
+
 let mLoc = 's', mPiano = true;
- 
+
 function mSetLoc(t) {
   mLoc = t;
   document.getElementById('m-l-s').classList.toggle('selected', t === 's');
@@ -1070,41 +1070,41 @@ function mSetLoc(t) {
   document.getElementById('m-piano-box').style.display = t === 'u' ? 'block' : 'none';
   mUpdatePrice();
 }
- 
+
 function mSetPiano(v) {
   mPiano = v;
   document.getElementById('m-p-y').classList.toggle('selected', v);
   document.getElementById('m-p-n').classList.toggle('selected', !v);
   mUpdatePrice();
 }
- 
+
 function mUpdatePrice() {
   document.getElementById('m-price').innerText = (mLoc === 'u' && !mPiano ? 119 : 99) + ' zł / h';
 }
- 
+
 async function wyslijModal() {
   const s         = document.getElementById('modal-status');
   const submitBtn = document.querySelector('.modal-submit');
- 
+
   const name  = document.getElementById('m-name').value.trim();
   const phone = document.getElementById('m-phone').value.trim();
   const email = document.getElementById('m-email').value.trim();
- 
+
   if (name.length < 2 || phone.length < 9 || !email.includes('@')) {
     s.innerText = "⚠️ Wypełnij imię, telefon i email.";
     s.style.color = "#ef4444";
     return;
   }
- 
+
   submitBtn.disabled = true;
   submitBtn.innerText = "Wysyłanie...";
   s.innerText = "";
- 
+
   const location = mLoc === 's' ? "Studio — Gdynia Mały Kack" : "U ucznia — dojazd";
   const piano    = mLoc === 's' ? "—" : (mPiano ? "Tak" : "Nie — dowóz instrumentu");
   const price    = (mLoc === 'u' && !mPiano ? 119 : 99) + " zł/h";
   const date     = new Date().toLocaleString('pl-PL');
- 
+
   const payload = {
     typ: "lekcja-probna-modal",
     imie_nazwisko: name,
@@ -1117,10 +1117,10 @@ async function wyslijModal() {
     data: date,
     owner_email: OWNER_EMAIL
   };
- 
+
   try {
     const result = await sendToMake(payload);
- 
+
     if (result.status === 'duplicate') {
       s.innerText = "⚠️ Ten email jest już w naszej bazie. Skontaktujemy się wkrótce!";
       s.style.color = "var(--gold)";
@@ -1128,7 +1128,7 @@ async function wyslijModal() {
       submitBtn.innerText = "WYŚLIJ PROŚBĘ";
       return;
     }
- 
+
     s.innerText = "✅ Wysłano! Sprawdź email.";
     s.style.color = "#22c55e";
     submitBtn.innerText = "WYŚLIJ PROŚBĘ";
@@ -1142,7 +1142,7 @@ async function wyslijModal() {
       document.getElementById('m-msg').value = "";
       submitBtn.disabled = false;
     }, 3000);
- 
+
   } catch(e) {
     s.innerText = "❌ Błąd wysyłki. Zadzwoń: 514 338 875";
     s.style.color = "#ef4444";
@@ -1151,14 +1151,14 @@ async function wyslijModal() {
     showToast("Błąd. Spróbuj ponownie lub zadzwoń.", true);
   }
 }
- 
+
 // ============================================================
 // ANIMACJE SCROLL
 // ============================================================
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('bentoBox'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('pomoceGrid'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('appleLocation'));
- 
+
 // ============================================================
 // SLIDER
 // ============================================================
@@ -1182,7 +1182,7 @@ document.getElementById('next').onclick = ()=>slider.scrollBy({left:step,behavio
 document.getElementById('prev').onclick = ()=>slider.scrollBy({left:-step,behavior:'smooth'});
 const tileObs = new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('is-visible',e.isIntersecting&&e.intersectionRatio>0.7)),{root:slider,threshold:0.7});
 document.querySelectorAll('.tile').forEach(t=>tileObs.observe(t));
- 
+
 // ============================================================
 // PIANINO
 // ============================================================
@@ -1257,7 +1257,7 @@ for(let i=0;i<25;i++) {
   };
   pianoEl.appendChild(key);
 }
- 
+
 // ============================================================
 // PDF MODAL
 // ============================================================
@@ -1275,4 +1275,3 @@ function closePDF() {
 </script>
 </body>
 </html>
- 
