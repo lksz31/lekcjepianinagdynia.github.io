@@ -901,11 +901,11 @@ async function sprawdzKod() {
   btn.innerText = '...'; btn.style.opacity = '0.6'; btn.style.cursor = 'not-allowed';
   result.style.display = 'none';
 
-  try {
-    const response = await fetch(BRIEF_WEBHOOK, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ kod })
-    });
+const response = await fetch(BRIEF_WEBHOOK, {
+  method: 'POST',
+  headers: { 'Content-Type': 'text/plain' },  // ← zmiana!
+  body: JSON.stringify({ kod })
+});
     const data = await response.json();
     btn.innerText = 'Sprawdź'; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
 
