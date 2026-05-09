@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -9,305 +8,80 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #d4af37;
-    --navy: #1e3a8a;
-    --blue: #3b82f6;
-    --border: #f0f0f0;
-    --text: #334155;
-  }
- 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
- 
-  body {
-    background: #f8fafc;
-    font-family: 'Poppins', sans-serif;
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
- 
-  /* NAV */
-  .site-nav {
-    position: fixed; top: 20px; left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    padding: 10px 30px;
-    display: flex; gap: 25px;
-    z-index: 1000;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    font-size: 0.85rem; font-weight: 600;
-    white-space: nowrap;
-  }
-  .site-nav a { color: var(--navy); text-decoration: none; transition: 0.3s; }
-  .site-nav a:hover { color: var(--gold); }
-  .site-nav a.nav-highlight {
-    background: var(--navy); color: white;
-    padding: 4px 16px; border-radius: 50px; font-size: 0.8rem;
-  }
-  .site-nav a.nav-highlight:hover { background: var(--gold); }
-  @media (max-width: 700px) { .site-nav { display: none; } }
- 
-  /* MAIN */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 100px 20px 40px;
-    gap: 24px;
-  }
- 
-  /* HEADER */
-  .book-header {
-    text-align: center;
-    animation: fadeUp 0.6s ease forwards;
-  }
-  .book-label {
-    font-size: 0.72rem; font-weight: 800;
-    text-transform: uppercase; letter-spacing: 0.2em;
-    color: var(--gold); margin-bottom: 8px;
-  }
-  .book-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    color: var(--navy); line-height: 1.2;
-  }
-  .book-title em { color: var(--gold); font-style: italic; }
-  .book-author {
-    font-size: 0.85rem; color: #94a3b8;
-    font-weight: 500; margin-top: 6px;
-  }
- 
-  /* VIEWER */
-  .viewer-wrap {
-    width: 100%;
-    max-width: 860px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
- 
-  /* PAGE DISPLAY */
-  .page-display {
-    width: 100%;
-    background: white;
-    border-radius: 24px;
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 50px rgba(0,0,0,0.1);
-    overflow: hidden;
-    position: relative;
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
- 
-  .page-img {
-    width: 100%;
-    height: auto;
-    display: block;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .page-img.loaded { opacity: 1; }
- 
-  .page-loader {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    color: #94a3b8;
-    font-size: 0.85rem;
-  }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid #e2e8f0;
-    border-top-color: var(--navy);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
- 
-  /* CONTROLS */
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: white;
-    padding: 14px 24px;
-    border-radius: 50px;
-    border: 1px solid var(--border);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-    flex-wrap: wrap;
-    justify-content: center;
-  }
- 
-  .nav-arrow {
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    border: 2px solid var(--navy);
-    background: white;
-    color: var(--navy);
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: 0.2s;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .nav-arrow:hover:not(:disabled) { background: var(--navy); color: white; }
-  .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
- 
-  .page-counter {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--navy);
-    min-width: 80px;
-    text-align: center;
-  }
- 
-  .page-input-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
-    color: #94a3b8;
-    font-weight: 600;
-  }
- 
-  .page-jump {
-    width: 56px;
-    padding: 6px 10px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--navy);
-    text-align: center;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .page-jump:focus { border-color: var(--gold); }
- 
-  /* THUMBNAILS */
-  .thumbs-toggle {
-    background: transparent;
-    border: 2px solid var(--border);
-    border-radius: 50px;
-    padding: 8px 18px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .thumbs-toggle:hover, .thumbs-toggle.active {
-    border-color: var(--navy);
-    color: var(--navy);
-  }
- 
-  .thumbs-panel {
-    display: none;
-    width: 100%;
-    max-width: 860px;
-    background: white;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-    padding: 20px;
-    animation: fadeUp 0.3s ease;
-  }
-  .thumbs-panel.open { display: block; }
- 
-  .thumbs-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 12px;
-  }
- 
-  .thumb-item {
-    cursor: pointer;
-    border-radius: 10px;
-    overflow: hidden;
-    border: 2px solid transparent;
-    transition: 0.2s;
-    position: relative;
-  }
-  .thumb-item:hover { border-color: var(--gold); }
-  .thumb-item.active { border-color: var(--navy); box-shadow: 0 4px 12px rgba(30,58,138,0.2); }
- 
-  .thumb-item img {
-    width: 100%;
-    height: 130px;
-    object-fit: cover;
-    display: block;
-    background: #f8fafc;
-  }
- 
-  .thumb-num {
-    position: absolute;
-    bottom: 4px; right: 6px;
-    background: rgba(30,58,138,0.8);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 6px;
-  }
- 
-  /* KEYBOARD SHORTCUTS */
-  .shortcuts {
-    font-size: 0.72rem;
-    color: #cbd5e1;
-    text-align: center;
-  }
- 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
- 
-  @media (max-width: 600px) {
-    .main { padding: 80px 12px 40px; }
-    .page-input-wrap { display: none; }
-    .thumbs-grid { grid-template-columns: repeat(3, 1fr); }
-  }
- 
-  /* STOPKA */
-  .site-footer { background: white; border-top: 1px solid #e8eaee; padding: 0 5%; font-family: 'Poppins', sans-serif; margin-top: 40px; }
-  .footer-main { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 3rem; padding: 3rem 0 2.5rem; align-items: start; }
-  @media(max-width:900px) { .footer-main { grid-template-columns: 1fr 1fr; gap: 2rem; } .footer-cta-col { grid-column: span 2; } }
-  @media(max-width:560px) { .footer-main { grid-template-columns: 1fr; padding: 2rem 0; } .footer-cta-col { grid-column: span 1; } }
-  .footer-brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem; }
-  .footer-logo { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-  .footer-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: #1a1a22; }
-  .footer-tagline { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #8a8a9a; margin-top: 2px; }
-  .footer-rule { height: 2px; background: linear-gradient(to right, #1e3a8a 28px, #e0e3ea 28px); margin-bottom: 1.1rem; }
-  .footer-contacts { display: flex; flex-direction: column; gap: 7px; }
-  .footer-contact-row { display: flex; align-items: baseline; gap: 14px; }
-  .footer-contact-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa; min-width: 38px; }
-  .footer-contact-val { font-size: 13px; color: var(--navy); text-decoration: none; }
-  .footer-contact-val:hover { color: var(--gold); }
-  .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #aaa; margin-bottom: 0.75rem; }
-  .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
-  .footer-links a { font-size: 13.5px; color: #3d3d4a; text-decoration: none; transition: color 0.2s; }
-  .footer-links a:hover { color: var(--navy); }
-  .footer-cta-col { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-  .footer-cta-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: white; padding: 14px 26px; border-radius: 50px; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 0.85rem; text-decoration: none; transition: all 0.3s; white-space: nowrap; }
-  .footer-cta-btn:hover { background: var(--gold); transform: translateY(-2px); }
-  .footer-bottom { border-top: 1px solid #e8eaee; padding: 0.85rem 0; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-  .footer-copy { font-size: 11px; color: #c0c0cc; }
-  .footer-location { font-size: 12px; color: #aaa; }
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#f8fafc;font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
+  .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
+  .site-nav a:hover{color:var(--gold);}
+  .site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+  .site-nav a.nav-highlight:hover{background:var(--gold);}
+  @media(max-width:700px){.site-nav{display:none;}}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+  .mobile-nav a .mn-icon{font-size:1.15rem;}
+  .mobile-nav a:hover,.mobile-nav a.active{color:var(--navy);}
+  .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  .mobile-nav a.mn-cta:hover{background:var(--gold);}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:100px 20px 40px;gap:24px;}
+  .book-header{text-align:center;}
+  .book-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold);margin-bottom:8px;}
+  .book-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--navy);line-height:1.2;}
+  .book-title em{color:var(--gold);font-style:italic;}
+  .book-author{font-size:0.85rem;color:#94a3b8;font-weight:500;margin-top:6px;}
+  .viewer-wrap{width:100%;max-width:860px;display:flex;flex-direction:column;align-items:center;gap:20px;}
+  .page-display{width:100%;background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 10px 50px rgba(0,0,0,0.1);overflow:hidden;position:relative;min-height:400px;display:flex;align-items:center;justify-content:center;}
+  .page-img{width:100%;height:auto;display:block;opacity:0;transition:opacity 0.3s ease;}
+  .page-img.loaded{opacity:1;}
+  .page-loader{position:absolute;display:flex;flex-direction:column;align-items:center;gap:12px;color:#94a3b8;font-size:0.85rem;text-align:center;padding:20px;}
+  .spinner{width:36px;height:36px;border:3px solid #e2e8f0;border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .controls{display:flex;align-items:center;gap:16px;background:white;padding:14px 24px;border-radius:50px;border:1px solid var(--border);box-shadow:0 5px 20px rgba(0,0,0,0.06);flex-wrap:wrap;justify-content:center;}
+  .nav-arrow{width:46px;height:46px;border-radius:50%;border:2px solid var(--navy);background:white;color:var(--navy);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;font-family:'Poppins',sans-serif;font-weight:700;flex-shrink:0;}
+  .nav-arrow:hover:not(:disabled){background:var(--navy);color:white;}
+  .nav-arrow:disabled{opacity:0.3;cursor:not-allowed;}
+  .page-counter{font-size:0.85rem;font-weight:700;color:var(--navy);min-width:80px;text-align:center;}
+  .page-input-wrap{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:#94a3b8;font-weight:600;}
+  .page-jump{width:56px;padding:6px 10px;border:2px solid var(--border);border-radius:12px;font-family:'Poppins',sans-serif;font-size:0.85rem;font-weight:700;color:var(--navy);text-align:center;outline:none;transition:border-color 0.2s;}
+  .page-jump:focus{border-color:var(--gold);}
+  .thumbs-toggle{background:transparent;border:2px solid var(--border);border-radius:50px;padding:8px 18px;font-family:'Poppins',sans-serif;font-size:0.78rem;font-weight:700;color:#94a3b8;cursor:pointer;transition:0.2s;}
+  .thumbs-toggle:hover,.thumbs-toggle.active{border-color:var(--navy);color:var(--navy);}
+  .thumbs-panel{display:none;width:100%;max-width:860px;background:white;border-radius:20px;border:1px solid var(--border);box-shadow:0 5px 20px rgba(0,0,0,0.06);padding:20px;}
+  .thumbs-panel.open{display:block;}
+  .thumbs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;}
+  .thumb-item{cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:0.2s;position:relative;}
+  .thumb-item:hover{border-color:var(--gold);}
+  .thumb-item.active{border-color:var(--navy);box-shadow:0 4px 12px rgba(30,58,138,0.2);}
+  .thumb-item img{width:100%;height:130px;object-fit:cover;display:block;background:#f8fafc;}
+  .thumb-num{position:absolute;bottom:4px;right:6px;background:rgba(30,58,138,0.8);color:white;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:6px;}
+  .shortcuts{font-size:0.72rem;color:#cbd5e1;text-align:center;}
+  @media(max-width:600px){.main{padding:80px 12px 40px;}.page-input-wrap{display:none;}.thumbs-grid{grid-template-columns:repeat(3,1fr);}}
+  .site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:40px;}
+  .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
+  @media(max-width:900px){.footer-main{grid-template-columns:1fr 1fr;gap:2rem;}.footer-cta-col{grid-column:span 2;}}
+  @media(max-width:560px){.footer-main{grid-template-columns:1fr;padding:2rem 0;}.footer-cta-col{grid-column:span 1;}}
+  .footer-brand-row{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
+  .footer-logo{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+  .footer-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tagline{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-rule{height:2px;background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px);margin-bottom:1.1rem;}
+  .footer-contacts{display:flex;flex-direction:column;gap:7px;}
+  .footer-contact-row{display:flex;align-items:baseline;gap:14px;}
+  .footer-contact-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;min-width:38px;}
+  .footer-contact-val{font-size:13px;color:var(--navy);text-decoration:none;}
+  .footer-contact-val:hover{color:var(--gold);}
+  .footer-col-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#aaa;margin-bottom:0.75rem;}
+  .footer-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-links a{font-size:13.5px;color:#3d3d4a;text-decoration:none;transition:color 0.2s;}
+  .footer-links a:hover{color:var(--navy);}
+  .footer-cta-col{display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
+  .footer-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:14px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.85rem;text-decoration:none;transition:all 0.3s;white-space:nowrap;}
+  .footer-cta-btn:hover{background:var(--gold);transform:translateY(-2px);}
+  .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .footer-copy{font-size:11px;color:#c0c0cc;}
+  .footer-location{font-size:12px;color:#aaa;}
 </style>
 </head>
 <body>
@@ -320,17 +94,23 @@
   <a href="podrecznik.html" class="nav-highlight">📖 Podręcznik</a>
 </nav>
  
-<main class="main">
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="podrecznik.html" class="active"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
  
+<main class="main">
   <div class="book-header">
     <div class="book-label">E-book · Łukasz Ganczarek</div>
     <h1 class="book-title">Szkoła Gry na <em>Fortepianie</em></h1>
     <p class="book-author">Autorski podręcznik do nauki gry na pianinie</p>
   </div>
- 
   <div class="viewer-wrap">
- 
-    <!-- STRONA -->
     <div class="page-display" id="pageDisplay">
       <div class="page-loader" id="loader">
         <div class="spinner"></div>
@@ -338,34 +118,23 @@
       </div>
       <img class="page-img" id="pageImg" src="" alt="Strona podręcznika" onload="imgLoaded()" onerror="imgError()">
     </div>
- 
-    <!-- NAWIGACJA -->
     <div class="controls">
-      <button class="nav-arrow" id="btnFirst" onclick="goTo(1)" title="Pierwsza strona">⟪</button>
-      <button class="nav-arrow" id="btnPrev" onclick="prev()" title="Poprzednia strona">‹</button>
- 
+      <button class="nav-arrow" id="btnFirst" onclick="goTo(1)">⟪</button>
+      <button class="nav-arrow" id="btnPrev"  onclick="prev()">‹</button>
       <span class="page-counter" id="pageCounter">1 / 13</span>
- 
-      <button class="nav-arrow" id="btnNext" onclick="next()" title="Następna strona">›</button>
-      <button class="nav-arrow" id="btnLast" onclick="goTo(TOTAL)" title="Ostatnia strona">⟫</button>
- 
+      <button class="nav-arrow" id="btnNext"  onclick="next()">›</button>
+      <button class="nav-arrow" id="btnLast"  onclick="goTo(TOTAL)">⟫</button>
       <div style="width:1px;height:30px;background:#e2e8f0;"></div>
- 
       <div class="page-input-wrap">
         Idź do strony
         <input type="number" class="page-jump" id="pageJump" min="1" value="1" onchange="jumpTo()">
       </div>
- 
       <button class="thumbs-toggle" id="thumbsToggle" onclick="toggleThumbs()">☰ Spis stron</button>
     </div>
- 
-    <!-- MINIATURY -->
     <div class="thumbs-panel" id="thumbsPanel">
       <div class="thumbs-grid" id="thumbsGrid"></div>
     </div>
- 
-    <div class="shortcuts">Klawiatura: ← → nawigacja · Home/End pierwsza/ostatnia strona</div>
- 
+    <div class="shortcuts">← → nawigacja · Home/End pierwsza/ostatnia · swipe na mobile</div>
   </div>
 </main>
  
@@ -374,10 +143,7 @@
     <div>
       <div class="footer-brand-row">
         <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo">
-        <div>
-          <div class="footer-name">Łukasz Ganczarek</div>
-          <div class="footer-tagline">Nauka gry na pianinie</div>
-        </div>
+        <div><div class="footer-name">Łukasz Ganczarek</div><div class="footer-tagline">Nauka gry na pianinie</div></div>
       </div>
       <div class="footer-rule"></div>
       <div class="footer-contacts">
@@ -420,148 +186,112 @@
  
 <script>
 // ============================================================
-// KONFIGURACJA — wpisz ścieżki do swoich plików PNG
-// Pliki muszą być w tym samym folderze co podrecznik.html
-// lub podaj pełną ścieżkę np. "images/strona1.png"
+// KONFIGURACJA GOOGLE DRIVE
+//
+// Jak pobrać ID pliku z Google Drive:
+//   1. Otwórz plik w Drive → kliknij prawym → "Udostępnij"
+//   2. Upewnij się że "Każdy z linkiem może zobaczyć"
+//   3. Link wygląda tak:
+//      https://drive.google.com/file/d/ ► ID_PLIKU ◄ /view
+//   4. Skopiuj samo ID i wklej poniżej
+//
+// Folder podręcznika:
+// https://drive.google.com/drive/folders/1N0aTy-GLdmkFasu1Wua_eaRew5lBUgAG
 // ============================================================
-const PAGES = [
-  '1.png',
-  '2.png',
-  '3.png',
-  '4.png',
-  '5.png',
-  '6.png',
-  '7.png',
-  '8.png',
-  '9.png',
-  '10.png',
-  '11.png',
-  '12.png',
-  '13.png',
+const FILE_IDS = [
+  // Wklej ID każdego pliku (1.png ... 13.png) — bez cudzysłowów w samym ID
+  'https://drive.google.com/file/d/1B5bt75PhMVILHgSaPyf5iYTkiaGWuxYL/view?usp=drive_link1',   // strona 1
+  'https://drive.google.com/file/d/1Rr_7kA24OiRtSQ2uDWF_jr_z95YATT86/view?usp=drive_link',   // strona 2
+  'https://drive.google.com/file/d/1wtFh7LSaspyESfr_ujFdkmq2YNyeCZe8/view?usp=drive_link',   // strona 3
+  'https://drive.google.com/file/d/1XnDlSFeVNf2B__4n3p1P6CqdBF6qdsPT/view?usp=drive_link',   // strona 4
+  'https://drive.google.com/file/d/1KHgJPNFNM2sOVqsI76BopOcQW019cgm6/view?usp=drive_link',   // strona 5
+  'https://drive.google.com/file/d/1Vw6EjDmRsXUXiYmzV3SXowkjGwZEmgl0/view?usp=drive_link',   // strona 6
+  'https://drive.google.com/file/d/1I8hlLnNIyEvBZu_55CCK7r4DQsEN6w8X/view?usp=drive_link',   // strona 7
+  'https://drive.google.com/file/d/1R40qA8XjkU_703ngr_n_w364OFAlP_YR/view?usp=drive_link',   // strona 8
+  'https://drive.google.com/file/d/1y9QhoNOukhiRMqfQy3w7JEHurCInvcd_/view?usp=drive_link',   // strona 9
+  'https://drive.google.com/file/d/1v7zfbE27cFXvF_2BWPxSr252P-yUUhP4/view?usp=drive_link', // strona 10
+  'https://drive.google.com/file/d/1gJeZ-Fa1aDtiGdnPVs0cC_C543ds1GtQ/view?usp=drive_link', // strona 11
+  'https://drive.google.com/file/d/1EXakadvRyjO7P4i9qOF-DDumoiAb2SmR/view?usp=drive_link', // strona 12
+  'https://drive.google.com/file/d/1onhz5XHOs-iT1mS0rXBykBZrp_sjFHxT/view?usp=drive_link', // strona 13
 ];
  
+const PAGES = FILE_IDS.map(id =>
+  `https://drive.google.com/uc?export=view&id=${id}`
+);
+ 
 const TOTAL = PAGES.length;
-let current = 1;
-let thumbsOpen = false;
+let current = 1, thumbsOpen = false;
  
-// ============================================================
-// NAWIGACJA
-// ============================================================
-function goTo(n) {
-  n = Math.max(1, Math.min(TOTAL, n));
-  current = n;
-  loadPage();
-  updateUI();
+function goTo(n){
+  n=Math.max(1,Math.min(TOTAL,n)); current=n; loadPage(); updateUI();
 }
- 
-function prev() { goTo(current - 1); }
-function next() { goTo(current + 1); }
- 
-function jumpTo() {
-  const val = parseInt(document.getElementById('pageJump').value);
-  if (!isNaN(val)) goTo(val);
+function prev(){goTo(current-1);}
+function next(){goTo(current+1);}
+function jumpTo(){
+  const v=parseInt(document.getElementById('pageJump').value);
+  if(!isNaN(v))goTo(v);
 }
- 
-// ============================================================
-// ŁADOWANIE STRONY
-// ============================================================
-function loadPage() {
-  const img    = document.getElementById('pageImg');
-  const loader = document.getElementById('loader');
- 
+function loadPage(){
+  const img=document.getElementById('pageImg');
+  const ldr=document.getElementById('loader');
   img.classList.remove('loaded');
-  loader.style.display = 'flex';
-  img.src = PAGES[current - 1];
- 
-  // aktualizuj miniaturę aktywną
-  document.querySelectorAll('.thumb-item').forEach((t, i) => {
-    t.classList.toggle('active', i + 1 === current);
-  });
- 
-  // scroll do aktywnej miniatury
-  const activeThumb = document.querySelector('.thumb-item.active');
-  if (activeThumb) activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  ldr.style.display='flex';
+  ldr.innerHTML='<div class="spinner"></div><span>Ładowanie strony...</span>';
+  img.src=PAGES[current-1];
+  document.querySelectorAll('.thumb-item').forEach((t,i)=>t.classList.toggle('active',i+1===current));
+  const at=document.querySelector('.thumb-item.active');
+  if(at)at.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
- 
-function imgLoaded() {
+function imgLoaded(){
   document.getElementById('pageImg').classList.add('loaded');
-  document.getElementById('loader').style.display = 'none';
+  document.getElementById('loader').style.display='none';
 }
- 
-function imgError() {
-  document.getElementById('loader').innerHTML = `
-    <div style="font-size:2rem;">📄</div>
-    <span style="color:#ef4444;">Nie znaleziono pliku: ${PAGES[current-1]}</span>
-    <small style="color:#94a3b8;max-width:300px;text-align:center;">Upewnij się że plik PNG jest w tym samym folderze co podrecznik.html</small>
-  `;
+function imgError(){
+  document.getElementById('loader').innerHTML=`
+    <div style="font-size:2rem;">⚠️</div>
+    <span style="color:#ef4444;">Błąd ładowania strony ${current}.</span>
+    <small style="color:#94a3b8;margin-top:6px;">
+      Sprawdź czy pliki w Google Drive mają włączone<br>
+      udostępnianie: "Każdy z linkiem może zobaczyć"
+    </small>`;
 }
- 
-// ============================================================
-// AKTUALIZACJA UI
-// ============================================================
-function updateUI() {
-  document.getElementById('pageCounter').textContent = `${current} / ${TOTAL}`;
-  document.getElementById('pageJump').value = current;
-  document.getElementById('btnPrev').disabled  = current === 1;
-  document.getElementById('btnFirst').disabled = current === 1;
-  document.getElementById('btnNext').disabled  = current === TOTAL;
-  document.getElementById('btnLast').disabled  = current === TOTAL;
+function updateUI(){
+  document.getElementById('pageCounter').textContent=`${current} / ${TOTAL}`;
+  document.getElementById('pageJump').value=current;
+  document.getElementById('btnPrev').disabled=current===1;
+  document.getElementById('btnFirst').disabled=current===1;
+  document.getElementById('btnNext').disabled=current===TOTAL;
+  document.getElementById('btnLast').disabled=current===TOTAL;
 }
- 
-// ============================================================
-// MINIATURY
-// ============================================================
-function buildThumbs() {
-  const grid = document.getElementById('thumbsGrid');
-  PAGES.forEach((src, i) => {
-    const item = document.createElement('div');
-    item.className = 'thumb-item' + (i === 0 ? ' active' : '');
-    item.onclick = () => { goTo(i + 1); };
-    item.innerHTML = `
-      <img src="${src}" alt="Strona ${i+1}" loading="lazy">
-      <div class="thumb-num">${i + 1}</div>
-    `;
+function buildThumbs(){
+  const grid=document.getElementById('thumbsGrid');
+  PAGES.forEach((src,i)=>{
+    const item=document.createElement('div');
+    item.className='thumb-item'+(i===0?' active':'');
+    item.onclick=()=>goTo(i+1);
+    item.innerHTML=`<img src="${src}" alt="Strona ${i+1}" loading="lazy"><div class="thumb-num">${i+1}</div>`;
     grid.appendChild(item);
   });
 }
- 
-function toggleThumbs() {
-  thumbsOpen = !thumbsOpen;
-  document.getElementById('thumbsPanel').classList.toggle('open', thumbsOpen);
-  document.getElementById('thumbsToggle').classList.toggle('active', thumbsOpen);
+function toggleThumbs(){
+  thumbsOpen=!thumbsOpen;
+  document.getElementById('thumbsPanel').classList.toggle('open',thumbsOpen);
+  document.getElementById('thumbsToggle').classList.toggle('active',thumbsOpen);
 }
- 
-// ============================================================
-// KLAWIATURA
-// ============================================================
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT') return;
-  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
-  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
-  if (e.key === 'Home') goTo(1);
-  if (e.key === 'End')  goTo(TOTAL);
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')next();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();
+  if(e.key==='Home')goTo(1);
+  if(e.key==='End')goTo(TOTAL);
 });
- 
-// ============================================================
-// SWIPE na mobile
-// ============================================================
-let touchStartX = 0;
-document.getElementById('pageDisplay').addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-}, { passive: true });
-document.getElementById('pageDisplay').addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (dx < -50) next();
-  if (dx > 50)  prev();
-}, { passive: true });
- 
-// ============================================================
-// INIT
-// ============================================================
-buildThumbs();
-loadPage();
-updateUI();
+let tx=0;
+document.getElementById('pageDisplay').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.getElementById('pageDisplay').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx;
+  if(dx<-50)next(); if(dx>50)prev();
+},{passive:true});
+buildThumbs(); loadPage(); updateUI();
 </script>
 </body>
 </html>
- 
