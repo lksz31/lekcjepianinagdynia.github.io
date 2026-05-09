@@ -430,6 +430,32 @@
   .info-card iframe { width: 100%; height: 350px; border-radius: 16px; border: none; filter: invert(92%) hue-rotate(190deg); }
   @media (max-width: 500px) { .info-card iframe { height: 280px; } }
  
+  /* PROMO — fiszki i podręcznik */
+  .promo-section { padding: 70px 5%; background: white; }
+  @media(max-width:600px){.promo-section{padding:48px 4%;}}
+  .promo-inner { max-width: 1100px; margin: 0 auto; }
+  .promo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; }
+  @media(max-width:700px){.promo-grid{grid-template-columns:1fr;gap:16px;}}
+  .promo-card { border-radius: 28px; padding: 36px 32px; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; text-decoration: none; opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.7s, box-shadow 0.3s; }
+  .promo-card.active { opacity: 1; transform: translateY(0); }
+  .promo-card:hover { transform: translateY(-6px) !important; box-shadow: 0 24px 56px rgba(0,0,0,0.14); }
+  .promo-card.fiszki { background: var(--navy); }
+  .promo-card.podrecznik { background: var(--gold); }
+  .promo-card::before { content: ''; position: absolute; width: 200px; height: 200px; border-radius: 50%; opacity: 0.08; bottom: -40px; right: -40px; background: white; }
+  .promo-icon { font-size: 2.4rem; line-height: 1; }
+  .promo-badge { font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; }
+  .promo-card.fiszki .promo-badge { color: rgba(255,255,255,0.65); }
+  .promo-card.podrecznik .promo-badge { color: rgba(30,58,138,0.65); }
+  .promo-title { font-family: 'Playfair Display', serif; font-size: clamp(1.3rem,2.5vw,1.8rem); line-height: 1.2; }
+  .promo-card.fiszki .promo-title { color: white; }
+  .promo-card.podrecznik .promo-title { color: var(--navy); }
+  .promo-desc { font-size: 0.85rem; line-height: 1.65; }
+  .promo-card.fiszki .promo-desc { color: rgba(255,255,255,0.75); }
+  .promo-card.podrecznik .promo-desc { color: rgba(30,58,138,0.8); }
+  .promo-cta { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.82rem; width: fit-content; margin-top: 4px; }
+  .promo-card.fiszki .promo-cta { background: var(--gold); color: #1a1a2e; }
+  .promo-card.podrecznik .promo-cta { background: var(--navy); color: white; }
+ 
   /* BRIEFY */
   .briefy-section { padding: 100px 5%; background: var(--navy); position: relative; overflow: hidden; }
   @media (max-width: 600px) { .briefy-section { padding: 60px 4%; } }
@@ -708,6 +734,32 @@
      SEKCJA BRIEFY — STREFA UCZNIA
      Kod ucznia = numer telefonu (9 cyfr, bez 48)
      ============================================================ -->
+<section class="promo-section">
+  <div class="promo-inner">
+    <div class="section-label">Narzędzia dla uczniów</div>
+    <h2 class="section-title">Ucz się z autorskimi aplikacjami</h2>
+    <div class="promo-grid" id="promoGrid">
+ 
+      <a href="fiszki.html" class="promo-card fiszki">
+        <div class="promo-icon">🎼</div>
+        <div class="promo-badge">Interaktywne ćwiczenia</div>
+        <div class="promo-title">Fiszki Nutowe</div>
+        <div class="promo-desc">Ćwicz czytanie nut w kluczu wiolinowym i basowym. Losuj nuty, ustaw timer, włącz mikrofon i graj — aplikacja sprawdzi czy zagrałeś poprawnie.</div>
+        <div class="promo-cta">Otwórz fiszki →</div>
+      </a>
+ 
+      <a href="podrecznik.html" class="promo-card podrecznik">
+        <div class="promo-icon">📖</div>
+        <div class="promo-badge">E-book</div>
+        <div class="promo-title">Szkoła Gry na Fortepianie</div>
+        <div class="promo-desc">Autorski podręcznik do nauki gry na pianinie — ćwiczenia, ilustracje, zadania rytmiczne. Przeglądaj strona po stronie bezpośrednio w przeglądarce.</div>
+        <div class="promo-cta">Otwórz podręcznik →</div>
+      </a>
+ 
+    </div>
+  </div>
+</section>
+ 
 <section class="briefy-section" id="briefy">
   <div class="briefy-inner">
     <div class="briefy-label">Strefa ucznia</div>
@@ -1211,6 +1263,9 @@ async function wyslijModal() {
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('bentoBox'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('pomoceGrid'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('appleLocation'));
+// Promo karty
+const promoObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('active');}}),{threshold:0.15});
+document.querySelectorAll('.promo-card').forEach((c,i)=>{c.style.transitionDelay=i*0.12+'s';promoObs.observe(c);});
  
 // ============================================================
 // SLIDER
