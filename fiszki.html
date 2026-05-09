@@ -8,129 +8,89 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root { --gold:#d4af37; --navy:#1e3a8a; --blue:#3b82f6; --border:#f0f0f0; --text:#334155; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { background:#f8fafc; font-family:'Poppins',sans-serif; color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
- 
-  /* ── DESKTOP NAV ── */
-  .site-nav {
-    position:fixed; top:20px; left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.9); backdrop-filter:blur(10px);
-    border:1px solid var(--border); border-radius:50px;
-    padding:10px 30px; display:flex; gap:25px; z-index:1000;
-    box-shadow:0 5px 20px rgba(0,0,0,0.08); font-size:0.85rem; font-weight:600; white-space:nowrap;
-  }
-  .site-nav a { color:var(--navy); text-decoration:none; transition:0.3s; }
-  .site-nav a:hover { color:var(--gold); }
-  .site-nav a.nav-highlight { background:var(--navy); color:white; padding:4px 16px; border-radius:50px; font-size:0.8rem; }
-  .site-nav a.nav-highlight:hover { background:var(--gold); }
-  @media(max-width:700px) { .site-nav { display:none; } }
- 
-  /* ── MOBILE BOTTOM NAV (5 ikon) ── */
-  .mobile-nav {
-    display:none; position:fixed; bottom:0; left:0; right:0;
-    background:rgba(255,255,255,0.97); backdrop-filter:blur(10px);
-    border-top:1px solid var(--border);
-    padding:8px 0 env(safe-area-inset-bottom,8px);
-    z-index:1000; box-shadow:0 -5px 20px rgba(0,0,0,0.08);
-  }
-  .mobile-nav-inner { display:flex; justify-content:space-around; align-items:center; }
-  .mobile-nav a {
-    display:flex; flex-direction:column; align-items:center;
-    text-decoration:none; color:#94a3b8; font-size:0.58rem; font-weight:600; gap:3px; transition:0.2s;
-    flex:1; max-width:72px;
-  }
-  .mobile-nav a .mn-icon { font-size:1.15rem; }
-  .mobile-nav a:hover, .mobile-nav a.active { color:var(--navy); }
-  .mobile-nav a.mn-cta {
-    background:var(--navy); color:white !important;
-    padding:7px 10px; border-radius:50px; flex-direction:row; gap:4px; font-size:0.65rem;
-    max-width:none; flex:none;
-  }
-  .mobile-nav a.mn-cta:hover { background:var(--gold); }
-  @media(max-width:700px) { .mobile-nav { display:block; } body { padding-bottom:68px; } }
- 
-  /* ── MAIN ── */
-  .main { flex:1; display:flex; flex-direction:column; align-items:center; padding:100px 16px 40px; gap:16px; }
- 
-  .page-title { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.8rem); color:var(--navy); text-align:center; }
-  .page-title em { color:var(--gold); font-style:italic; }
- 
-  /* ── CONTROLS ── */
-  .controls-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; max-width:860px; }
-  .ctrl-panel { background:white; padding:9px 14px; border-radius:16px; border:1px solid var(--border); box-shadow:0 3px 12px rgba(0,0,0,0.05); display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
-  .ctrl-label { font-size:0.67rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; color:#94a3b8; white-space:nowrap; }
-  .ctrl-btn { padding:5px 12px; border-radius:50px; border:2px solid var(--navy); background:white; color:var(--navy); font-weight:700; cursor:pointer; transition:0.2s; font-size:0.75rem; font-family:'Poppins',sans-serif; white-space:nowrap; }
-  .ctrl-btn.active { background:var(--navy); color:white; }
-  .ctrl-btn:hover:not(.active) { background:#f0f7ff; }
-  .ctrl-btn.mic-on { background:var(--gold); border-color:var(--gold); color:white; }
- 
-  /* ── CARD ── */
-  .card { background:white; border-radius:28px; padding:28px 24px; border:1px solid var(--border); box-shadow:0 8px 40px rgba(0,0,0,0.08); display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; max-width:740px; animation:fadeIn 0.35s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
- 
-  .timer-display { font-size:2.2rem; font-weight:800; color:var(--navy); font-family:'Playfair Display',serif; display:none; }
-  .timer-display.active { display:block; }
-  .timer-display.warning { color:#ef4444; }
- 
-  .staff-wrapper { width:100%; }
-  canvas#staffCanvas { width:100%; height:auto; display:block; border-radius:10px; }
- 
-  .note-reveal { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
-  .note-names-row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; min-height:44px; align-items:center; }
-  .note-name-box { font-family:'Playfair Display',serif; font-size:1.7rem; color:var(--navy); font-weight:700; transition:opacity 0.3s; background:#f0f4ff; padding:3px 14px; border-radius:10px; border:1px solid #dbeafe; }
-  .note-name-box.hidden { opacity:0; }
-  .reveal-btn { background:transparent; border:2px solid var(--navy); color:var(--navy); padding:7px 22px; border-radius:50px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.8rem; cursor:pointer; transition:0.2s; }
-  .reveal-btn:hover { background:var(--navy); color:white; }
- 
-  .mic-feedback { width:100%; padding:10px 14px; border-radius:14px; background:#f8fafc; border:1px solid var(--border); display:none; flex-direction:column; gap:6px; }
-  .mic-feedback.active { display:flex; }
-  .mic-lbl { font-size:0.68rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; }
-  .mic-detected { font-size:1rem; font-weight:800; color:var(--navy); font-family:'Playfair Display',serif; }
-  .mic-result { font-size:0.78rem; font-weight:700; padding:3px 12px; border-radius:50px; display:inline-block; width:fit-content; }
-  .mic-result.correct { background:#dcfce7; color:#16a34a; }
-  .mic-result.wrong { background:#fee2e2; color:#dc2626; }
-  .mic-result.waiting { background:#f1f5f9; color:#94a3b8; }
-  .pitch-bar-wrap { width:100%; height:5px; background:#e2e8f0; border-radius:3px; overflow:hidden; }
-  .pitch-bar { height:100%; width:0; background:var(--navy); border-radius:3px; transition:width 0.1s, background 0.2s; }
- 
-  .draw-btn { background:var(--navy); color:white; padding:14px 48px; border-radius:50px; font-family:'Poppins',sans-serif; font-weight:800; font-size:1rem; border:none; cursor:pointer; transition:0.3s; box-shadow:0 8px 24px rgba(30,58,138,0.25); animation:pulse 2s infinite; }
-  .draw-btn:hover { background:var(--gold); transform:translateY(-2px); }
-  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);} 70%{box-shadow:0 0 0 12px rgba(30,58,138,0);} 100%{box-shadow:0 0 0 0 rgba(30,58,138,0);} }
- 
-  .score-bar { display:flex; gap:20px; font-size:0.82rem; font-weight:600; color:#64748b; flex-wrap:wrap; justify-content:center; }
-  .score-bar span { color:var(--navy); font-weight:800; }
- 
-  /* ── STOPKA ── */
-  .site-footer { background:white; border-top:1px solid #e8eaee; padding:0 5%; font-family:'Poppins',sans-serif; margin-top:40px; }
-  .footer-main { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1.4fr 1fr 1fr auto; gap:3rem; padding:3rem 0 2.5rem; align-items:start; }
+  :root{--gold:#d4af37;--navy:#1e3a8a;--blue:#3b82f6;--border:#f0f0f0;--text:#334155;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#f8fafc;font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+  .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
+  .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
+  .site-nav a:hover{color:var(--gold);}
+  .site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+  .site-nav a.nav-highlight:hover{background:var(--gold);}
+  @media(max-width:700px){.site-nav{display:none;}}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+  .mobile-nav a .mn-icon{font-size:1.15rem;}
+  .mobile-nav a:hover,.mobile-nav a.active{color:var(--navy);}
+  .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  .mobile-nav a.mn-cta:hover{background:var(--gold);}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:100px 16px 40px;gap:16px;}
+  .page-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--navy);text-align:center;}
+  .page-title em{color:var(--gold);font-style:italic;}
+  .controls-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:900px;}
+  .ctrl-panel{background:white;padding:9px 14px;border-radius:16px;border:1px solid var(--border);box-shadow:0 3px 12px rgba(0,0,0,0.05);display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .ctrl-label{font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;white-space:nowrap;}
+  .ctrl-btn{padding:5px 12px;border-radius:50px;border:2px solid var(--navy);background:white;color:var(--navy);font-weight:700;cursor:pointer;transition:0.2s;font-size:0.75rem;font-family:'Poppins',sans-serif;white-space:nowrap;}
+  .ctrl-btn.active{background:var(--navy);color:white;}
+  .ctrl-btn:hover:not(.active){background:#f0f7ff;}
+  .ctrl-btn.mic-on{background:var(--gold);border-color:var(--gold);color:white;}
+  .card{background:white;border-radius:28px;padding:28px 24px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:780px;animation:fadeIn 0.35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .timer-display{font-size:2.2rem;font-weight:800;color:var(--navy);font-family:'Playfair Display',serif;display:none;}
+  .timer-display.active{display:block;}
+  .timer-display.warning{color:#ef4444;}
+  .staff-wrapper{width:100%;}
+  canvas#staffCanvas{width:100%;height:auto;display:block;border-radius:10px;}
+  .note-reveal{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;}
+  .note-names-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;min-height:44px;align-items:center;}
+  .note-name-box{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--navy);font-weight:700;transition:opacity 0.3s;background:#f0f4ff;padding:3px 14px;border-radius:10px;border:1px solid #dbeafe;}
+  .note-name-box.hidden{opacity:0;}
+  .reveal-btn{background:transparent;border:2px solid var(--navy);color:var(--navy);padding:7px 22px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;transition:0.2s;}
+  .reveal-btn:hover{background:var(--navy);color:white;}
+  .mic-feedback{width:100%;padding:10px 14px;border-radius:14px;background:#f8fafc;border:1px solid var(--border);display:none;flex-direction:column;gap:6px;}
+  .mic-feedback.active{display:flex;}
+  .mic-lbl{font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;}
+  .mic-detected{font-size:1rem;font-weight:800;color:var(--navy);font-family:'Playfair Display',serif;}
+  .mic-result{font-size:0.78rem;font-weight:700;padding:3px 12px;border-radius:50px;display:inline-block;width:fit-content;}
+  .mic-result.correct{background:#dcfce7;color:#16a34a;}
+  .mic-result.wrong{background:#fee2e2;color:#dc2626;}
+  .mic-result.waiting{background:#f1f5f9;color:#94a3b8;}
+  .pitch-bar-wrap{width:100%;height:5px;background:#e2e8f0;border-radius:3px;overflow:hidden;}
+  .pitch-bar{height:100%;width:0;background:var(--navy);border-radius:3px;transition:width 0.1s,background 0.2s;}
+  .draw-btn{background:var(--navy);color:white;padding:14px 48px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:800;font-size:1rem;border:none;cursor:pointer;transition:0.3s;box-shadow:0 8px 24px rgba(30,58,138,0.25);animation:pulse 2s infinite;}
+  .draw-btn:hover{background:var(--gold);transform:translateY(-2px);}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);}70%{box-shadow:0 0 0 12px rgba(30,58,138,0);}100%{box-shadow:0 0 0 0 rgba(30,58,138,0);}}
+  .score-bar{display:flex;gap:20px;font-size:0.82rem;font-weight:600;color:#64748b;flex-wrap:wrap;justify-content:center;}
+  .score-bar span{color:var(--navy);font-weight:800;}
+  .site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:40px;}
+  .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
   @media(max-width:900px){.footer-main{grid-template-columns:1fr 1fr;gap:2rem;}.footer-cta-col{grid-column:span 2;}}
   @media(max-width:560px){.footer-main{grid-template-columns:1fr;padding:2rem 0;}.footer-cta-col{grid-column:span 1;}}
-  .footer-brand-row { display:flex; align-items:center; gap:12px; margin-bottom:1.2rem; }
-  .footer-logo { width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0; }
-  .footer-name { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:#1a1a22; }
-  .footer-tagline { font-size:10px; font-weight:500; letter-spacing:0.14em; text-transform:uppercase; color:#8a8a9a; margin-top:2px; }
-  .footer-rule { height:2px; background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px); margin-bottom:1.1rem; }
-  .footer-contacts { display:flex; flex-direction:column; gap:7px; }
-  .footer-contact-row { display:flex; align-items:baseline; gap:14px; }
-  .footer-contact-label { font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:#aaa; min-width:38px; }
-  .footer-contact-val { font-size:13px; color:var(--navy); text-decoration:none; }
-  .footer-contact-val:hover { color:var(--gold); }
-  .footer-col-title { font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#aaa; margin-bottom:0.75rem; }
-  .footer-links { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; }
-  .footer-links a { font-size:13.5px; color:#3d3d4a; text-decoration:none; transition:color 0.2s; }
-  .footer-links a:hover { color:var(--navy); }
-  .footer-cta-col { display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
-  .footer-cta-btn { display:inline-flex; align-items:center; gap:8px; background:var(--navy); color:white; padding:14px 26px; border-radius:50px; font-family:'Poppins',sans-serif; font-weight:700; font-size:0.85rem; text-decoration:none; transition:all 0.3s; white-space:nowrap; }
-  .footer-cta-btn:hover { background:var(--gold); transform:translateY(-2px); }
-  .footer-bottom { border-top:1px solid #e8eaee; padding:0.85rem 0; max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
-  .footer-copy { font-size:11px; color:#c0c0cc; }
-  .footer-location { font-size:12px; color:#aaa; }
+  .footer-brand-row{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
+  .footer-logo{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+  .footer-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tagline{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-rule{height:2px;background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px);margin-bottom:1.1rem;}
+  .footer-contacts{display:flex;flex-direction:column;gap:7px;}
+  .footer-contact-row{display:flex;align-items:baseline;gap:14px;}
+  .footer-contact-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;min-width:38px;}
+  .footer-contact-val{font-size:13px;color:var(--navy);text-decoration:none;}
+  .footer-contact-val:hover{color:var(--gold);}
+  .footer-col-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#aaa;margin-bottom:0.75rem;}
+  .footer-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-links a{font-size:13.5px;color:#3d3d4a;text-decoration:none;transition:color 0.2s;}
+  .footer-links a:hover{color:var(--navy);}
+  .footer-cta-col{display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
+  .footer-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:14px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.85rem;text-decoration:none;transition:all 0.3s;white-space:nowrap;}
+  .footer-cta-btn:hover{background:var(--gold);transform:translateY(-2px);}
+  .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .footer-copy{font-size:11px;color:#c0c0cc;}
+  .footer-location{font-size:12px;color:#aaa;}
 </style>
 </head>
 <body>
  
-<!-- DESKTOP NAV -->
 <nav class="site-nav">
   <a href="index.html">Strona główna</a>
   <a href="index.html#o-mnie">O mnie</a>
@@ -140,7 +100,6 @@
   <a href="fiszki.html" class="nav-highlight">🎼 Fiszki</a>
 </nav>
  
-<!-- MOBILE BOTTOM NAV — 5 ikon -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="index.html"><span class="mn-icon">🏠</span>Główna</a>
@@ -154,7 +113,6 @@
 <main class="main">
   <h1 class="page-title">Fiszki <em>nutowe</em></h1>
  
-  <!-- ROW 1 -->
   <div class="controls-row">
     <div class="ctrl-panel">
       <span class="ctrl-label">Klucz</span>
@@ -169,7 +127,6 @@
     </div>
   </div>
  
-  <!-- ROW 2 -->
   <div class="controls-row">
     <div class="ctrl-panel">
       <span class="ctrl-label">Nut naraz</span>
@@ -180,11 +137,18 @@
       <button class="ctrl-btn"        id="btn-n5" onclick="setNoteCount(5)">5</button>
     </div>
     <div class="ctrl-panel">
+      <span class="ctrl-label">Układ nut</span>
+      <button class="ctrl-btn active" id="btn-cluster" onclick="setLayout('cluster')">🎵 Klaster</button>
+      <button class="ctrl-btn"        id="btn-seq"     onclick="setLayout('seq')">🎶 Postępujące</button>
+    </div>
+  </div>
+ 
+  <div class="controls-row">
+    <div class="ctrl-panel">
       <span class="ctrl-label">Timer</span>
       <button class="ctrl-btn active" id="btn-t0"  onclick="setTimer(0)">Wył.</button>
-      <button class="ctrl-btn"        id="btn-t5"  onclick="setTimer(5)">5s</button>
-      <button class="ctrl-btn"        id="btn-t10" onclick="setTimer(10)">10s</button>
       <button class="ctrl-btn"        id="btn-t30" onclick="setTimer(30)">30s</button>
+      <button class="ctrl-btn"        id="btn-t60" onclick="setTimer(60)">60s</button>
     </div>
     <div class="ctrl-panel">
       <span class="ctrl-label">Mikrofon</span>
@@ -192,11 +156,10 @@
     </div>
   </div>
  
-  <!-- CARD -->
   <div class="card" id="card">
-    <div class="timer-display" id="timerDisplay">0:10</div>
+    <div class="timer-display" id="timerDisplay">0:30</div>
     <div class="staff-wrapper">
-      <canvas id="staffCanvas" width="680" height="300"></canvas>
+      <canvas id="staffCanvas" width="720" height="300"></canvas>
     </div>
     <div class="note-reveal">
       <div class="note-names-row" id="noteNamesRow"></div>
@@ -221,16 +184,12 @@
   </div>
 </main>
  
-<!-- STOPKA -->
 <footer class="site-footer">
   <div class="footer-main">
     <div>
       <div class="footer-brand-row">
         <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo">
-        <div>
-          <div class="footer-name">Łukasz Ganczarek</div>
-          <div class="footer-tagline">Nauka gry na pianinie</div>
-        </div>
+        <div><div class="footer-name">Łukasz Ganczarek</div><div class="footer-tagline">Nauka gry na pianinie</div></div>
       </div>
       <div class="footer-rule"></div>
       <div class="footer-contacts">
@@ -275,337 +234,265 @@
 // ================================================================
 // DANE NUT
 // pos: 0=linia1(dół) 2=linia2 4=linia3(środek) 6=linia4 8=linia5
-// każda jednostka pos = pół kroku między liniami (STEP/2 pikseli)
-// Ogonki: pos<=4 → prawa strona w GÓRĘ; pos>4 → lewa strona w DÓŁ
+// Ogonki: pos<=4 → z prawej w GÓRĘ; pos>4 → z lewej w DÓŁ
 // ================================================================
-const TREBLE = [
-  {label:'c¹', pos:-2, freq:261.63},
-  {label:'d¹', pos:-1, freq:293.66},
-  {label:'e¹', pos: 0, freq:329.63},
-  {label:'f¹', pos: 1, freq:349.23},
-  {label:'g¹', pos: 2, freq:392.00},
-  {label:'a¹', pos: 3, freq:440.00},
-  {label:'h¹', pos: 4, freq:493.88},
-  {label:'c²', pos: 5, freq:523.25},
-  {label:'d²', pos: 6, freq:587.33},
-  {label:'e²', pos: 7, freq:659.25},
-  {label:'f²', pos: 8, freq:698.46},
-  {label:'g²', pos: 9, freq:783.99},
-  {label:'a²', pos:10, freq:880.00},
-  {label:'h²', pos:11, freq:987.77},
-  {label:'c³', pos:12, freq:1046.50},
+const TREBLE=[
+  {label:'c¹',pos:-2,freq:261.63},{label:'d¹',pos:-1,freq:293.66},
+  {label:'e¹',pos:0, freq:329.63},{label:'f¹',pos:1, freq:349.23},
+  {label:'g¹',pos:2, freq:392.00},{label:'a¹',pos:3, freq:440.00},
+  {label:'h¹',pos:4, freq:493.88},{label:'c²',pos:5, freq:523.25},
+  {label:'d²',pos:6, freq:587.33},{label:'e²',pos:7, freq:659.25},
+  {label:'f²',pos:8, freq:698.46},{label:'g²',pos:9, freq:783.99},
+  {label:'a²',pos:10,freq:880.00},{label:'h²',pos:11,freq:987.77},
+  {label:'c³',pos:12,freq:1046.50},
 ];
-const BASS = [
-  {label:'H',   pos:-2, freq:61.74},
-  {label:'c',   pos:-1, freq:65.41},
-  {label:'d',   pos: 0, freq:73.42},
-  {label:'e',   pos: 1, freq:82.41},
-  {label:'f',   pos: 2, freq:87.31},
-  {label:'g',   pos: 3, freq:98.00},
-  {label:'a',   pos: 4, freq:110.00},
-  {label:'h',   pos: 5, freq:123.47},
-  {label:'c¹',  pos: 6, freq:130.81},
-  {label:'d¹',  pos: 7, freq:146.83},
-  {label:'e¹',  pos: 8, freq:164.81},
-  {label:'f¹',  pos: 9, freq:174.61},
-  {label:'g¹',  pos:10, freq:196.00},
-  {label:'a¹',  pos:11, freq:220.00},
-  {label:'h¹',  pos:12, freq:246.94},
+const BASS=[
+  {label:'H',  pos:-2,freq:61.74},{label:'c',  pos:-1,freq:65.41},
+  {label:'d',  pos:0, freq:73.42},{label:'e',  pos:1, freq:82.41},
+  {label:'f',  pos:2, freq:87.31},{label:'g',  pos:3, freq:98.00},
+  {label:'a',  pos:4, freq:110.00},{label:'h', pos:5, freq:123.47},
+  {label:'c¹', pos:6, freq:130.81},{label:'d¹',pos:7, freq:146.83},
+  {label:'e¹', pos:8, freq:164.81},{label:'f¹',pos:9, freq:174.61},
+  {label:'g¹', pos:10,freq:196.00},{label:'a¹',pos:11,freq:220.00},
+  {label:'h¹', pos:12,freq:246.94},
 ];
  
 // ================================================================
 // STAN
 // ================================================================
-let clef='treble', range='small', noteCount=1;
-let revealed=false, count=0, correct=0;
-let currentNotes=[];
+let clef='treble', range='small', noteCount=1, layout='cluster';
+let revealed=false, count=0, correct=0, currentNotes=[];
 let timerSec=0, timerLeft=0, timerInt=null;
 let micActive=false, audioCtx=null, analyser=null, micStream=null, pitchInt=null;
  
-function getPool(c) {
-  const arr = c==='bass' ? BASS : TREBLE;
-  return range==='small' ? arr.filter(n=>n.pos>=-2&&n.pos<=11) : arr;
+function getPool(c){
+  const a=c==='bass'?BASS:TREBLE;
+  return range==='small'?a.filter(n=>n.pos>=-2&&n.pos<=11):a;
 }
  
 // ================================================================
-// RYSOWANIE — stałe
+// RYSOWANIE
 // ================================================================
-const STEP = 18;       // px między liniami pięciolinii
-const LX0  = 80;       // x startu linii (po kluczu)
-const LXEND_MARGIN = 30; // margines prawy
+const STEP=18, LX0=82, LXEND=28;
  
-// Y nuty na pięciolinii:
-// linia 1 (pos=0) jest najniżej → staffTop + 4*STEP
-// pos rośnie → Y maleje (idzie do góry)
-function noteY(staffTop, pos) {
-  return staffTop + 4*STEP - pos*(STEP/2);
-}
+function noteY(st,pos){return st+4*STEP-pos*(STEP/2);}
  
-// ================================================================
-// RYSOWANIE PIĘCIOLINII I NUT
-// ================================================================
-function drawStaff(notes) {
-  const cv  = document.getElementById('staffCanvas');
-  const ctx = cv.getContext('2d');
-  const W=cv.width, H=cv.height;
+function drawStaff(notes){
+  const cv=document.getElementById('staffCanvas');
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
   ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.roundRect(0,0,W,H,12); ctx.fill();
  
-  // tło
-  ctx.fillStyle='#fff';
-  ctx.beginPath(); ctx.roundRect(0,0,W,H,12); ctx.fill();
+  const dual=clef==='both';
+  const staffTops=dual?[H/2-STEP*6.2,H/2+STEP*0.4]:[H/2-STEP*2];
+  const staffClefs=dual?['treble','bass']:[clef];
  
-  const dual       = clef==='both';
-  // Pozycje górnej krawędzi każdej pięciolinii
-  const staffTops  = dual
-    ? [H/2 - STEP*6.2,  H/2 + STEP*0.4]
-    : [H/2 - STEP*2];
-  const staffClefs = dual ? ['treble','bass'] : [clef];
+  // ── akolada ──
+  if(dual){
+    const topY=staffTops[0], botY=staffTops[1]+4*STEP;
+    ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(LX0-2,topY); ctx.lineTo(LX0-2,botY); ctx.stroke();
+    // klamra (akolada) — esowaty kształt
+    const bW=10, midY=(topY+botY)/2;
+    ctx.lineWidth=1.8;
+    // górna połowa klamry
+    ctx.beginPath();
+    ctx.moveTo(LX0-2,topY);
+    ctx.bezierCurveTo(LX0-2-bW,topY,LX0-2-bW,midY-STEP,LX0-2,midY);
+    ctx.stroke();
+    // dolna połowa klamry
+    ctx.beginPath();
+    ctx.moveTo(LX0-2,midY);
+    ctx.bezierCurveTo(LX0-2-bW,midY+STEP,LX0-2-bW,botY,LX0-2,botY);
+    ctx.stroke();
+    // trójkąciki na końcach akolady
+    ctx.fillStyle='#1e3a8a';
+    ctx.beginPath();
+    ctx.moveTo(LX0-2,topY); ctx.lineTo(LX0-2-6,topY+8); ctx.lineTo(LX0-2+2,topY+4); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(LX0-2,botY); ctx.lineTo(LX0-2-6,botY-8); ctx.lineTo(LX0-2+2,botY-4); ctx.fill();
+  }
  
-  // ── rysuj każdą pięciolinię ──
-  staffTops.forEach((st, si) => {
-    const clefT = staffClefs[si];
- 
-    // 5 linii
+  staffTops.forEach((st,si)=>{
+    const clefT=staffClefs[si];
     ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=1.5;
     for(let i=0;i<5;i++){
       const y=st+i*STEP;
-      ctx.beginPath(); ctx.moveTo(LX0,y); ctx.lineTo(W-LXEND_MARGIN,y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(LX0,y); ctx.lineTo(W-LXEND,y); ctx.stroke();
     }
- 
-    // lewa kreska pionowa
     ctx.lineWidth=2.5;
     ctx.beginPath(); ctx.moveTo(LX0,st); ctx.lineTo(LX0,st+4*STEP); ctx.stroke();
- 
-    // ── KLUCZ ──
-    if(clefT==='treble') {
-      drawTrebleClef(ctx, st);
-    } else {
-      drawBassClef(ctx, st);
-    }
- 
-    // akolada (dual)
-    if(dual && si===0){
-      ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2.5;
-      ctx.beginPath();
-      ctx.moveTo(LX0-2, staffTops[0]);
-      ctx.lineTo(LX0-2, staffTops[1]+4*STEP);
-      ctx.stroke();
-    }
+    if(clefT==='treble') drawTrebleClef(ctx,st);
+    else drawBassClef(ctx,st);
   });
  
-  // prawa kreska pionowa
+  // prawa kreska
   ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2.5;
-  const topY=staffTops[0];
-  const botY=staffTops[staffTops.length-1]+4*STEP;
-  ctx.beginPath(); ctx.moveTo(W-LXEND_MARGIN,topY); ctx.lineTo(W-LXEND_MARGIN,botY); ctx.stroke();
+  const topY=staffTops[0], botY=staffTops[staffTops.length-1]+4*STEP;
+  ctx.beginPath(); ctx.moveTo(W-LXEND,topY); ctx.lineTo(W-LXEND,botY); ctx.stroke();
  
-  if(!notes||!notes.length) return;
+  if(!notes||!notes.length)return;
  
   // ── rozmieszczenie nut ──
-  const noteStart = LX0+72;
-  const noteEnd   = W-LXEND_MARGIN-15;
-  const noteAreaW = noteEnd-noteStart;
+  // layout: 'cluster' = wszystkie w jednym miejscu; 'seq' = rozłożone poziomo
+  const noteStart=LX0+76, noteEnd=W-LXEND-15, noteAreaW=noteEnd-noteStart;
  
-  const groups = dual
-    ? [notes.filter(n=>n.clef==='treble'), notes.filter(n=>n.clef==='bass')]
-    : [notes];
+  const groups=dual
+    ?[notes.filter(n=>n.clef==='treble'),notes.filter(n=>n.clef==='bass')]
+    :[notes];
  
   groups.forEach((gNotes,si)=>{
-    if(!gNotes.length) return;
-    const st = staffTops[si];
-    const sp = noteAreaW/(gNotes.length+1);
-    gNotes.forEach((item,ni)=>{
-      const note=item.note;
-      const nx=noteStart+sp*(ni+1);
-      const ny=noteY(st,note.pos);
-      const rx=STEP*0.72, ry=STEP*0.50;
+    if(!gNotes.length)return;
+    const st=staffTops[si];
  
-      // linie dodane dolne
-      ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=1.5;
-      const lw=rx*2.7;
-      if(note.pos<0){
-        for(let p=-2;p>=note.pos;p-=2){
-          const ly=noteY(st,p);
-          ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
-        }
-        // jeśli pos=-1, dodaj linię na 0 (pod linią 1) tylko jeśli nuty nie ma na linii 0
-        if(note.pos===-1){
-          const ly=noteY(st,-2);
-          ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
-        }
-      }
-      // linie dodane górne
-      if(note.pos>8){
-        for(let p=10;p<=note.pos;p+=2){
-          const ly=noteY(st,p);
-          ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
-        }
-        if(note.pos===9){
-          const ly=noteY(st,10);
-          ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
-        }
-      }
- 
-      // główka nuty (lekko pochylona elipsa)
-      ctx.save();
-      ctx.translate(nx,ny); ctx.rotate(-0.22);
-      ctx.fillStyle='#1e3a8a';
-      ctx.beginPath(); ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2); ctx.fill();
-      ctx.restore();
- 
-      // laska: pos<=4 → z prawej w GÓRĘ; pos>4 → z lewej w DÓŁ
-      ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2;
-      const stemLen=STEP*3.5;
-      if(note.pos<=4){
-        // prawa strona nuty, w górę
-        const sx=nx+rx-1;
-        ctx.beginPath(); ctx.moveTo(sx,ny); ctx.lineTo(sx,ny-stemLen); ctx.stroke();
-      } else {
-        // lewa strona nuty, w dół
-        const sx=nx-rx+1;
-        ctx.beginPath(); ctx.moveTo(sx,ny); ctx.lineTo(sx,ny+stemLen); ctx.stroke();
-      }
-    });
+    if(layout==='cluster'){
+      // Klaster: wszystkie nuty w centrum, ułożone pionowo jedna nad drugą
+      const cx=noteStart+noteAreaW/2;
+      gNotes.forEach(item=>drawNote(ctx,st,item.note,cx));
+    } else {
+      // Postępujące: rozłożone poziomo
+      const sp=noteAreaW/(gNotes.length+1);
+      gNotes.forEach((item,ni)=>{
+        const nx=noteStart+sp*(ni+1);
+        drawNote(ctx,st,item.note,nx);
+      });
+    }
   });
 }
  
+function drawNote(ctx,st,note,nx){
+  const ny=noteY(st,note.pos);
+  const rx=STEP*0.72, ry=STEP*0.50;
+  const lw=rx*2.7;
+ 
+  // linie dodane dolne
+  ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=1.5;
+  if(note.pos<0){
+    for(let p=-2;p>=note.pos;p-=2){
+      const ly=noteY(st,p);
+      ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
+    }
+    if(note.pos===-1){
+      const ly=noteY(st,-2);
+      ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
+    }
+  }
+  // linie dodane górne
+  if(note.pos>8){
+    for(let p=10;p<=note.pos;p+=2){
+      const ly=noteY(st,p);
+      ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
+    }
+    if(note.pos===9){
+      const ly=noteY(st,10);
+      ctx.beginPath(); ctx.moveTo(nx-lw/2,ly); ctx.lineTo(nx+lw/2,ly); ctx.stroke();
+    }
+  }
+ 
+  // główka
+  ctx.save();
+  ctx.translate(nx,ny); ctx.rotate(-0.22);
+  ctx.fillStyle='#1e3a8a';
+  ctx.beginPath(); ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+ 
+  // laska: pos<=4 → z prawej w górę; pos>4 → z lewej w dół
+  ctx.strokeStyle='#1e3a8a'; ctx.lineWidth=2;
+  const stemLen=STEP*3.5;
+  if(note.pos<=4){
+    const sx=nx+rx-1;
+    ctx.beginPath(); ctx.moveTo(sx,ny); ctx.lineTo(sx,ny-stemLen); ctx.stroke();
+  } else {
+    const sx=nx-rx+1;
+    ctx.beginPath(); ctx.moveTo(sx,ny); ctx.lineTo(sx,ny+stemLen); ctx.stroke();
+  }
+}
+ 
 // ================================================================
-// KLUCZ WIOLINOWY — rysowany przez Canvas Path
-// Wymagania:
-//   • góra klucza delikatnie nad linią 5 (staffTop)
-//   • brzuch (środek) od linii 2 (staffTop + 3*STEP)
-//   • ogon schodzi poniżej linii 1
+// KLUCZ WIOLINOWY
+// góra = staffTop-6 (nad linią 5)
+// brzuch G = linia 2 = staffTop+3*STEP
 // ================================================================
-function drawTrebleClef(ctx, staffTop) {
-  // Parametry klucza: skalujemy tak by:
-  //   top klucza = staffTop - 6px (delikatnie nad linią 5)
-  //   "brzuch" G klucza = linia 2 = staffTop + 3*STEP
-  // Klucz wiolinowy z Unicode 𝄞 brzmi źle w Canvas font,
-  // dlatego rysujemy go jako ścieżkę Beziera.
+function drawTrebleClef(ctx,staffTop){
+  const gY=staffTop+3*STEP;
+  const topY=staffTop-6;
+  const botY=staffTop+4*STEP+STEP*0.5;
+  const totalH=botY-topY;
+  const cx=LX0+26;
+  const thick=STEP*0.28;
+  ctx.strokeStyle='#1e3a8a'; ctx.fillStyle='#1e3a8a';
+  ctx.lineCap='round'; ctx.lineJoin='round';
  
-  const gY  = staffTop + 3*STEP;   // linia G (linia 2 od dołu = pos 2 = 2. linia)
-  const topY = staffTop - 6;        // delikatnie nad linią 5
-  const botY = staffTop + 4*STEP + STEP*0.5; // ogon nieco pod linią 1
- 
-  const totalH = botY - topY;
-  const cx_mid = LX0 + 24; // środek poziomy klucza
- 
-  // Grubość pióra
-  const thick = STEP * 0.28;
-  ctx.strokeStyle = '#1e3a8a';
-  ctx.fillStyle   = '#1e3a8a';
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
- 
-  // ── Pion (linia pionowa klucza) ──
-  ctx.lineWidth = thick * 0.55;
+  // pion
+  ctx.lineWidth=thick*0.55;
   ctx.beginPath();
-  ctx.moveTo(cx_mid, topY);
-  ctx.bezierCurveTo(
-    cx_mid + STEP*0.4, topY + totalH*0.15,
-    cx_mid + STEP*0.3, topY + totalH*0.5,
-    cx_mid,            botY
-  );
+  ctx.moveTo(cx,topY);
+  ctx.bezierCurveTo(cx+STEP*0.4,topY+totalH*0.15,cx+STEP*0.3,topY+totalH*0.5,cx,botY);
   ctx.stroke();
  
-  // ── Brzuch (pętla na G) ──
-  const bR = STEP * 1.05; // promień pętli
-  ctx.lineWidth = thick * 0.65;
+  // brzuch (pętla G)
+  const bR=STEP*1.05;
+  ctx.lineWidth=thick*0.65;
   ctx.beginPath();
-  ctx.ellipse(cx_mid, gY, bR * 0.72, bR, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx,gY,bR*0.72,bR,0,0,Math.PI*2);
   ctx.stroke();
  
-  // ── Górna pętla (zawijanie klucza na górze) ──
-  const loopTopY = topY + totalH * 0.18;
-  ctx.lineWidth = thick * 0.55;
+  // górna pętla
+  const loopTopY=topY+totalH*0.18;
+  ctx.lineWidth=thick*0.55;
   ctx.beginPath();
-  ctx.moveTo(cx_mid, loopTopY);
-  ctx.bezierCurveTo(
-    cx_mid + STEP*1.1, loopTopY,
-    cx_mid + STEP*1.3, loopTopY + STEP*1.0,
-    cx_mid,            loopTopY + STEP*1.4
-  );
-  ctx.bezierCurveTo(
-    cx_mid - STEP*1.0, loopTopY + STEP*1.8,
-    cx_mid - STEP*0.8, loopTopY + STEP*2.4,
-    cx_mid,            gY
-  );
+  ctx.moveTo(cx,loopTopY);
+  ctx.bezierCurveTo(cx+STEP*1.1,loopTopY,cx+STEP*1.3,loopTopY+STEP*1.0,cx,loopTopY+STEP*1.4);
+  ctx.bezierCurveTo(cx-STEP*1.0,loopTopY+STEP*1.8,cx-STEP*0.8,loopTopY+STEP*2.4,cx,gY);
   ctx.stroke();
  
-  // ── Ślimak na dole ──
-  const snailY = botY - STEP*0.3;
-  const snailR = STEP * 0.42;
-  ctx.lineWidth = thick * 0.5;
+  // ślimak na dole
+  const snailY=botY-STEP*0.3;
+  const snailR=STEP*0.42;
+  ctx.lineWidth=thick*0.5;
   ctx.beginPath();
-  ctx.arc(cx_mid + STEP*0.05, snailY, snailR, Math.PI*0.2, Math.PI*1.85, false);
+  ctx.arc(cx+STEP*0.05,snailY,snailR,Math.PI*0.2,Math.PI*1.85,false);
   ctx.stroke();
 }
  
 // ================================================================
-// KLUCZ BASOWY — rysowany przez Canvas Path
-// Wymagania:
-//   • Zaczyna się na linii 4 (staffTop + STEP)
-//   • Ślimak kończy się na linii 2 (staffTop + 3*STEP)
-//   • Dwie kropki po prawej stronie klucza
+// KLUCZ BASOWY
+// ślimak: linia 4 (staffTop+STEP) → linia 2 (staffTop+3*STEP)
 // ================================================================
-function drawBassClef(ctx, staffTop) {
-  // linia F (gdzie siedzi ślimak) = linia 4 od dołu = pos 6
-  // staffTop + 0*STEP = linia 5 (góra)
-  // staffTop + 1*STEP = linia 4
-  // staffTop + 2*STEP = linia 3 (środek)
-  // staffTop + 3*STEP = linia 2
-  // staffTop + 4*STEP = linia 1 (dół)
+function drawBassClef(ctx,staffTop){
+  const fY=staffTop+STEP;
+  const endY=staffTop+3*STEP;
+  const cx=LX0+14;
+  const thick=STEP*0.26;
+  ctx.strokeStyle='#1e3a8a'; ctx.fillStyle='#1e3a8a';
+  ctx.lineCap='round'; ctx.lineJoin='round';
  
-  const fY   = staffTop + STEP;         // linia 4 (F) — start ślimaka
-  const endY = staffTop + 3*STEP;       // linia 2 — koniec ślimaka (wymaganie)
-  const cx   = LX0 + 14;               // x centrum klucza
+  const radius=(endY-fY)*0.72;
  
-  const thick = STEP * 0.26;
-  ctx.strokeStyle = '#1e3a8a';
-  ctx.fillStyle   = '#1e3a8a';
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
- 
-  // ── Ślimak basowy: duży łuk od linii 4 schodząc do linii 2 ──
-  const radius = (endY - fY) * 0.72; // promień łuku
-  ctx.lineWidth = thick;
+  // ślimak
+  ctx.lineWidth=thick;
   ctx.beginPath();
-  // Startujemy na linii 4, robimy łuk w prawo a potem spiralę w dół do linii 2
-  ctx.moveTo(cx + radius * 1.1, fY);
-  ctx.bezierCurveTo(
-    cx + radius * 1.9, fY,                  // punkt kontrolny 1
-    cx + radius * 1.9, fY + (endY-fY)*0.5, // punkt kontrolny 2
-    cx + radius * 0.5, fY + (endY-fY)*0.65 // punkt końcowy pośredni
-  );
-  ctx.bezierCurveTo(
-    cx - radius * 0.3, fY + (endY-fY)*0.8,
-    cx - radius * 0.2, endY,
-    cx + radius * 0.4, endY               // kończy się na linii 2
-  );
+  ctx.moveTo(cx+radius*1.1,fY);
+  ctx.bezierCurveTo(cx+radius*1.9,fY,cx+radius*1.9,fY+(endY-fY)*0.5,cx+radius*0.5,fY+(endY-fY)*0.65);
+  ctx.bezierCurveTo(cx-radius*0.3,fY+(endY-fY)*0.8,cx-radius*0.2,endY,cx+radius*0.4,endY);
   ctx.stroke();
  
-  // ── Ogon (kreska pionowa po lewej) ──
-  ctx.lineWidth = thick * 0.95;
+  // ogon
+  ctx.lineWidth=thick*0.95;
   ctx.beginPath();
-  ctx.moveTo(cx, fY - STEP*0.1);
-  ctx.lineTo(cx, endY + STEP*0.05);
-  ctx.stroke();
+  ctx.moveTo(cx,fY-STEP*0.1); ctx.lineTo(cx,endY+STEP*0.05); ctx.stroke();
  
-  // ── Dwie kropki (po prawej, między liniami 3-4 i 4-5) ──
-  const dotX = cx + radius * 1.75;
-  const dotR = thick * 0.75;
-  ctx.beginPath();
-  ctx.arc(dotX, staffTop + STEP*0.5,  dotR, 0, Math.PI*2); // między linią 5 a 4
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(dotX, staffTop + STEP*1.5, dotR, 0, Math.PI*2); // między linią 4 a 3
-  ctx.fill();
+  // dwie kropki
+  const dotX=cx+radius*1.75, dotR=thick*0.75;
+  ctx.beginPath(); ctx.arc(dotX,staffTop+STEP*0.5,dotR,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(dotX,staffTop+STEP*1.5,dotR,0,Math.PI*2); ctx.fill();
 }
  
 // ================================================================
 // LOSOWANIE
 // ================================================================
-function drawNotes() {
+function drawNotes(){
   revealed=false; count++;
   document.getElementById('scoreCount').textContent=count;
   document.getElementById('noteNamesRow').innerHTML='';
@@ -613,8 +500,8 @@ function drawNotes() {
   currentNotes=[];
  
   if(clef==='both'){
-    const tPool=getPool('treble'), bPool=getPool('bass');
-    const tC=Math.ceil(noteCount/2), bC=Math.floor(noteCount/2);
+    const tPool=getPool('treble'),bPool=getPool('bass');
+    const tC=Math.ceil(noteCount/2),bC=Math.floor(noteCount/2);
     for(let i=0;i<tC;i++) currentNotes.push({note:tPool[Math.floor(Math.random()*tPool.length)],clef:'treble'});
     for(let i=0;i<bC;i++) currentNotes.push({note:bPool[Math.floor(Math.random()*bPool.length)],clef:'bass'});
   } else {
@@ -633,7 +520,6 @@ function drawNotes() {
  
   const card=document.getElementById('card');
   card.style.animation='none'; card.offsetHeight; card.style.animation='fadeIn 0.35s ease';
- 
   document.getElementById('micDetected').textContent='—';
   document.getElementById('micResult').className='mic-result waiting';
   document.getElementById('micResult').textContent='Graj nutę...';
@@ -641,14 +527,11 @@ function drawNotes() {
   document.getElementById('pitchBar').style.background='var(--navy)';
 }
  
-// ================================================================
-// ODKRYWANIE
-// ================================================================
 function toggleReveal(){
   revealed=!revealed;
   document.querySelectorAll('.note-name-box').forEach((b,i)=>{
-    if(revealed){b.classList.remove('hidden'); b.textContent=currentNotes[i]?.note?.label||'?';}
-    else        {b.classList.add('hidden');    b.textContent='?';}
+    if(revealed){b.classList.remove('hidden');b.textContent=currentNotes[i]?.note?.label||'?';}
+    else        {b.classList.add('hidden');   b.textContent='?';}
   });
   document.getElementById('revealBtn').textContent=revealed?'Ukryj nazwy':'Pokaż nuty';
 }
@@ -671,27 +554,33 @@ function setNoteCount(n){
   noteCount=n;
   [1,2,3,4,5].forEach(i=>document.getElementById('btn-n'+i).classList.toggle('active',i===n));
 }
+function setLayout(l){
+  layout=l;
+  document.getElementById('btn-cluster').classList.toggle('active',l==='cluster');
+  document.getElementById('btn-seq').classList.toggle('active',l==='seq');
+  if(currentNotes.length) drawStaff(currentNotes);
+}
  
 // ================================================================
 // TIMER
 // ================================================================
 function setTimer(s){
   timerSec=s; stopTimer();
-  [0,5,10,30].forEach(t=>document.getElementById('btn-t'+t).classList.toggle('active',t===s));
+  [0,30,60].forEach(t=>document.getElementById('btn-t'+t).classList.toggle('active',t===s));
   const d=document.getElementById('timerDisplay');
   d.classList.toggle('active',s>0);
   if(s>0) d.textContent=fmt(s);
 }
 function fmt(s){return`${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;}
 function startTimer(){
-  stopTimer(); if(!timerSec) return;
+  stopTimer(); if(!timerSec)return;
   timerLeft=timerSec;
   const d=document.getElementById('timerDisplay');
   d.textContent=fmt(timerLeft); d.classList.remove('warning');
   timerInt=setInterval(()=>{
     timerLeft--;
     d.textContent=fmt(timerLeft);
-    if(timerLeft<=3) d.classList.add('warning');
+    if(timerLeft<=5) d.classList.add('warning');
     if(timerLeft<=0){stopTimer();drawNotes();}
   },1000);
 }
@@ -712,16 +601,15 @@ async function toggleMic(){
   }
   try{
     micStream=await navigator.mediaDevices.getUserMedia({audio:true});
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    audioCtx=new(window.AudioContext||window.webkitAudioContext)();
     const src=audioCtx.createMediaStreamSource(micStream);
     analyser=audioCtx.createAnalyser(); analyser.fftSize=4096;
     src.connect(analyser);
     micActive=true; btn.textContent='🎤 Wyłącz'; btn.classList.add('mic-on');
     fb.classList.add('active');
     pitchInt=setInterval(detectPitch,120);
-  }catch(e){alert('Brak dostępu do mikrofonu. Sprawdź uprawnienia.');}
+  }catch(e){alert('Brak dostępu do mikrofonu.');}
 }
- 
 function detectPitch(){
   if(!analyser)return;
   const buf=new Float32Array(analyser.fftSize);
@@ -745,7 +633,6 @@ function detectPitch(){
     else  {res.className='mic-result wrong';  res.textContent='✗ Zła nuta'; bar.style.background='#dc2626';}
   }
 }
- 
 function autoCorrelate(buf,sr){
   let rms=0; for(let i=0;i<buf.length;i++) rms+=buf[i]*buf[i]; rms=Math.sqrt(rms/buf.length);
   if(rms<0.008)return -1;
@@ -762,7 +649,7 @@ function autoCorrelate(buf,sr){
   let T=mp;
   const x1=c[T-1],x2=c[T],x3=c[T+1];
   const a=(x1+x3-2*x2)/2,b=(x3-x1)/2;
-  if(a) T=T-b/(2*a);
+  if(a)T=T-b/(2*a);
   return sr/T;
 }
 function getVol(buf){let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length);}
