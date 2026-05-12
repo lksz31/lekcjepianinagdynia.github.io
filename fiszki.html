@@ -166,9 +166,23 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .modal-submit{background:var(--navy);color:white;padding:13px 28px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;transition:all 0.3s;width:100%;margin-top:6px;}
 .modal-submit:hover{background:var(--gold);}
 .modal-submit:disabled{opacity:0.6;cursor:not-allowed;}
-.modal-ok{display:none;text-align:center;padding:20px 0;}
-.modal-ok .ok-icon{font-size:3rem;}
-.modal-ok p{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--green);margin-top:10px;}
+.modal-hidden{display:none;}
+.modal-radio-group{display:flex;flex-direction:column;gap:7px;margin-top:4px;}
+.modal-radio{display:flex;align-items:center;gap:8px;font-size:0.88rem;font-weight:500;color:var(--text);cursor:pointer;padding:8px 12px;border-radius:10px;border:1.5px solid var(--border);transition:0.2s;}
+.modal-radio:has(input:checked){border-color:var(--navy);background:#f0f4ff;}
+.modal-radio input[type=radio]{accent-color:var(--navy);width:16px;height:16px;flex-shrink:0;}
+.modal-ok{display:none;padding:16px 0;}
+.modal-ok .ok-icon{font-size:3rem;text-align:center;}
+.modal-ok-title{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--green);text-align:center;margin:8px 0 4px;}
+.modal-ok-sub{font-size:0.85rem;color:#64748b;text-align:center;margin-bottom:18px;}
+.modal-ok-summary{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;}
+.summary-row{display:flex;gap:8px;font-size:0.85rem;align-items:baseline;}
+.summary-label{font-weight:700;color:#94a3b8;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;min-width:120px;flex-shrink:0;}
+.summary-val{color:var(--text);font-weight:500;}
+.summary-price-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-top:8px;padding-top:10px;border-top:1.5px solid var(--border);}
+.summary-price-label{font-weight:800;color:#94a3b8;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;min-width:120px;flex-shrink:0;}
+.summary-price-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--navy);}
+.summary-price-note{font-size:0.72rem;color:#94a3b8;flex-basis:100%;}
  
 /* ── Note fly animation ── */
 .note-fly{position:fixed;pointer-events:none;z-index:3000;font-size:1.6rem;will-change:transform,opacity;}
@@ -1028,10 +1042,26 @@ render([]);
     <div id="modalForm">
       <div class="modal-title">🎹 Umów lekcję próbną</div>
       <div class="modal-sub">Wypełnij formularz — odezwę się najszybciej jak mogę!</div>
+ 
       <div class="modal-field"><label>Imię i nazwisko *</label><input type="text" id="mName" placeholder="Jan Kowalski"></div>
       <div class="modal-field"><label>Telefon *</label><input type="tel" id="mPhone" placeholder="+48 500 000 000"></div>
       <div class="modal-field"><label>E-mail</label><input type="email" id="mEmail" placeholder="jan@example.com"></div>
-      <div class="modal-field"><label>Poziom zaawansowania</label>
+ 
+      <div class="modal-field">
+        <label>Kto będzie uczęszczał na lekcje?</label>
+        <div class="modal-radio-group">
+          <label class="modal-radio"><input type="radio" name="student" value="ja" onchange="onStudentChange()" checked> Ja</label>
+          <label class="modal-radio"><input type="radio" name="student" value="dziecko" onchange="onStudentChange()"> Moje dziecko</label>
+        </div>
+      </div>
+ 
+      <div class="modal-field modal-hidden" id="mChildAgeField">
+        <label>Wiek dziecka *</label>
+        <input type="number" id="mChildAge" min="4" max="18" placeholder="np. 8">
+      </div>
+ 
+      <div class="modal-field">
+        <label>Poziom zaawansowania</label>
         <select id="mLevel">
           <option value="">— wybierz —</option>
           <option>Zupełny początkujący</option>
@@ -1040,12 +1070,37 @@ render([]);
           <option>Zaawansowany</option>
         </select>
       </div>
+ 
+      <div class="modal-field">
+        <label>Miejsce lekcji *</label>
+        <div class="modal-radio-group">
+          <label class="modal-radio"><input type="radio" name="location" value="u_nauczyciela" onchange="onLocationChange()" checked> U nauczyciela (Gdynia)</label>
+          <label class="modal-radio"><input type="radio" name="location" value="u_ucznia" onchange="onLocationChange()"> U ucznia / online</label>
+        </div>
+      </div>
+ 
+      <div id="mAtStudentFields" class="modal-hidden">
+        <div class="modal-field">
+          <label>Czy masz pianino / keyboard?</label>
+          <div class="modal-radio-group">
+            <label class="modal-radio"><input type="radio" name="piano" value="tak"> Tak</label>
+            <label class="modal-radio"><input type="radio" name="piano" value="nie"> Nie</label>
+          </div>
+        </div>
+        <div class="modal-field">
+          <label>Adres / miejscowość *</label>
+          <input type="text" id="mAddress" placeholder="np. Gdańsk, ul. Długa 5">
+        </div>
+      </div>
+ 
       <div class="modal-field"><label>Wiadomość (opcjonalnie)</label><textarea id="mMsg" placeholder="Np. preferowane dni, godziny..."></textarea></div>
       <button class="modal-submit" id="mSubmit" onclick="submitBooking()">Wyślij zgłoszenie →</button>
     </div>
     <div class="modal-ok" id="modalOk">
       <div class="ok-icon">🎉</div>
-      <p>Zgłoszenie wysłane!<br><span style="font-size:0.9rem;color:#64748b;font-family:'Poppins'">Odezwę się wkrótce 🎹</span></p>
+      <div class="modal-ok-title">Zgłoszenie wysłane!</div>
+      <div class="modal-ok-sub">Odezwę się najszybciej jak mogę 🎹</div>
+      <div class="modal-ok-summary" id="mSummary"></div>
     </div>
   </div>
 </div>
@@ -1213,22 +1268,68 @@ function openBookingModal(){
 function closeBookingModal(){
   document.getElementById('bookingModal').classList.remove('open');
 }
+function onStudentChange(){
+  const isDziecko=document.querySelector('input[name=student]:checked')?.value==='dziecko';
+  document.getElementById('mChildAgeField').classList.toggle('modal-hidden',!isDziecko);
+}
+function onLocationChange(){
+  const isUcznia=document.querySelector('input[name=location]:checked')?.value==='u_ucznia';
+  document.getElementById('mAtStudentFields').classList.toggle('modal-hidden',!isUcznia);
+}
 async function submitBooking(){
   const name=document.getElementById('mName').value.trim();
   const phone=document.getElementById('mPhone').value.trim();
-  if(!name||!phone){alert('Podaj imię i telefon.');return;}
+  if(!name||!phone){alert('Podaj imię i nazwisko oraz telefon.');return;}
+  const student=document.querySelector('input[name=student]:checked')?.value||'ja';
+  const location=document.querySelector('input[name=location]:checked')?.value||'u_nauczyciela';
+  const isUcznia=location==='u_ucznia';
+  if(isUcznia&&!document.getElementById('mAddress').value.trim()){
+    alert('Podaj adres / miejscowość.');return;
+  }
   const btn=document.getElementById('mSubmit');
   btn.disabled=true;btn.textContent='Wysyłam...';
-  const payload={name,phone,
+  const payload={
+    name,phone,
     email:document.getElementById('mEmail').value.trim(),
+    student,
+    childAge:student==='dziecko'?document.getElementById('mChildAge').value:'',
     level:document.getElementById('mLevel').value,
-    message:document.getElementById('mMsg').value.trim()};
+    location,
+    piano:isUcznia?(document.querySelector('input[name=piano]:checked')?.value||''):'',
+    address:isUcznia?document.getElementById('mAddress').value.trim():'',
+    message:document.getElementById('mMsg').value.trim()
+  };
   try{
     await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',
       {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    // Buduj podsumowanie
+    const studentLabel=payload.student==='dziecko'?'Moje dziecko':'Ja';
+    const locationLabel=payload.location==='u_ucznia'?'U ucznia':'U nauczyciela (Gdynia)';
+    const pianoLabel=payload.piano==='tak'?'Tak':payload.piano==='nie'?'Nie':'';
+    const noPiano=payload.location==='u_ucznia'&&payload.piano==='nie';
+    const price=noPiano?119:99;
+    const priceNote=noPiano?' (99 zł/h + 20 zł/h dojazd z pianinem)':'';
+    let rows=[
+      ['Imię i nazwisko',payload.name],
+      ['Telefon',payload.phone],
+    ];
+    if(payload.email)rows.push(['E-mail',payload.email]);
+    rows.push(['Uczestnik',studentLabel]);
+    if(payload.student==='dziecko'&&payload.childAge)rows.push(['Wiek dziecka',payload.childAge+' lat']);
+    if(payload.level)rows.push(['Poziom',payload.level]);
+    rows.push(['Miejsce lekcji',locationLabel]);
+    if(payload.location==='u_ucznia'){
+      if(pianoLabel)rows.push(['Pianino/keyboard',pianoLabel]);
+      if(payload.address)rows.push(['Adres',payload.address]);
+    }
+    if(payload.message)rows.push(['Wiadomość',payload.message]);
+    const regularRows=rows.map(([l,v])=>
+      '<div class="summary-row"><span class="summary-label">'+l+'</span><span class="summary-val">'+v+'</span></div>'
+    ).join('');
+    const priceRow='<div class="summary-price-row"><span class="summary-price-label">Cena lekcji</span><span class="summary-price-val">'+price+' zł/h</span>'+(priceNote?'<span class="summary-price-note">'+priceNote+'</span>':'')+'</div>';
+    document.getElementById('mSummary').innerHTML=regularRows+priceRow;
     document.getElementById('modalForm').style.display='none';
     document.getElementById('modalOk').style.display='block';
-    setTimeout(closeBookingModal,4000);
   }catch(e){
     btn.disabled=false;btn.textContent='Wyślij zgłoszenie →';
     alert('Błąd połączenia. Spróbuj zadzwonić: 514 338 875');
@@ -1240,3 +1341,4 @@ document.getElementById('bookingModal').addEventListener('click',function(e){
 </script>
 </body>
 </html>
+ 
