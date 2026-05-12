@@ -47,25 +47,44 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .cb.active{background:var(--navy);color:white;}
 .cb:hover:not(.active):not(:disabled){background:#f0f7ff;}
 .cb:disabled{opacity:0.35;cursor:not-allowed;border-color:#ccc;color:#ccc;}
-.slider-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:160px;}
-.slider-wrap input[type=range]{flex:1;accent-color:var(--navy);cursor:pointer;height:6px;}
+.slider-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:160px;position:relative;}
+.slider-wrap input[type=range]{flex:1;accent-color:var(--navy);cursor:pointer;height:6px;position:relative;z-index:1;}
+/* Shimmer overlay – ukośna kreska przejeżdżająca po tracku */
+.slider-shimmer{position:absolute;top:50%;left:0;right:0;height:6px;transform:translateY(-50%);pointer-events:none;overflow:hidden;border-radius:3px;z-index:2;}
+.slider-shimmer::after{content:'';position:absolute;top:-100%;left:-60%;width:40%;height:300%;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:shimmerSlide 5.5s ease-in-out infinite;}
+@keyframes shimmerSlide{0%{left:-60%;}70%{left:120%;}100%{left:120%;}}
 .sl-lbl{font-size:0.69rem;color:#94a3b8;font-weight:700;}
 .sl-val{font-size:1.05rem;font-weight:800;color:var(--navy);min-width:26px;text-align:center;font-family:'Playfair Display',serif;}
 .sl-sfx{font-size:0.63rem;color:#94a3b8;font-weight:600;white-space:nowrap;}
 .ctrl-div{height:1px;background:var(--border);}
-.card{background:white;border-radius:28px;padding:18px 16px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:1060px;animation:fadeIn 0.35s ease;}
+.card{background:white;border-radius:28px;padding:18px 16px 18px 16px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:1060px;animation:fadeIn 0.35s ease;position:relative;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .timer-disp{font-size:1.9rem;font-weight:800;color:var(--navy);font-family:'Playfair Display',serif;display:none;}
 .timer-disp.active{display:block;}
 .timer-disp.warn{color:#ef4444;}
 .ok-msg{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--green);background:#dcfce7;padding:7px 22px;border-radius:50px;border:2px solid #86efac;display:none;text-align:center;}
 .ok-msg.show{display:block;}
-.staff-row{display:flex;align-items:stretch;gap:12px;width:100%;}
+.staff-row{display:flex;align-items:center;gap:0;width:100%;padding-right:108px;}
 .staff-wrap{flex:1;min-width:0;}
 canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
-.draw-btn{background:var(--navy);color:white;padding:12px 14px;border-radius:16px;font-family:'Poppins',sans-serif;font-weight:800;font-size:0.85rem;border:none;cursor:pointer;transition:0.3s;box-shadow:0 4px 16px rgba(30,58,138,0.25);animation:pulse 2s infinite;flex-shrink:0;white-space:nowrap;align-self:center;}
-.draw-btn:hover{background:var(--gold);transform:translateY(-2px);}
+ 
+/* Kolumna: Dobrze / Losuj / Źle */
+.draw-col{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:8px;width:96px;position:absolute;right:16px;top:50%;transform:translateY(-50%);}
+/* Losuj – mały, wyśrodkowany pionowo (flex:1 wypełnia przestrzeń) */
+.draw-btn{background:var(--navy);color:white;padding:12px 14px;border-radius:18px;font-family:'Poppins',sans-serif;font-weight:800;font-size:0.85rem;border:none;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 18px rgba(30,58,138,0.28);animation:pulse 2s infinite;text-align:center;line-height:1.35;width:100%;}
+.draw-btn:hover{background:var(--gold);transform:translateY(-2px);box-shadow:0 5px 18px rgba(212,175,55,0.35);}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);}70%{box-shadow:0 0 0 10px rgba(30,58,138,0);}100%{box-shadow:0 0 0 0 rgba(30,58,138,0);}}
+ 
+/* Dobrze / Źle – duże, zawsze te same rozmiary */
+.sc-btn{display:none;padding:0 8px;border-radius:14px;font-family:'Poppins',sans-serif;font-weight:800;font-size:1.55rem;border:2px solid;cursor:pointer;transition:all 0.22s;width:100%;text-align:center;flex-shrink:0;height:56px;line-height:56px;}
+.sc-btn.visible{display:block;}
+.sc-btn.good{border-color:#22c55e;background:#f0fdf4;color:#15803d;}
+.sc-btn.good:hover{background:#22c55e;color:white;transform:translateY(-2px);box-shadow:0 4px 14px rgba(34,197,94,0.35);}
+.sc-btn.good:active{transform:scale(0.97);}
+.sc-btn.bad{border-color:#f87171;background:#fff5f5;color:#dc2626;}
+.sc-btn.bad:hover{background:#ef4444;color:white;transform:translateY(-2px);box-shadow:0 4px 14px rgba(239,68,68,0.35);border-color:#ef4444;}
+.sc-btn.bad:active{transform:scale(0.97);}
+ 
 .reveal-sec{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;}
 .names-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:38px;align-items:center;}
 .nb{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);font-weight:700;transition:all 0.25s;background:#f0f4ff;padding:2px 11px;border-radius:10px;border:1px solid #dbeafe;cursor:default;}
@@ -95,8 +114,8 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 @keyframes spinText{0%{transform:rotateX(0deg);opacity:1;}50%{transform:rotateX(90deg);opacity:0;}100%{transform:rotateX(0deg);opacity:1;}}
 .pitch-wrap{width:100%;height:4px;background:#e2e8f0;border-radius:3px;overflow:hidden;}
 .pitch-bar{height:100%;width:0;background:var(--navy);border-radius:3px;transition:width 0.1s,background 0.2s;}
-.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:480px;}
-.ch-btn{padding:12px 8px;border-radius:14px;border:2px solid var(--border);background:#f8fafc;font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--navy);cursor:pointer;transition:0.25s;text-align:center;}
+.choice-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:720px;}
+.ch-btn{padding:18px 12px;border-radius:16px;border:2px solid var(--border);background:#f8fafc;font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--navy);cursor:pointer;transition:0.25s;text-align:center;}
 .ch-btn:hover{border-color:var(--navy);background:#f0f7ff;}
 .ch-btn.ok{background:#dcfce7;border-color:var(--green);color:var(--green);}
 .ch-btn.bad{background:#fee2e2;border-color:#dc2626;color:#dc2626;}
@@ -129,20 +148,45 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-copy{font-size:11px;color:#c0c0cc;}
 .footer-location{font-size:12px;color:#aaa;}
+ 
+/* ── Booking modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.55);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal-box{background:white;border-radius:28px;padding:36px 32px;width:min(520px,92vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.18);position:relative;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#94a3b8;line-height:1;}
+.modal-close:hover{color:var(--navy);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--navy);margin-bottom:6px;}
+.modal-sub{font-size:0.82rem;color:#64748b;margin-bottom:22px;}
+.modal-field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.modal-field label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;}
+.modal-field input,.modal-field textarea,.modal-field select{padding:10px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Poppins',sans-serif;font-size:0.9rem;color:var(--text);outline:none;transition:border-color 0.2s;width:100%;}
+.modal-field input:focus,.modal-field textarea:focus,.modal-field select:focus{border-color:var(--navy);}
+.modal-field textarea{resize:vertical;min-height:80px;}
+.modal-submit{background:var(--navy);color:white;padding:13px 28px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;border:none;cursor:pointer;transition:all 0.3s;width:100%;margin-top:6px;}
+.modal-submit:hover{background:var(--gold);}
+.modal-submit:disabled{opacity:0.6;cursor:not-allowed;}
+.modal-ok{display:none;text-align:center;padding:20px 0;}
+.modal-ok .ok-icon{font-size:3rem;}
+.modal-ok p{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--green);margin-top:10px;}
+ 
+/* ── Note fly animation ── */
+.note-fly{position:fixed;pointer-events:none;z-index:3000;font-size:1.6rem;will-change:transform,opacity;}
+.emoji-float{position:fixed;pointer-events:none;z-index:3001;font-size:1.2rem;will-change:transform,opacity;}
 </style>
 </head>
 <body>
 <nav class="site-nav">
-        <li><a href="#">Strona główna</a></li>
-        <li><a href="#kontakt">Dla ucznia</a></li>
-        <li><a href="#terminy">Wolne terminy</a></li>
-        <li><a href="#kontakt">Kontakt</a></li>
+  <a href="index.html">Strona główna</a>
+  <a href="index.html#uczniowie">Dla ucznia</a>
+  <a href="index.html#terminy">Wolne terminy</a>
+  <a href="index.html#kontakt">Kontakt</a>
 </nav>
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="index.html"><span class="mn-icon">🏠</span>Główna</a>
     <a href="index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
-    <a href="index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="#" class="mn-cta" onclick="openBookingModal();return false;">🎹 Umów</a>
     <a href="fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
     <a href="podrecznik.html" class="active"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
@@ -187,7 +231,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       <span class="ctrl-lbl">Nut naraz</span>
       <div class="slider-wrap">
         <span class="sl-lbl">1</span>
-        <input type="range" id="slider" min="1" max="10" value="1" oninput="setN(+this.value)">
+        <input type="range" id="slider" min="1" max="10" value="1" oninput="setN(+this.value)"><div class="slider-shimmer"></div>
         <span class="sl-lbl">10</span>
       </div>
     </div>
@@ -209,7 +253,12 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
     <div class="staff-wrap">
       <canvas id="C" width="900" height="440"></canvas>
     </div>
+  </div>
+  <!-- Kolumna: Dobrze / Losuj / Źle – wyśrodkowana w karcie -->
+  <div class="draw-col">
+    <button class="sc-btn good" id="scGood" onclick="handleSelfCheck(true)">🎉</button>
     <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
+    <button class="sc-btn bad" id="scBad" onclick="handleSelfCheck(false)">😬</button>
   </div>
   <div class="reveal-sec" id="revealSec">
     <div class="names-row" id="namesRow"></div>
@@ -233,6 +282,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       <button class="play-btn" onclick="playCurrentGuess()">▶ Odtwórz</button>
     </div>
     <div class="choice-grid" id="choiceGrid"></div>
+ 
   </div>
 </div>
 <div class="score-bar">
@@ -275,7 +325,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       </ul>
     </div>
     <div class="footer-cta-col">
-      <a href="index.html#terminy" class="footer-cta-btn">🎹 Umów lekcję próbną</a>
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
     </div>
   </div>
   <div style="max-width:1100px;margin:0 auto;">
@@ -287,8 +337,6 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 </footer>
 <script>
 const TREBLE=[
-  // e¹=p:0 (pierwsza linia), każdy stopień muzyczny = 1p w górę
-  // c¹=p:-2 (linia dodana dolna), h=p:-3 (pod linią), a=p:-4 (linia dodana 2), g=p:-5 (pod nią)
   {l:'g',p:-5,f:196.00},
   {l:'a',p:-4,f:220.00},
   {l:'h',p:-3,f:246.94},
@@ -302,9 +350,6 @@ const TREBLE=[
   {l:'d³',p:13,f:1174.66},{l:'e³',p:14,f:1318.51},
 ];
 const BASS=[
-  // G małe=p:0 (pierwsza linia basowa), każdy stopień = 1p
-  // F=p:-1, E=p:-2 (linia dodana), D=p:-3, C=p:-4 (linia dodana),
-  // H-kontra=p:-5, A-kontra=p:-6 (linia dodana), G-kontra=p:-7
   {l:'G',p:-7,f:24.50,kontra:true},
   {l:'A',p:-6,f:27.50,kontra:true},
   {l:'H',p:-5,f:30.87,kontra:true},
@@ -351,6 +396,8 @@ let freqHist=[],cooldown=false;
 let panelOpen=true;
 let lastDrawnNote=null;
 let feedbackTimeout=null;
+// Czy pierwsza nuta została już wylosowana (żeby przyciski Dobrze/Źle były dostępne)
+let selfCheckActive=false;
  
 function togglePanel(){
   panelOpen=!panelOpen;
@@ -367,29 +414,69 @@ function resetStats(){
   }
 }
  
+// Aktualizuje widoczność przycisków Dobrze/Źle
+function updateSelfCheckVisibility(){
+  const show=(mode==='reveal' && !micOn && selfCheckActive);
+  const good=document.getElementById('scGood');
+  const bad=document.getElementById('scBad');
+  if(good)good.classList.toggle('visible',show);
+  if(bad)bad.classList.toggle('visible',show);
+}
+ 
+// Rotating emoji lists
+const EMOJIS_GOOD=['🎉','🥳','🌟','👏','🎯','💪','🏆','✨','🔥','😄'];
+const EMOJIS_BAD=['😬','😅','🙈','💀','😵','🤦','🫠','😤','😭','🤷'];
+let emojiGoodIdx=0,emojiBadIdx=0;
+function nextEmojiGood(){emojiGoodIdx=(emojiGoodIdx+1)%EMOJIS_GOOD.length;return EMOJIS_GOOD[emojiGoodIdx];}
+function nextEmojiBad(){emojiBadIdx=(emojiBadIdx+1)%EMOJIS_BAD.length;return EMOJIS_BAD[emojiBadIdx];}
+function updateEmojis(){
+  const g=document.getElementById('scGood');if(g)g.textContent=EMOJIS_GOOD[emojiGoodIdx];
+  const b=document.getElementById('scBad');if(b)b.textContent=EMOJIS_BAD[emojiBadIdx];
+  const gc=document.getElementById('scGoodC');if(gc)gc.textContent=EMOJIS_GOOD[emojiGoodIdx];
+  const bc=document.getElementById('scBadC');if(bc)bc.textContent=EMOJIS_BAD[emojiBadIdx];
+}
+ 
+// Obsługa kliknięcia Dobrze / Źle (oba tryby)
+function handleSelfCheck(correct){
+  if(mode==='reveal'&&!selfCheckActive)return;
+  cnt++;
+  document.getElementById('sCnt').textContent=cnt;
+  const canvas=document.getElementById('C');
+  if(correct){
+    ok++;
+    playPyk(true);
+    const btnTarget=document.getElementById('scGood');
+    const currentGoodEmoji=btnTarget?btnTarget.textContent:'🎉';
+    if(canvas&&btnTarget)flyNoteAnimationWithEmoji(canvas,btnTarget,currentGoodEmoji);
+    const g=document.getElementById('scGood');if(g)g.textContent=nextEmojiGood();
+  }else{
+    playPyk(false);
+    const btnTarget=document.getElementById('scBad');
+    const currentBadEmoji=btnTarget?btnTarget.textContent:'😬';
+    if(canvas&&btnTarget)flyNoteAnimationWithEmoji(canvas,btnTarget,currentBadEmoji);
+    const b=document.getElementById('scBad');if(b)b.textContent=nextEmojiBad();
+  }
+  updScore();
+  go();
+}
+ 
 function pool(ct){
   const base=ct==='bass'?BASS:TREBLE;
   const alts=ct==='bass'?B_ALT:T_ALT;
   let arr;
   if(clef==='both'){
     if(range==='small'){
-      // Bass: od c małego (p=3) do c¹ (p=10)
-      // Treble: od c¹ (p=-2) do h¹ (p=4)
       arr=ct==='bass'?base.filter(n=>n.p>=3&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=4);
     }else{
-      // Bass: od A kontra (p=-6) do c¹ (p=10)
-      // Treble: od c¹ (p=-2) do e³ (p=14)
       arr=ct==='bass'?base.filter(n=>n.p>=-6&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=14);
     }
   }else if(ct==='bass'){
-    // Tylko basowy: od G kontra (p=-7) do góry
     if(range==='small'){
-      arr=base.filter(n=>n.p>=-7&&n.p<=12);
+      arr=base.filter(n=>n.p>=3&&n.p<=13);
     }else{
       arr=base.filter(n=>n.p>=-7);
     }
   }else{
-    // Tylko wiolinowy: od g małego (p=-5) do góry
     if(range==='small'){
       arr=base.filter(n=>n.p>=-5&&n.p<=4);
     }else{
@@ -417,7 +504,7 @@ const cfont=new FontFace('NotoMusic',"url('https://fonts.gstatic.com/s/notomusic
 cfont.load().then(f=>{document.fonts.add(f);render([]);}).catch(()=>{});
  
 function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
-  const W=cv.width,H=cv.height;
+  const W=cv.width/(window.devicePixelRatio||1),H=cv.height/(window.devicePixelRatio||1);
   ctx.clearRect(0,0,W,H);
   ctx.fillStyle='#fff';ctx.beginPath();ctx.roundRect(0,0,W,H,12);ctx.fill();
  
@@ -473,18 +560,12 @@ function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
   }
 }
  
-// drawNote — linie dodane dolne i górne, obsługa klucza basowego
-// W wiolinowym: pierwsza linia = e¹ (p=0), linia dodana dolna = c¹ (p=-2), d (p=-1 między)
-// W basowym: pierwsza linia = G (p=0), linia dodana dolna od p=-2, p=-4, p=-6...
 function drawNote(st,n,nx,stemUp,col,accSign,isBasClef){
   const ny_=ny(st,n.p);
   const rx=STEP*0.70,ry=STEP*0.49,lw=rx*2.8;
  
   ctx.strokeStyle=col;ctx.lineWidth=1.6;
  
-  // Linie dodane dolne (poniżej pięciolinii)
-  // Pierwsza linia pięciolinii = p=0 (e¹ w wiolinowym, G w basowym)
-  // Linia dodana dolna pojawia się przy p=-2, -4, -6...
   if(n.p<=-2){
     for(let p=-2;p>=n.p;p-=2){
       const ly=ny(st,p);
@@ -492,9 +573,6 @@ function drawNote(st,n,nx,stemUp,col,accSign,isBasClef){
     }
   }
  
-  // Linie dodane górne (powyżej pięciolinii)
-  // Ostatnia linia pięciolinii = p=8 (f² w wiolinowym, a¹ w basowym)
-  // Linia dodana górna od p=10, 12...
   if(n.p>=10){
     for(let p=10;p<=n.p;p+=2){
       const ly=ny(st,p);
@@ -544,9 +622,14 @@ function go(){
   buildNotes();
   render(notes);
   if(mode==='reveal'){
-    cnt++;
-    document.getElementById('sCnt').textContent=cnt;
-    updScore();
+    // Liczenie wylosowań jest teraz w selfCheck (gdy micOn=false) lub przez mikrofon
+    if(micOn){
+      cnt++;
+      document.getElementById('sCnt').textContent=cnt;
+      updScore();
+    }
+    selfCheckActive=true;
+    updateSelfCheckVisibility();
     document.getElementById('revealSec').style.display='flex';
     document.getElementById('choiceSec').style.display='none';
     notes.forEach(()=>{
@@ -555,6 +638,11 @@ function go(){
     });
     resetMicUI();
   }else{
+    selfCheckActive=false;
+    updateSelfCheckVisibility();
+    // Liczenie wylosowań w trybie choice: +1 przy każdym nowym losowaniu
+    cnt++;
+    document.getElementById('sCnt').textContent=cnt;
     document.getElementById('revealSec').style.display='none';
     document.getElementById('choiceSec').style.display='block';
     buildChoiceUI();
@@ -628,7 +716,7 @@ function buildChoiceButtons(){
   opts.forEach(n=>{
     const btn=document.createElement('button');
     btn.className='ch-btn'+(n.kontra?' kontra':'');
-    btn.textContent=n.l+(n.a==='#'?'♯':n.a==='b'?'♭':'');
+    btn.textContent=n.l;
     btn.onclick=()=>handleChoice(n,it.n);
     grid.appendChild(btn);
   });
@@ -642,19 +730,23 @@ function handleChoice(chosen,correct){
     allBtns.forEach(b=>{if(b.textContent.startsWith(correct.l))b.classList.add('ok');});
     if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=correct.l;if(correct.kontra)nb.classList.add('kontra');}
     render(notes,guessIdx,'#16a34a');
+    // Dźwięk + animacja nuty: z canvasu do wybranego przycisku
+    playPyk(true);
+    {const clickedBtn=Array.from(allBtns).find(b=>b.textContent===chosen.l)||allBtns[0];
+     const canvasEl=document.getElementById('C');
+     flyNoteAnimation(canvasEl,clickedBtn);}
     guessIdx++;
     if(guessIdx>=notes.length){
       ok++;updScore();
-      document.getElementById('okMsg').textContent='✓ Brawo! Wszystko poprawnie!';
-      document.getElementById('okMsg').classList.add('show');
       cooldown=true;resetTimer();
-      setTimeout(()=>{document.getElementById('okMsg').classList.remove('show');go();},1500);
+      setTimeout(go,600);
     }else{
       const nextNb=document.getElementById('nc-'+guessIdx);
       if(nextNb)nextNb.classList.add('guess-cur');
       setTimeout(()=>{render(notes,guessIdx,'#d4af37');buildChoiceButtons();},600);
     }
   }else{
+    playPyk(false);
     allBtns.forEach(b=>{if(b.textContent.startsWith(correct.l))b.classList.add('ok');});
     document.querySelectorAll('.ch-btn').forEach(b=>{if(b.textContent.startsWith(chosen.l)&&!b.classList.contains('ok'))b.classList.add('bad');});
     if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-bad');nb.textContent='✗';}
@@ -717,9 +809,21 @@ function setAcc(){
   btn.classList.toggle('active',acc);
   btn.textContent=acc?'Chromatyczne':'Diatoniczne';
 }
-function setN(n){noteCount=n;document.getElementById('slider').value=n;}
+function setN(n){
+  noteCount=n;
+  const sl=document.getElementById('slider');
+  if(sl){
+    sl.value=n;
+    const t=(n-1)/9;
+    const r=Math.round(30+t*(220-30));
+    const g=Math.round(58+t*(38-58));
+    const b=Math.round(138+t*(38-138));
+    const hex='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    sl.style.accentColor=hex;
+  }
+}
 function setMode(m){
-  mode=m;cnt=0;ok=0;
+  mode=m;cnt=0;ok=0;selfCheckActive=false;
   document.getElementById('sCnt').textContent='0';
   document.getElementById('cCnt').textContent='0';
   document.getElementById('sPct').textContent='';
@@ -732,6 +836,7 @@ function setMode(m){
   document.getElementById('okMsg').classList.remove('show');
   render([]);
   if(m!=='reveal'&&micOn)stopMic();
+  updateSelfCheckVisibility();
   go();
 }
  
@@ -764,18 +869,13 @@ function resetTimer(){
 }
  
 function updScore(){
-  if(micOn){
-    document.getElementById('cCnt').textContent=ok;
-    const pct=cnt>0?'('+Math.round(ok/cnt*100)+'% poprawnych)':'';
-    document.getElementById('sPct').textContent=pct;
-  }else{
-    document.getElementById('cCnt').textContent='—';
-    document.getElementById('sPct').textContent='';
-  }
+  document.getElementById('cCnt').textContent=ok;
+  const pct=cnt>0?'('+Math.round(ok/cnt*100)+'% poprawnych)':'';
+  document.getElementById('sPct').textContent=pct;
 }
  
 async function toggleMic(){
-  if(micOn){stopMic();updScore();return;}
+  if(micOn){stopMic();updateSelfCheckVisibility();updScore();return;}
   try{
     micSt=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     aCtx=new(window.AudioContext||window.webkitAudioContext)();
@@ -787,6 +887,7 @@ async function toggleMic(){
     document.getElementById('micBtn').textContent='🎤 Wyłącz';
     document.getElementById('micPanel').classList.add('on');
     pitchInt=setInterval(detectPitch,100);
+    updateSelfCheckVisibility();
     updScore();
   }catch(e){alert('Brak dostępu do mikrofonu.');}
 }
@@ -856,7 +957,9 @@ function detectPitch(){
 }
  
 function allGood(){
-  ok++;updScore();cooldown=true;
+  ok++;cnt++;
+  document.getElementById('sCnt').textContent=cnt;
+  updScore();cooldown=true;
   document.getElementById('okMsg').textContent='✓ Brawo! Zagrano poprawnie!';
   document.getElementById('okMsg').classList.add('show');
   resetTimer();
@@ -894,6 +997,246 @@ function rnd(n){return Math.floor(Math.random()*n);}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
  
 render([]);
+ 
+// HiDPI / Retina fix: scale canvas buffer by devicePixelRatio so clefs stay sharp on all screens
+(function(){
+  const canvas=document.getElementById('C');
+  const BASE_W=900,BASE_H=440;
+  function applyDPR(){
+    const dpr=Math.min(window.devicePixelRatio||1,3);
+    canvas.width=BASE_W*dpr;
+    canvas.height=BASE_H*dpr;
+    ctx.scale(dpr,dpr);
+  }
+  // Patch render to reset scale each time
+  const _render=render;
+  window.render=function(items,hi,hc){
+    const dpr=Math.min(window.devicePixelRatio||1,3);
+    canvas.width=BASE_W*dpr;
+    canvas.height=BASE_H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    _render(items,hi,hc);
+  };
+  window.render([]);
+})();
+</script>
+ 
+<!-- Booking modal -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeBookingModal()">×</button>
+    <div id="modalForm">
+      <div class="modal-title">🎹 Umów lekcję próbną</div>
+      <div class="modal-sub">Wypełnij formularz — odezwę się najszybciej jak mogę!</div>
+      <div class="modal-field"><label>Imię i nazwisko *</label><input type="text" id="mName" placeholder="Jan Kowalski"></div>
+      <div class="modal-field"><label>Telefon *</label><input type="tel" id="mPhone" placeholder="+48 500 000 000"></div>
+      <div class="modal-field"><label>E-mail</label><input type="email" id="mEmail" placeholder="jan@example.com"></div>
+      <div class="modal-field"><label>Poziom zaawansowania</label>
+        <select id="mLevel">
+          <option value="">— wybierz —</option>
+          <option>Zupełny początkujący</option>
+          <option>Grałem/am kiedyś</option>
+          <option>Średniozaawansowany</option>
+          <option>Zaawansowany</option>
+        </select>
+      </div>
+      <div class="modal-field"><label>Wiadomość (opcjonalnie)</label><textarea id="mMsg" placeholder="Np. preferowane dni, godziny..."></textarea></div>
+      <button class="modal-submit" id="mSubmit" onclick="submitBooking()">Wyślij zgłoszenie →</button>
+    </div>
+    <div class="modal-ok" id="modalOk">
+      <div class="ok-icon">🎉</div>
+      <p>Zgłoszenie wysłane!<br><span style="font-size:0.9rem;color:#64748b;font-family:'Poppins'">Odezwę się wkrótce 🎹</span></p>
+    </div>
+  </div>
+</div>
+ 
+<script>
+// ── Wszystkie funkcje wymagające DOM ──────────────────────────────────────
+const HAPPY_EMOJIS=['👻','🎉','⭐','🌟','✨','🎵','🎶','💫','🥳','😄'];
+ 
+// Dźwięk "pyk" przy wyborze odpowiedzi
+function playPyk(correct){
+  try{
+    const ac=getACtx();
+    const now=ac.currentTime;
+    const osc=ac.createOscillator();
+    const gain=ac.createGain();
+    osc.connect(gain);gain.connect(ac.destination);
+    if(correct){
+      // Dobrze: trochę niżej — miły, ciepły dźwięk w górę
+      osc.type='sine';
+      osc.frequency.setValueAtTime(523,now);
+      osc.frequency.exponentialRampToValueAtTime(784,now+0.10);
+      gain.gain.setValueAtTime(0.22,now);
+      gain.gain.exponentialRampToValueAtTime(0.001,now+0.32);
+      osc.start(now);osc.stop(now+0.32);
+    }else{
+      // Źle: jeszcze niżej — głębszy, przytłumiony dźwięk w dół
+      osc.type='sine';
+      osc.frequency.setValueAtTime(220,now);
+      osc.frequency.exponentialRampToValueAtTime(140,now+0.18);
+      gain.gain.setValueAtTime(0.18,now);
+      gain.gain.exponentialRampToValueAtTime(0.001,now+0.28);
+      osc.start(now);osc.stop(now+0.28);
+    }
+  }catch(e){}
+}
+ 
+// Animacja nuty lecącej z canvasu do przycisku odpowiedzi
+function flyNoteAnimationWithEmoji(fromEl,toEl,emoji){
+  const from=fromEl.getBoundingClientRect();
+  const to=toEl.getBoundingClientRect();
+  const fromX=from.left+from.width/2;
+  const fromY=from.top+from.height/2;
+  const toX=to.left+to.width/2;
+  const toY=to.top+to.height/2;
+ 
+  const note=document.createElement('div');
+  note.className='note-fly';
+  note.textContent='♩';
+  note.style.left=fromX+'px';
+  note.style.top=fromY+'px';
+  note.style.color='#1e3a8a';
+  document.body.appendChild(note);
+ 
+  const midX=(fromX+toX)/2+(Math.random()-0.5)*100;
+  const midY=Math.min(fromY,toY)-80-Math.random()*50;
+  const dur=650;
+  const startT=performance.now();
+ 
+  (function step(now){
+    const t=Math.min((now-startT)/dur,1);
+    const e2=t<0.5?2*t*t:(1-Math.pow(-2*t+2,2)/2);
+    const x=(1-e2)*(1-e2)*fromX+2*(1-e2)*e2*midX+e2*e2*toX;
+    const y=(1-e2)*(1-e2)*fromY+2*(1-e2)*e2*midY+e2*e2*toY;
+    const sc=1+Math.sin(e2*Math.PI)*0.6;
+    const op=t>0.72?1-(t-0.72)/0.28:1;
+    note.style.left=x+'px';
+    note.style.top=y+'px';
+    note.style.transform='translate(-50%,-50%) scale('+sc+')';
+    note.style.opacity=op;
+    if(t<1){requestAnimationFrame(step);}
+    else{note.remove();spawnSpecificEmoji(toX,toY,emoji);}
+  })(startT);
+}
+ 
+function spawnSpecificEmoji(x,y,emoji){
+  const el=document.createElement('div');
+  el.className='emoji-float';
+  el.textContent=emoji;
+  el.style.left=x+'px';el.style.top=y+'px';
+  document.body.appendChild(el);
+  const dur=1300;const startT=performance.now();
+  const ampX=25+Math.random()*25;const freq=2.5+Math.random()*2;
+  (function step(now){
+    const t=Math.min((now-startT)/dur,1);
+    const ease=1-Math.pow(1-t,3);
+    const dx=Math.sin(t*Math.PI*freq)*ampX;
+    const op=t>0.6?1-(t-0.6)/0.4:1;
+    const sc=1+Math.sin(t*Math.PI)*0.5;
+    el.style.left=(x+dx)+'px';
+    el.style.top=(y-ease*120)+'px';
+    el.style.transform='translate(-50%,-50%) scale('+sc+')';
+    el.style.opacity=op;
+    if(t<1){requestAnimationFrame(step);}else{el.remove();}
+  })(startT);
+}
+ 
+// Animacja nuty lecącej z canvasu do przycisku odpowiedzi
+function flyNoteAnimation(fromEl,toEl){
+  const from=fromEl.getBoundingClientRect();
+  const to=toEl.getBoundingClientRect();
+  const fromX=from.left+from.width/2;
+  const fromY=from.top+from.height/2;
+  const toX=to.left+to.width/2;
+  const toY=to.top+to.height/2;
+ 
+  const note=document.createElement('div');
+  note.className='note-fly';
+  note.textContent='♩';
+  note.style.left=fromX+'px';
+  note.style.top=fromY+'px';
+  note.style.color='#1e3a8a';
+  document.body.appendChild(note);
+ 
+  const midX=(fromX+toX)/2+(Math.random()-0.5)*100;
+  const midY=Math.min(fromY,toY)-80-Math.random()*50;
+  const dur=650;
+  const startT=performance.now();
+ 
+  (function step(now){
+    const t=Math.min((now-startT)/dur,1);
+    const e2=t<0.5?2*t*t:(1-Math.pow(-2*t+2,2)/2);
+    const x=(1-e2)*(1-e2)*fromX+2*(1-e2)*e2*midX+e2*e2*toX;
+    const y=(1-e2)*(1-e2)*fromY+2*(1-e2)*e2*midY+e2*e2*toY;
+    const sc=1+Math.sin(e2*Math.PI)*0.6;
+    const op=t>0.72?1-(t-0.72)/0.28:1;
+    note.style.left=x+'px';
+    note.style.top=y+'px';
+    note.style.transform='translate(-50%,-50%) scale('+sc+')';
+    note.style.opacity=op;
+    if(t<1){requestAnimationFrame(step);}
+    else{note.remove();spawnHappyEmoji(toX,toY);}
+  })(startT);
+}
+ 
+function spawnHappyEmoji(x,y){
+  const el=document.createElement('div');
+  el.className='emoji-float';
+  el.textContent=HAPPY_EMOJIS[Math.floor(Math.random()*HAPPY_EMOJIS.length)];
+  el.style.left=x+'px';el.style.top=y+'px';
+  document.body.appendChild(el);
+  const dur=1300;const startT=performance.now();
+  const ampX=25+Math.random()*25;const freq=2.5+Math.random()*2;
+  (function step(now){
+    const t=Math.min((now-startT)/dur,1);
+    const ease=1-Math.pow(1-t,3);
+    const dx=Math.sin(t*Math.PI*freq)*ampX;
+    const op=t>0.6?1-(t-0.6)/0.4:1;
+    const sc=1+Math.sin(t*Math.PI)*0.5;
+    el.style.left=(x+dx)+'px';
+    el.style.top=(y-ease*120)+'px';
+    el.style.transform='translate(-50%,-50%) scale('+sc+')';
+    el.style.opacity=op;
+    if(t<1){requestAnimationFrame(step);}else{el.remove();}
+  })(startT);
+}
+ 
+// ── Booking modal ──────────────────────────────────────────────────────────
+function openBookingModal(){
+  document.getElementById('bookingModal').classList.add('open');
+  document.getElementById('modalForm').style.display='block';
+  document.getElementById('modalOk').style.display='none';
+  document.getElementById('mSubmit').disabled=false;
+  document.getElementById('mSubmit').textContent='Wyślij zgłoszenie →';
+}
+function closeBookingModal(){
+  document.getElementById('bookingModal').classList.remove('open');
+}
+async function submitBooking(){
+  const name=document.getElementById('mName').value.trim();
+  const phone=document.getElementById('mPhone').value.trim();
+  if(!name||!phone){alert('Podaj imię i telefon.');return;}
+  const btn=document.getElementById('mSubmit');
+  btn.disabled=true;btn.textContent='Wysyłam...';
+  const payload={name,phone,
+    email:document.getElementById('mEmail').value.trim(),
+    level:document.getElementById('mLevel').value,
+    message:document.getElementById('mMsg').value.trim()};
+  try{
+    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    document.getElementById('modalForm').style.display='none';
+    document.getElementById('modalOk').style.display='block';
+    setTimeout(closeBookingModal,4000);
+  }catch(e){
+    btn.disabled=false;btn.textContent='Wyślij zgłoszenie →';
+    alert('Błąd połączenia. Spróbuj zadzwonić: 514 338 875');
+  }
+}
+document.getElementById('bookingModal').addEventListener('click',function(e){
+  if(e.target===this)closeBookingModal();
+});
 </script>
 </body>
 </html>
