@@ -14,6 +14,8 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
 .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
 .site-nav a:hover{color:var(--gold);}
+.site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+.site-nav a.nav-highlight:hover{background:var(--gold);color:white;}
 @media(max-width:700px){.site-nav{display:none;}}
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
 .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
@@ -95,15 +97,36 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-copy{font-size:11px;color:#c0c0cc;}
 .footer-location{font-size:12px;color:#aaa;}
+ 
+/* ── Modal lekcja próbna ── */
+.footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
+.footer-modal-overlay.open{opacity:1;pointer-events:all;}
+.footer-modal{background:white;border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
+@media(max-width:600px){.footer-modal{grid-template-columns:1fr;padding:24px;}}
+.footer-modal-overlay.open .footer-modal{transform:translateY(0);}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:1.4rem;color:var(--navy);cursor:pointer;font-weight:bold;}
+.modal-left h3{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:0 0 14px;}
+.modal-price{background:#f9fbfe;border:2px dashed var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;text-align:center;}
+.modal-price span{font-weight:800;font-size:1.4rem;color:var(--navy);}
+.m-tile{background:#fff;border:1px solid #eee;border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;transition:0.3s;font-size:0.85rem;color:var(--navy);}
+.m-tile.selected{border-color:#3b82f6;background:#f0f7ff;}
+#m-piano-box{display:none;margin-top:10px;}
+.modal-right{background:var(--navy);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;}
+.modal-right input,.modal-right textarea{width:100%;padding:11px 14px;border-radius:12px;border:none;font-family:'Poppins',sans-serif;font-size:0.85rem;box-sizing:border-box;}
+.modal-right textarea{height:80px;resize:none;}
+.modal-submit-btn{background:var(--gold);color:white;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;font-size:0.9rem;transition:0.3s;text-transform:uppercase;}
+.modal-submit-btn:hover{opacity:0.9;}
+#modal-status{color:#22c55e;font-size:0.85rem;font-weight:600;text-align:center;min-height:20px;}
 </style>
 </head>
 <body>
  
 <nav class="site-nav">
   <a href="index.html">Strona główna</a>
-  <a href="index.html#uczniowie">Dla ucznia</a>
-  <a href="index.html#terminy">Wolne terminy</a>
-  <a href="index.html#kontakt">Kontakt</a>
+  <a href="fiszki.html">Fiszki</a>
+  <a href="index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="podrecznik.html">Podręcznik</a>
+  <a href="index.html#briefy">Materiały</a>
 </nav>
  
 <nav class="mobile-nav">
@@ -201,7 +224,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
       </ul>
     </div>
     <div class="footer-cta-col">
-      <a href="index.html#terminy" class="footer-cta-btn">🎹 Umów lekcję próbną</a>
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
     </div>
   </div>
   <div style="max-width:1100px;margin:0 auto;">
@@ -310,7 +333,92 @@ document.getElementById('pageDisplay').addEventListener('touchend',e=>{
  
 buildToc();
 goTo(1);
+ 
+// ── Modal lekcja próbna ────────────────────────────────────────────────────
+function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
+function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
+let mLoc='s',mPiano=true;
+function mSetLoc(t){
+  mLoc=t;
+  document.getElementById('m-l-s').classList.toggle('selected',t==='s');
+  document.getElementById('m-l-u').classList.toggle('selected',t==='u');
+  document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';
+  mUpdatePrice();
+}
+function mSetPiano(v){
+  mPiano=v;
+  document.getElementById('m-p-y').classList.toggle('selected',v);
+  document.getElementById('m-p-n').classList.toggle('selected',!v);
+  mUpdatePrice();
+}
+function mUpdatePrice(){
+  document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h';
+}
+async function wyslijModal(){
+  const s=document.getElementById('modal-status');
+  const submitBtn=document.querySelector('.modal-submit-btn');
+  const name=document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const email=document.getElementById('m-email').value.trim();
+  if(name.length<2||phone.length<9||!email.includes('@')){
+    s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;
+  }
+  submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
+  const location=mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd';
+  const piano=mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu');
+  const price=(mLoc==='u'&&!mPiano?119:99)+' zł/h';
+  const payload={
+    typ:'lekcja-probna-podrecznik',
+    imie_nazwisko:name,telefon:phone,email:email,
+    tresc:document.getElementById('m-msg').value.trim(),
+    miejsce:location,pianino:piano,cena:price,
+    data:new Date().toLocaleString('pl-PL')
+  };
+  try{
+    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    s.innerText='✅ Wysłano! Sprawdź email.';s.style.color='#22c55e';
+    submitBtn.innerText='WYŚLIJ PROŚBĘ';
+    setTimeout(()=>{
+      closeBookingModal();s.innerText='';
+      ['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');
+      submitBtn.disabled=false;
+    },3000);
+  }catch(e){
+    s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';
+    submitBtn.innerText='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;
+  }
+}
 </script>
+ 
+<!-- Modal lekcja próbna -->
+<div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
+  <div class="footer-modal">
+    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+    <div class="modal-left">
+      <h3>Lekcja próbna</h3>
+      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
+      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+      <div id="m-piano-box">
+        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
+          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
+      <input type="tel" id="m-phone" placeholder="Numer telefonu">
+      <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
+      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
+      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
+      <div id="modal-status"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
  
