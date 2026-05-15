@@ -589,7 +589,7 @@ function drawGame(){
   ctx.fillRect(0,canvas.height-4,canvas.width,4);
   const dc=prog<0.7?'#a0d040':prog<0.9?'#f0a020':'#e04020';
   ctx.fillStyle=dc
-ctx.fillRect(0,canvas.height-4,canvas.width*(1-prog),4);
+  ctx.fillRect(0,canvas.height-4,canvas.width*(1-prog),4);
   // Day label
   ctx.fillStyle='rgba(255,255,255,0.7)';
   ctx.font='8px Press Start 2P,monospace';
@@ -1024,7 +1024,7 @@ function renderInv(){
   Object.keys(CROPS).forEach(seed=>{
     const qty=player.inventory[seed]||0;
     const info
-  const info=CROPS[seed];
+    const info=CROPS[seed];
     const div=document.createElement('div');
     div.className='inv-item'+(player.selectedSeed===seed?' sel':'');
     div.innerHTML=`<div class="inv-icon">${info.icon}</div><div class="inv-lbl">${info.name}</div><div class="inv-cnt">${qty}</div>`;
@@ -1310,8 +1310,3 @@ document.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-
-
-
-
-                                   
