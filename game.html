@@ -246,8 +246,7 @@ function buildVillage(){
     if(m[y][x].t===T.GRASS&&Math.random()<0.3)m[y][x]=mkCell(T.TREE);
   // Farm zone (right of center, rows 8–19, cols 10–22)
   for(let y=8;y<=19;y++)for(let x=10;x<=22;x++)
-    m[y][x]=mkCell(T.DIRT,'field',{tilled:false,wet:false,crop:null,growDay
-,growDay:0,growStage:0});
+    m[y][x]=mkCell(T.DIRT,'field',{tilled:false,wet:false,crop:null,growDay,growDay:0,growStage:0});
   // Farm fences
   for(let x=9;x<=23;x++){m[7][x]=mkCell(T.FENCE);m[20][x]=mkCell(T.FENCE);}
   for(let y=7;y<=20;y++){m[y][9]=mkCell(T.FENCE);m[y][23]=mkCell(T.FENCE);}
