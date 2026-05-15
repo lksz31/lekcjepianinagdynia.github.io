@@ -769,13 +769,13 @@ async function toggleMic(){
     micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     aCtx=new(window.AudioContext||window.webkitAudioContext)();
     const src=aCtx.createMediaStreamSource(micStream);
-    const gainNode=aCtx.createGain(); gainNode.gain.value=2.0; src.connect(gainNode);
-    analyser=aCtx.createAnalyser(); analyser.fftSize=8192; analyser.smoothingTimeConstant=0.55;
+    const gainNode=aCtx.createGain(); gainNode.gain.value=4.0; src.connect(gainNode);
+    analyser=aCtx.createAnalyser(); analyser.fftSize=8192; analyser.smoothingTimeConstant=0.3;
     gainNode.connect(analyser);
     micOn=true;
     document.getElementById('mic-btn').textContent='🎤 Mikrofon: ON';
     document.getElementById('mic-btn').classList.add('on');
-    pitchInterval=setInterval(detectPitch,80);
+    pitchInterval=setInterval(detectPitch,50);
     addLog('🎤 Mikrofon włączony','info');
   }catch(e){alert('Brak dostępu do mikrofonu: '+e.message);}
 }
@@ -798,7 +798,7 @@ function detectPitch(){
   const vol=getRMS(buf);
   document.getElementById('pitch-fill').style.width=Math.min(100,vol*500)+'%';
  
-  if(vol<0.007){
+  if(vol<0.002){
     freqHistory=[];
     document.getElementById('detected-note').textContent='—';
     highlightNote(null);
@@ -809,7 +809,7 @@ function detectPitch(){
   if(freq<0){freqHistory=[];return;}
  
   freqHistory.push(freq);
-  if(freqHistory.length>5) freqHistory.shift();
+  if(freqHistory.length>4) freqHistory.shift();
  
   // Find closest note
   let bestIdx=-1, bestDist=Infinity;
@@ -818,7 +818,7 @@ function detectPitch(){
     if(d<bestDist){bestDist=d;bestIdx=i;}
   });
  
-  if(bestDist>0.06){
+  if(bestDist>0.10){
     document.getElementById('detected-note').textContent='?';
     highlightNote(null);
     return;
@@ -828,17 +828,17 @@ function detectPitch(){
   document.getElementById('detected-note').textContent=noteName;
   highlightNote(bestIdx);
  
-  // Stability check: 3 of last 5 match
+  // Stability check: 2 of last 4 match (more responsive)
   const matchCount=freqHistory.filter(f=>{
     let bi=-1,bd=Infinity;
     NOTES.forEach((n,i)=>{const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bi=i;}});
     return bi===bestIdx;
   }).length;
  
-  if(matchCount>=3 && detectedCooldown===0){
+  if(matchCount>=2 && detectedCooldown===0){
     // Trigger action
     pendingNote=bestIdx;
-    detectedCooldown=18; // ~1.4s cooldown
+    detectedCooldown=12; // ~600ms cooldown
     document.getElementById('detected-note').style.animation='none';
     void document.getElementById('detected-note').offsetWidth;
     document.getElementById('detected-note').style.animation='pulse-gold 0.3s ease';
@@ -849,7 +849,7 @@ function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.le
  
 function autoCorrelate(buf,sr){
   let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
-  if(rms<0.005)return-1;
+  if(rms<0.001)return-1;
   let r1=0,r2=buf.length-1;
   for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.12){r1=i;break;}}
   for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.12){r2=buf.length-i;break;}}
