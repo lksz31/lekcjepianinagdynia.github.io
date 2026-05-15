@@ -1,1181 +1,320 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>DOOM MUSIC</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Music Hex Garden</title>
 <style>
-@font-face{font-family:'DOOMFont';src:local('Courier New');}
-:root{
-  --red:#cc0000;--dkred:#880000;--orange:#ff6600;--yellow:#ffcc00;
-  --green:#00aa00;--dkgreen:#005500;--grey:#888888;--dkgrey:#444444;
-  --brown:#886644;--dkbrown:#553322;--blood:#990000;
-  --bg:#111111;--panel:#1a1a1a;--border:#333333;
-  --gold:#d4af37;--pixelfont:'Courier New',monospace;
-}
-*{box-sizing:border-box;margin:0;padding:0;image-rendering:pixelated;}
-body{background:#000;font-family:var(--pixelfont);color:#ccc;height:100vh;overflow:hidden;display:flex;flex-direction:column;user-select:none;}
- 
-/* ── TITLE SCREEN ── */
-#title-screen{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;}
-.title-logo{font-size:clamp(2rem,8vw,5rem);font-weight:900;letter-spacing:.15em;text-align:center;line-height:1;}
-.title-logo .doom{color:var(--red);text-shadow:0 0 30px #ff0000,0 0 60px #880000;}
-.title-logo .music{color:var(--yellow);text-shadow:0 0 20px #ffcc00;}
-.title-sub{font-size:.85rem;color:#666;letter-spacing:.3em;text-transform:uppercase;margin:16px 0 32px;}
-.title-btn{padding:12px 40px;background:var(--red);color:#fff;border:3px solid #ff4444;font-family:var(--pixelfont);font-size:1.1rem;font-weight:700;letter-spacing:.2em;cursor:pointer;text-transform:uppercase;transition:.15s;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
-.title-btn:hover{background:#ff2222;transform:scale(1.04);}
-.title-credits{font-size:.7rem;color:#444;margin-top:24px;letter-spacing:.15em;}
-.scanlines{position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0px,rgba(0,0,0,0.15) 1px,transparent 1px,transparent 3px);z-index:1000;}
- 
-/* ── GAME LAYOUT ── */
-#game-root{display:flex;flex-direction:column;height:100vh;}
- 
-/* ── 3D VIEW ── */
-#view-wrap{position:relative;flex:1;min-height:0;background:#000;overflow:hidden;}
-#view-canvas{display:block;width:100%;height:100%;}
-#flash-overlay{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .05s;}
- 
-/* ── FACE HUD (Doom classic) ── */
-#face-hud{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:2rem;filter:drop-shadow(0 0 4px #ff0000);transition:.3s;}
- 
-/* ── BOTTOM HUD ── */
-#hud{display:flex;align-items:stretch;background:#1a1a1a;border-top:3px solid var(--dkred);flex-shrink:0;height:90px;}
-.hud-block{padding:6px 12px;border-right:2px solid #333;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;}
-.hud-lbl{font-size:.58rem;color:#666;text-transform:uppercase;letter-spacing:.12em;}
-.hud-val{font-size:1.4rem;font-weight:700;line-height:1;color:var(--red);}
-.hud-val.green{color:#00cc00;}
-.hud-val.yellow{color:var(--yellow);}
-.hud-val.blue{color:#4488ff;}
-.hud-hp-bar{height:8px;background:#330000;border:1px solid #550000;border-radius:1px;width:80px;overflow:hidden;}
-.hud-hp-fill{height:100%;background:var(--red);transition:width .3s;}
-.hud-xp-bar{height:5px;background:#001133;border:1px solid #002255;border-radius:1px;width:80px;overflow:hidden;}
-.hud-xp-fill{height:100%;background:#4488ff;transition:width .4s;}
- 
-/* ── MIC SECTION ── */
-#mic-block{display:flex;flex-direction:column;gap:4px;padding:6px 12px;border-right:2px solid #333;min-width:130px;}
-.mic-toggle{padding:3px 10px;background:transparent;border:1px solid #555;color:#aaa;font-family:var(--pixelfont);font-size:.68rem;cursor:pointer;text-transform:uppercase;letter-spacing:.1em;transition:.15s;}
-.mic-toggle.on{border-color:#ffcc00;color:#ffcc00;background:rgba(255,204,0,.08);}
-.detected-big{font-size:1.8rem;font-weight:700;color:var(--yellow);line-height:1;text-shadow:0 0 8px rgba(255,204,0,.5);min-height:1.8rem;font-family:var(--pixelfont);}
-.pitch-bar-wrap{height:4px;background:#222;width:100%;}
-.pitch-bar-fill{height:100%;background:var(--yellow);width:0;transition:width .06s;}
- 
-/* ── COMBO SECTION ── */
-#combo-block{flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:4px;border-right:2px solid #333;overflow:hidden;}
-.combo-sequence{display:flex;gap:4px;flex-wrap:wrap;min-height:28px;align-items:center;}
-.combo-note-chip{padding:2px 6px;background:#2a1a00;border:1px solid #885500;color:var(--yellow);font-size:.75rem;font-weight:700;border-radius:2px;transition:.2s;font-family:var(--pixelfont);}
-.combo-note-chip.new{animation:chipPop .25s ease;}
-@keyframes chipPop{0%{transform:scale(1.6);background:#ff8800;}100%{transform:scale(1);}}
-.combo-label{font-size:.6rem;color:#666;text-transform:uppercase;letter-spacing:.1em;}
-.combo-match{font-size:.75rem;font-weight:700;color:#00ff44;min-height:1em;text-shadow:0 0 6px #00ff44;}
- 
-/* ── UNLOCKED COMBOS ── */
-#combos-block{padding:6px 10px;display:flex;flex-direction:column;gap:3px;width:180px;overflow-y:auto;}
-.combo-entry{font-size:.62rem;display:flex;gap:4px;align-items:center;}
-.combo-entry .seq{color:var(--yellow);letter-spacing:.05em;font-family:var(--pixelfont);}
-.combo-entry .effect{color:#88aacc;}
-.combo-entry.locked{opacity:.3;}
-.combo-entry .dmg{color:var(--red);font-weight:700;margin-left:auto;}
- 
-/* ── NAVIGATION BUTTONS ── */
-#nav-btns{position:absolute;bottom:0;left:0;right:0;display:none;justify-content:center;gap:12px;padding:8px;pointer-events:all;}
-#nav-btns.show{display:flex;}
-.nav-btn{padding:8px 22px;background:#1a1a1a;border:2px solid var(--dkred);color:#cc4444;font-family:var(--pixelfont);font-size:.85rem;font-weight:700;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:.15s;}
-.nav-btn:hover{background:#330000;color:#ff4444;border-color:var(--red);}
- 
-/* ── LOG ── */
-#log{position:absolute;top:8px;left:8px;max-width:260px;pointer-events:none;}
-.log-line{font-size:.65rem;color:#aaa;text-shadow:1px 1px 0 #000;line-height:1.4;padding:1px 0;}
-.log-line.dmg{color:#ff4444;}
-.log-line.hit{color:#ffcc00;}
-.log-line.move{color:#44aaff;}
-.log-line.lvl{color:#44ff44;font-weight:700;}
- 
-/* ── MONSTER VIEW ── */
-#monster-display{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;}
- 
-/* ── DAMAGE NUMBERS ── */
-.dmg-float{position:absolute;font-size:1.8rem;font-weight:700;pointer-events:none;animation:floatUp .9s ease forwards;text-shadow:2px 2px 0 #000;font-family:var(--pixelfont);}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-80px);}}
- 
-/* ── LEVEL UP ── */
-#levelup-banner{position:absolute;top:30%;left:50%;transform:translateX(-50%);background:#000;border:3px solid var(--yellow);padding:10px 24px;font-size:1.3rem;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:.2em;display:none;text-align:center;text-shadow:0 0 10px var(--yellow);white-space:nowrap;}
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f0f8ff;
+  }
+
+  #game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  #hexMap {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-gap: 5px;
+  }
+
+  .hex {
+    width: 50px;
+    height: 50px;
+    background-color: #88cc88;
+    clip-path: polygon(
+      25% 0%,
+      75% 0%,
+      100% 50%,
+      75% 100%,
+      25% 100%,
+      0% 50%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #status {
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
- 
-<!-- Scanlines overlay -->
-<div class="scanlines"></div>
- 
-<!-- Title Screen -->
-<div id="title-screen">
-  <div class="title-logo">
-    <div class="doom">DOOM</div>
-    <div class="music">MUSIC</div>
-  </div>
-  <div class="title-sub">Muzyczna Apokalipsa</div>
-  <button class="title-btn" onclick="startGame()">▶ Graj</button>
-  <div class="title-credits" style="margin-top:18px;font-size:.65rem;color:#333;">
-    🎤 Śpiewaj nuty &nbsp;·&nbsp; ⚔ Atakuj potwory &nbsp;·&nbsp; 🎵 Odblokowuj combo<br>
-    <span style="color:#222;margin-top:6px;display:block;">Klawiatura: C D E F G A H · Enter=ruch</span>
-  </div>
+<div id="game">
+  <h1>Music Hex Garden</h1>
+  <div id="hexMap"></div>
+  <button id="startMic">Start Microphone</button>
+  <div id="status">Microphone not started</div>
+  <p>Use singing to move (C=Up, D=Right, E=Down, F=Left).</p>
 </div>
- 
-<!-- Game -->
-<div id="game-root" style="display:none;">
-  <!-- 3D View -->
-  <div id="view-wrap">
-    <canvas id="view-canvas"></canvas>
-    <div id="flash-overlay"></div>
-    <div id="monster-display"></div>
-    <div id="log"></div>
-    <div id="face-hud">😐</div>
-    <div id="levelup-banner">⬆ POZIOM WYŻEJ! ⬆</div>
-    <div id="nav-btns">
-      <button class="nav-btn" id="btn-left" onclick="move('left')" style="display:none">◀ LEWO</button>
-      <button class="nav-btn" id="btn-fwd" onclick="move('forward')">▲ NAPRZÓD</button>
-      <button class="nav-btn" id="btn-right" onclick="move('right')" style="display:none">PRAWO ▶</button>
-      <button class="nav-btn" id="btn-back" onclick="move('back')" style="display:none">▼ COFNIJ</button>
-    </div>
-  </div>
- 
-  <!-- HUD -->
-  <div id="hud">
-    <!-- HP/XP -->
-    <div class="hud-block">
-      <div class="hud-lbl">HP</div>
-      <div class="hud-val" id="hp-val" style="color:var(--red);">100</div>
-      <div class="hud-hp-bar"><div class="hud-hp-fill" id="hp-fill" style="width:100%"></div></div>
-      <div class="hud-lbl" style="margin-top:3px;">XP</div>
-      <div class="hud-xp-bar"><div class="hud-xp-fill" id="xp-fill" style="width:0%"></div></div>
-    </div>
-    <!-- Level/Score -->
-    <div class="hud-block">
-      <div class="hud-lbl">Poziom</div>
-      <div class="hud-val blue" id="lvl-val">1</div>
-      <div class="hud-lbl" style="margin-top:4px;">Wynik</div>
-      <div class="hud-val yellow" id="score-val">0</div>
-    </div>
-    <!-- Mic -->
-    <div id="mic-block">
-      <button class="mic-toggle" id="mic-toggle" onclick="toggleMic()">🎤 MIC: OFF</button>
-      <div class="detected-big" id="det-note">—</div>
-      <div class="pitch-bar-wrap"><div class="pitch-bar-fill" id="pitch-fill2"></div></div>
-    </div>
-    <!-- Combo input -->
-    <div id="combo-block">
-      <div class="combo-label">Sekwencja:</div>
-      <div class="combo-sequence" id="combo-seq"></div>
-      <div class="combo-match" id="combo-match"></div>
-    </div>
-    <!-- Unlocked combos -->
-    <div id="combos-block">
-      <div class="hud-lbl" style="margin-bottom:3px;">Odblokowane Combo:</div>
-      <div id="combos-list"></div>
-    </div>
-  </div>
-</div>
- 
+
 <script>
-'use strict';
-// ═══════════════════════════════════════════════════
-// NOTES
-// ═══════════════════════════════════════════════════
-const NOTES=[
-  {n:'C',l:'c¹',f:261.63},
-  {n:'D',l:'d¹',f:293.66},
-  {n:'E',l:'e¹',f:329.63},
-  {n:'F',l:'f¹',f:349.23},
-  {n:'G',l:'g¹',f:392.00},
-  {n:'A',l:'a¹',f:440.00},
-  {n:'H',l:'h¹',f:493.88},
-];
- 
-// ═══════════════════════════════════════════════════
-// COMBO DEFINITIONS — unlocked by level
-// ═══════════════════════════════════════════════════
-const ALL_COMBOS=[
-  // Level 1 — single notes (always available)
-  {id:'c1', seq:['C'],     name:'Uderzenie',      dmg:[12,18],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'d1', seq:['D'],     name:'Kopniak',         dmg:[10,16],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'e1', seq:['E'],     name:'Cięcie',          dmg:[14,20],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'f1', seq:['F'],     name:'Cios',            dmg:[11,17],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'g1', seq:['G'],     name:'Szarża',          dmg:[13,19],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'a1', seq:['A'],     name:'Taran',           dmg:[15,22],  fx:'normal', color:'#cc4444', minLvl:1},
-  {id:'h1', seq:['H'],     name:'Finisz',          dmg:[18,25],  fx:'normal', color:'#ff6600', minLvl:1},
-  // Level 2 — 2-note combos
-  {id:'cd', seq:['C','D'], name:'Podwójny Riff',   dmg:[30,45],  fx:'stun',   color:'#ffaa00', minLvl:2},
-  {id:'eg', seq:['E','G'], name:'Melodia Bólu',    dmg:[35,50],  fx:'normal', color:'#ffaa00', minLvl:2},
-  {id:'ah', seq:['A','H'], name:'Diabelski Akord', dmg:[40,55],  fx:'bleed',  color:'#ff4400', minLvl:2},
-  {id:'fd', seq:['F','D'], name:'Bass Drop',       dmg:[28,42],  fx:'stun',   color:'#ffaa00', minLvl:2},
-  {id:'gc', seq:['G','C'], name:'Power Chord',     dmg:[32,48],  fx:'normal', color:'#ffaa00', minLvl:2},
-  // Level 3 — 3-note combos
-  {id:'ceg', seq:['C','E','G'],  name:'Trytonus',       dmg:[65,90],  fx:'burn',   color:'#ff6600', minLvl:3},
-  {id:'dfa', seq:['D','F','A'],  name:'Krwawa Kadencja',dmg:[70,95],  fx:'bleed',  color:'#ff3300', minLvl:3},
-  {id:'cdh', seq:['C','D','H'],  name:'Riff Śmierci',   dmg:[75,100], fx:'stun',   color:'#ff4400', minLvl:3},
-  {id:'gah', seq:['G','A','H'],  name:'Solo Zagłady',   dmg:[80,110], fx:'burn',   color:'#ff2200', minLvl:3},
-  // Level 4 — 4-note combos
-  {id:'cdef',seq:['C','D','E','F'],  name:'SCALE OF DOOM',  dmg:[130,160],fx:'destroy',color:'#ffcc00',minLvl:4},
-  {id:'gahc',seq:['G','A','H','C'],  name:'HELLFIRE RIFF',  dmg:[140,175],fx:'destroy',color:'#ff8800',minLvl:4},
-  {id:'egdf',seq:['E','G','D','F'],  name:'METAL MAYHEM',   dmg:[150,190],fx:'destroy',color:'#ffaa00',minLvl:4},
-];
- 
-const FX_NAMES={normal:'',stun:'[OGŁUSZENIE]',bleed:'[KRWAWIENIE]',burn:'[SPALENIE]',destroy:'[ZNISZCZENIE!]'};
- 
-// ═══════════════════════════════════════════════════
-// MONSTERS
-// ═══════════════════════════════════════════════════
-const MONSTERS=[
-  {id:'imp',    name:'Imp',         hp:60,  maxHp:60,  atk:8,  emoji:'👿', color:'#cc4400',xp:15, score:100},
-  {id:'demon',  name:'Demon',       hp:120, maxHp:120, atk:14, emoji:'😈', color:'#8800cc',xp:30, score:200},
-  {id:'zombie', name:'Zombie',      hp:40,  maxHp:40,  atk:5,  emoji:'🧟', color:'#448844',xp:10, score:75},
-  {id:'skull',  name:'Czaszka',     hp:80,  maxHp:80,  atk:12, emoji:'💀', color:'#aaaaaa',xp:20, score:150},
-  {id:'baron',  name:'Baron Piekła',hp:300, maxHp:300, atk:25, emoji:'😡', color:'#cc0000',xp:80, score:500},
-  {id:'cyber',  name:'Cyberdemon',  hp:500, maxHp:500, atk:40, emoji:'🤖', color:'#ff4400',xp:150,score:1000},
-];
- 
-// ═══════════════════════════════════════════════════
-// WORLD GENERATION
-// ═══════════════════════════════════════════════════
-// Each room: {id, exits:{forward,left,right,back}, visited, monsterChance, style}
-let worldMap=[]; // array of rooms
-let roomIndex=0;
- 
-function genWorld(){
-  worldMap=[];
-  for(let i=0;i<60;i++){
-    const isWide=Math.random()<0.4;
-    const hasFwd=i<59;
-    const hasLeft=isWide&&Math.random()<0.6;
-    const hasRight=isWide&&Math.random()<0.6;
-    const isBoss=(i%20===19);
-    worldMap.push({
-      id:i,
-      exits:{forward:hasFwd,left:hasLeft,right:hasRight,back:i>0},
-      visited:false,
-      style:isBoss?'boss':isWide?'wide':'corridor',
-      monsterChance:isBoss?1.0:0.3+i*0.01,
-      monster:null,
-      isBoss,
-      treasureChance:0.2,
-      hasTreasure:Math.random()<0.2&&!isBoss,
-      depth:i,
-    });
-  }
-  worldMap[0].visited=true;
-}
- 
-// ═══════════════════════════════════════════════════
-// PLAYER STATE
-// ═══════════════════════════════════════════════════
-let player={hp:100,maxHp:100,xp:0,level:1,score:0,kills:0,comboUnlocks:[]};
-const XP_PER_LEVEL=[0,0,100,250,500,900,1500,2500];
-let inFight=false;
-let currentMonster=null;
-let fightPhase='player'; // player|enemy
-let enemyAttackTimer=null;
-let gameStarted=false;
- 
-// ═══════════════════════════════════════════════════
-// COMBO SYSTEM
-// ═══════════════════════════════════════════════════
-let comboBuffer=[]; // current note sequence
-let comboTimeout=null;
-const COMBO_WINDOW=2200; // ms to complete combo
- 
-function getUnlockedCombos(){
-  return ALL_COMBOS.filter(c=>c.minLvl<=player.level);
-}
- 
-function tryMatchCombo(){
-  const unlocked=getUnlockedCombos();
-  // Sort by sequence length descending to prefer longer matches
-  const sorted=[...unlocked].sort((a,b)=>b.seq.length-a.seq.length);
-  const buf=comboBuffer.slice();
- 
-  for(const combo of sorted){
-    const sl=combo.seq.length;
-    if(buf.length>=sl){
-      const tail=buf.slice(buf.length-sl);
-      if(tail.join('')===combo.seq.join('')){
-        return combo;
-      }
-    }
-  }
-  return null;
-}
- 
-// ── Note → direction mapping (outside fight) ──────────────────────────────
-// c¹=forward  d¹=left  e¹=right  f¹=back
-// g¹ a¹ h¹ are attack-only (no movement assigned)
-const MOVE_NOTE_MAP={C:'forward',D:'left',E:'right',F:'back'};
- 
-function noteTriggered(noteN){
-  if(!gameStarted) return;
- 
-  if(!inFight){
-    // MOVEMENT MODE
-    const dir=MOVE_NOTE_MAP[noteN];
-    if(dir){
-      move(dir);
-      // flash nav button
-      const btnId={forward:'btn-fwd',left:'btn-left',right:'btn-right',back:'btn-back'}[dir];
-      if(btnId){const btn=document.getElementById(btnId);if(btn){btn.style.background='#550000';setTimeout(()=>btn.style.background='',220);}}
-    }
-    return;
-  }
- 
-  // FIGHT MODE — all notes go into combo buffer
-  comboBuffer.push(noteN);
-  if(comboBuffer.length>4) comboBuffer=comboBuffer.slice(-4);
-  renderComboSeq();
- 
-  if(comboTimeout) clearTimeout(comboTimeout);
-  comboTimeout=setTimeout(()=>{comboBuffer=[];renderComboSeq();document.getElementById('combo-match').textContent='';},COMBO_WINDOW);
- 
-  const match=tryMatchCombo();
-  if(match){
-    clearTimeout(comboTimeout);
-    comboBuffer=[];
-    setTimeout(()=>{renderComboSeq();},100);
-    executeAttack(match);
+const mapSize = 10; // 10x10 grid
+const hexMapDiv = document.getElementById('hexMap');
+const statusDiv = document.getElementById('status');
+
+let playerPosition = {x: 0, y: 0};
+let microphoneActive = false;
+let audioContext;
+let analyser;
+let microphoneStream;
+let pitchDetectionInterval;
+
+// Game state for tiles
+// Each tile: {hasSeed: bool, isGrowing: bool, watered: bool}
+const mapTiles = Array.from({ length: mapSize }, () => 
+  Array.from({ length: mapSize }, () => ({hasSeed: false, isGrowing: false, watered: false}))
+);
+
+// Generate hex map
+for (let y = 0; y < mapSize; y++) {
+  for (let x = 0; x < mapSize; x++) {
+    const hex = document.createElement('div');
+    hex.className = 'hex';
+    hex.dataset.x = x;
+    hex.dataset.y = y;
+    hex.innerText = '';
+    hexMapDiv.appendChild(hex);
   }
 }
- 
-function executeAttack(combo){
-  if(!currentMonster||!inFight) return;
-  const dmg=combo.dmg[0]+Math.floor(Math.random()*(combo.dmg[1]-combo.dmg[0]+1));
-  const lvlBonus=1+(player.level-1)*0.15;
-  const finalDmg=Math.round(dmg*lvlBonus);
- 
-  currentMonster.hp=Math.max(0,currentMonster.hp-finalDmg);
- 
-  // Show combo name
-  document.getElementById('combo-match').textContent=`★ ${combo.name}! ${FX_NAMES[combo.fx]}`;
- 
-  // Float damage number
-  showDmgFloat(finalDmg,combo.color);
- 
-  // Screen flash
-  flashScreen(combo.color,combo.seq.length>=4?200:100);
- 
-  // Log
-  addLog(`⚔ ${combo.name}: -${finalDmg} HP ${FX_NAMES[combo.fx]}`,'hit');
- 
-  // Play sound
-  playHitSound(combo.seq.length);
- 
-  // Special effects
-  if(combo.fx==='stun'&&currentMonster){
-    currentMonster.stunned=3;
-    addLog('  Wróg ogłuszony!','hit');
-  }
- 
-  // Update monster display
-  renderMonster();
- 
-  if(currentMonster.hp<=0){
-    defeatMonster();
-  }
-}
- 
-function defeatMonster(){
-  inFight=false;
-  if(enemyAttackTimer){clearInterval(enemyAttackTimer);enemyAttackTimer=null;}
-  const m=currentMonster;
-  addLog(`☠ ${m.name} pokonany!`,'hit');
-  addLog(`+${m.xp} XP  +${m.score} pkt`,'lvl');
- 
-  player.xp+=m.xp;
-  player.score+=m.score;
-  player.kills++;
-  checkLevelUp();
-  updateHUD();
-  flashScreen('#00ff44',150);
-  showDmgFloat('KILL!','#00ff44',true);
-  playHitSound(4);
- 
-  setTimeout(()=>{
-    currentMonster=null;
-    const md=document.getElementById('monster-display');md.innerHTML='';
-    document.getElementById('combo-match').textContent='';
-    comboBuffer=[];renderComboSeq();
-    showNavButtons();
-  },1200);
- 
-  setFace('😄');
-  setTimeout(()=>setFace('😐'),2000);
-}
- 
-// ═══════════════════════════════════════════════════
-// LEVEL UP
-// ═══════════════════════════════════════════════════
-function checkLevelUp(){
-  const nextLvl=player.level+1;
-  if(nextLvl>=XP_PER_LEVEL.length) return;
-  if(player.xp>=XP_PER_LEVEL[nextLvl]){
-    player.level=nextLvl;
-    player.hp=Math.min(player.maxHp,player.hp+20);
-    addLog(`★★★ POZIOM ${player.level}! ★★★`,'lvl');
-    // Show banner
-    const b=document.getElementById('levelup-banner');
-    b.textContent=`⬆ POZIOM ${player.level}! ⬆`;
-    b.style.display='block';
-    setTimeout(()=>b.style.display='none',2500);
-    renderCombosPanel();
-    playLevelUpSound();
-  }
-}
- 
-// ═══════════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════════
-function move(dir){
-  if(inFight) return;
-  const room=worldMap[roomIndex];
-  if(!room.exits[dir]) return;
- 
-  let nextIdx=roomIndex;
-  if(dir==='forward') nextIdx=Math.min(59,roomIndex+1);
-  else if(dir==='back') nextIdx=Math.max(0,roomIndex-1);
-  else if(dir==='left') nextIdx=Math.min(59,roomIndex+1);  // branches treated as forward
-  else if(dir==='right') nextIdx=Math.min(59,roomIndex+1);
- 
-  roomIndex=nextIdx;
-  const nextRoom=worldMap[roomIndex];
-  nextRoom.visited=true;
- 
-  addLog(`→ Wchodzisz do korytarza #${roomIndex}`,'move');
-  drawView(dir);
- 
-  // Check for monster encounter
-  setTimeout(()=>{
-    if(Math.random()<nextRoom.monsterChance&&!nextRoom.monster){
-      spawnMonster(nextRoom);
-    } else if(nextRoom.hasTreasure){
-      nextRoom.hasTreasure=false;
-      const heal=15+Math.floor(Math.random()*25);
-      player.hp=Math.min(player.maxHp,player.hp+heal);
-      addLog(`📦 Skrzynka! +${heal} HP`,'lvl');
-      updateHUD();
-      flashScreen('#ffcc00',120);
-    } else {
-      showNavButtons();
-    }
-  },400);
-}
- 
-function spawnMonster(room){
-  // Pick monster based on depth
-  const depth=room.depth;
-  let pool;
-  if(room.isBoss&&depth>=40) pool=[MONSTERS[5]]; // cyberdemon
-  else if(room.isBoss) pool=[MONSTERS[4]]; // baron
-  else if(depth<10) pool=[MONSTERS[0],MONSTERS[2]];
-  else if(depth<25) pool=[MONSTERS[0],MONSTERS[1],MONSTERS[2],MONSTERS[3]];
-  else pool=[MONSTERS[1],MONSTERS[3],MONSTERS[4]];
- 
-  const tmpl=pool[Math.floor(Math.random()*pool.length)];
-  // Scale HP with depth
-  const scale=1+depth*0.02;
-  currentMonster={...tmpl,hp:Math.round(tmpl.hp*scale),maxHp:Math.round(tmpl.maxHp*scale),stunned:0};
-  room.monster=currentMonster;
-  inFight=true;
-  hideNavButtons();
-  renderMonster();
-  addLog(`👿 Pojawia się ${currentMonster.name}!`,'dmg');
-  setFace('😨');
- 
-  // Enemy attacks on timer
-  if(enemyAttackTimer) clearInterval(enemyAttackTimer);
-  const atkInterval=room.isBoss?1800:2500;
-  enemyAttackTimer=setInterval(()=>{
-    if(!inFight){clearInterval(enemyAttackTimer);return;}
-    if(currentMonster.stunned>0){currentMonster.stunned--;addLog('  Wróg ogłuszony — pomija turę','move');return;}
-    enemyAttack();
-  },atkInterval);
-}
- 
-function enemyAttack(){
-  if(!currentMonster||!inFight) return;
-  const dmg=currentMonster.atk+Math.floor(Math.random()*currentMonster.atk*0.5);
-  player.hp=Math.max(0,player.hp-dmg);
-  addLog(`💥 ${currentMonster.name} atakuje! -${dmg} HP`,'dmg');
-  flashScreen('#cc0000',120);
-  showDmgFloat(`-${dmg}`,'#ff4444');
-  updateHUD();
- 
-  if(player.hp<=0){
-    gameOver();
-  } else if(player.hp<player.maxHp*0.3){
-    setFace('😰');
-  } else {
-    setFace('😠');
-    setTimeout(()=>setFace('😐'),600);
-  }
-}
- 
-function gameOver(){
-  inFight=false;
-  if(enemyAttackTimer){clearInterval(enemyAttackTimer);enemyAttackTimer=null;}
-  setFace('💀');
-  flashScreen('#ff0000',400);
-  addLog('☠ ZGINĄŁEŚ!','dmg');
-  setTimeout(()=>{
-    const ts=document.getElementById('title-screen');
-    ts.style.display='flex';
-    ts.innerHTML=`
-      <div class="title-logo"><div class="doom">GAME</div><div class="music" style="color:var(--red)">OVER</div></div>
-      <div class="title-sub">Wynik: ${player.score} | Poziom: ${player.level} | Zabici: ${player.kills}</div>
-      <button class="title-btn" onclick="resetGame()">▶ Spróbuj ponownie</button>`;
-    document.getElementById('game-root').style.display='none';
-  },1500);
-}
- 
-// ═══════════════════════════════════════════════════
-// CANVAS — FIRST PERSON VIEW
-// ═══════════════════════════════════════════════════
-const canvas=document.getElementById('view-canvas');
-const ctx2=canvas.getContext('2d');
-let animFrame2=null;
- 
-function resizeCanvas(){
-  const wrap=document.getElementById('view-wrap');
-  canvas.width=wrap.offsetWidth;
-  canvas.height=wrap.offsetHeight;
-}
- 
-// Draw a pseudo-3D corridor view
-function drawView(moveDir){
-  resizeCanvas();
-  const W=canvas.width,H=canvas.height;
-  const room=worldMap[roomIndex];
- 
-  // Ceiling
-  const ceilGrad=ctx2.createLinearGradient(0,0,0,H*0.5);
-  if(room.style==='boss'){
-    ceilGrad.addColorStop(0,'#200000');ceilGrad.addColorStop(1,'#4a0000');
-  } else if(room.style==='wide'){
-    ceilGrad.addColorStop(0,'#111122');ceilGrad.addColorStop(1,'#1a1a33');
-  } else {
-    ceilGrad.addColorStop(0,'#0a0a0a');ceilGrad.addColorStop(1,'#1a1a1a');
-  }
-  ctx2.fillStyle=ceilGrad;
-  ctx2.fillRect(0,0,W,H*0.5);
- 
-  // Floor
-  const floorGrad=ctx2.createLinearGradient(0,H*0.5,0,H);
-  floorGrad.addColorStop(0,'#1a1100');floorGrad.addColorStop(1,'#0a0800');
-  ctx2.fillStyle=floorGrad;
-  ctx2.fillRect(0,H*0.5,W,H*0.5);
- 
-  // Horizon line
-  ctx2.strokeStyle='#333';ctx2.lineWidth=1;
-  ctx2.beginPath();ctx2.moveTo(0,H*0.5);ctx2.lineTo(W,H*0.5);ctx2.stroke();
- 
-  // Draw walls with perspective
-  drawWalls(W,H,room);
- 
-  // Draw door/opening ahead
-  drawOpening(W,H,room);
- 
-  // Draw side passages if wide
-  if(room.style==='wide'||room.exits.left) drawSidePassage(W,H,'left');
-  if(room.style==='wide'||room.exits.right) drawSidePassage(W,H,'right');
- 
-  // Depth texture — pixel noise on walls
-  addWallNoise(W,H);
- 
-  // Vignette
-  const vig=ctx2.createRadialGradient(W/2,H/2,H*0.2,W/2,H/2,H*0.8);
-  vig.addColorStop(0,'transparent');
-  vig.addColorStop(1,'rgba(0,0,0,0.55)');
-  ctx2.fillStyle=vig;
-  ctx2.fillRect(0,0,W,H);
- 
-  // Room info text
-  ctx2.fillStyle='rgba(255,68,0,0.7)';
-  ctx2.font='bold 11px Courier New,monospace';
-  ctx2.textAlign='right';
-  ctx2.fillText(`SEKTOR ${roomIndex.toString().padStart(3,'0')}`,W-12,H-10);
- 
-  // Doom-style depth level
-  const depthStr='GŁĘBOKOŚĆ: '+Math.floor(roomIndex*3.2)+'m';
-  ctx2.fillStyle='rgba(150,150,150,0.4)';
-  ctx2.font='10px Courier New';
-  ctx2.textAlign='left';
-  ctx2.fillText(depthStr,12,H-10);
-}
- 
-function drawWalls(W,H,room){
-  const cx=W/2,cy=H/2;
-  const wallH=H*0.8;
-  const wallTop=cy-wallH/2;
-  const wallBot=cy+wallH/2;
- 
-  // Left wall
-  const wallColor=room.style==='boss'?'#3a0000':room.style==='wide'?'#222233':'#1a1a1a';
-  const brickColor=room.style==='boss'?'#4a0000':'#252525';
- 
-  // Left wall surface
-  ctx2.fillStyle=wallColor;
-  ctx2.beginPath();
-  ctx2.moveTo(0,0);ctx2.lineTo(W*0.22,wallTop);
-  ctx2.lineTo(W*0.22,wallBot);ctx2.lineTo(0,H);
-  ctx2.closePath();ctx2.fill();
- 
-  // Right wall surface
-  ctx2.fillStyle=wallColor;
-  ctx2.beginPath();
-  ctx2.moveTo(W,0);ctx2.lineTo(W*0.78,wallTop);
-  ctx2.lineTo(W*0.78,wallBot);ctx2.lineTo(W,H);
-  ctx2.closePath();ctx2.fill();
- 
-  // Brick pattern on walls
-  drawBricks(0,0,W*0.22,H,brickColor,W*0.22,wallTop,wallBot,'left');
-  drawBricks(W*0.78,0,W*0.22,H,brickColor,W*0.78,wallTop,wallBot,'right');
- 
-  // Edge lines
-  ctx2.strokeStyle='#111';ctx2.lineWidth=2;
-  ctx2.beginPath();ctx2.moveTo(0,0);ctx2.lineTo(W*0.22,wallTop);ctx2.stroke();
-  ctx2.beginPath();ctx2.moveTo(0,H);ctx2.lineTo(W*0.22,wallBot);ctx2.stroke();
-  ctx2.beginPath();ctx2.moveTo(W,0);ctx2.lineTo(W*0.78,wallTop);ctx2.stroke();
-  ctx2.beginPath();ctx2.moveTo(W,H);ctx2.lineTo(W*0.78,wallBot);ctx2.stroke();
- 
-  // Wall accent lines (horizontal banding)
-  ctx2.strokeStyle='rgba(0,0,0,0.5)';ctx2.lineWidth=1;
-  for(let i=0;i<5;i++){
-    const y=wallTop+i*(wallH/5);
-    ctx2.beginPath();ctx2.moveTo(W*0.22,y);ctx2.lineTo(W*0.78,y);ctx2.stroke();
-  }
-}
- 
-function drawBricks(x,y,w,h,color,perspX,wallTop,wallBot,side){
-  // Simple horizontal brick lines
-  ctx2.strokeStyle='rgba(0,0,0,0.4)';ctx2.lineWidth=1;
-  const brickRows=8;
-  for(let i=0;i<=brickRows;i++){
-    const fy=i/brickRows;
-    // interpolate from screen edge to perspective wall edge
-    const ly=fy*h;
-    ctx2.beginPath();
-    if(side==='left'){ctx2.moveTo(0,ly);ctx2.lineTo(perspX,wallTop+(fy*(wallBot-wallTop)));}
-    else{ctx2.moveTo(W,ly);ctx2.lineTo(perspX,wallTop+(fy*(wallBot-wallTop)));}
-    ctx2.stroke();
-  }
-}
- 
-function drawOpening(W,H,room){
-  const cx=W/2,cy=H/2;
-  const wallH=H*0.8;
-  const wallTop=cy-wallH/2;
-  const wallBot=cy+wallH/2;
-  const openW=W*0.56; // width of the opening (between left and right walls)
-  const openL=W*0.22,openR=W*0.78;
- 
-  if(!room.exits.forward){
-    // Dead end wall
-    ctx2.fillStyle='#1a1a1a';
-    ctx2.fillRect(openL,wallTop,openW,wallH);
-    // Brick pattern
-    ctx2.strokeStyle='rgba(0,0,0,0.6)';ctx2.lineWidth=1;
-    const bW=openW/8,bH=wallH/10;
-    for(let row=0;row<10;row++){
-      for(let col=0;col<8;col++){
-        const ox=openL+col*bW+(row%2===0?0:bW/2);
-        const oy=wallTop+row*bH;
-        ctx2.strokeRect(ox,oy,bW,bH);
-      }
-    }
-    // "ŚCIANA" text
-    ctx2.fillStyle='rgba(80,80,80,0.6)';
-    ctx2.font='bold 14px Courier New';
-    ctx2.textAlign='center';
-    ctx2.fillText('[ ŚCIANA ]',W/2,H/2);
-    return;
-  }
- 
-  // Opening — darker tunnel inside
-  const innerL=cx-openW*0.25,innerR=cx+openW*0.25;
-  const innerT=cy-wallH*0.28,innerB=cy+wallH*0.28;
- 
-  // Perspective trapezoid for corridor ahead
-  ctx2.fillStyle='#050505';
-  ctx2.beginPath();
-  ctx2.moveTo(openL,wallTop);ctx2.lineTo(innerL,innerT);
-  ctx2.lineTo(innerL,innerB);ctx2.lineTo(openL,wallBot);
-  ctx2.closePath();ctx2.fill();
- 
-  ctx2.fillStyle='#050505';
-  ctx2.beginPath();
-  ctx2.moveTo(openR,wallTop);ctx2.lineTo(innerR,innerT);
-  ctx2.lineTo(innerR,innerB);ctx2.lineTo(openR,wallBot);
-  ctx2.closePath();ctx2.fill();
- 
-  // Deep dark center
-  const deepGrad=ctx2.createLinearGradient(innerL,0,innerR,0);
-  deepGrad.addColorStop(0,'#0a0a0a');deepGrad.addColorStop(0.5,'#000000');deepGrad.addColorStop(1,'#0a0a0a');
-  ctx2.fillStyle=deepGrad;
-  ctx2.fillRect(innerL,innerT,innerR-innerL,innerB-innerT);
- 
-  // Ceiling and floor of corridor
-  ctx2.fillStyle='#111';
-  ctx2.beginPath();
-  ctx2.moveTo(openL,wallTop);ctx2.lineTo(innerL,innerT);
-  ctx2.lineTo(innerR,innerT);ctx2.lineTo(openR,wallTop);
-  ctx2.closePath();ctx2.fill();
- 
-  ctx2.fillStyle='#222';
-  ctx2.beginPath();
-  ctx2.moveTo(openL,wallBot);ctx2.lineTo(innerL,innerB);
-  ctx2.lineTo(innerR,innerB);ctx2.lineTo(openR,wallBot);
-  ctx2.closePath();ctx2.fill();
- 
-  // Red light at end of tunnel
-  const redLight=ctx2.createRadialGradient(cx,cy,5,cx,cy,60);
-  redLight.addColorStop(0,'rgba(150,0,0,0.4)');
-  redLight.addColorStop(1,'transparent');
-  ctx2.fillStyle=redLight;
-  ctx2.fillRect(innerL,innerT,innerR-innerL,innerB-innerT);
- 
-  // Frame lines
-  ctx2.strokeStyle='#333';ctx2.lineWidth=2;
-  ctx2.strokeRect(openL,wallTop,openW,wallH);
-}
- 
-function drawSidePassage(W,H,side){
-  const cx=W/2,cy=H/2;
-  const wallH=H*0.8;
-  const wallTop=cy-wallH/2;
-  const wallBot=cy+wallH/2;
- 
-  const px=side==='left'?W*0.22:W*0.78;
-  const dx=side==='left'?-1:1;
-  const passW=W*0.12;
- 
-  // Side passage opening
-  ctx2.fillStyle='#080808';
-  if(side==='left'){
-    ctx2.fillRect(px-passW,wallTop,passW,wallH);
-    // Dark inside
-    const g=ctx2.createLinearGradient(px-passW,0,px,0);
-    g.addColorStop(0,'#000');g.addColorStop(1,'rgba(0,0,0,0)');
-    ctx2.fillStyle=g;
-    ctx2.fillRect(px-passW,wallTop,passW,wallH);
-  } else {
-    ctx2.fillRect(px,wallTop,passW,wallH);
-    const g=ctx2.createLinearGradient(px,0,px+passW,0);
-    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'#000');
-    ctx2.fillStyle=g;
-    ctx2.fillRect(px,wallTop,passW,wallH);
-  }
-}
- 
-function addWallNoise(W,H){
-  // Very subtle pixel noise on walls for texture
-  const imgData=ctx2.getImageData(0,0,W,H);
-  const d=imgData.data;
-  for(let i=0;i<d.length;i+=4){
-    const n=(Math.random()-0.5)*12;
-    d[i]=Math.max(0,Math.min(255,d[i]+n));
-    d[i+1]=Math.max(0,Math.min(255,d[i+1]+n));
-    d[i+2]=Math.max(0,Math.min(255,d[i+2]+n));
-  }
-  ctx2.putImageData(imgData,0,0);
-}
- 
-// ═══════════════════════════════════════════════════
-// MONSTER SPRITE (pixel art drawn on canvas)
-// ═══════════════════════════════════════════════════
-function renderMonster(){
-  const md=document.getElementById('monster-display');
-  md.innerHTML='';
-  if(!currentMonster) return;
- 
-  const m=currentMonster;
-  const wrap=document.createElement('div');
-  wrap.style.cssText=`position:relative;display:flex;flex-direction:column;align-items:center;padding-bottom:60px;`;
- 
-  // Monster sprite canvas
-  const mc=document.createElement('canvas');
-  const sz=Math.min(180,window.innerHeight*0.35);
-  mc.width=sz;mc.height=sz;
-  mc.style.cssText=`image-rendering:pixelated;filter:drop-shadow(0 0 20px ${m.color});animation:monsterBob 1s ease-in-out infinite;`;
- 
-  // Add CSS animation
-  if(!document.getElementById('monster-style')){
-    const st=document.createElement('style');
-    st.id='monster-style';
-    st.textContent=`
-      @keyframes monsterBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
-      @keyframes monsterDmg{0%,100%{filter:drop-shadow(0 0 20px ${m.color});}50%{filter:drop-shadow(0 0 40px #ffffff) brightness(3);}}
-    `;
-    document.head.appendChild(st);
-  }
- 
-  drawMonsterSprite(mc.getContext('2d'),m,sz);
-  wrap.appendChild(mc);
- 
-  // HP bar
-  const hpWrap=document.createElement('div');
-  hpWrap.style.cssText=`width:${sz}px;margin-top:8px;`;
-  const hpPct=m.hp/m.maxHp*100;
-  hpWrap.innerHTML=`
-    <div style="font-size:.7rem;color:#888;text-align:center;font-family:monospace;margin-bottom:3px;">${m.name} — ${m.hp}/${m.maxHp} HP</div>
-    <div style="height:8px;background:#330000;border:1px solid #550000;border-radius:1px;">
-      <div style="height:100%;width:${hpPct}%;background:${hpPct>50?'#cc0000':hpPct>25?'#ff6600':'#ff0000'};transition:width .3s;border-radius:1px;"></div>
-    </div>`;
-  wrap.appendChild(hpWrap);
- 
-  md.appendChild(wrap);
-}
- 
-function drawMonsterSprite(c,m,sz){
-  // Pixel art monsters — different for each type
-  const scale=sz/16;
-  c.imageSmoothingEnabled=false;
- 
-  function px(x,y,col,w=1,h=1){
-    c.fillStyle=col;
-    c.fillRect(x*scale,y*scale,w*scale,h*scale);
-  }
- 
-  const col=m.color;
-  const dark=shadeColor(col,-50);
-  const lite=shadeColor(col,50);
- 
-  if(m.id==='zombie'){
-    // Simple zombie
-    px(5,1,lite,6,1);px(4,2,col,8,2);px(4,4,dark,8,1);
-    px(5,5,col,6,4);px(3,5,dark,2,3);px(11,5,dark,2,3);
-    px(5,9,col,2,5);px(9,9,col,2,5);
-    px(4,1,col,1,1);px(11,1,col,1,1); // ears
-    px(6,2,'#88ff88',1,1);px(9,2,'#88ff88',1,1); // eyes
-    px(6,4,'#440000',4,1); // mouth
-  } else if(m.id==='imp'){
-    px(6,0,'#ff4400',4,1);px(5,1,col,6,2);px(4,3,dark,8,2);
-    px(5,5,col,6,3);px(3,4,col,2,4);px(11,4,col,2,4);
-    px(5,8,col,2,5);px(9,8,col,2,5);
-    px(6,1,lite,1,1);px(9,1,lite,1,1);
-    px(6,3,'#ffcc00',4,1);
-    // horns
-    px(5,0,'#ff6600',1,1);px(10,0,'#ff6600',1,1);
-  } else if(m.id==='skull'){
-    px(5,1,'#cccccc',6,1);px(4,2,'#aaaaaa',8,4);
-    px(4,6,'#aaaaaa',3,1);px(9,6,'#aaaaaa',3,1);
-    px(5,7,'#aaaaaa',6,1);
-    px(5,2,'#000',2,2);px(9,2,'#000',2,2); // eye sockets
-    px(6,5,'#000',4,1); // teeth gap
-    px(6,6,'#fff',1,1);px(8,6,'#fff',1,1);px(10,6,'#fff',1,1);
-    // flame
-    px(4,0,'#ff6600',1,2);px(11,0,'#ff6600',1,2);
-    px(7,0,'#ffcc00',2,1);
-  } else if(m.id==='demon'){
-    px(4,1,'#660088',8,1);px(3,2,'#7700aa',10,3);px(3,5,col,10,3);
-    px(4,8,col,8,4);
-    px(2,3,dark,2,3);px(12,3,dark,2,3);
-    px(5,8,col,2,5);px(9,8,col,2,5);
-    px(5,2,'#ff00ff',2,1);px(9,2,'#ff00ff',2,1); // eyes
-    px(5,5,'#ff0000',6,1); // mouth
-    px(6,4,'#ffcc00',1,1);px(9,4,'#ffcc00',1,1); // fangs
-    px(3,0,'#440066',2,2);px(11,0,'#440066',2,2); // horns
-  } else if(m.id==='baron'){
-    // Big baron
-    for(let i=0;i<16;i++) for(let j=0;j<16;j++) px(i,j,'transparent');
-    px(4,0,'#880000',8,1);px(3,1,'#aa0000',10,3);px(2,4,'#cc0000',12,4);
-    px(2,8,'#cc0000',12,4);px(3,12,col,10,2);
-    px(1,3,dark,2,6);px(13,3,dark,2,6);
-    px(4,12,col,2,4);px(10,12,col,2,4);
-    px(5,2,'#ffcc00',2,2);px(9,2,'#ffcc00',2,2); // eyes
-    px(4,6,'#ff0000',8,1); // mouth
-    px(5,5,lite,1,1);px(7,5,lite,1,1);px(9,5,lite,1,1); // teeth
-  } else {
-    // Cyberdemon — massive
-    px(3,0,'#ff4400',10,2);px(2,2,'#884400',12,6);px(1,8,'#663300',14,6);
-    px(2,14,col,4,2);px(10,14,col,4,2);
-    px(0,4,dark,2,6);px(14,4,dark,2,6);
-    px(4,2,'#ff0000',3,2);px(9,2,'#ff0000',3,2);
-    px(4,6,'#00ffff',8,2);
-    px(6,4,'#ffcc00',4,2); // visor
-    px(13,6,'#888',3,4); // arm cannon
-  }
-}
- 
-function shadeColor(col,amt){
-  let r=parseInt(col.slice(1,3),16),g=parseInt(col.slice(3,5),16),b=parseInt(col.slice(5,7),16);
-  r=Math.max(0,Math.min(255,r+amt));g=Math.max(0,Math.min(255,g+amt));b=Math.max(0,Math.min(255,b+amt));
-  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-}
- 
-// ═══════════════════════════════════════════════════
-// UI HELPERS
-// ═══════════════════════════════════════════════════
-let logLines=[];
-function addLog(msg,type='move'){
-  logLines.unshift({msg,type});if(logLines.length>12)logLines.pop();
-  const el=document.getElementById('log');
-  el.innerHTML=logLines.map(l=>`<div class="log-line ${l.type}">${l.msg}</div>`).join('');
-}
- 
-function showNavButtons(){
-  const room=worldMap[roomIndex];
-  const nb=document.getElementById('nav-btns');
-  nb.classList.add('show');
-  const bl=document.getElementById('btn-left');
-  const br=document.getElementById('btn-right');
-  const bb=document.getElementById('btn-back');
-  bl.style.display=room.exits.left?'block':'none';
-  br.style.display=room.exits.right?'block':'none';
-  bb.style.display=room.exits.back?'block':'none';
-  document.getElementById('btn-fwd').style.display=room.exits.forward?'block':'none';
-}
- 
-function hideNavButtons(){
-  document.getElementById('nav-btns').classList.remove('show');
-}
- 
-function flashScreen(color,dur){
-  const fl=document.getElementById('flash-overlay');
-  fl.style.background=color;fl.style.opacity='0.4';
-  setTimeout(()=>{fl.style.opacity='0';},dur);
-}
- 
-function showDmgFloat(val,color,big=false){
-  const wrap=document.getElementById('view-wrap');
-  const el=document.createElement('div');
-  el.className='dmg-float';
-  el.style.color=color;
-  el.style.fontSize=big?'2.5rem':'1.8rem';
-  el.textContent=typeof val==='number'?`-${val}`:val;
-  el.style.left=(30+Math.random()*40)+'%';
-  el.style.top=(20+Math.random()*40)+'%';
-  wrap.appendChild(el);
-  setTimeout(()=>el.remove(),900);
-}
- 
-function setFace(emoji){document.getElementById('face-hud').textContent=emoji;}
- 
-function updateHUD(){
-  document.getElementById('hp-val').textContent=player.hp;
-  document.getElementById('hp-fill').style.width=(player.hp/player.maxHp*100)+'%';
-  document.getElementById('lvl-val').textContent=player.level;
-  document.getElementById('score-val').textContent=player.score;
-  const nextXp=XP_PER_LEVEL[Math.min(player.level+1,XP_PER_LEVEL.length-1)];
-  const prevXp=XP_PER_LEVEL[player.level]||0;
-  const pct=nextXp>prevXp?((player.xp-prevXp)/(nextXp-prevXp)*100):100;
-  document.getElementById('xp-fill').style.width=Math.min(100,pct)+'%';
-}
- 
-function renderComboSeq(){
-  const el=document.getElementById('combo-seq');
-  el.innerHTML=comboBuffer.map(n=>`<span class="combo-note-chip new">${n}</span>`).join('');
-}
- 
-function renderCombosPanel(){
-  const list=document.getElementById('combos-list');
-  list.innerHTML='';
-  ALL_COMBOS.forEach(c=>{
-    const locked=c.minLvl>player.level;
-    const div=document.createElement('div');
-    div.className='combo-entry'+(locked?' locked':'');
-    div.innerHTML=`<span class="seq">${c.seq.join('-')}</span><span class="effect">${c.name}</span><span class="dmg">${locked?'???':`${c.dmg[0]}-${c.dmg[1]}`}</span>`;
-    list.appendChild(div);
+
+// Draw player
+function drawPlayer() {
+  document.querySelectorAll('.hex').forEach(hex => {
+    hex.innerHTML = '';
+    hex.style.border = 'none';
   });
+  const currentHex = getHex(playerPosition.x, playerPosition.y);
+  const playerDot = document.createElement('div');
+  playerDot.className = 'player';
+  currentHex.appendChild(playerDot);
 }
- 
-// ═══════════════════════════════════════════════════
-// AUDIO — SOUNDS
-// ═══════════════════════════════════════════════════
-let audioCtx=null;
-function getACtx(){
-  if(!audioCtx||audioCtx.state==='closed') audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
-  return audioCtx;
+drawPlayer();
+
+function getHex(x, y) {
+  return document.querySelector(`.hex[data-x='${x}'][data-y='${y}']`);
 }
- 
-function playHitSound(strength){
-  try{
-    const ac=getACtx(),now=ac.currentTime;
-    const osc=ac.createOscillator(),g=ac.createGain();
-    osc.connect(g);g.connect(ac.destination);
-    if(strength>=4){
-      osc.type='sawtooth';osc.frequency.setValueAtTime(180,now);
-      osc.frequency.exponentialRampToValueAtTime(40,now+0.4);
-      g.gain.setValueAtTime(0.4,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.4);
-      osc.start(now);osc.stop(now+0.4);
-    } else if(strength>=3){
-      osc.type='square';osc.frequency.setValueAtTime(220,now);
-      osc.frequency.exponentialRampToValueAtTime(80,now+0.25);
-      g.gain.setValueAtTime(0.3,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.25);
-      osc.start(now);osc.stop(now+0.25);
-    } else if(strength>=2){
-      osc.type='triangle';osc.frequency.setValueAtTime(300,now);
-      osc.frequency.exponentialRampToValueAtTime(150,now+0.15);
-      g.gain.setValueAtTime(0.25,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.15);
-      osc.start(now);osc.stop(now+0.15);
-    } else {
-      osc.type='sine';osc.frequency.setValueAtTime(400,now);
-      osc.frequency.exponentialRampToValueAtTime(200,now+0.1);
-      g.gain.setValueAtTime(0.2,now);g.gain.exponentialRampToValueAtTime(0.001,now+0.1);
-      osc.start(now);osc.stop(now+0.1);
-    }
-  }catch(e){}
-}
- 
-function playLevelUpSound(){
-  try{
-    const ac=getACtx(),now=ac.currentTime;
-    [523,659,784,1047].forEach((f,i)=>{
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.connect(g);g.connect(ac.destination);
-      o.type='sine';o.frequency.value=f;
-      g.gain.setValueAtTime(0,now+i*0.1);
-      g.gain.linearRampToValueAtTime(0.3,now+i*0.1+0.05);
-      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.1+0.3);
-      o.start(now+i*0.1);o.stop(now+i*0.1+0.3);
-    });
-  }catch(e){}
-}
- 
-// ═══════════════════════════════════════════════════
-// MICROPHONE & PITCH DETECTION
-// ═══════════════════════════════════════════════════
-let micOn=false,micStream=null,analyser=null,pitchInt=null;
-let freqHistory=[],detCooldown=0;
- 
-async function toggleMic(){
-  if(micOn){stopMic();return;}
-  try{
-    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    const ac=getACtx();
-    const src=ac.createMediaStreamSource(micStream);
-    const gain=ac.createGain();gain.gain.value=4.0;src.connect(gain);
-    analyser=ac.createAnalyser();analyser.fftSize=8192;analyser.smoothingTimeConstant=0.3;
-    gain.connect(analyser);
-    micOn=true;
-    document.getElementById('mic-toggle').textContent='🎤 MIC: ON';
-    document.getElementById('mic-toggle').classList.add('on');
-    pitchInt=setInterval(detectPitch,50);
-  }catch(e){alert('Brak dostępu do mikrofonu: '+e.message);}
-}
- 
-function stopMic(){
-  if(pitchInt){clearInterval(pitchInt);pitchInt=null;}
-  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
-  micOn=false;
-  document.getElementById('mic-toggle').textContent='🎤 MIC: OFF';
-  document.getElementById('mic-toggle').classList.remove('on');
-  document.getElementById('det-note').textContent='—';
-  document.getElementById('pitch-fill2').style.width='0';
-}
- 
-function detectPitch(){
-  if(!analyser) return;
-  const buf=new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
-  const vol=getRMS(buf);
-  document.getElementById('pitch-fill2').style.width=Math.min(100,vol*500)+'%';
- 
-  if(vol<0.002){freqHistory=[];document.getElementById('det-note').textContent='—';return;}
- 
-  const freq=autoCorr(buf,getACtx().sampleRate);
-  if(freq<0){freqHistory=[];return;}
- 
-  freqHistory.push(freq);if(freqHistory.length>4)freqHistory.shift();
- 
-  let bestIdx=-1,bestDist=Infinity;
-  NOTES.forEach((n,i)=>{const d=Math.abs(freq-n.freq)/n.freq;if(d<bestDist){bestDist=d;bestIdx=i;}});
-  if(bestDist>0.10){document.getElementById('det-note').textContent='?';return;}
- 
-  document.getElementById('det-note').textContent=NOTES[bestIdx].l;
- 
-  const matchCount=freqHistory.filter(f=>{
-    let bi=-1,bd=Infinity;
-    NOTES.forEach((n,i)=>{const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bi=i;}});
-    return bi===bestIdx;
-  }).length;
- 
-  if(matchCount>=2&&detCooldown===0){
-    detCooldown=12;
-    noteTriggered(NOTES[bestIdx].n);
-  }
-  if(detCooldown>0) detCooldown--;
-}
- 
-function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.length);}
- 
-function autoCorr(buf,sr){
-  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
-  if(rms<0.001)return-1;
-  let r1=0,r2=buf.length-1;
-  for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.12){r1=i;break;}}
-  for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.12){r2=buf.length-i;break;}}
-  const s=buf.slice(r1,r2);if(s.length<2)return-1;
-  const c=new Float32Array(s.length);
-  for(let i=0;i<s.length;i++)for(let j=0;j<s.length-i;j++)c[i]+=s[j]*s[j+i];
-  let d=0;while(d<c.length-1&&c[d]>c[d+1])d++;
-  let mv=-1,mp=-1;for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
-  if(mp<1)return-1;
-  let T=mp;
-  if(T>0&&T<c.length-1){const a=(c[T-1]+c[T+1]-2*c[T])/2,b2=(c[T+1]-c[T-1])/2;if(a)T-=b2/(2*a);}
-  const f=sr/T;return(f<60||f>2000)?-1:f;
-}
- 
-// ═══════════════════════════════════════════════════
-// KEYBOARD FALLBACK
-// ═══════════════════════════════════════════════════
-document.addEventListener('keydown',e=>{
-  if(!gameStarted) return;
-  const noteMap={c:'C',d:'D',e:'E',f:'F',g:'G',a:'A',h:'H',C:'C',D:'D',E:'E',F:'F',G:'G',A:'A',H:'H'};
-  if(noteMap[e.key]){
-    const n=noteMap[e.key];
-    document.getElementById('det-note').textContent=n+'¹';
-    noteTriggered(n);
-    return;
-  }
-  if(!inFight){
-    if(e.key==='ArrowUp'||e.key==='w'||e.key==='Enter') move('forward');
-    if(e.key==='ArrowLeft'||e.key==='q') move('left');
-    if(e.key==='ArrowRight'||e.key==='e') move('right');
-    if(e.key==='ArrowDown'||e.key==='s') move('back');
-  }
+
+// Microphone setup
+document.getElementById('startMic').addEventListener('click', () => {
+  startMicrophone();
 });
- 
-// ═══════════════════════════════════════════════════
-// START / RESET
-// ═══════════════════════════════════════════════════
-function startGame(){
-  document.getElementById('title-screen').style.display='none';
-  document.getElementById('game-root').style.display='flex';
-  gameStarted=true;
- 
-  // Init player
-  player={hp:100,maxHp:100,xp:0,level:1,score:0,kills:0};
-  roomIndex=0;
-  inFight=false;
-  currentMonster=null;
-  logLines=[];comboBuffer=[];
- 
-  genWorld();
-  resizeCanvas();
-  drawView('forward');
-  updateHUD();
-  renderCombosPanel();
-  showNavButtons();
- 
-  addLog('⚔ Wchodzisz do DOOM MUSIC...','move');
-  addLog('🎤 Włącz mikrofon lub używaj klawiatury (C D E F G A H)','move');
-  addLog('⚡ Gdy wróg atakuje: graj nuty aby zadawać ciosy!','move');
+
+function startMicrophone() {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      microphoneStream = audioContext.createMediaStreamSource(stream);
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 2048;
+      microphoneStream.connect(analyser);
+      statusDiv.innerText = 'Microphone started. Sing a note!';
+      microphoneActive = true;
+      detectPitch();
+    }).catch(err => {
+      statusDiv.innerText = 'Microphone access denied.';
+    });
+  } else {
+    statusDiv.innerText = 'Microphone not supported in this browser.';
+  }
 }
- 
-function resetGame(){
-  if(micOn) stopMic();
-  if(enemyAttackTimer){clearInterval(enemyAttackTimer);enemyAttackTimer=null;}
-  document.getElementById('title-screen').style.display='none';
-  startGame();
+
+// Pitch detection using auto-correlation
+function detectPitch() {
+  const bufferLength = analyser.fftSize;
+  const buffer = new Float32Array(bufferLength);
+
+  setInterval(() => {
+    analyser.getFloatTimeDomainData(buffer);
+    const pitchFreq = autoCorrelate(buffer, audioContext.sampleRate);
+    if (pitchFreq !== -1) {
+      const note = getNoteFromFrequency(pitchFreq);
+      statusDiv.innerText = 'Detected note: ' + note;
+      handleNoteInput(note);
+    }
+  }, 500);
 }
- 
-window.addEventListener('resize',()=>{resizeCanvas();if(gameStarted)drawView('forward');});
-resizeCanvas();
+
+// Auto-correlation pitch detection
+function autoCorrelate(buf, sampleRate) {
+  let SIZE = buf.length;
+  let MAX_SAMPLES = Math.floor(SIZE/2);
+  let bestOffset = -1;
+  let bestCorrelation = 0;
+  let rms = 0;
+  for (let i=0; i < SIZE; i++) {
+    let val = buf[i];
+    rms += val*val;
+  }
+  rms = Math.sqrt(rms/SIZE);
+  if (rms < 0.01) // too quiet
+    return -1;
+
+  let correlations = new Array(MAX_SAMPLES);
+  for (let offset=0; offset < MAX_SAMPLES; offset++) {
+    let correlation = 0;
+
+    for (let i=0; i < MAX_SAMPLES; i++) {
+      correlation += buf[i] * buf[i+offset];
+    }
+    correlations[offset] = correlation;
+    if (correlation > bestCorrelation) {
+      bestCorrelation = correlation;
+      bestOffset = offset;
+    }
+  }
+
+  if (bestCorrelation > 0.01) {
+    let freq = sampleRate / bestOffset;
+    return freq;
+  }
+  return -1;
+}
+
+// Map frequency to note
+function getNoteFromFrequency(freq) {
+  const noteFreqs = {
+    'C': 261.63,
+    'D': 293.66,
+    'E': 329.63,
+    'F': 349.23,
+    'G': 392.00,
+    'A': 440.00,
+    'B': 493.88
+  };
+  let closestNote = null;
+  let minDiff = Infinity;
+  for (const [note, noteFreq] of Object.entries(noteFreqs)) {
+    const diff = Math.abs(freq - noteFreq);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestNote = note;
+    }
+  }
+  return closestNote;
+}
+
+// Handle singing notes for movement and actions
+let lastNote = null;
+function handleNoteInput(note) {
+  // Prevent repeated triggers
+  if (note === lastNote) return;
+  lastNote = note;
+
+  // Movement
+  if (note === 'C') movePlayer(0, -1); // up
+  if (note === 'D') movePlayer(1, 0); // right
+  if (note === 'E') movePlayer(0, 1); // down
+  if (note === 'F') movePlayer(-1, 0); // left
+
+  // Plant seed with G
+  if (note === 'G') {
+    plantSeed();
+  }
+
+  // Harvest with A
+  if (note === 'A') {
+    harvestPlant();
+  }
+
+  // Water with B (if a seed is present)
+  if (note === 'B') {
+    waterPlant();
+  }
+}
+
+// Movement
+function movePlayer(dx, dy) {
+  const newX = playerPosition.x + dx;
+  const newY = playerPosition.y + dy;
+  if (newX >= 0 && newX < mapSize && newY >= 0 && newY < mapSize) {
+    playerPosition.x = newX;
+    playerPosition.y = newY;
+    drawPlayer();
+    updateTileStatus();
+  }
+}
+
+// Plant seed
+function plantSeed() {
+  const tile = mapTiles[playerPosition.x][playerPosition.y];
+  if (!tile.hasSeed) {
+    tile.hasSeed = true;
+    tile.isGrowing = true;
+    tile.watered = false;
+    updateTileVisual(playerPosition.x, playerPosition.y);
+  }
+}
+
+// Harvest plant
+function harvestPlant() {
+  const tile = mapTiles[playerPosition.x][playerPosition.y];
+  if (tile.hasSeed && !tile.isGrowing) {
+    tile.hasSeed = false;
+    tile.watered = false;
+    updateTileVisual(playerPosition.x, playerPosition.y, true);
+  } else {
+    alert('Nothing to harvest here!');
+  }
+}
+
+// Water plant
+function waterPlant() {
+  const tile = mapTiles[playerPosition.x][playerPosition.y];
+  if (tile.hasSeed && tile.isGrowing) {
+    tile.watered = true;
+    updateTileVisual(playerPosition.x, playerPosition.y);
+  }
+}
+
+// Update tile visual
+function updateTileVisual(x, y, harvested=false) {
+  const hex = getHex(x, y);
+  const tile = mapTiles[x][y];
+  hex.innerHTML = '';
+  if (tile.hasSeed) {
+    const seedDiv = document.createElement('div');
+    seedDiv.innerText = tile.isGrowing ? '🌱' : '🌳';
+    if (tile.watered) seedDiv.innerText = '💧' + seedDiv.innerText;
+    hex.appendChild(seedDiv);
+  } else {
+    hex.innerText = '';
+  }
+}
+
+// Update tile state when player moves
+function updateTileStatus() {
+  const tile = mapTiles[playerPosition.x][playerPosition.y];
+  if (tile.hasSeed && tile.isGrowing && tile.watered) {
+    // Grow seed over time
+    setTimeout(() => {
+      tile.isGrowing = false; // plant is ready
+      updateTileVisual(playerPosition.x, playerPosition.y);
+    }, 3000); // 3 seconds to grow
+  }
+}
+
 </script>
 </body>
 </html>
