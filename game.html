@@ -3,847 +3,1215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Nutowy Dungeon – Łukasz Ganczarek</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<title>Muzyczna Farma</title>
+<link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Crimson+Text:wght@400;600&display=swap)" rel="stylesheet">
 <style>
-:root{
-  --gold:#d4af37;--gold2:#f0d060;--navy:#1e3a8a;
-  --dark:#0a0d14;--dark2:#111827;--dark3:#1a2235;
-  --red:#c0392b;--green:#16a34a;--purple:#7c3aed;
-  --border:#2a3a5a;--text:#c8d4e8;
-}
+:root{--gold:#d4af37;--dark:#1a1208;--ui-bg:rgba(18,12,4,0.96);--ui-border:#5a3e1b;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--dark);font-family:'Crimson Text',serif;color:var(--text);min-height:100vh;overflow:hidden;display:flex;flex-direction:column;}
- 
-/* ── Stars background ── */
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,#1a2a4a 0%,#0a0d14 60%);z-index:0;}
- 
-#game-root{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
- 
-/* ── Top HUD ── */
-#hud{display:flex;align-items:center;gap:12px;padding:8px 16px;background:rgba(10,13,20,0.9);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
-.hud-title{font-family:'Cinzel',serif;font-size:1rem;font-weight:900;color:var(--gold);letter-spacing:0.15em;white-space:nowrap;}
-.hud-sep{width:1px;height:24px;background:var(--border);}
-.hud-stat{display:flex;align-items:center;gap:6px;font-size:0.8rem;}
-.hud-label{color:#64748b;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;}
-.hp-bar{width:90px;height:8px;background:#1a2235;border-radius:4px;border:1px solid var(--border);overflow:hidden;}
-.hp-fill{height:100%;background:linear-gradient(90deg,#c0392b,#e74c3c);border-radius:4px;transition:width 0.3s;}
-.score-val{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);font-weight:700;}
-.level-val{font-family:'Cinzel',serif;font-size:1rem;color:#a78bfa;font-weight:700;}
-.mic-btn{padding:5px 14px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-family:'Crimson Text',serif;font-size:0.82rem;cursor:pointer;transition:.2s;white-space:nowrap;}
-.mic-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.1);}
-.mic-btn:hover{border-color:var(--gold);}
- 
-/* ── Pitch display ── */
-#pitch-panel{display:flex;align-items:center;gap:10px;margin-left:auto;}
-.detected-note{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold2);min-width:48px;text-align:center;text-shadow:0 0 12px rgba(240,208,96,0.6);}
-.pitch-meter{width:60px;height:6px;background:#1a2235;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
-.pitch-fill{height:100%;width:0;background:var(--gold);border-radius:3px;transition:width .08s;}
- 
-/* ── Main game area ── */
-#game-area{flex:1;display:flex;overflow:hidden;min-height:0;}
- 
-/* ── Canvas ── */
-#hex-canvas{display:block;flex:1;min-width:0;}
- 
-/* ── Right panel ── */
-#right-panel{width:200px;flex-shrink:0;background:rgba(10,13,20,0.95);border-left:1px solid var(--border);display:flex;flex-direction:column;gap:0;overflow-y:auto;}
-.panel-section{padding:12px;border-bottom:1px solid var(--border);}
-.panel-title{font-family:'Cinzel',serif;font-size:0.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;}
-.note-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
-.note-card{background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:5px 4px;text-align:center;transition:.2s;}
-.note-card.target{border-color:var(--gold);background:rgba(212,175,55,0.15);box-shadow:0 0 8px rgba(212,175,55,0.3);}
-.note-card.ok{border-color:var(--green);background:rgba(22,163,74,0.2);}
-.note-card-name{font-family:'Cinzel',serif;font-size:0.85rem;font-weight:700;color:var(--gold2);}
-.note-card-action{font-size:0.62rem;color:#64748b;margin-top:1px;}
-.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:0.78rem;}
-.legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
-.log-list{display:flex;flex-direction:column;gap:3px;max-height:140px;overflow-y:auto;}
-.log-entry{font-size:0.72rem;color:#64748b;padding:2px 0;border-bottom:1px solid rgba(42,58,90,0.4);}
-.log-entry.good{color:#4ade80;}
-.log-entry.bad{color:#f87171;}
-.log-entry.info{color:#93c5fd;}
- 
-/* ── Overlays ── */
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-.overlay-box{background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:36px 40px;text-align:center;max-width:420px;width:90%;}
-.overlay-title{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;color:var(--gold);margin-bottom:12px;}
-.overlay-sub{font-size:1rem;color:var(--text);line-height:1.6;margin-bottom:20px;}
-.overlay-btn{padding:12px 32px;border-radius:50px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-family:'Cinzel',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:0.1em;}
-.overlay-btn:hover{background:var(--gold);color:var(--dark);}
- 
-/* ── Bottom note display (mobile) ── */
-#bottom-note{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,13,20,0.97);border-top:1px solid var(--border);padding:8px 16px;z-index:50;text-align:center;}
-@media(max-width:600px){
-  #right-panel{display:none;}
-  #bottom-note{display:block;}
-  .hud-title{font-size:0.85rem;}
-}
- 
-/* ── Animations ── */
-@keyframes pulse-gold{0%,100%{text-shadow:0 0 8px rgba(212,175,55,0.4);}50%{text-shadow:0 0 20px rgba(212,175,55,0.9);}}
-@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
-@keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.3);}100%{transform:scale(1);}}
+body{background:#1a1208;font-family:'Crimson Text',serif;color:#f0e4c4;overflow:hidden;height:100vh;display:flex;flex-direction:column;}
+#topbar{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--ui-bg);border-bottom:2px solid var(--ui-border);flex-shrink:0;flex-wrap:wrap;z-index:50;}
+.tb-pix{font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--gold);}
+.tb-sep{width:1px;height:18px;background:var(--ui-border);}
+.tb-s{display:flex;align-items:center;gap:4px;}
+.tb-lbl{color:#8a6a3a;font-size:0.65rem;font-weight:600;text-transform:uppercase;}
+.gold-v{font-family:'Press Start 2P',monospace;font-size:0.58rem;color:var(--gold);}
+.mic-btn{padding:3px 10px;border-radius:3px;border:1.5px solid var(--ui-border);background:transparent;color:#f0e4c4;font-size:0.72rem;cursor:pointer;font-family:'Crimson Text',serif;}
+.mic-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.12);}
+.note-disp{font-family:'Press Start 2P',monospace;font-size:0.62rem;color:#7fff7f;min-width:38px;text-align:center;}
+.oct-row{display:flex;gap:3px;}
+.oct-b{padding:2px 7px;border-radius:3px;border:1px solid var(--ui-border);background:transparent;color:#8a6a3a;font-size:0.65rem;cursor:pointer;font-family:'Crimson Text',serif;}
+.oct-b.active{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.14);}
+.tool-v{font-size:0.78rem;color:#c8e4a0;}
+#game-wrap{flex:1;display:flex;overflow:hidden;min-height:0;}
+#gc{display:block;cursor:crosshair;}
+#rpanel{width:185px;flex-shrink:0;background:var(--ui-bg);border-left:2px solid var(--ui-border);display:flex;flex-direction:column;overflow-y:auto;}
+.rp-s{padding:9px;border-bottom:1px solid var(--ui-border);}
+.rp-t{font-family:'Press Start 2P',monospace;font-size:0.48rem;color:var(--gold);margin-bottom:7px;letter-spacing:.04em;}
+.nm-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.nm-cell{background:#110d04;border:1px solid var(--ui-border);border-radius:3px;padding:3px 2px;text-align:center;}
+.nm-cell.lit{border-color:#7fff7f;background:rgba(127,255,127,0.1);}
+.nm-note{font-family:'Press Start 2P',monospace;font-size:0.46rem;color:var(--gold);}
+.nm-act{font-size:0.6rem;color:#8a6a3a;margin-top:1px;}
+.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+.inv-item{background:#110d04;border:1px solid var(--ui-border);border-radius:3px;padding:5px;text-align:center;cursor:pointer;transition:.15s;}
+.inv-item.sel{border-color:var(--gold);}
+.inv-icon{font-size:1.1rem;}.inv-lbl{font-size:0.58rem;color:#8a6a3a;margin-top:1px;}.inv-cnt{font-size:0.6rem;color:var(--gold);}
+.log-list{max-height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.log-e{font-size:0.67rem;padding:2px 0;border-bottom:1px solid rgba(90,62,27,0.3);}
+.log-e.good{color:#7fff7f;}.log-e.bad{color:#ff8080;}.log-e.info{color:#93c5fd;}.log-e.gld{color:var(--gold);}
+#dlg{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);width:min(500px,92vw);background:#100c04;border:2px solid var(--ui-border);border-radius:6px;padding:14px 18px;z-index:200;display:none;}
+#dlg.show{display:block;}
+.dlg-name{font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--gold);margin-bottom:6px;}
+.dlg-txt{font-size:0.88rem;line-height:1.55;}
+.dlg-close{margin-top:9px;padding:4px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:0.75rem;cursor:pointer;border-radius:3px;font-family:'Crimson Text',serif;}
+#shop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(540px,94vw);background:#100c04;border:2px solid var(--ui-border);border-radius:8px;padding:18px;z-index:300;display:none;max-height:88vh;overflow-y:auto;}
+#shop.show{display:block;}
+.sh-title{font-family:'Press Start 2P',monospace;font-size:0.58rem;color:var(--gold);text-align:center;margin-bottom:12px;}
+.sh-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.sh-tab{padding:4px 12px;border:1px solid var(--ui-border);background:transparent;color:#8a6a3a;font-size:0.72rem;cursor:pointer;border-radius:3px;font-family:'Crimson Text',serif;}
+.sh-tab.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.1);}
+.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.sh-card{background:#1a1208;border:1px solid var(--ui-border);border-radius:5px;padding:9px;text-align:center;}
+.sh-icon{font-size:1.4rem;}.sh-name{font-size:0.75rem;font-weight:600;color:#f0e4c4;margin:3px 0 2px;}
+.sh-desc{font-size:0.6rem;color:#8a6a3a;margin-bottom:5px;}
+.sh-price{font-family:'Press Start 2P',monospace;font-size:0.46rem;color:var(--gold);margin-bottom:5px;}
+.sh-btn{padding:3px 10px;border-radius:3px;border:1px solid var(--ui-border);background:transparent;color:#f0e4c4;font-size:0.68rem;cursor:pointer;}
+.sh-btn:hover{border-color:var(--gold);color:var(--gold);}
+.sh-btn:disabled{opacity:.35;cursor:not-allowed;}
+.sh-close{display:block;margin:10px auto 0;padding:5px 18px;border-radius:4px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:0.75rem;cursor:pointer;font-family:'Crimson Text',serif;}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;align-items:center;justify-content:center;}
+.ov-box{background:#100c04;border:2px solid var(--ui-border);border-radius:10px;padding:28px 32px;text-align:center;max-width:400px;width:92%;}
+.ov-title{font-family:'Press Start 2P',monospace;font-size:0.85rem;color:var(--gold);line-height:1.7;margin-bottom:12px;}
+.ov-sub{font-size:0.87rem;color:#c8b090;line-height:1.65;margin-bottom:16px;}
+.ov-btn{padding:9px 24px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-family:'Press Start 2P',monospace;font-size:0.52rem;cursor:pointer;border-radius:5px;}
+.ov-btn:hover{background:var(--gold);color:#100c04;}
+#btmbar{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--ui-bg);border-top:2px solid var(--ui-border);flex-shrink:0;flex-wrap:wrap;}
+.btm-hint{font-size:0.7rem;color:#8a6a3a;}
+.btm-active{font-family:'Press Start 2P',monospace;font-size:0.55rem;color:#7fff7f;}
+@media(max-width:600px){#rpanel{display:none;}}
 </style>
 </head>
 <body>
-<div id="game-root">
-  <!-- HUD -->
-  <div id="hud">
-    <span class="hud-title">⚔ NUTOWY DUNGEON</span>
-    <div class="hud-sep"></div>
-    <div class="hud-stat">
-      <span class="hud-label">HP</span>
-      <div class="hp-bar"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
-      <span id="hp-text" style="font-size:0.78rem;color:#e74c3c;font-weight:700;">10/10</span>
-    </div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat"><span class="hud-label">Wynik</span><span class="score-val" id="score-val">0</span></div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat"><span class="hud-label">Poziom</span><span class="level-val" id="level-val">1</span></div>
-    <div class="hud-sep"></div>
-    <div class="hud-stat"><span class="hud-label">Zabici</span><span id="kills-val" style="font-family:'Cinzel',serif;color:#a78bfa;font-size:1rem;">0</span></div>
-    <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤 Mikrofon: OFF</button>
-    <div id="pitch-panel">
-      <span class="hud-label">Dźwięk:</span>
-      <span class="detected-note" id="detected-note">—</span>
-      <div class="pitch-meter"><div class="pitch-fill" id="pitch-fill"></div></div>
+<div id="topbar">
+  <span class="tb-pix">🌾 MUZYCZNA FARMA</span>
+  <div class="tb-sep"></div>
+  <div class="tb-s"><span class="tb-lbl">💰</span><span class="gold-v" id="gv">50</span></div>
+  <div class="tb-sep"></div>
+  <div class="tb-s"><span class="tb-lbl">Dzień</span><span class="gold-v" id="dayv">1</span></div>
+  <div class="tb-sep"></div>
+  <div class="tb-s"><span class="tb-lbl">Narzędzie:</span><span class="tool-v" id="toolv">👢 Chód</span></div>
+  <div class="tb-sep"></div>
+  <div class="tb-s"><span class="tb-lbl">Oktawa:</span>
+    <div class="oct-row">
+      <button class="oct-b" id="ob-small" onclick="setOctave('small')">Mała</button>
+      <button class="oct-b active" id="ob-one" onclick="setOctave('one')">Razk.</button>
+      <button class="oct-b" id="ob-two" onclick="setOctave('two')">Dwuk.</button>
     </div>
   </div>
- 
-  <!-- Game area -->
-  <div id="game-area">
-    <canvas id="hex-canvas"></canvas>
-    <div id="right-panel">
-      <div class="panel-section">
-        <div class="panel-title">🎵 Nuty akcji</div>
-        <div class="note-grid" id="note-grid"></div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-title">📖 Legenda</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#3b5bdb;border:1px solid #60a5fa;"></div><span>Gracz (Ty)</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#7f1d1d;border:1px solid #f87171;"></div><span>Szkielet</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#4c1d95;border:1px solid #a78bfa;"></div><span>Demon</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#78350f;border:1px solid #fbbf24;"></div><span>Troll</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#065f46;border:1px solid #34d399;"></div><span>Wyjście</span></div>
-      </div>
-      <div class="panel-section" style="flex:1;">
-        <div class="panel-title">📜 Dziennik</div>
-        <div class="log-list" id="log-list"></div>
-      </div>
+  <button class="mic-btn" id="micbtn" onclick="toggleMic()">🎤 Mikrofon: OFF</button>
+  <div class="tb-s"><span class="tb-lbl">Nuta:</span><span class="note-disp" id="notedisp">—</span></div>
+</div>
+<div id="game-wrap">
+  <canvas id="gc"></canvas>
+  <div id="rpanel">
+    <div class="rp-s">
+      <div class="rp-t">🎵 NUTY → AKCJE</div>
+      <div class="nm-grid" id="nm-grid"></div>
     </div>
-  </div>
- 
-  <!-- Bottom note (mobile) -->
-  <div id="bottom-note" id="bottom-note-panel">
-    <span style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--gold);letter-spacing:.1em;">ZAGRAJ NUTĘ →</span>
-    <span style="font-family:'Cinzel',serif;font-size:1.4rem;color:var(--gold2);margin-left:10px;" id="mobile-target">—</span>
+    <div class="rp-s">
+      <div class="rp-t">🎒 EKWIPUNEK</div>
+      <div class="inv-grid" id="inv-grid"></div>
+    </div>
+    <div class="rp-s" style="flex:1;">
+      <div class="rp-t">📜 DZIENNIK</div>
+      <div class="log-list" id="log-list"></div>
+    </div>
   </div>
 </div>
- 
-<!-- Overlay: Start -->
+<div id="btmbar">
+  <span class="btm-hint" id="btm-hint">Poruszaj się śpiewając nuty. G=Akcja, A=Zmień narzędzie, H=Rozmowa</span>
+</div>
+<div id="dlg">
+  <div class="dlg-name" id="dlg-name">NPC</div>
+  <div class="dlg-txt" id="dlg-txt"></div>
+  <button class="dlg-close" onclick="closeDlg()">[ Zamknij ]</button>
+</div>
+<div id="shop">
+  <div class="sh-title" id="sh-title">🏪 SKLEP</div>
+  <div class="sh-tabs">
+    <button class="sh-tab on" id="sh-tab-buy" onclick="shopTab('buy')">Kup</button>
+    <button class="sh-tab" id="sh-tab-sell" onclick="shopTab('sell')">Sprzedaj</button>
+    <button class="sh-tab" id="sh-tab-oct" onclick="shopTab('oct')">Oktawy</button>
+  </div>
+  <div class="sh-grid" id="sh-content"></div>
+  <button class="sh-close" onclick="closeShop()">Zamknij sklep</button>
+</div>
 <div id="overlay">
-  <div class="overlay-box">
-    <div class="overlay-title">⚔ Nutowy Dungeon</div>
-    <div class="overlay-sub">
-      Poruszaj się po heksach śpiewając lub grając odpowiednią nutę.<br><br>
-      🎵 <strong style="color:var(--gold);">Ruch</strong> — zaśpiewaj nutę widoczną na sąsiednim hexie<br>
-      ⚔️ <strong style="color:var(--gold);">Atak</strong> — zaśpiewaj nutę nad głową wroga (gdy stoisz obok)<br>
-      🏆 <strong style="color:var(--gold);">Cel</strong> — pokonaj wszystkich wrogów i dotrzyj do wyjścia
+  <div class="ov-box">
+    <div class="ov-title">🌾 MUZYCZNA<br>FARMA</div>
+    <div class="ov-sub">
+      Śpiewaj nuty przez mikrofon!<br><br>
+      <b style="color:var(--gold)">C/D/E/F</b> = ruch ↑→↓←<br>
+      <b style="color:var(--gold)">G</b> = użyj narzędzia / akcja<br>
+      <b style="color:var(--gold)">A</b> = zmień narzędzie<br>
+      <b style="color:var(--gold)">H</b> = rozmawiaj / wejdź<br><br>
+      🌱 Sadź, podlewaj, zbieraj<br>
+      🏪 Kupuj i sprzedawaj w sklepie<br>
+      🕷️ Walcz z pająkami w dungeonie
     </div>
-    <button class="overlay-btn" onclick="startGame()">Rozpocznij przygodę</button>
+    <button class="ov-btn" onclick="startGame()">Rozpocznij!</button>
   </div>
 </div>
- 
 <script>
-// ════════════════════════════════════════════════════════════
-// NOTES CONFIG
-// ════════════════════════════════════════════════════════════
-const NOTES = [
-  {name:'C',  label:'c¹',  freq:261.63},
-  {name:'D',  label:'d¹',  freq:293.66},
-  {name:'E',  label:'e¹',  freq:329.63},
-  {name:'F',  label:'f¹',  freq:349.23},
-  {name:'G',  label:'g¹',  freq:392.00},
-  {name:'A',  label:'a¹',  freq:440.00},
-  {name:'H',  label:'h¹',  freq:493.88},
+// ══════════════════════════════════════════
+// OCTAVES
+// ══════════════════════════════════════════
+const OCTAVES={
+  small:{label:'Mała',   mult:0.5, notes:[{n:'c', f:130.81},{n:'d',f:146.83},{n:'e',f:164.81},{n:'f',f:174.61},{n:'g',f:196.00},{n:'a',f:220.00},{n:'h',f:246.94}]},
+  one:  {label:'Razk.',  mult:1.0, notes:[{n:'c¹',f:261.63},{n:'d¹',f:293.66},{n:'e¹',f:329.63},{n:'f¹',f:349.23},{n:'g¹',f:392.00},{n:'a¹',f:440.00},{n:'h¹',f:493.88}]},
+  two:  {label:'Dwuk.',  mult:2.0, notes:[{n:'c²',f:523.25},{n:'d²',f:587.33},{n:'e²',f:659.25},{n:'f²',f:698.46},{n:'g²',f:783.99},{n:'a²',f:880.00},{n:'h²',f:987.77}]}
+};
+let curOct='one';
+let unlockedOct={small:false,one:true,two:false};
+function setOctave(o){
+  if(!unlockedOct[o]){addLog('Kup tę oktawę w sklepie!','bad');return;}
+  curOct=o;
+  document.querySelectorAll('.oct-b').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ob-'+o).classList.add('active');
+  renderNoteMap();
+  addLog('Oktawa: '+OCTAVES[o].label,'info');
+}
+function getNotes(){return OCTAVES[curOct].notes;}
+// ══════════════════════════════════════════
+// NOTE → ACTION
+// ══════════════════════════════════════════
+// idx: 0=C 1=D 2=E 3=F 4=G 5=A 6=H
+const NOTE_ACTS=[
+  {key:'up',   icon:'↑', label:'Ruch Góra'},
+  {key:'right',icon:'→', label:'Ruch Prawo'},
+  {key:'down', icon:'↓', label:'Ruch Dół'},
+  {key:'left', icon:'←', label:'Ruch Lewo'},
+  {key:'use',  icon:'✅', label:'Użyj narzędzia'},
+  {key:'tool', icon:'🔧', label:'Zmień narzędzie'},
+  {key:'talk', icon:'💬', label:'Rozmawiaj/Wejdź'},
 ];
- 
-// Each of 6 hex directions maps to a note index (0-6, wrapping)
-// Direction indices: 0=NE, 1=E, 2=SE, 3=SW, 4=W, 5=NW
-const DIR_NOTE = [0,1,2,3,4,5]; // 6 dirs → 6 notes (C D E F G A)
-// Attack note = H (index 6) — unique so it never conflicts with move
-const ATTACK_NOTE_IDX = 6;
- 
-// Hex directions (offset coords, pointy-top)
-// For even rows and odd rows in offset coordinates
-function hexNeighbors(q, r) {
-  // Using axial coordinates
-  return [
-    {q:q+1,r:r},   // E   → note 1 (D)
-    {q:q+1,r:r-1}, // NE  → note 0 (C)
-    {q:q,  r:r-1}, // NW  → note 5 (A)
-    {q:q-1,r:r},   // W   → note 4 (G)
-    {q:q-1,r:r+1}, // SW  → note 3 (F)
-    {q:q,  r:r+1}, // SE  → note 2 (E)
-  ];
-}
- 
-// ════════════════════════════════════════════════════════════
-// GAME STATE
-// ════════════════════════════════════════════════════════════
-let gameActive = false;
-let player = {q:0, r:0, hp:10, maxHp:10, cooldown:0};
-let enemies = [];
-let hexMap = new Map(); // key="q,r" value={type, visible}
-let score = 0;
-let kills = 0;
-let level = 1;
-let exitHex = null;
-let animFrame = null;
-let lastEnemyTick = 0;
-let particles = [];
-let shakeTimer = 0;
-let flashTimer = 0;
-let flashColor = '';
-let logEntries = [];
- 
-// Note detection state
-let micOn = false, aCtx = null, analyser = null, micStream = null, pitchInterval = null;
-let freqHistory = [];
-let lastDetected = null;
-let detectedCooldown = 0; // frames before same note triggers again
-let pendingNote = null; // note triggered this tick
- 
-// Canvas
-const canvas = document.getElementById('hex-canvas');
-const ctx = canvas.getContext('2d');
- 
-const HEX_SIZE = 38; // radius in pixels
-const MAP_RADIUS = 5;
- 
-// ════════════════════════════════════════════════════════════
-// HEX MATH (axial coords)
-// ════════════════════════════════════════════════════════════
-function hexToPixel(q, r) {
-  const x = HEX_SIZE * (Math.sqrt(3)*q + Math.sqrt(3)/2*r);
-  const y = HEX_SIZE * (3/2 * r);
-  return {x, y};
-}
- 
-function hexKey(q,r){return q+','+r;}
- 
-function hexDist(q1,r1,q2,r2){
-  return (Math.abs(q1-q2)+Math.abs(q1+r1-q2-r2)+Math.abs(r1-r2))/2;
-}
- 
-function dirIndex(dq,dr){
-  const dirs=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
-  for(let i=0;i<6;i++) if(dirs[i].q===dq&&dirs[i].r===dr) return i;
-  return -1;
-}
- 
-// ════════════════════════════════════════════════════════════
-// MAP GENERATION
-// ════════════════════════════════════════════════════════════
-function generateMap(){
-  hexMap.clear();
-  enemies = [];
-  // Fill hex circle
-  for(let q=-MAP_RADIUS;q<=MAP_RADIUS;q++){
-    const r1=Math.max(-MAP_RADIUS,-q-MAP_RADIUS);
-    const r2=Math.min(MAP_RADIUS,-q+MAP_RADIUS);
-    for(let r=r1;r<=r2;r++){
-      hexMap.set(hexKey(q,r),{type:'floor',visible:false,explored:false});
+// ══════════════════════════════════════════
+// TILE SYSTEM
+// ══════════════════════════════════════════
+const TS=40;
+const WW=30,WH=26;
+const T={
+  GRASS:0,GRASS2:1,GRASS3:2,PATH:3,DIRT:4,WATER:5,
+  TREE:6,BUSH:7,FLOWER:8,WEED:9,FENCE:10,
+  HOUSE:11,SHOP:12,BARN:13,WELL:14,SIGN:15,SELL:16,
+  TILLED:17,WET:18,
+  CROP0:20,CROP1:21,CROP2:22,CROP3:23,
+  DNG_WALL:30,DNG_FLOOR:31,ROCK:32,ORE:33,CHEST:34,EXIT:35,
+};
+const TC={
+  [T.GRASS]:'#4a8c35',[T.GRASS2]:'#438029',[T.GRASS3]:'#3a7020',
+  [T.PATH]:'#c8a870',[T.DIRT]:'#8b6340',[T.WATER]:'#1a63b8',
+  [T.TREE]:'#1a5c0e',[T.BUSH]:'#2a6e1e',[T.FLOWER]:'#4a8c35',
+  [T.WEED]:'#3a6428',[T.FENCE]:'#9b7840',
+  [T.HOUSE]:'#8b4513',[T.SHOP]:'#5a30a0',[T.BARN]:'#b03818',
+  [T.WELL]:'#506878',[T.SIGN]:'#b88040',[T.SELL]:'#a07820',
+  [T.TILLED]:'#6b4420',[T.WET]:'#4a2e10',
+  [T.CROP0]:'#7a5230',[T.CROP1]:'#60a020',[T.CROP2]:'#40b018',[T.CROP3]:'#e8c820',
+  [T.DNG_WALL]:'#1e1e2e',[T.DNG_FLOOR]:'#2a2a3e',
+  [T.ROCK]:'#607080',[T.ORE]:'#7a5840',[T.CHEST]:'#c08820',[T.EXIT]:'#4040a0',
+};
+const TE={
+  [T.TREE]:'🌲',[T.BUSH]:'🌳',[T.FLOWER]:'🌸',[T.WEED]:'🌿',
+  [T.HOUSE]:'🏠',[T.SHOP]:'🏪',[T.BARN]:'🏚',[T.WELL]:'🪣',
+  [T.SIGN]:'🪧',[T.SELL]:'📦',[T.WATER]:'〰',
+  [T.CROP0]:'·',[T.CROP1]:'🌱',[T.CROP2]:'🌿',[T.CROP3]:'🌾',
+  [T.ROCK]:'🪨',[T.ORE]:'💎',[T.CHEST]:'🎁',[T.EXIT]:'🚪',
+  [T.FENCE]:'|',
+};
+// ══════════════════════════════════════════
+// WORLD DATA
+// ══════════════════════════════════════════
+// Each cell: {t:tileType, obj:null|string, data:{}}
+let village=[], dungeon=[];
+let inDungeon=false;
+function mkCell(t,obj=null,data={}){return{t,obj,data};}
+function buildVillage(){
+  const m=[];
+  for(let y=0;y<WH;y++){
+    m[y]=[];
+    for(let x=0;x<WW;x++){
+      const r=Math.random();
+      m[y][x]=mkCell(r<0.07?T.GRASS2:r<0.12?T.GRASS3:T.GRASS);
     }
   }
- 
-  // Place player at center
-  player.q=0; player.r=0;
-  player.hp=player.maxHp;
-  setVisible(0,0,2);
- 
-  // Spawn enemies based on level
-  const enemyCount = 3 + level * 2;
-  const enemyTypes = ['skeleton','demon','troll'];
-  const hpByType = {skeleton:3,demon:5,troll:8};
-  const scoreByType = {skeleton:10,demon:20,troll:35};
-  let placed=0;
-  let attempts=0;
-  while(placed<enemyCount && attempts<500){
-    attempts++;
-    const q=Math.round((Math.random()-0.5)*MAP_RADIUS*2);
-    const r=Math.round((Math.random()-0.5)*MAP_RADIUS*2);
-    if(!hexMap.has(hexKey(q,r))) continue;
-    if(hexDist(0,0,q,r)<3) continue;
-    if(enemies.find(e=>e.q===q&&e.r===r)) continue;
-    const type=enemyTypes[Math.floor(Math.random()*enemyTypes.length)];
-    const noteIdx=Math.floor(Math.random()*NOTES.length);
-    enemies.push({
-      q,r,type,
-      hp:hpByType[type],maxHp:hpByType[type],
-      noteIdx, // note needed to attack it
-      score:scoreByType[type],
-      moveTimer:0,moveCooldown:type==='troll'?180:type==='demon'?90:120,
-      stunTimer:0,
-      deathAnim:0
-    });
-    placed++;
-  }
- 
-  // Exit hex: opposite side of map
-  const ex=MAP_RADIUS-1, er=-(MAP_RADIUS-1);
-  exitHex={q:ex,r:er};
+  // Main paths
+  for(let x=0;x<WW;x++) m[6][x]=mkCell(T.PATH);
+  for(let y=0;y<WH;y++) m[y][9]=mkCell(T.PATH);
+  // Water stream right edge
+  for(let y=0;y<WH;y++) m[y][WW-2]=mkCell(T.WATER);
+  for(let y=0;y<WH;y++) m[y][WW-1]=mkCell(T.WATER);
+  // Village structures (top-left)
+  st(m,2,1,T.HOUSE,'house');st(m,3,1,T.HOUSE,'house');
+  st(m,2,3,T.HOUSE,'house2');st(m,3,3,T.HOUSE,'house2');
+  st(m,5,1,T.SHOP,'shop');st(m,6,1,T.SHOP,'shop');st(m,5,2,T.SHOP,'shop');st(m,6,2,T.SHOP,'shop');
+  st(m,2,5,T.BARN,'barn');
+  st(m,5,4,T.WELL,'well');
+  st(m,7,4,T.SIGN,'sign');
+  st(m,7,5,T.SELL,'sell');
+  // Village deco
+  for(const[x,y]of[[1,0],[8,0],[0,1],[8,2],[0,5],[8,5]])st(m,x,y,T.TREE);
+  for(const[x,y]of[[1,4],[4,4],[6,5],[3,5]])st(m,x,y,T.FLOWER);
+  // Forest left side
+  for(let y=7;y<WH;y++)for(let x=0;x<9;x++)
+    if(m[y][x].t===T.GRASS&&Math.random()<0.3)m[y][x]=mkCell(T.TREE);
+  // Farm zone (right of center, rows 8–19, cols 10–22)
+  for(let y=8;y<=19;y++)for(let x=10;x<=22;x++)
+    m[y][x]=mkCell(T.DIRT,'field',{tilled:false,wet:false,crop:null,growDay
+,growDay:0,growStage:0});
+  // Farm fences
+  for(let x=9;x<=23;x++){m[7][x]=mkCell(T.FENCE);m[20][x]=mkCell(T.FENCE);}
+  for(let y=7;y<=20;y++){m[y][9]=mkCell(T.FENCE);m[y][23]=mkCell(T.FENCE);}
+  m[7][9]=mkCell(T.FENCE);m[20][9]=mkCell(T.FENCE);
+  // Weeds scattered in farm
+  for(const[x,y]of[[11,9],[15,12],[19,10],[12,15],[21,14],[16,17]])
+    if(m[y]&&m[y][x]&&m[y][x].obj==='field')m[y][x].data.weed=true;
+  // Bush line separating farm from dungeon
+  for(let x=10;x<=22;x++) m[21][x]=mkCell(T.BUSH);
+  m[21][16]=mkCell(T.PATH,'dungeon_gate'); // gap = dungeon entrance
+  // Right side bushes
+  for(let y=0;y<WH;y++)for(let x=WW-6;x<WW-2;x++)
+    if(m[y][x].t===T.GRASS&&Math.random()<0.35)m[y][x]=mkCell(T.BUSH);
+  return m;
 }
- 
-function setVisible(q,r,radius){
-  for(let dq=-radius;dq<=radius;dq++){
-    const dr1=Math.max(-radius,-dq-radius);
-    const dr2=Math.min(radius,-dq+radius);
-    for(let dr=dr1;dr<=dr2;dr++){
-      const k=hexKey(q+dq,r+dr);
-      if(hexMap.has(k)){
-        const h=hexMap.get(k);
-        h.visible=true; h.explored=true;
-      }
+function buildDungeon(){
+  const m=[];
+  for(let y=0;y<WH;y++){
+    m[y]=[];
+    for(let x=0;x<WW;x++){
+      const wall=x===0||x===WW-1||y===0||y===WH-1;
+      m[y][x]=mkCell(wall?T.DNG_WALL:T.DNG_FLOOR);
     }
   }
-  // Mark all others not visible
-  hexMap.forEach((h,k)=>{
-    const [hq,hr]=k.split(',').map(Number);
-    if(hexDist(q,r,hq,hr)>radius) h.visible=false;
-  });
-}
- 
-// ════════════════════════════════════════════════════════════
-// ENEMY AI
-// ════════════════════════════════════════════════════════════
-function updateEnemies(){
-  const now=performance.now();
-  if(now-lastEnemyTick<800) return;
-  lastEnemyTick=now;
- 
-  enemies.forEach(e=>{
-    if(e.deathAnim>0) return;
-    if(e.stunTimer>0){e.stunTimer--;return;}
-    const dist=hexDist(player.q,player.r,e.q,e.r);
- 
-    // Attack player if adjacent
-    if(dist===1){
-      const dmg=e.type==='troll'?2:1;
-      player.hp=Math.max(0,player.hp-dmg);
-      shakeTimer=15;
-      flashTimer=8; flashColor='rgba(192,57,43,0.35)';
-      addLog(`${enemyName(e.type)} atakuje! -${dmg}HP`,'bad');
-      updateHUD();
-      if(player.hp<=0){ endGame(false); return; }
-      return;
-    }
- 
-    // Move toward player if visible hex
-    e.moveTimer++;
-    if(e.moveTimer<e.moveCooldown) return;
-    e.moveTimer=0;
- 
-    if(dist<=MAP_RADIUS){
-      const neighbors=hexNeighbors(e.q,e.r);
-      // Pick neighbor closest to player that has no other enemy
-      let best=null,bestDist=dist;
-      neighbors.forEach(n=>{
-        if(!hexMap.has(hexKey(n.q,n.r))) return;
-        if(enemies.find(oe=>oe!==e&&oe.q===n.q&&oe.r===n.r&&oe.deathAnim===0)) return;
-        const d=hexDist(player.q,player.r,n.q,n.r);
-        if(d<bestDist){bestDist=d;best=n;}
-      });
-      if(best){e.q=best.q;e.r=best.r;}
+  // Interior walls forming corridors
+  const walls=[[5,2,12,1],[5,6,12,1],[3,9,1,9],[17,2,1,13],[21,7,7,1],[21,11,7,1],[10,14,8,1]];
+  walls.forEach(([x,y,w,h])=>{
+    for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
+      const ty=y+dy,tx=x+dx;
+      if(ty>0&&ty<WH-1&&tx>0&&tx<WW-1)m[ty][tx]=mkCell(T.DNG_WALL);
     }
   });
-}
- 
-function enemyName(type){return type==='skeleton'?'Szkielet':type==='demon'?'Demon':'Troll';}
- 
-// ════════════════════════════════════════════════════════════
-// PLAYER ACTIONS
-// ════════════════════════════════════════════════════════════
-function tryAction(noteIdx){
-  if(!gameActive) return;
- 
-  // Check if any adjacent enemy needs this attack note
-  const attackNote = ATTACK_NOTE_IDX;
-  if(noteIdx===attackNote){
-    // Try to attack an adjacent enemy
-    let attacked=false;
-    enemies.forEach(e=>{
-      if(e.deathAnim>0) return;
-      const dist=hexDist(player.q,player.r,e.q,e.r);
-      if(dist===1){
-        // Attack it!
-        e.hp--;
-        e.stunTimer=2;
-        flashTimer=5;flashColor='rgba(212,175,55,0.3)';
-        spawnParticles(e.q,e.r,'#f0d060',8);
-        addLog(`Atakujesz ${enemyName(e.type)}! (HP: ${e.hp}/${e.maxHp})`,'good');
-        if(e.hp<=0){
-          e.deathAnim=30;
-          score+=e.score*(level);
-          kills++;
-          spawnParticles(e.q,e.r,'#f0d060',20);
-          addLog(`☠ Pokonałeś ${enemyName(e.type)}! +${e.score*level}pkt`,'good');
-          updateHUD();
-          // Check win
-          checkLevelClear();
-        }
-        attacked=true;
-      }
-    });
-    if(attacked) return;
+  // Rocks
+  for(const[x,y]of[[7,4],[11,7],[15,10],[20,5],[24,3],[8,12],[13,15],[22,14],[18,17],[25,17]])
+    if(m[y]&&m[y][x])m[y][x]=mkCell(T.ROCK,'rock',{hp:3});
+  // Ore
+  for(const[x,y]of[[9,5],[14,8],[23,4],[12,13],[20,16]])
+    if(m[y]&&m[y][x])m[y][x]=mkCell(T.ORE,'ore',{hp:2,gives:'ore'});
+  // Chest
+  if(m[2]&&m[2][25])m[2][25]=mkCell(T.CHEST,'chest',{opened:false});
+  // Exit
+  if(m[1]&&m[1][1])m[1][1]=mkCell(T.EXIT,'exit');
+  // Spiders spawn positions
+  spiders=[];
+  for(const[x,y]of[[4,3],[10,5],[16,3],[6,10],[13,12],[22,9],[18,15],[25,13]]){
+    if(m[y]&&m[y][x]&&m[y][x].t===T.DNG_FLOOR)
+      spiders.push({x,y,hp:3,maxHp:3,moveTimer:0,stunTimer:0,dead:false,deathAnim:0});
   }
- 
-  // Try to move: find neighbor with this note
-  const dirs=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
-  for(let i=0;i<6;i++){
-    if(DIR_NOTE[i]===noteIdx){
-      const nq=player.q+dirs[i].q;
-      const nr=player.r+dirs[i].r;
-      if(!hexMap.has(hexKey(nq,nr))) continue;
-      // Check enemy blocking
-      if(enemies.find(e=>e.q===nq&&e.r===nr&&e.deathAnim===0)) continue;
-      player.q=nq; player.r=nr;
-      setVisible(nq,nr,2);
-      spawnParticles(nq,nr,'#3b82f6',4);
-      addLog(`Ruch na (${nq},${nr})`,'info');
-      // Check exit
-      if(exitHex&&nq===exitHex.q&&nr===exitHex.r){
-        checkLevelClear();
-      }
-      return;
-    }
-  }
+  return m;
 }
- 
-function checkLevelClear(){
-  const aliveEnemies=enemies.filter(e=>e.deathAnim===0&&e.hp>0);
-  const onExit=exitHex&&player.q===exitHex.q&&player.r===exitHex.r;
-  if(aliveEnemies.length===0||onExit){
-    setTimeout(()=>nextLevel(),800);
-  }
+function st(m,x,y,t,obj=null,data={}){
+  if(y>=0&&y<WH&&x>=0&&x<WW)m[y][x]=mkCell(t,obj,data);
 }
- 
-function nextLevel(){
-  level++;
-  score+=100*level;
-  addLog(`🏆 Poziom ${level}! Bonus: ${100*level}pkt`,'good');
-  generateMap();
-  updateHUD();
-  setVisible(player.q,player.r,2);
+// ══════════════════════════════════════════
+// NPCS
+// ══════════════════════════════════════════
+const NPC_LIST=[
+  {id:'boleslaw',wx:6.5,wy:1.5,emoji:'👴',name:'Pan Bolesław',color:'#d4af37',
+   lines:[
+    'Witaj, wędrowcze! Sklep otwarty — śpiewaj G by wejść.',
+    'Kupiłem dziś nowe sadzonki. Dobra ziemia to podstawa!',
+    'Sprzedaj mi dojrzałe plony — dam dobrą cenę.',
+    'Słyszałem, że w dungeonie jest skarb. Ostrożnie z pająkami!',
+   ]},
+  {id:'marta',wx:3.5,wy:2.5,emoji:'👩',name:'Marta',color:'#e87040',
+   lines:[
+    'Dzień dobry! Ładna dziś pogoda na uprawy.',
+    'Pamiętaj podlewać codziennie — rośliny lubią wodę!',
+    'Kultywator z boku robi cuda na glebie, wiesz?',
+    'Mój ogródek kwitnie dzięki nowej sadzonicy pomidorów.',
+   ]},
+  {id:'dziadzio',wx:2.5,wy:4.5,emoji:'🧓',name:'Dziadek Kazimierz',color:'#80a0ff',
+   lines:[
+    'Za moich czasów wszystko śpiewaniem robiliśmy... Ha!',
+    'Dungeon pod wsią istnieje od wieków. Tam rudy pełno.',
+    'Aerator ziemię napowietrza, zbiory trzy razy lepsze!',
+    'Odblokuj wyższe oktawy — silniejszy głos, szybsza praca.',
+   ]},
+];
+let npcDialogIdx={};
+NPC_LIST.forEach(n=>npcDialogIdx[n.id]=0);
+// ══════════════════════════════════════════
+// PLAYER & GAME STATE
+// ══════════════════════════════════════════
+const TOOLS=['walk','hoe','water','cult','aer','shovel'];
+const TOOL_INFO={
+  walk: {icon:'👢',label:'Chód',      owned:true},
+  hoe:  {icon:'⚒',label:'Motyka',    owned:true},
+  water:{icon:'💧',label:'Konewka',   owned:true},
+  cult: {icon:'🔧',label:'Kultywator',owned:false},
+  aer:  {icon:'🌬',label:'Aerator',   owned:false},
+  shovel:{icon:'⛏',label:'Łopata',   owned:false},
+};
+let player={
+  x:5,y:4,   // world tile coords
+  hp:10,maxHp:10,
+  gold:50,
+  day:1,
+  toolIdx:0,
+  inventory:{
+    seeds_wheat:3, seeds_carrot:0, seeds_tomato:0,
+    wheat:0, carrot:0, tomato:0,
+    ore:0, crystal:0,
+  },
+  selectedSeed:'seeds_wheat',
+};
+let spiders=[];
+let particles=[];
+let shopTabActive='buy';
+let gameRunning=false;
+let pendingAction=null;
+let actionCooldown=0;
+let animTick=0;
+let dayTimer=0;   // counts frames, every 1800 frames = new day
+const DAY_FRAMES=1800;
+// ══════════════════════════════════════════
+// CROP DEFINITIONS
+// ══════════════════════════════════════════
+const CROPS={
+  seeds_wheat: {name:'Pszenica', icon:'🌾', growDays:2, sellPrice:8,  buyPrice:5},
+  seeds_carrot:{name:'Marchew',  icon:'🥕', growDays:3, sellPrice:15, buyPrice:10},
+  seeds_tomato:{name:'Pomidor',  icon:'🍅', growDays:4, sellPrice:25, buyPrice:18},
+};
+const HARVEST_ITEM={seeds_wheat:'wheat',seeds_carrot:'carrot',seeds_tomato:'tomato'};
+const ITEM_INFO={
+  wheat: {name:'Pszenica',icon:'🌾',sellPrice:8},
+  carrot:{name:'Marchew', icon:'🥕',sellPrice:15},
+  tomato:{name:'Pomidor', icon:'🍅',sellPrice:25},
+  ore:   {name:'Ruda',    icon:'💎',sellPrice:20},
+  crystal:{name:'Kryształ',icon:'💠',sellPrice:50},
+};
+// ══════════════════════════════════════════
+// SHOP CATALOG
+// ══════════════════════════════════════════
+const SHOP_BUY=[
+  {id:'seeds_wheat', name:'Nasiona Pszenicy',icon:'🌾',desc:'Rośnie 2 dni',price:5,  type:'seed'},
+  {id:'seeds_carrot',name:'Nasiona Marchew', icon:'🥕',desc:'Rośnie 3 dni',price:10, type:'seed'},
+  {id:'seeds_tomato',name:'Nasiona Pomidora',icon:'🍅',desc:'Rośnie 4 dni',price:18, type:'seed'},
+  {id:'cult', name:'Kultywator', icon:'🔧',desc:'Szybsze motykowanie',price:80, type:'tool'},
+  {id:'aer',  name:'Aerator',    icon:'🌬',desc:'+50% wzrost plonów',  price:120,type:'tool'},
+  {id:'shovel',name:'Łopata',   icon:'⛏',desc:'Kopie rudy w dungeonie',price:100,type:'tool'},
+];
+const SHOP_OCT=[
+  {id:'small',name:'Oktawa Mała',  icon:'🎵',desc:'c–h (130–247 Hz)',price:60},
+  {id:'two',  name:'Oktawa Dwuk.', icon:'🎶',desc:'c²–h² (523–988 Hz)',price:100},
+];
+// ══════════════════════════════════════════
+// CANVAS SETUP
+// ══════════════════════════════════════════
+const canvas=document.getElementById('gc');
+const ctx=canvas.getContext('2d');
+let camX=0,camY=0; // camera offset in pixels
+function resizeCanvas(){
+  const wrap=document.getElementById('game-wrap');
+  const rp=document.getElementById('rpanel');
+  const pw=rp.offsetParent?rp.offsetWidth:0;
+  canvas.width=wrap.offsetWidth-pw;
+  canvas.height=wrap.offsetHeight;
+  clampCamera();
 }
- 
-// ════════════════════════════════════════════════════════════
-// PARTICLES
-// ════════════════════════════════════════════════════════════
-function spawnParticles(q,r,color,count){
-  const {x,y}=hexToPixel(q,r);
-  const cx=canvas.width/2+x;
-  const cy=canvas.height/2+y;
-  for(let i=0;i<count;i++){
-    const angle=Math.random()*Math.PI*2;
-    const speed=1+Math.random()*3;
-    particles.push({
-      x:cx,y:cy,
-      vx:Math.cos(angle)*speed,
-      vy:Math.sin(angle)*speed,
-      life:1,decay:0.03+Math.random()*0.03,
-      size:2+Math.random()*4,
-      color
-    });
-  }
+window.addEventListener('resize',resizeCanvas);
+function clampCamera(){
+  const map=inDungeon?dungeon:village;
+  const maxX=WW*TS-canvas.width;
+  const maxY=WH*TS-canvas.height;
+  camX=Math.max(0,Math.min(maxX,player.x*TS-canvas.width/2));
+  camY=Math.max(0,Math.min(maxY,player.y*TS-canvas.height/2));
 }
- 
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // DRAWING
-// ════════════════════════════════════════════════════════════
-function hexCorners(cx,cy,size){
-  const pts=[];
-  for(let i=0;i<6;i++){
-    const a=Math.PI/180*(60*i-30); // pointy top
-    pts.push({x:cx+size*Math.cos(a),y:cy+size*Math.sin(a)});
-  }
-  return pts;
-}
- 
-function drawHex(cx,cy,size,fillStyle,strokeStyle,lineWidth=1){
-  const pts=hexCorners(cx,cy,size);
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<6;i++) ctx.lineTo(pts[i].x,pts[i].y);
-  ctx.closePath();
-  if(fillStyle){ctx.fillStyle=fillStyle;ctx.fill();}
-  if(strokeStyle){ctx.strokeStyle=strokeStyle;ctx.lineWidth=lineWidth;ctx.stroke();}
-}
- 
+// ══════════════════════════════════════════
 function drawGame(){
-  const W=canvas.width, H=canvas.height;
-  const cx=W/2, cy=H/2;
- 
-  // Shake offset
-  const sx=shakeTimer>0?(Math.random()-0.5)*6:0;
-  const sy=shakeTimer>0?(Math.random()-0.5)*6:0;
-  if(shakeTimer>0) shakeTimer--;
- 
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   ctx.save();
-  ctx.translate(sx,sy);
- 
-  // Background
-  ctx.fillStyle='#070a10';
-  ctx.fillRect(-10,-10,W+20,H+20);
- 
-  // Grid pattern
-  ctx.strokeStyle='rgba(30,58,138,0.08)';
-  ctx.lineWidth=0.5;
- 
-  // Draw hexes
-  hexMap.forEach((hex,key)=>{
-    const [q,r]=key.split(',').map(Number);
-    const {x,y}=hexToPixel(q,r);
-    const px=cx+x, py=cy+y;
- 
-    if(!hex.explored) return;
- 
-    const isPlayer=(q===player.q&&r===player.r);
-    const isExit=exitHex&&q===exitHex.q&&r===exitHex.r;
-    const enemy=enemies.find(e=>e.q===q&&e.r===r&&e.deathAnim===0);
- 
-    let fill='#111827';
-    if(!hex.visible) fill='#0d1117';
-    if(isExit) fill='#052e16';
- 
-    // Hex body
-    drawHex(px,py,HEX_SIZE-1,fill,
-      hex.visible?'#1e3a5a':'#131c30',
-      hex.visible?1:0.4);
- 
-    if(!hex.visible) return;
- 
-    // Highlight adjacent to player
-    const dist=hexDist(player.q,player.r,q,r);
-    if(dist===1){
-      // Find direction index
-      const dq=q-player.q, dr=r-player.r;
-      const di=dirIndex(dq,dr);
-      if(di>=0){
-        const noteIdx=DIR_NOTE[di];
-        const note=NOTES[noteIdx];
-        // Glow
-        drawHex(px,py,HEX_SIZE-1,null,'rgba(59,91,219,0.5)',1.5);
-        // Note label
-        ctx.fillStyle='#93c5fd';
-        ctx.font='bold 12px Cinzel,serif';
-        ctx.textAlign='center';
-        ctx.textBaseline='middle';
-        ctx.fillText(note.label,px,py);
+  ctx.translate(-camX,-camY);
+  const map=inDungeon?dungeon:village;
+  const startX=Math.max(0,Math.floor(camX/TS)-1);
+  const endX=Math.min(WW,Math.ceil((camX+canvas.width)/TS)+1);
+  const startY=Math.max(0,Math.floor(camY/TS)-1);
+  const endY=Math.min(WH,Math.ceil((camY+canvas.height)/TS)+1);
+  // Draw tiles
+  for(let y=startY;y<endY;y++){
+    for(let x=startX;x<endX;x++){
+      const cell=map[y][x];
+      const px=x*TS, py=y*TS;
+      // Base color
+      ctx.fillStyle=TC[cell.t]||'#3a7d2c';
+      ctx.fillRect(px,py,TS,TS);
+      // Tile grid line
+      ctx.strokeStyle='rgba(0,0,0,0.12)';
+      ctx.lineWidth=0.5;
+      ctx.strokeRect(px,py,TS,TS);
+      // Grass texture dots
+      if(cell.t===T.GRASS||cell.t===T.GRASS2||cell.t===T.GRASS3){
+        ctx.fillStyle='rgba(0,0,0,0.08)';
+        const seed=(x*31+y*17)%7;
+        if(seed<3){ctx.fillRect(px+6,py+8,2,2);ctx.fillRect(px+22,py+18,2,2);}
+      }
+      // Field overlay
+      if(cell.obj==='field'){
+        const d=cell.data;
+        if(d.weed){
+          ctx.fillStyle='rgba(60,100,20,0.6)';
+          ctx.fillRect(px+2,py+2,TS-4,TS-4);
+          ctx.font='16px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText('🌿',px+TS/2,py+TS/2);
+        } else if(d.tilled||d.crop){
+          ctx.fillStyle=d.wet?TC[T.WET]:TC[T.TILLED];
+          ctx.fillRect(px+1,py+1,TS-2,TS-2);
+          // Draw crop
+          if(d.crop&&d.growStage>=0){
+            const stage=d.growStage;
+            ctx.font=(14+stage*4)+'px serif';
+            ctx.textAlign='center';ctx.textBaseline='middle';
+            const emojis=['·','🌱','🌿','🌾'];
+            if(d.crop==='seeds_carrot'){emojis[3]='🥕';}
+            if(d.crop==='seeds_tomato'){emojis[3]='🍅';}
+            ctx.fillText(emojis[Math.min(stage,3)],px+TS/2,py+TS/2);
+          }
+          // Wet shimmer
+          if(d.wet){
+            ctx.fillStyle='rgba(30,100,200,0.18)';
+            ctx.fillRect(px+1,py+1,TS-2,TS-2);
+          }
+        }
+      }
+      // Emoji overlay for special tiles
+      const em=TE[cell.t];
+      if(em){
+        ctx.font=(cell.t===T.TREE||cell.t===T.HOUSE||cell.t===T.SHOP||cell.t===T.BARN?'24px':'18px')+' serif';
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(em,px+TS/2,py+TS/2);
+      }
+      // Special labels
+      if(cell.t===T.SELL){
+        ctx.fillStyle='rgba(212,175,55,0.85)';
+        ctx.font='bold 8px Press Start 2P,monospace';
+        ctx.textAlign='center';ctx.textBaseline='bottom';
+        ctx.fillText('SPRZEDAJ',px+TS/2,py+TS-2);
+      }
+      if(cell.obj==='dungeon_gate'){
+        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('⛩',px+TS/2,py+TS/2);
+      }
+      if(cell.obj==='exit'){
+        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('🚪',px+TS/2,py+TS/2);
+        ctx.fillStyle='rgba(100,100,255,0.3)';
+        ctx.fillRect(px,py,TS,TS);
       }
     }
- 
-    // Exit marker
-    if(isExit){
-      ctx.fillStyle='#34d399';
-      ctx.font='bold 14px Cinzel,serif';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText('⬡',px,py);
-      ctx.fillStyle='#34d399';
-      ctx.font='9px Crimson Text,serif';
-      ctx.fillText('WYJŚCIE',px,py+16);
-    }
-  });
- 
-  // Draw enemies
-  enemies.forEach(e=>{
-    const {x,y}=hexToPixel(e.q,e.r);
-    const px=cx+x, py=cy+y;
-    const hex=hexMap.get(hexKey(e.q,e.r));
-    if(!hex||!hex.visible) return;
- 
-    if(e.deathAnim>0){
-      // Death animation
-      const t=1-e.deathAnim/30;
-      ctx.globalAlpha=1-t;
-      const s=HEX_SIZE*(1-t*0.5);
-      drawHex(px,py,s,null,'rgba(240,208,96,0.8)',2);
-      ctx.globalAlpha=1;
-      e.deathAnim--;
-      return;
-    }
- 
-    // Enemy colors
-    const colors={
-      skeleton:{body:'#7f1d1d',border:'#f87171',symbol:'💀'},
-      demon:{body:'#4c1d95',border:'#a78bfa',symbol:'👿'},
-      troll:{body:'#78350f',border:'#fbbf24',symbol:'👹'}
-    };
-    const col=colors[e.type];
- 
-    drawHex(px,py,HEX_SIZE-3,col.body,col.border,1.5);
- 
-    // Enemy symbol
-    ctx.font='18px serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(col.symbol,px,py+2);
- 
-    // HP bar
-    const bw=HEX_SIZE*1.4;
-    const bx=px-bw/2, by=py+HEX_SIZE-8;
-    ctx.fillStyle='#1a1a2e';
-    ctx.fillRect(bx,by,bw,4);
-    ctx.fillStyle=e.hp/e.maxHp>0.5?'#22c55e':'#ef4444';
-    ctx.fillRect(bx,by,bw*(e.hp/e.maxHp),4);
- 
-    // Attack note above enemy (if adjacent to player)
-    const dist=hexDist(player.q,player.r,e.q,e.r);
-    if(dist===1){
-      const an=NOTES[e.noteIdx];
-      // Pulsing background
-      const pulse=0.7+0.3*Math.sin(performance.now()*0.006);
-      ctx.fillStyle=`rgba(212,175,55,${pulse*0.9})`;
-      ctx.beginPath();
-      ctx.roundRect(px-18,py-HEX_SIZE-22,36,18,4);
-      ctx.fill();
-      ctx.fillStyle='#0a0d14';
-      ctx.font='bold 11px Cinzel,serif';
-      ctx.textAlign='center';
-      ctx.textBaseline='middle';
-      ctx.fillText(an.label,px,py-HEX_SIZE-13);
- 
-      // Arrow down
-      ctx.fillStyle='rgba(212,175,55,0.7)';
-      ctx.font='10px serif';
-      ctx.fillText('▼',px,py-HEX_SIZE+2);
-    }
- 
-    // Stun indicator
-    if(e.stunTimer>0){
-      ctx.fillStyle='rgba(147,197,253,0.6)';
-      ctx.font='14px serif';
-      ctx.textAlign='center';
-      ctx.fillText('★',px+HEX_SIZE-4,py-HEX_SIZE+4);
-    }
-  });
- 
+  }
+  // Draw NPCs (only in village)
+  if(!inDungeon){
+    NPC_LIST.forEach(npc=>{
+      const px=npc.wx*TS, py=npc.wy*TS;
+      if(px<camX-TS||px>camX+canvas.width+TS||py<camY-TS||py>camY+canvas.height+TS)return;
+      // Shadow
+      ctx.fillStyle='rgba(0,0,0,0.2)';
+      ctx.beginPath();ctx.ellipse(px,py+TS*0.45,TS*0.28,TS*0.1,0,0,Math.PI*2);ctx.fill();
+      // Bob animation
+      const bob=Math.sin(animTick*0.04+npc.wx)*2;
+      ctx.font='22px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(npc.emoji,px,py+bob);
+      // Name tag
+      const dist=Math.hypot(player.x-npc.wx,player.y-npc.wy);
+      if(dist<3){
+        ctx.fillStyle='rgba(0,0,0,0.65)';
+        const tw=ctx.measureText(npc.name).width+8;
+        ctx.fillRect(px-tw/2,py-TS*0.65,tw,14);
+        ctx.fillStyle=npc.color;
+        ctx.font='bold 9px Crimson Text,serif';
+        ctx.textAlign='center';ctx.textBaseline='top';
+        ctx.fillText(npc.name,px,py-TS*0.63);
+        // Talk hint
+        ctx.fillStyle='rgba(212,175,55,0.9)';
+        ctx.font='8px Press Start 2P,monospace';
+        ctx.fillText('[H] Rozmawiaj',px,py+TS*0.55);
+      }
+    });
+  }
+  // Draw spiders (dungeon)
+  if(inDungeon){
+    spiders.forEach(sp=>{
+      if(sp.dead&&sp.deathAnim<=0)return;
+      const px=sp.x*TS,py=sp.y*TS;
+      if(sp.deathAnim>0){
+        ctx.globalAlpha=sp.deathAnim/20;
+        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText('🕷️',px+TS/2,py+TS/2);
+        ctx.globalAlpha=1;sp.deathAnim--;
+        return;
+      }
+      const bob=Math.sin(animTick*0.08+sp.x)*2;
+      ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('🕷️',px+TS/2,py+TS/2+bob);
+      // HP bar
+      const bw=TS-4;
+      ctx.fillStyle='#3a0000';ctx.fillRect(px+2,py+TS-6,bw,4);
+      ctx.fillStyle=sp.hp/sp.maxHp>0.5?'#22c55e':'#ef4444';
+      ctx.fillRect(px+2,py+TS-6,bw*(sp.hp/sp.maxHp),4);
+      // Stun stars
+      if(sp.stunTimer>0){
+        ctx.font='10px serif';ctx.fillText('⭐',px+TS-6,py+4);
+      }
+    });
+  }
   // Draw player
   {
-    const {x,y}=hexToPixel(player.q,player.r);
-    const px=cx+x, py=cy+y;
-    const t=performance.now()*0.003;
-    const glow=0.5+0.5*Math.sin(t);
-    drawHex(px,py,HEX_SIZE-3,'#1e3a8a',`rgba(96,165,250,${0.5+glow*0.5})`,2);
-    ctx.font='20px serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText('🧙',px,py+2);
+    const px=player.x*TS, py=player.y*TS;
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    ctx.beginPath();ctx.ellipse(px+TS/2,py+TS*0.85,TS*0.3,TS*0.1,0,0,Math.PI*2);ctx.fill();
+    // Player sprite
+    const t=TOOL_INFO[TOOLS[player.toolIdx]];
+    ctx.font='24px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('🧑‍🌾',px+TS/2,py+TS/2);
+    // Tool indicator
+    ctx.font='13px serif';
+    ctx.fillText(t.icon,px+TS-4,py+4);
+    // Selection ring
+    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
+    ctx.strokeRect(px+1,py+1,TS-2,TS-2);
   }
- 
-  // Flash overlay
-  if(flashTimer>0){
-    ctx.fillStyle=flashColor;
-    ctx.fillRect(-10,-10,W+20,H+20);
-    flashTimer--;
-  }
- 
   // Particles
-  ctx.restore(); // undo shake for particles (they follow canvas coords)
-  ctx.save();
   particles=particles.filter(p=>p.life>0);
   particles.forEach(p=>{
     ctx.globalAlpha=p.life;
     ctx.fillStyle=p.color;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);
-    ctx.fill();
-    p.x+=p.vx; p.y+=p.vy;
-    p.vy+=0.08;
-    p.life-=p.decay;
+    ctx.font=p.size+'px serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.emoji,p.x,p.y);
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life-=p.decay;
   });
   ctx.globalAlpha=1;
   ctx.restore();
- 
-  // HUD overlay: detected note pulse
-  if(pendingNote!==null){
-    ctx.fillStyle='rgba(240,208,96,0.12)';
-    ctx.fillRect(0,0,W,H);
+  // Day timer overlay bar
+  const prog=dayTimer/DAY_FRAMES;
+  ctx.fillStyle='rgba(0,0,0,0.4)';
+  ctx.fillRect(0,canvas.height-4,canvas.width,4);
+  const dc=prog<0.7?'#a0d040':prog<0.9?'#f0a020':'#e04020';
+  ctx.fillStyle=dc
+ctx.fillRect(0,canvas.height-4,canvas.width*(1-prog),4);
+  // Day label
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.font='8px Press Start 2P,monospace';
+  ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillText('Dzień '+player.day+' | '+(inDungeon?'DUNGEON':'Wioska'),canvas.width-6,canvas.height-6);
+}
+function spawnParticle(wx,wy,emoji,color='#fff'){
+  particles.push({x:wx*TS+TS/2,y:wy*TS+TS/2,vx:(Math.random()-0.5)*2,vy:-2-Math.random()*2,life:1,decay:0.04,emoji,color,size:16});
+}
+// ══════════════════════════════════════════
+// MOVEMENT & COLLISION
+// ══════════════════════════════════════════
+function canWalk(x,y){
+  if(x<0||y<0||x>=WW||y>=WH)return false;
+  const map=inDungeon?dungeon:village;
+  const cell=map[y][x];
+  const blocked=[T.TREE,T.BUSH,T.FENCE,T.WATER,T.HOUSE,T.SHOP,T.BARN,T.DNG_WALL,T.ROCK,T.ORE,T.CHEST];
+  if(blocked.includes(cell.t))return false;
+  if(inDungeon&&spiders.find(s=>!s.dead&&s.x===x&&s.y===y))return false;
+  return true;
+}
+function tryMove(dx,dy){
+  const nx=Math.round(player.x)+dx;
+  const ny=Math.round(player.y)+dy;
+  if(canWalk(nx,ny)){
+    player.x=nx; player.y=ny;
+    clampCamera();
+    checkProximityHint();
+    return true;
+  }
+  return false;
+}
+// ══════════════════════════════════════════
+// TOOL ACTIONS
+// ══════════════════════════════════════════
+function currentTool(){return TOOLS[player.toolIdx];}
+function useTool(){
+  const map=inDungeon?dungeon:village;
+  const px=Math.round(player.x), py=Math.round(player.y);
+  const tool=currentTool();
+  // Check adjacent cells for action targets
+  const dirs=[[0,0],[0,-1],[0,1],[-1,0],[1,0]];
+  for(const[dx,dy]of dirs){
+    const tx=px+dx, ty=py+dy;
+    if(tx<0||ty<0||tx>=WW||ty>=WH)continue;
+    const cell=map[ty][tx];
+    // DUNGEON ACTIONS
+    if(inDungeon){
+      if(tool==='shovel'&&cell.obj==='ore'){
+        cell.data.hp--;
+        spawnParticle(tx,ty,'💥');
+        if(cell.data.hp<=0){
+          player.inventory.ore++;
+          map[ty][tx]=mkCell(T.DNG_FLOOR);
+          addLog('Wydobyto rudę! +1 💎','good');
+          updateHUD();
+        } else addLog('Kopiesz rudę... (HP:'+cell.data.hp+')','info');
+        return;
+      }
+      if(tool==='shovel'&&cell.obj==='rock'){
+        cell.data.hp--;
+        spawnParticle(tx,ty,'💥');
+        if(cell.data.hp<=0){
+          map[ty][tx]=mkCell(T.DNG_FLOOR);
+          // Chance of crystal
+          if(Math.random()<0.3){player.inventory.crystal++;addLog('Znaleziono kryształ! +1 💠','good');}
+          else addLog('Kamień rozbity!','info');
+          updateHUD();
+        } else addLog('Rozbijasz kamień...','info');
+        return;
+      }
+      // Attack spider
+      const spider=spiders.find(s=>!s.dead&&s.x===tx&&s.y===ty);
+      if(spider){
+        spider.hp--;spider.stunTimer=60;
+        spawnParticle(tx,ty,'⚔️','#ff4040');
+        if(spider.hp<=0){
+          spider.dead=true;spider.deathAnim=20;
+          player.gold+=5;
+          addLog('Pokonano pająka! +5💰','good');
+          updateHUD();
+        } else addLog('Uderzasz pająka! (HP:'+spider.hp+')','info');
+        return;
+      }
+      // Open chest
+      if(cell.obj==='chest'&&!cell.data.opened){
+        cell.data.opened=true;
+        map[ty][tx].t=T.DNG_FLOOR;
+        const bonus=30+Math.floor(Math.random()*40);
+        player.gold+=bonus;
+        player.inventory.crystal+=1;
+        addLog('Otworzyłeś skrzynię! +'+bonus+'💰 +1💠','gld');
+        updateHUD();spawnParticle(tx,ty,'🎁');
+        return;
+      }
+      return;
+    }
+    // VILLAGE ACTIONS
+    if(cell.obj==='field'){
+      const d=cell.data;
+      // Remove weed first
+      if(d.weed){
+        if(tool==='hoe'||tool==='cult'){
+          d.weed=false;
+          addLog('Usunięto chwast!','good');
+          spawnParticle(tx,ty,'✨');
+          return;
+        } else {addLog('Użyj motyki lub kultyvatora aby usunąć chwast!','bad');return;}
+      }
+      // HOE: till soil
+      if((tool==='hoe'||tool==='cult')&&!d.tilled&&!d.crop){
+        d.tilled=true;
+        addLog('Ziemia zaorana!','good');
+        spawnParticle(tx,ty,'⛏');
+        return;
+      }
+      // WATER: water tilled/planted
+      if(tool==='water'&&(d.tilled||d.crop)){
+        d.wet=true;
+        addLog('Pole podlane!','info');
+        spawnParticle(tx,ty,'💧');
+        return;
+      }
+      // AERATOR: boost growth on wet tilled soil
+      if(tool==='aer'&&d.tilled&&d.wet&&!d.crop){
+        d.aerated=true;
+        addLog('Gleba napowietrzona — szybszy wzrost!','good');
+        spawnParticle(tx,ty,'🌬');
+        return;
+      }
+      // HAND: plant seed if tilled, or harvest if ready
+      if(tool==='walk'){
+        if(d.tilled&&!d.crop){
+          // Plant selected seed
+          const seed=player.selectedSeed;
+          if(player.inventory[seed]>0){
+            player.inventory[seed]--;
+            d.crop=seed; d.growStage=0; d.growDay=player.day;
+            addLog('Posadzono: '+CROPS[seed].name,'good');
+            spawnParticle(tx,ty,'🌱');
+            updateHUD();
+          } else addLog('Brak nasion! Kup w sklepie.','bad');
+          return;
+        }
+        if(d.crop&&d.growStage>=3){
+          // Harvest
+          const harvestItem=HARVEST_ITEM[d.crop];
+          const qty=d.aerated?2:1;
+          player.inventory[harvestItem]=(player.inventory[harvestItem]||0)+qty;
+          addLog('Zebrano: '+ITEM_INFO[harvestItem].name+(qty>1?' x'+qty:'')+'!','good');
+          spawnParticle(tx,ty,'🌾');
+          d.crop=null;d.tilled=false;d.wet=false;d.growStage=0;d.aerated=false;
+          updateHUD();
+          return;
+        }
+        if(d.crop&&d.growStage<3){
+          const days=CROPS[d.crop].growDays-d.growStage;
+          addLog('Rośnie jeszcze '+days+' dni...','info');
+          return;
+        }
+      }
+    }
+  }
+  addLog('Nic tu nie ma do zrobienia tym narzędziem.','info');
+}
+// ══════════════════════════════════════════
+// TALK / INTERACT
+// ══════════════════════════════════════════
+function tryTalk(){
+  const px=Math.round(player.x),py=Math.round(player.y);
+  const map=inDungeon?dungeon:village;
+  // Check dungeon exit
+  if(inDungeon){
+    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
+      const cell=map[py+dy]?.[px+dx];
+      if(cell&&cell.obj==='exit'){exitDungeon();return;}
+    }
+    addLog('Idź do drzwi wyjściowych (🚪) aby wyjść.','info');
+    return;
+  }
+  // Check NPC proximity
+  for(const npc of NPC_LIST){
+    const dist=Math.hypot(player.x-npc.wx,player.y-npc.wy);
+    if(dist<2){
+      const idx=npcDialogIdx[npc.id];
+      const line=npc.lines[idx%npc.lines.length];
+      npcDialogIdx[npc.id]++;
+      showDlg(npc.name,npc.emoji+' '+line);
+      return;
+    }
+  }
+  // Check shop proximity
+  const shopDist=Math.hypot(player.x-5.5,player.y-1.5);
+  if(shopDist<3){openShop();return;}
+  // Check sell box proximity
+  for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
+    const tx=px+dx,ty=py+dy;
+    if(ty>=0&&ty<WH&&tx>=0&&tx<WW&&map[ty][tx].t===T.SELL){
+      openSell();return;
+    }
+  }
+  // Check dungeon gate
+  for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
+    const tx=px+dx,ty=py+dy;
+    if(ty>=0&&ty<WH&&tx>=0&&tx<WW&&map[ty][tx].obj==='dungeon_gate'){
+      enterDungeon();return;
+    }
+  }
+  addLog('Podejdź bliżej NPC, sklepu lub wejścia do dungeonu.','info');
+}
+// ══════════════════════════════════════════
+// DUNGEON
+// ══════════════════════════════════════════
+function enterDungeon(){
+  inDungeon=true;
+  player.x=2;player.y=2;
+  if(!dungeon.length) dungeon=buildDungeon();
+  // Respawn spiders if all dead
+  const alive=spiders.filter(s=>!s.dead);
+  if(alive.length===0){
+    dungeon=buildDungeon(); // rebuild respawns spiders
+  }
+  addLog('Wchodzisz do dungeonu! Pająki czuwają...','bad');
+  clampCamera();
+}
+function exitDungeon(){
+  inDungeon=false;
+  player.x=16;player.y=21;
+  addLog('Wyszedłeś z dungeonu.','info');
+  clampCamera();
+}
+// ══════════════════════════════════════════
+// SPIDER AI
+// ══════════════════════════════════════════
+let spiderTick=0;
+function updateSpiders(){
+  if(!inDungeon)return;
+  spiderTick++;
+  if(spiderTick%40!==0)return; // move every 40 frames
+  spiders.forEach(sp=>{
+    if(sp.dead)return;
+    if(sp.stunTimer>0){sp.stunTimer-=40;return;}
+    const dist=Math.hypot(player.x-sp.x,player.y-sp.y);
+    // Attack player if adjacent
+    if(dist<1.5){
+      player.hp=Math.max(0,player.hp-1);
+      addLog('Pająk cię gryzie! -1 HP','bad');
+      updateHUD();
+      if(player.hp<=0){gameOver();return;}
+      return;
+    }
+    // Chase if within 6 tiles
+    if(dist<6){
+      const dx=player.x>sp.x?1:player.x<sp.x?-1:0;
+      const dy=player.y>sp.y?1:player.y<sp.y?-1:0;
+      const dirs=[[dx,0],[0,dy],[dx,dy],[-dx,0],[0,-dy]];
+      for(const[mx,my]of dirs){
+        if(mx===0&&my===0)continue;
+        const nx=sp.x+mx,ny=sp.y+my;
+        if(nx<0||ny<0||nx>=WW||ny>=WH)continue;
+        if(dungeon[ny][nx].t===T.DNG_FLOOR&&!spiders.find(s=>s!==sp&&!s.dead&&s.x===nx&&s.y===ny)&&!(nx===Math.round(player.x)&&ny===Math.round(player.y))){
+          sp.x=nx;sp.y=ny;break;
+        }
+      }
+    } else {
+      // Random wander
+      if(Math.random()<0.4){
+        const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+        const[mx,my]=dirs[Math.floor(Math.random()*4)];
+        const nx=sp.x+mx,ny=sp.y+my;
+        if(nx>0&&ny>0&&nx<WW-1&&ny<WH-1&&dungeon[ny][nx].t===T.DNG_FLOOR)
+          {sp.x=nx;sp.y=ny;}
+      }
+    }
+  });
+}
+// ══════════════════════════════════════════
+// DAY CYCLE
+// ══════════════════════════════════════════
+function advanceDay(){
+  player.day++;
+  dayTimer=0;
+  addLog('─── Nowy dzień: '+player.day+' ───','gld');
+  // Grow crops
+  const map=village;
+  let grew=0;
+  for(let y=0;y<WH;y++){
+    for(let x=0;x<WW;x++){
+      const cell=map[y][x];
+      if(cell.obj==='field'&&cell.data.crop){
+        const d=cell.data;
+        if(d.wet){
+          const maxStage=3;
+          if(d.growStage<maxStage){
+            d.growStage++;grew++;
+            if(d.growStage===maxStage) addLog(CROPS[d.crop].name+' gotowa do zbioru!','good');
+          }
+        }
+        d.wet=false; // needs re-watering each day
+        // Weeds can spread
+        if(Math.random()<0.05){
+          const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+          const[dx,dy]=dirs[Math.floor(Math.random()*4)];
+          const nx=x+dx,ny=y+dy;
+          if(nx>=0&&ny>=0&&nx<WW&&ny<WH&&map[ny][nx].obj==='field'&&!map[ny][nx].data.crop&&!map[ny][nx].data.weed)
+            map[ny][nx].data.weed=true;
+        }
+      }
+    }
+  }
+  if(grew>0) addLog(grew+' roślin urosło tej nocy.','info');
+  updateHUD();
+}
+// ══════════════════════════════════════════
+// SHOP
+// ══════════════════════════════════════════
+let shopTab='buy';
+function openShop(){
+  document.getElementById('shop').classList.add('show');
+  shopTab='buy';renderShop();
+}
+function closeShop(){document.getElementById('shop').classList.remove('show');}
+function shopTab2(t){shopTab=t;renderShop();}
+function renderShop(){
+  const el=document.getElementById('sh-content');
+  el.innerHTML='';
+  // Tab buttons
+  document.querySelectorAll('.sh-tab').forEach(b=>{
+    b.classList.toggle('on',b.dataset.tab===shopTab);
+  });
+  if(shopTab==='buy'){
+    document.getElementById('sh-title').textContent='🏪 SKLEP — Kup (Złoto: '+player.gold+')';
+    SHOP_BUY.forEach(item=>{
+      const owned=item.type==='tool'?TOOL_INFO[item.id]?.owned:false;
+      const canAfford=player.gold>=item.price;
+      const div=document.createElement('div');div.className='sh-card';
+      div.innerHTML=`<div class="sh-icon">${item.icon}</div>
+        <div class="sh-name">${item.name}</div>
+        <div class="sh-desc">${item.desc}</div>
+        <div class="sh-price">${item.price} 💰</div>
+        <button class="sh-btn" ${(owned||!canAfford)?'disabled':''} onclick="buyItem('${item.id}',${item.price},'${item.type}')">
+          ${owned?'Posiadasz':canAfford?'Kup':'Za mało złota'}
+        </button>`;
+      el.appendChild(div);
+    });
+  } else if(shopTab==='sell'){
+    document.getElementById('sh-title').textContent='💰 SPRZEDAJ PLONY';
+    const sellable=['wheat','carrot','tomato','ore','crystal'];
+    sellable.forEach(id=>{
+      const qty=player.inventory[id]||0;
+      if(!ITEM_INFO[id])return;
+      const info=ITEM_INFO[id];
+      const div=document.createElement('div');div.className='sh-card';
+      div.innerHTML=`<div class="sh-icon">${info.icon}</div>
+        <div class="sh-name">${info.name}</div>
+        <div class="sh-desc">Masz: ${qty} szt.</div>
+        <div class="sh-price">${info.sellPrice} 💰 / szt.</div>
+        <button class="sh-btn" ${qty===0?'disabled':''} onclick="sellItem('${id}',1)">Sprzedaj 1</button>
+        <button class="sh-btn" style="margin-top:3px" ${qty===0?'disabled':''} onclick="sellItem('${id}',${qty})">Sprzedaj wszystko</button>`;
+      el.appendChild(div);
+    });
+  } else if(shopTab==='oct'){
+    document.getElementById('sh-title').textContent='🎵 ODBLOKUJ OKTAWY';
+    SHOP_OCT.forEach(item=>{
+      const already=unlockedOct[item.id];
+      const canAfford=player.gold>=item.price;
+      const div=document.createElement('div');div.className='sh-card';
+      div.innerHTML=`<div class="sh-icon">${item.icon}</div>
+        <div class="sh-name">${item.name}</div>
+        <div class="sh-desc">${item.desc}</div>
+        <div class="sh-price">${item.price} 💰</div>
+        <button class="sh-btn" ${(already||!canAfford)?'disabled':''} onclick="buyOctave('${item.id}',${item.price})">
+          ${already?'Odblokowano':canAfford?'Kup':'Za mało złota'}
+        </button>`;
+      el.appendChild(div);
+    });
   }
 }
- 
-function updateNoteGrid(){
-  const grid=document.getElementById('note-grid');
+function buyItem(id,price,type){
+  if(player.gold<price){addLog('Za mało złota!','bad');return;}
+  player.gold-=price;
+  if(type==='seed'){
+    player.inventory[id]=(player.inventory[id]||0)+3;
+    addLog('Kupiono 3x '+CROPS[id].name,'gld');
+  } else if(type==='tool'){
+    TOOL_INFO[id].owned=true;
+    addLog('Kupiono narzędzie: '+TOOL_INFO[id].label,'gld');
+  }
+  updateHUD();renderShop();
+}
+function sellItem(id,qty){
+  const have=player.inventory[id]||0;
+  const q=Math.min(qty,have);
+  if(q===0){addLog('Nie masz tego!','bad');return;}
+  player.inventory[id]-=q;
+  const earned=q*ITEM_INFO[id].sellPrice;
+  player.gold+=earned;
+  addLog('Sprzedano '+q+'x '+ITEM_INFO[id].name+' za '+earned+'💰','gld');
+  updateHUD();renderShop();
+}
+function buyOctave(id,price){
+  if(player.gold<price){addLog('Za mało złota!','bad');return;}
+  player.gold-=price;
+  unlockedOct[id]=true;
+  addLog('Odblokowano oktawę: '+OCTAVES[id].label,'gld');
+  updateHUD();renderShop();
+}
+// ══════════════════════════════════════════
+// DIALOG
+// ══════════════════════════════════════════
+function showDlg(name,text){
+  document.getElementById('dlg-name').textContent=name;
+  document.getElementById('dlg-txt').textContent=text;
+  document.getElementById('dlg').classList.add('show');
+}
+function closeDlg(){document.getElementById('dlg').classList.remove('show');}
+// ══════════════════════════════════════════
+// HUD & INVENTORY
+// ══════════════════════════════════════════
+function updateHUD(){
+  document.getElementById('gv').textContent=player.gold;
+  document.getElementById('dayv').textContent=player.day;
+  const t=TOOL_INFO[TOOLS[player.toolIdx]];
+  document.getElementById('toolv').textContent=t.icon+' '+t.label;
+  renderInv();
+}
+function renderInv(){
+  const grid=document.getElementById('inv-grid');
+  if(!grid)return;
   grid.innerHTML='';
-  NOTES.forEach((n,i)=>{
+  // Seeds
+  Object.keys(CROPS).forEach(seed=>{
+    const qty=player.inventory[seed]||0;
+    const info
+  const info=CROPS[seed];
     const div=document.createElement('div');
-    div.className='note-card';
-    div.id='nc-'+i;
-    // Find what this note does
-    const moveDir=DIR_NOTE.indexOf(i);
-    const dirNames=['→E','↗NE','↖NW','←W','↙SW','↘SE'];
-    const action=i===ATTACK_NOTE_IDX?'⚔ ATAK':moveDir>=0?dirNames[moveDir]:'—';
-    div.innerHTML=`<div class="note-card-name">${n.label}</div><div class="note-card-action">${action}</div>`;
+    div.className='inv-item'+(player.selectedSeed===seed?' sel':'');
+    div.innerHTML=`<div class="inv-icon">${info.icon}</div><div class="inv-lbl">${info.name}</div><div class="inv-cnt">${qty}</div>`;
+    div.onclick=()=>{player.selectedSeed=seed;renderInv();addLog('Wybrano nasiona: '+info.name,'info');};
+    grid.appendChild(div);
+  });
+  // Harvested items & resources
+  ['wheat','carrot','tomato','ore','crystal'].forEach(id=>{
+    const qty=player.inventory[id]||0;
+    if(!qty)return;
+    const info=ITEM_INFO[id];
+    const div=document.createElement('div');div.className='inv-item';
+    div.innerHTML=`<div class="inv-icon">${info.icon}</div><div class="inv-lbl">${info.name}</div><div class="inv-cnt">${qty}</div>`;
     grid.appendChild(div);
   });
 }
- 
+function renderNoteMap(){
+  const grid=document.getElementById('nm-grid');
+  if(!grid)return;
+  grid.innerHTML='';
+  const notes=getNotes();
+  notes.forEach((note,i)=>{
+    const act=NOTE_ACTS[i];
+    const cell=document.createElement('div');
+    cell.className='nm-cell';
+    cell.id='nm-'+i;
+    cell.innerHTML=`<div class="nm-note">${note.n}</div><div class="nm-act">${act.icon} ${act.label}</div>`;
+    grid.appendChild(cell);
+  });
+}
 function highlightNote(idx){
-  document.querySelectorAll('.note-card').forEach((c,i)=>{
-    c.classList.toggle('target',i===idx);
+  document.querySelectorAll('.nm-cell').forEach((c,i)=>{
+    c.classList.toggle('lit',i===idx);
   });
-  // Mobile
-  const mn=document.getElementById('mobile-target');
-  if(mn&&idx!==null&&idx>=0) mn.textContent=NOTES[idx].label;
-  else if(mn) mn.textContent='—';
 }
- 
-// ════════════════════════════════════════════════════════════
-// GAME LOOP
-// ════════════════════════════════════════════════════════════
-let lastTick=0;
-function gameLoop(now){
-  if(!gameActive){animFrame=requestAnimationFrame(gameLoop);return;}
- 
-  resizeCanvas();
-  updateEnemies();
- 
-  // Process pending note
-  if(pendingNote!==null){
-    tryAction(pendingNote);
-    pendingNote=null;
-  }
- 
-  if(detectedCooldown>0) detectedCooldown--;
- 
-  drawGame();
-  animFrame=requestAnimationFrame(gameLoop);
-}
- 
-function resizeCanvas(){
-  const area=document.getElementById('game-area');
-  const panel=document.getElementById('right-panel');
-  const panelW=panel.offsetParent?panel.offsetWidth:0;
-  const W=area.offsetWidth-panelW;
-  const H=area.offsetHeight;
-  if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
-}
- 
-// ════════════════════════════════════════════════════════════
-// HUD
-// ════════════════════════════════════════════════════════════
-function updateHUD(){
-  const pct=player.hp/player.maxHp*100;
-  document.getElementById('hp-fill').style.width=pct+'%';
-  document.getElementById('hp-text').textContent=player.hp+'/'+player.maxHp;
-  document.getElementById('score-val').textContent=score;
-  document.getElementById('level-val').textContent=level;
-  document.getElementById('kills-val').textContent=kills;
-}
- 
 function addLog(msg,type='info'){
-  logEntries.unshift({msg,type});
-  if(logEntries.length>50) logEntries.pop();
   const list=document.getElementById('log-list');
-  if(!list) return;
-  list.innerHTML='';
-  logEntries.slice(0,20).forEach(e=>{
-    const div=document.createElement('div');
-    div.className='log-entry '+e.type;
-    div.textContent=e.msg;
-    list.appendChild(div);
-  });
+  if(!list)return;
+  const div=document.createElement('div');
+  div.className='log-e '+type;
+  div.textContent=msg;
+  list.prepend(div);
+  while(list.children.length>30)list.removeChild(list.lastChild);
 }
- 
-// ════════════════════════════════════════════════════════════
+function checkProximityHint(){
+  const px=Math.round(player.x),py=Math.round(player.y);
+  let hint='Śpiewaj nuty aby się poruszać. G=Akcja, A=Zmień narzędzie, H=Rozmawiaj';
+  if(!inDungeon){
+    for(const npc of NPC_LIST){
+      if(Math.hypot(player.x-npc.wx,player.y-npc.wy)<2){hint='Blisko: '+npc.name+' — H aby porozmawiać';break;}
+    }
+    if(Math.hypot(player.x-5.5,player.y-1.5)<3)hint='Blisko sklepu — H aby wejść';
+    const map=village;
+    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
+      const tx=px+dx,ty=py+dy;
+      if(ty>=0&&ty<WH&&tx>=0&&tx<WW){
+        if(map[ty][tx].t===T.SELL)hint='Blisko skrzynki sprzedaży — H aby sprzedać';
+        if(map[ty][tx].obj==='dungeon_gate')hint='Wejście do dungeonu — H aby wejść';
+        if(map[ty][tx].obj==='field'){
+          const d=map[ty][tx].data;
+          if(d.weed)hint='Pole: chwast! Użyj motyki (G) aby usunąć';
+          else if(!d.tilled&&!d.crop)hint='Pole: użyj motyki (G) aby zaorać';
+          else if(d.tilled&&!d.crop)hint='Pole: zaoranie gotowe — G (ręką) aby posadzić nasiona';
+          else if(d.crop&&!d.wet)hint='Pole: podlej konewką (G)!';
+          else if(d.crop&&d.growStage>=3)hint='Pole: GOTOWE! G (ręką) aby zebrać plony';
+          else if(d.crop)hint='Pole: rośnie (etap '+d.growStage+'/3) — podlewaj każdy dzień';
+        }
+      }
+    }
+  } else {
+    for(const sp of spiders){
+      if(!sp.dead&&Math.hypot(player.x-sp.x,player.y-sp.y)<2){hint='Pająk obok! G=Atak (potrzebujesz łopaty)';break;}
+    }
+    const map=dungeon;
+    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
+      const tx=px+dx,ty=py+dy;
+      if(ty>=0&&ty<WH&&tx>=0&&tx<WW){
+        if(map[ty]?.[tx]?.obj==='ore')hint='Ruda! G=Kopaj (potrzebujesz łopaty)';
+        if(map[ty]?.[tx]?.obj==='chest')hint='Skrzynka! G aby otworzyć';
+        if(map[ty]?.[tx]?.obj==='exit')hint='Wyjście! H aby opuścić dungeon';
+      }
+    }
+  }
+  const el=document.getElementById('btm-hint');
+  if(el)el.textContent=hint;
+}
+// ══════════════════════════════════════════
+// TOOL CYCLE
+// ══════════════════════════════════════════
+function cycleTool(){
+  let tries=0;
+  do{
+    player.toolIdx=(player.toolIdx+1)%TOOLS.length;
+    tries++;
+  } while(!TOOL_INFO[TOOLS[player.toolIdx]].owned&&tries<TOOLS.length);
+  const t=TOOL_INFO[TOOLS[player.toolIdx]];
+  addLog('Narzędzie: '+t.icon+' '+t.label,'info');
+  updateHUD();
+}
+// ══════════════════════════════════════════
+// ACTION DISPATCH
+// ══════════════════════════════════════════
+function dispatchAction(key){
+  if(!gameRunning)return;
+  if(document.getElementById('dlg').classList.contains('show')){
+    if(key==='talk')closeDlg();
+    return;
+  }
+  if(document.getElementById('shop').classList.contains('show')){
+    if(key==='talk')closeShop();
+    return;
+  }
+  switch(key){
+    case'up':   tryMove(0,-1);break;
+    case'down': tryMove(0,1);break;
+    case'left': tryMove(-1,0);break;
+    case'right':tryMove(1,0);break;
+    case'use':  useTool();break;
+    case'tool': cycleTool();break;
+    case'talk': tryTalk();break;
+  }
+}
+// ══════════════════════════════════════════
 // MICROPHONE & PITCH DETECTION
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
+let micOn=false,aCtx=null,analyser=null,micStream=null,pitchInterval=null;
+let freqHistory=[];
+let detCooldown=0;
 async function toggleMic(){
   if(micOn){stopMic();return;}
   try{
     micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     aCtx=new(window.AudioContext||window.webkitAudioContext)();
     const src=aCtx.createMediaStreamSource(micStream);
-    const gainNode=aCtx.createGain(); gainNode.gain.value=4.0; src.connect(gainNode);
-    analyser=aCtx.createAnalyser(); analyser.fftSize=8192; analyser.smoothingTimeConstant=0.3;
-    gainNode.connect(analyser);
+    const gain=aCtx.createGain();gain.gain.value=4.0;src.connect(gain);
+    analyser=aCtx.createAnalyser();analyser.fftSize=8192;analyser.smoothingTimeConstant=0.3;
+    gain.connect(analyser);
     micOn=true;
-    document.getElementById('mic-btn').textContent='🎤 Mikrofon: ON';
-    document.getElementById('mic-btn').classList.add('on');
+    document.getElementById('micbtn').textContent='🎤 Mikrofon: ON';
+    document.getElementById('micbtn').classList.add('on');
     pitchInterval=setInterval(detectPitch,50);
     addLog('🎤 Mikrofon włączony','info');
   }catch(e){alert('Brak dostępu do mikrofonu: '+e.message);}
 }
- 
 function stopMic(){
   if(pitchInterval){clearInterval(pitchInterval);pitchInterval=null;}
   if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
   if(aCtx){aCtx.close().catch(()=>{});aCtx=null;}
   micOn=false;
-  document.getElementById('mic-btn').textContent='🎤 Mikrofon: OFF';
-  document.getElementById('mic-btn').classList.remove('on');
-  document.getElementById('detected-note').textContent='—';
-  document.getElementById('pitch-fill').style.width='0';
+  document.getElementById('micbtn').textContent='🎤 Mikrofon: OFF';
+  document.getElementById('micbtn').classList.remove('on');
+  document.getElementById('notedisp').textContent='—';
+  highlightNote(-1);
 }
- 
 function detectPitch(){
-  if(!analyser) return;
+  if(!analyser)return;
   const buf=new Float32Array(analyser.fftSize);
   analyser.getFloatTimeDomainData(buf);
   const vol=getRMS(buf);
-  document.getElementById('pitch-fill').style.width=Math.min(100,vol*500)+'%';
- 
-  if(vol<0.002){
-    freqHistory=[];
-    document.getElementById('detected-note').textContent='—';
-    highlightNote(null);
-    return;
-  }
- 
+  if(vol<0.002){freqHistory=[];document.getElementById('notedisp').textContent='—';highlightNote(-1);return;}
   const freq=autoCorrelate(buf,aCtx.sampleRate);
-  if(freq<0){freqHistory=[];return;}
- 
+  if(freq<0){return;}
   freqHistory.push(freq);
-  if(freqHistory.length>4) freqHistory.shift();
- 
-  // Find closest note
-  let bestIdx=-1, bestDist=Infinity;
-  NOTES.forEach((n,i)=>{
-    const d=Math.abs(freq-n.freq)/n.freq;
+  if(freqHistory.length>4)freqHistory.shift();
+  const notes=getNotes();
+  let bestIdx=-1,bestDist=Infinity;
+  notes.forEach((note,i)=>{
+    const d=Math.abs(freq-note.f)/note.f;
     if(d<bestDist){bestDist=d;bestIdx=i;}
   });
- 
-  if(bestDist>0.10){
-    document.getElementById('detected-note').textContent='?';
-    highlightNote(null);
-    return;
-  }
- 
-  const noteName=NOTES[bestIdx].label;
-  document.getElementById('detected-note').textContent=noteName;
+  if(bestDist>0.12){document.getElementById('notedisp').textContent='?';highlightNote(-1);return;}
+  document.getElementById('notedisp').textContent=notes[bestIdx].n;
   highlightNote(bestIdx);
- 
-  // Stability check: 2 of last 4 match (more responsive)
   const matchCount=freqHistory.filter(f=>{
     let bi=-1,bd=Infinity;
-    NOTES.forEach((n,i)=>{const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bi=i;}});
+    notes.forEach((n,i)=>{const d=Math.abs(f-n.f)/n.f;if(d<bd){bd=d;bi=i;}});
     return bi===bestIdx;
   }).length;
- 
-  if(matchCount>=2 && detectedCooldown===0){
-    // Trigger action
-    pendingNote=bestIdx;
-    detectedCooldown=12; // ~600ms cooldown
-    document.getElementById('detected-note').style.animation='none';
-    void document.getElementById('detected-note').offsetWidth;
-    document.getElementById('detected-note').style.animation='pulse-gold 0.3s ease';
+  if(matchCount>=2&&detCooldown===0){
+    const act=NOTE_ACTS[bestIdx];
+    dispatchAction(act.key);
+    detCooldown=12;
+    setTimeout(()=>{detCooldown=0;},600);
   }
 }
- 
 function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.length);}
- 
 function autoCorrelate(buf,sr){
   let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
   if(rms<0.001)return-1;
@@ -856,70 +1224,95 @@ function autoCorrelate(buf,sr){
   let d=0;while(d<c.length-1&&c[d]>c[d+1])d++;
   let mv=-1,mp=-1;for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
   if(mp<1)return-1;
-  let T=mp;
-  if(T>0&&T<c.length-1){const a=(c[T-1]+c[T+1]-2*c[T])/2,b2=(c[T+1]-c[T-1])/2;if(a)T-=b2/(2*a);}
-  const f=sr/T;return(f<60||f>2000)?-1:f;
+  let T0=mp;
+  if(T0>0&&T0<c.length-1){const a=(c[T0-1]+c[T0+1]-2*c[T0])/2,b2=(c[T0+1]-c[T0-1])/2;if(a)T0-=b2/(2*a);}
+  const f=sr/T0;return(f<55||f>2100)?-1:f;
 }
- 
-// ════════════════════════════════════════════════════════════
-// START / END
-// ════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
+// KEYBOARD FALLBACK
+// ══════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(!gameRunning)return;
+  const map={
+    ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',
+    w:'up',s:'down',a:'left',d:'right',
+    ' ':'use',e:'use',q:'tool',f:'talk',
+    W:'up',S:'down',A:'left',D:'right',
+  };
+  if(map[e.key]){e.preventDefault();dispatchAction(map[e.key]);}
+  // Direct note keys for testing
+  const noteMap={c:'up',v:'right',b:'down',n:'left',m:'use',',':'tool','.':'talk'};
+  if(noteMap[e.key]){e.preventDefault();dispatchAction(noteMap[e.key]);}
+});
+// ══════════════════════════════════════════
+// GAME LOOP
+// ══════════════════════════════════════════
+let rafId=null;
+function gameLoop(){
+  animTick++;
+  dayTimer++;
+  if(dayTimer>=DAY_FRAMES)advanceDay();
+  if(detCooldown>0)detCooldown--;
+  updateSpiders();
+  clampCamera();
+  drawGame();
+  rafId=requestAnimationFrame(gameLoop);
+}
+// ══════════════════════════════════════════
+// START / GAME OVER
+// ══════════════════════════════════════════
 function startGame(){
   document.getElementById('overlay').style.display='none';
-  score=0; kills=0; level=1;
-  logEntries=[];
-  generateMap();
-  updateNoteGrid();
+  village=buildVillage();
+  dungeon=buildDungeon();
+  player.x=5;player.y=4;
+  player.hp=10;player.maxHp=10;
+  player.gold=50;player.day=1;player.toolIdx=0;
+  player.inventory={seeds_wheat:3,seeds_carrot:0,seeds_tomato:0,wheat:0,carrot:0,tomato:0,ore:0,crystal:0};
+  player.selectedSeed='seeds_wheat';
+  inDungeon=false;dayTimer=0;animTick=0;particles=[];
+  gameRunning=true;
+  resizeCanvas();
+  clampCamera();
+  renderNoteMap();
   updateHUD();
-  gameActive=true;
-  lastEnemyTick=performance.now();
-  if(animFrame) cancelAnimationFrame(animFrame);
-  animFrame=requestAnimationFrame(gameLoop);
-  addLog('🗡 Gra rozpoczęta! Śpiewaj nuty aby się poruszać.','info');
-  addLog('🎵 C/D/E/F/G/A = ruch, H = atak wroga obok','info');
+  addLog('🌾 Witaj w Muzycznej Farmie!','gld');
+  addLog('Śpiewaj nuty lub użyj klawiszy W/A/S/D + E/Q/F','info');
+  addLog('G=Akcja, A=Zmień narzędzie, H=Rozmawiaj','info');
+  if(rafId)cancelAnimationFrame(rafId);
+  rafId=requestAnimationFrame(gameLoop);
+  // Wire shop tabs
+  document.querySelectorAll('.sh-tab').forEach(b=>{
+    b.onclick=()=>shopTab2(b.dataset.tab);
+  });
 }
- 
-function endGame(won){
-  gameActive=false;
+function gameOver(){
+  gameRunning=false;
+  if(rafId)cancelAnimationFrame(rafId);
   const ov=document.getElementById('overlay');
   ov.style.display='flex';
-  const box=ov.querySelector('.overlay-box');
-  box.innerHTML=won
-    ?`<div class="overlay-title">🏆 Wygrana!</div>
-       <div class="overlay-sub">Wynik: <strong style="color:var(--gold)">${score}</strong><br>Zabiłeś: <strong style="color:var(--gold)">${kills}</strong> wrogów<br>Poziom: <strong style="color:var(--gold)">${level}</strong></div>
-       <button class="overlay-btn" onclick="restartGame()">Zagraj ponownie</button>`
-    :`<div class="overlay-title" style="color:#ef4444">💀 Poległeś!</div>
-       <div class="overlay-sub">Wynik: <strong style="color:var(--gold)">${score}</strong><br>Zabiłeś: <strong style="color:var(--gold)">${kills}</strong> wrogów<br>Przeżyłeś do poziomu: <strong style="color:var(--gold)">${level}</strong></div>
-       <button class="overlay-btn" onclick="restartGame()">Spróbuj ponownie</button>`;
+  ov.querySelector('.ov-box').innerHTML=`
+    <div class="ov-title">💀 GAME OVER</div>
+    <div class="ov-sub">Pająki cię pokonały...<br><br>Złoto: ${player.gold} 💰<br>Dzień: ${player.day}<br><br>Wróć silniejszy!</div>
+    <button class="ov-btn" onclick="startGame()">Zagraj ponownie</button>`;
 }
- 
-function restartGame(){
-  score=0;kills=0;level=1;particles=[];logEntries=[];
-  document.getElementById('overlay').style.display='none';
-  generateMap();
-  updateNoteGrid();
-  updateHUD();
-  gameActive=true;
-  lastEnemyTick=performance.now();
-  addLog('🗡 Nowa gra!','info');
-}
- 
-// Keyboard fallback (for testing without mic)
-document.addEventListener('keydown',e=>{
-  if(!gameActive) return;
-  const map={'c':0,'d':1,'e':2,'f':3,'g':4,'a':5,'h':6,
-             'C':0,'D':1,'E':2,'F':3,'G':4,'A':5,'H':6};
-  if(map[e.key]!==undefined){
-    pendingNote=map[e.key];
-    highlightNote(map[e.key]);
-    detectedCooldown=10;
-  }
-});
- 
-// Initial resize
-window.addEventListener('resize',resizeCanvas);
+// Init
 resizeCanvas();
-requestAnimationFrame(gameLoop);
+requestAnimationFrame(()=>drawGame());
+</script>
+<!-- Shop tab data attributes fix -->
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  // Assign data-tab to shop tab buttons after DOM ready
+  const tabs=document.querySelectorAll('.sh-tab');
+  const tabKeys=['buy','sell','oct'];
+  tabs.forEach((b,i)=>{if(tabKeys[i])b.dataset.tab=tabKeys[i];});
+});
 </script>
 </body>
 </html>
+
+
+
+
+                                   
