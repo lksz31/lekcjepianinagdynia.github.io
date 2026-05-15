@@ -1,320 +1,925 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Music Hex Garden</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Nutowy Dungeon – Łukasz Ganczarek</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background-color: #f0f8ff;
-  }
-
-  #game {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
-
-  #hexMap {
-    display: grid;
-    grid-template-columns: repeat(10, 50px);
-    grid-gap: 5px;
-  }
-
-  .hex {
-    width: 50px;
-    height: 50px;
-    background-color: #88cc88;
-    clip-path: polygon(
-      25% 0%,
-      75% 0%,
-      100% 50%,
-      75% 100%,
-      25% 100%,
-      0% 50%
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    cursor: pointer;
-    position: relative;
-  }
-
-  .player {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    background: red;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  #status {
-    margin-top: 10px;
-  }
+:root{
+  --gold:#d4af37;--gold2:#f0d060;--navy:#1e3a8a;
+  --dark:#0a0d14;--dark2:#111827;--dark3:#1a2235;
+  --red:#c0392b;--green:#16a34a;--purple:#7c3aed;
+  --border:#2a3a5a;--text:#c8d4e8;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);font-family:'Crimson Text',serif;color:var(--text);min-height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+ 
+/* ── Stars background ── */
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,#1a2a4a 0%,#0a0d14 60%);z-index:0;}
+ 
+#game-root{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;}
+ 
+/* ── Top HUD ── */
+#hud{display:flex;align-items:center;gap:12px;padding:8px 16px;background:rgba(10,13,20,0.9);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.hud-title{font-family:'Cinzel',serif;font-size:1rem;font-weight:900;color:var(--gold);letter-spacing:0.15em;white-space:nowrap;}
+.hud-sep{width:1px;height:24px;background:var(--border);}
+.hud-stat{display:flex;align-items:center;gap:6px;font-size:0.8rem;}
+.hud-label{color:#64748b;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;}
+.hp-bar{width:90px;height:8px;background:#1a2235;border-radius:4px;border:1px solid var(--border);overflow:hidden;}
+.hp-fill{height:100%;background:linear-gradient(90deg,#c0392b,#e74c3c);border-radius:4px;transition:width 0.3s;}
+.score-val{font-family:'Cinzel',serif;font-size:1rem;color:var(--gold);font-weight:700;}
+.level-val{font-family:'Cinzel',serif;font-size:1rem;color:#a78bfa;font-weight:700;}
+.mic-btn{padding:5px 14px;border-radius:50px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-family:'Crimson Text',serif;font-size:0.82rem;cursor:pointer;transition:.2s;white-space:nowrap;}
+.mic-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.1);}
+.mic-btn:hover{border-color:var(--gold);}
+ 
+/* ── Pitch display ── */
+#pitch-panel{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.detected-note{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:var(--gold2);min-width:48px;text-align:center;text-shadow:0 0 12px rgba(240,208,96,0.6);}
+.pitch-meter{width:60px;height:6px;background:#1a2235;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.pitch-fill{height:100%;width:0;background:var(--gold);border-radius:3px;transition:width .08s;}
+ 
+/* ── Main game area ── */
+#game-area{flex:1;display:flex;overflow:hidden;min-height:0;}
+ 
+/* ── Canvas ── */
+#hex-canvas{display:block;flex:1;min-width:0;}
+ 
+/* ── Right panel ── */
+#right-panel{width:200px;flex-shrink:0;background:rgba(10,13,20,0.95);border-left:1px solid var(--border);display:flex;flex-direction:column;gap:0;overflow-y:auto;}
+.panel-section{padding:12px;border-bottom:1px solid var(--border);}
+.panel-title{font-family:'Cinzel',serif;font-size:0.72rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:8px;}
+.note-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.note-card{background:var(--dark3);border:1px solid var(--border);border-radius:6px;padding:5px 4px;text-align:center;transition:.2s;}
+.note-card.target{border-color:var(--gold);background:rgba(212,175,55,0.15);box-shadow:0 0 8px rgba(212,175,55,0.3);}
+.note-card.ok{border-color:var(--green);background:rgba(22,163,74,0.2);}
+.note-card-name{font-family:'Cinzel',serif;font-size:0.85rem;font-weight:700;color:var(--gold2);}
+.note-card-action{font-size:0.62rem;color:#64748b;margin-top:1px;}
+.legend-item{display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:0.78rem;}
+.legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;}
+.log-list{display:flex;flex-direction:column;gap:3px;max-height:140px;overflow-y:auto;}
+.log-entry{font-size:0.72rem;color:#64748b;padding:2px 0;border-bottom:1px solid rgba(42,58,90,0.4);}
+.log-entry.good{color:#4ade80;}
+.log-entry.bad{color:#f87171;}
+.log-entry.info{color:#93c5fd;}
+ 
+/* ── Overlays ── */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.overlay-box{background:var(--dark2);border:1px solid var(--border);border-radius:16px;padding:36px 40px;text-align:center;max-width:420px;width:90%;}
+.overlay-title{font-family:'Cinzel',serif;font-size:1.8rem;font-weight:900;color:var(--gold);margin-bottom:12px;}
+.overlay-sub{font-size:1rem;color:var(--text);line-height:1.6;margin-bottom:20px;}
+.overlay-btn{padding:12px 32px;border-radius:50px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-family:'Cinzel',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:0.1em;}
+.overlay-btn:hover{background:var(--gold);color:var(--dark);}
+ 
+/* ── Bottom note display (mobile) ── */
+#bottom-note{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(10,13,20,0.97);border-top:1px solid var(--border);padding:8px 16px;z-index:50;text-align:center;}
+@media(max-width:600px){
+  #right-panel{display:none;}
+  #bottom-note{display:block;}
+  .hud-title{font-size:0.85rem;}
+}
+ 
+/* ── Animations ── */
+@keyframes pulse-gold{0%,100%{text-shadow:0 0 8px rgba(212,175,55,0.4);}50%{text-shadow:0 0 20px rgba(212,175,55,0.9);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+@keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.3);}100%{transform:scale(1);}}
 </style>
 </head>
 <body>
-<div id="game">
-  <h1>Music Hex Garden</h1>
-  <div id="hexMap"></div>
-  <button id="startMic">Start Microphone</button>
-  <div id="status">Microphone not started</div>
-  <p>Use singing to move (C=Up, D=Right, E=Down, F=Left).</p>
+<div id="game-root">
+  <!-- HUD -->
+  <div id="hud">
+    <span class="hud-title">⚔ NUTOWY DUNGEON</span>
+    <div class="hud-sep"></div>
+    <div class="hud-stat">
+      <span class="hud-label">HP</span>
+      <div class="hp-bar"><div class="hp-fill" id="hp-fill" style="width:100%"></div></div>
+      <span id="hp-text" style="font-size:0.78rem;color:#e74c3c;font-weight:700;">10/10</span>
+    </div>
+    <div class="hud-sep"></div>
+    <div class="hud-stat"><span class="hud-label">Wynik</span><span class="score-val" id="score-val">0</span></div>
+    <div class="hud-sep"></div>
+    <div class="hud-stat"><span class="hud-label">Poziom</span><span class="level-val" id="level-val">1</span></div>
+    <div class="hud-sep"></div>
+    <div class="hud-stat"><span class="hud-label">Zabici</span><span id="kills-val" style="font-family:'Cinzel',serif;color:#a78bfa;font-size:1rem;">0</span></div>
+    <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎤 Mikrofon: OFF</button>
+    <div id="pitch-panel">
+      <span class="hud-label">Dźwięk:</span>
+      <span class="detected-note" id="detected-note">—</span>
+      <div class="pitch-meter"><div class="pitch-fill" id="pitch-fill"></div></div>
+    </div>
+  </div>
+ 
+  <!-- Game area -->
+  <div id="game-area">
+    <canvas id="hex-canvas"></canvas>
+    <div id="right-panel">
+      <div class="panel-section">
+        <div class="panel-title">🎵 Nuty akcji</div>
+        <div class="note-grid" id="note-grid"></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-title">📖 Legenda</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b5bdb;border:1px solid #60a5fa;"></div><span>Gracz (Ty)</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7f1d1d;border:1px solid #f87171;"></div><span>Szkielet</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#4c1d95;border:1px solid #a78bfa;"></div><span>Demon</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#78350f;border:1px solid #fbbf24;"></div><span>Troll</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#065f46;border:1px solid #34d399;"></div><span>Wyjście</span></div>
+      </div>
+      <div class="panel-section" style="flex:1;">
+        <div class="panel-title">📜 Dziennik</div>
+        <div class="log-list" id="log-list"></div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Bottom note (mobile) -->
+  <div id="bottom-note" id="bottom-note-panel">
+    <span style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--gold);letter-spacing:.1em;">ZAGRAJ NUTĘ →</span>
+    <span style="font-family:'Cinzel',serif;font-size:1.4rem;color:var(--gold2);margin-left:10px;" id="mobile-target">—</span>
+  </div>
 </div>
-
+ 
+<!-- Overlay: Start -->
+<div id="overlay">
+  <div class="overlay-box">
+    <div class="overlay-title">⚔ Nutowy Dungeon</div>
+    <div class="overlay-sub">
+      Poruszaj się po heksach śpiewając lub grając odpowiednią nutę.<br><br>
+      🎵 <strong style="color:var(--gold);">Ruch</strong> — zaśpiewaj nutę widoczną na sąsiednim hexie<br>
+      ⚔️ <strong style="color:var(--gold);">Atak</strong> — zaśpiewaj nutę nad głową wroga (gdy stoisz obok)<br>
+      🏆 <strong style="color:var(--gold);">Cel</strong> — pokonaj wszystkich wrogów i dotrzyj do wyjścia
+    </div>
+    <button class="overlay-btn" onclick="startGame()">Rozpocznij przygodę</button>
+  </div>
+</div>
+ 
 <script>
-const mapSize = 10; // 10x10 grid
-const hexMapDiv = document.getElementById('hexMap');
-const statusDiv = document.getElementById('status');
-
-let playerPosition = {x: 0, y: 0};
-let microphoneActive = false;
-let audioContext;
-let analyser;
-let microphoneStream;
-let pitchDetectionInterval;
-
-// Game state for tiles
-// Each tile: {hasSeed: bool, isGrowing: bool, watered: bool}
-const mapTiles = Array.from({ length: mapSize }, () => 
-  Array.from({ length: mapSize }, () => ({hasSeed: false, isGrowing: false, watered: false}))
-);
-
-// Generate hex map
-for (let y = 0; y < mapSize; y++) {
-  for (let x = 0; x < mapSize; x++) {
-    const hex = document.createElement('div');
-    hex.className = 'hex';
-    hex.dataset.x = x;
-    hex.dataset.y = y;
-    hex.innerText = '';
-    hexMapDiv.appendChild(hex);
-  }
+// ════════════════════════════════════════════════════════════
+// NOTES CONFIG
+// ════════════════════════════════════════════════════════════
+const NOTES = [
+  {name:'C',  label:'c¹',  freq:261.63},
+  {name:'D',  label:'d¹',  freq:293.66},
+  {name:'E',  label:'e¹',  freq:329.63},
+  {name:'F',  label:'f¹',  freq:349.23},
+  {name:'G',  label:'g¹',  freq:392.00},
+  {name:'A',  label:'a¹',  freq:440.00},
+  {name:'H',  label:'h¹',  freq:493.88},
+];
+ 
+// Each of 6 hex directions maps to a note index (0-6, wrapping)
+// Direction indices: 0=NE, 1=E, 2=SE, 3=SW, 4=W, 5=NW
+const DIR_NOTE = [0,1,2,3,4,5]; // 6 dirs → 6 notes (C D E F G A)
+// Attack note = H (index 6) — unique so it never conflicts with move
+const ATTACK_NOTE_IDX = 6;
+ 
+// Hex directions (offset coords, pointy-top)
+// For even rows and odd rows in offset coordinates
+function hexNeighbors(q, r) {
+  // Using axial coordinates
+  return [
+    {q:q+1,r:r},   // E   → note 1 (D)
+    {q:q+1,r:r-1}, // NE  → note 0 (C)
+    {q:q,  r:r-1}, // NW  → note 5 (A)
+    {q:q-1,r:r},   // W   → note 4 (G)
+    {q:q-1,r:r+1}, // SW  → note 3 (F)
+    {q:q,  r:r+1}, // SE  → note 2 (E)
+  ];
 }
-
-// Draw player
-function drawPlayer() {
-  document.querySelectorAll('.hex').forEach(hex => {
-    hex.innerHTML = '';
-    hex.style.border = 'none';
-  });
-  const currentHex = getHex(playerPosition.x, playerPosition.y);
-  const playerDot = document.createElement('div');
-  playerDot.className = 'player';
-  currentHex.appendChild(playerDot);
+ 
+// ════════════════════════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════════════════════════
+let gameActive = false;
+let player = {q:0, r:0, hp:10, maxHp:10, cooldown:0};
+let enemies = [];
+let hexMap = new Map(); // key="q,r" value={type, visible}
+let score = 0;
+let kills = 0;
+let level = 1;
+let exitHex = null;
+let animFrame = null;
+let lastEnemyTick = 0;
+let particles = [];
+let shakeTimer = 0;
+let flashTimer = 0;
+let flashColor = '';
+let logEntries = [];
+ 
+// Note detection state
+let micOn = false, aCtx = null, analyser = null, micStream = null, pitchInterval = null;
+let freqHistory = [];
+let lastDetected = null;
+let detectedCooldown = 0; // frames before same note triggers again
+let pendingNote = null; // note triggered this tick
+ 
+// Canvas
+const canvas = document.getElementById('hex-canvas');
+const ctx = canvas.getContext('2d');
+ 
+const HEX_SIZE = 38; // radius in pixels
+const MAP_RADIUS = 5;
+ 
+// ════════════════════════════════════════════════════════════
+// HEX MATH (axial coords)
+// ════════════════════════════════════════════════════════════
+function hexToPixel(q, r) {
+  const x = HEX_SIZE * (Math.sqrt(3)*q + Math.sqrt(3)/2*r);
+  const y = HEX_SIZE * (3/2 * r);
+  return {x, y};
 }
-drawPlayer();
-
-function getHex(x, y) {
-  return document.querySelector(`.hex[data-x='${x}'][data-y='${y}']`);
+ 
+function hexKey(q,r){return q+','+r;}
+ 
+function hexDist(q1,r1,q2,r2){
+  return (Math.abs(q1-q2)+Math.abs(q1+r1-q2-r2)+Math.abs(r1-r2))/2;
 }
-
-// Microphone setup
-document.getElementById('startMic').addEventListener('click', () => {
-  startMicrophone();
-});
-
-function startMicrophone() {
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      microphoneStream = audioContext.createMediaStreamSource(stream);
-      analyser = audioContext.createAnalyser();
-      analyser.fftSize = 2048;
-      microphoneStream.connect(analyser);
-      statusDiv.innerText = 'Microphone started. Sing a note!';
-      microphoneActive = true;
-      detectPitch();
-    }).catch(err => {
-      statusDiv.innerText = 'Microphone access denied.';
-    });
-  } else {
-    statusDiv.innerText = 'Microphone not supported in this browser.';
-  }
-}
-
-// Pitch detection using auto-correlation
-function detectPitch() {
-  const bufferLength = analyser.fftSize;
-  const buffer = new Float32Array(bufferLength);
-
-  setInterval(() => {
-    analyser.getFloatTimeDomainData(buffer);
-    const pitchFreq = autoCorrelate(buffer, audioContext.sampleRate);
-    if (pitchFreq !== -1) {
-      const note = getNoteFromFrequency(pitchFreq);
-      statusDiv.innerText = 'Detected note: ' + note;
-      handleNoteInput(note);
-    }
-  }, 500);
-}
-
-// Auto-correlation pitch detection
-function autoCorrelate(buf, sampleRate) {
-  let SIZE = buf.length;
-  let MAX_SAMPLES = Math.floor(SIZE/2);
-  let bestOffset = -1;
-  let bestCorrelation = 0;
-  let rms = 0;
-  for (let i=0; i < SIZE; i++) {
-    let val = buf[i];
-    rms += val*val;
-  }
-  rms = Math.sqrt(rms/SIZE);
-  if (rms < 0.01) // too quiet
-    return -1;
-
-  let correlations = new Array(MAX_SAMPLES);
-  for (let offset=0; offset < MAX_SAMPLES; offset++) {
-    let correlation = 0;
-
-    for (let i=0; i < MAX_SAMPLES; i++) {
-      correlation += buf[i] * buf[i+offset];
-    }
-    correlations[offset] = correlation;
-    if (correlation > bestCorrelation) {
-      bestCorrelation = correlation;
-      bestOffset = offset;
-    }
-  }
-
-  if (bestCorrelation > 0.01) {
-    let freq = sampleRate / bestOffset;
-    return freq;
-  }
+ 
+function dirIndex(dq,dr){
+  const dirs=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
+  for(let i=0;i<6;i++) if(dirs[i].q===dq&&dirs[i].r===dr) return i;
   return -1;
 }
-
-// Map frequency to note
-function getNoteFromFrequency(freq) {
-  const noteFreqs = {
-    'C': 261.63,
-    'D': 293.66,
-    'E': 329.63,
-    'F': 349.23,
-    'G': 392.00,
-    'A': 440.00,
-    'B': 493.88
-  };
-  let closestNote = null;
-  let minDiff = Infinity;
-  for (const [note, noteFreq] of Object.entries(noteFreqs)) {
-    const diff = Math.abs(freq - noteFreq);
-    if (diff < minDiff) {
-      minDiff = diff;
-      closestNote = note;
+ 
+// ════════════════════════════════════════════════════════════
+// MAP GENERATION
+// ════════════════════════════════════════════════════════════
+function generateMap(){
+  hexMap.clear();
+  enemies = [];
+  // Fill hex circle
+  for(let q=-MAP_RADIUS;q<=MAP_RADIUS;q++){
+    const r1=Math.max(-MAP_RADIUS,-q-MAP_RADIUS);
+    const r2=Math.min(MAP_RADIUS,-q+MAP_RADIUS);
+    for(let r=r1;r<=r2;r++){
+      hexMap.set(hexKey(q,r),{type:'floor',visible:false,explored:false});
     }
   }
-  return closestNote;
+ 
+  // Place player at center
+  player.q=0; player.r=0;
+  player.hp=player.maxHp;
+  setVisible(0,0,2);
+ 
+  // Spawn enemies based on level
+  const enemyCount = 3 + level * 2;
+  const enemyTypes = ['skeleton','demon','troll'];
+  const hpByType = {skeleton:3,demon:5,troll:8};
+  const scoreByType = {skeleton:10,demon:20,troll:35};
+  let placed=0;
+  let attempts=0;
+  while(placed<enemyCount && attempts<500){
+    attempts++;
+    const q=Math.round((Math.random()-0.5)*MAP_RADIUS*2);
+    const r=Math.round((Math.random()-0.5)*MAP_RADIUS*2);
+    if(!hexMap.has(hexKey(q,r))) continue;
+    if(hexDist(0,0,q,r)<3) continue;
+    if(enemies.find(e=>e.q===q&&e.r===r)) continue;
+    const type=enemyTypes[Math.floor(Math.random()*enemyTypes.length)];
+    const noteIdx=Math.floor(Math.random()*NOTES.length);
+    enemies.push({
+      q,r,type,
+      hp:hpByType[type],maxHp:hpByType[type],
+      noteIdx, // note needed to attack it
+      score:scoreByType[type],
+      moveTimer:0,moveCooldown:type==='troll'?180:type==='demon'?90:120,
+      stunTimer:0,
+      deathAnim:0
+    });
+    placed++;
+  }
+ 
+  // Exit hex: opposite side of map
+  const ex=MAP_RADIUS-1, er=-(MAP_RADIUS-1);
+  exitHex={q:ex,r:er};
 }
-
-// Handle singing notes for movement and actions
-let lastNote = null;
-function handleNoteInput(note) {
-  // Prevent repeated triggers
-  if (note === lastNote) return;
-  lastNote = note;
-
-  // Movement
-  if (note === 'C') movePlayer(0, -1); // up
-  if (note === 'D') movePlayer(1, 0); // right
-  if (note === 'E') movePlayer(0, 1); // down
-  if (note === 'F') movePlayer(-1, 0); // left
-
-  // Plant seed with G
-  if (note === 'G') {
-    plantSeed();
+ 
+function setVisible(q,r,radius){
+  for(let dq=-radius;dq<=radius;dq++){
+    const dr1=Math.max(-radius,-dq-radius);
+    const dr2=Math.min(radius,-dq+radius);
+    for(let dr=dr1;dr<=dr2;dr++){
+      const k=hexKey(q+dq,r+dr);
+      if(hexMap.has(k)){
+        const h=hexMap.get(k);
+        h.visible=true; h.explored=true;
+      }
+    }
   }
-
-  // Harvest with A
-  if (note === 'A') {
-    harvestPlant();
+  // Mark all others not visible
+  hexMap.forEach((h,k)=>{
+    const [hq,hr]=k.split(',').map(Number);
+    if(hexDist(q,r,hq,hr)>radius) h.visible=false;
+  });
+}
+ 
+// ════════════════════════════════════════════════════════════
+// ENEMY AI
+// ════════════════════════════════════════════════════════════
+function updateEnemies(){
+  const now=performance.now();
+  if(now-lastEnemyTick<800) return;
+  lastEnemyTick=now;
+ 
+  enemies.forEach(e=>{
+    if(e.deathAnim>0) return;
+    if(e.stunTimer>0){e.stunTimer--;return;}
+    const dist=hexDist(player.q,player.r,e.q,e.r);
+ 
+    // Attack player if adjacent
+    if(dist===1){
+      const dmg=e.type==='troll'?2:1;
+      player.hp=Math.max(0,player.hp-dmg);
+      shakeTimer=15;
+      flashTimer=8; flashColor='rgba(192,57,43,0.35)';
+      addLog(`${enemyName(e.type)} atakuje! -${dmg}HP`,'bad');
+      updateHUD();
+      if(player.hp<=0){ endGame(false); return; }
+      return;
+    }
+ 
+    // Move toward player if visible hex
+    e.moveTimer++;
+    if(e.moveTimer<e.moveCooldown) return;
+    e.moveTimer=0;
+ 
+    if(dist<=MAP_RADIUS){
+      const neighbors=hexNeighbors(e.q,e.r);
+      // Pick neighbor closest to player that has no other enemy
+      let best=null,bestDist=dist;
+      neighbors.forEach(n=>{
+        if(!hexMap.has(hexKey(n.q,n.r))) return;
+        if(enemies.find(oe=>oe!==e&&oe.q===n.q&&oe.r===n.r&&oe.deathAnim===0)) return;
+        const d=hexDist(player.q,player.r,n.q,n.r);
+        if(d<bestDist){bestDist=d;best=n;}
+      });
+      if(best){e.q=best.q;e.r=best.r;}
+    }
+  });
+}
+ 
+function enemyName(type){return type==='skeleton'?'Szkielet':type==='demon'?'Demon':'Troll';}
+ 
+// ════════════════════════════════════════════════════════════
+// PLAYER ACTIONS
+// ════════════════════════════════════════════════════════════
+function tryAction(noteIdx){
+  if(!gameActive) return;
+ 
+  // Check if any adjacent enemy needs this attack note
+  const attackNote = ATTACK_NOTE_IDX;
+  if(noteIdx===attackNote){
+    // Try to attack an adjacent enemy
+    let attacked=false;
+    enemies.forEach(e=>{
+      if(e.deathAnim>0) return;
+      const dist=hexDist(player.q,player.r,e.q,e.r);
+      if(dist===1){
+        // Attack it!
+        e.hp--;
+        e.stunTimer=2;
+        flashTimer=5;flashColor='rgba(212,175,55,0.3)';
+        spawnParticles(e.q,e.r,'#f0d060',8);
+        addLog(`Atakujesz ${enemyName(e.type)}! (HP: ${e.hp}/${e.maxHp})`,'good');
+        if(e.hp<=0){
+          e.deathAnim=30;
+          score+=e.score*(level);
+          kills++;
+          spawnParticles(e.q,e.r,'#f0d060',20);
+          addLog(`☠ Pokonałeś ${enemyName(e.type)}! +${e.score*level}pkt`,'good');
+          updateHUD();
+          // Check win
+          checkLevelClear();
+        }
+        attacked=true;
+      }
+    });
+    if(attacked) return;
   }
-
-  // Water with B (if a seed is present)
-  if (note === 'B') {
-    waterPlant();
+ 
+  // Try to move: find neighbor with this note
+  const dirs=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
+  for(let i=0;i<6;i++){
+    if(DIR_NOTE[i]===noteIdx){
+      const nq=player.q+dirs[i].q;
+      const nr=player.r+dirs[i].r;
+      if(!hexMap.has(hexKey(nq,nr))) continue;
+      // Check enemy blocking
+      if(enemies.find(e=>e.q===nq&&e.r===nr&&e.deathAnim===0)) continue;
+      player.q=nq; player.r=nr;
+      setVisible(nq,nr,2);
+      spawnParticles(nq,nr,'#3b82f6',4);
+      addLog(`Ruch na (${nq},${nr})`,'info');
+      // Check exit
+      if(exitHex&&nq===exitHex.q&&nr===exitHex.r){
+        checkLevelClear();
+      }
+      return;
+    }
   }
 }
-
-// Movement
-function movePlayer(dx, dy) {
-  const newX = playerPosition.x + dx;
-  const newY = playerPosition.y + dy;
-  if (newX >= 0 && newX < mapSize && newY >= 0 && newY < mapSize) {
-    playerPosition.x = newX;
-    playerPosition.y = newY;
-    drawPlayer();
-    updateTileStatus();
+ 
+function checkLevelClear(){
+  const aliveEnemies=enemies.filter(e=>e.deathAnim===0&&e.hp>0);
+  const onExit=exitHex&&player.q===exitHex.q&&player.r===exitHex.r;
+  if(aliveEnemies.length===0||onExit){
+    setTimeout(()=>nextLevel(),800);
   }
 }
-
-// Plant seed
-function plantSeed() {
-  const tile = mapTiles[playerPosition.x][playerPosition.y];
-  if (!tile.hasSeed) {
-    tile.hasSeed = true;
-    tile.isGrowing = true;
-    tile.watered = false;
-    updateTileVisual(playerPosition.x, playerPosition.y);
+ 
+function nextLevel(){
+  level++;
+  score+=100*level;
+  addLog(`🏆 Poziom ${level}! Bonus: ${100*level}pkt`,'good');
+  generateMap();
+  updateHUD();
+  setVisible(player.q,player.r,2);
+}
+ 
+// ════════════════════════════════════════════════════════════
+// PARTICLES
+// ════════════════════════════════════════════════════════════
+function spawnParticles(q,r,color,count){
+  const {x,y}=hexToPixel(q,r);
+  const cx=canvas.width/2+x;
+  const cy=canvas.height/2+y;
+  for(let i=0;i<count;i++){
+    const angle=Math.random()*Math.PI*2;
+    const speed=1+Math.random()*3;
+    particles.push({
+      x:cx,y:cy,
+      vx:Math.cos(angle)*speed,
+      vy:Math.sin(angle)*speed,
+      life:1,decay:0.03+Math.random()*0.03,
+      size:2+Math.random()*4,
+      color
+    });
   }
 }
-
-// Harvest plant
-function harvestPlant() {
-  const tile = mapTiles[playerPosition.x][playerPosition.y];
-  if (tile.hasSeed && !tile.isGrowing) {
-    tile.hasSeed = false;
-    tile.watered = false;
-    updateTileVisual(playerPosition.x, playerPosition.y, true);
-  } else {
-    alert('Nothing to harvest here!');
+ 
+// ════════════════════════════════════════════════════════════
+// DRAWING
+// ════════════════════════════════════════════════════════════
+function hexCorners(cx,cy,size){
+  const pts=[];
+  for(let i=0;i<6;i++){
+    const a=Math.PI/180*(60*i-30); // pointy top
+    pts.push({x:cx+size*Math.cos(a),y:cy+size*Math.sin(a)});
+  }
+  return pts;
+}
+ 
+function drawHex(cx,cy,size,fillStyle,strokeStyle,lineWidth=1){
+  const pts=hexCorners(cx,cy,size);
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<6;i++) ctx.lineTo(pts[i].x,pts[i].y);
+  ctx.closePath();
+  if(fillStyle){ctx.fillStyle=fillStyle;ctx.fill();}
+  if(strokeStyle){ctx.strokeStyle=strokeStyle;ctx.lineWidth=lineWidth;ctx.stroke();}
+}
+ 
+function drawGame(){
+  const W=canvas.width, H=canvas.height;
+  const cx=W/2, cy=H/2;
+ 
+  // Shake offset
+  const sx=shakeTimer>0?(Math.random()-0.5)*6:0;
+  const sy=shakeTimer>0?(Math.random()-0.5)*6:0;
+  if(shakeTimer>0) shakeTimer--;
+ 
+  ctx.save();
+  ctx.translate(sx,sy);
+ 
+  // Background
+  ctx.fillStyle='#070a10';
+  ctx.fillRect(-10,-10,W+20,H+20);
+ 
+  // Grid pattern
+  ctx.strokeStyle='rgba(30,58,138,0.08)';
+  ctx.lineWidth=0.5;
+ 
+  // Draw hexes
+  hexMap.forEach((hex,key)=>{
+    const [q,r]=key.split(',').map(Number);
+    const {x,y}=hexToPixel(q,r);
+    const px=cx+x, py=cy+y;
+ 
+    if(!hex.explored) return;
+ 
+    const isPlayer=(q===player.q&&r===player.r);
+    const isExit=exitHex&&q===exitHex.q&&r===exitHex.r;
+    const enemy=enemies.find(e=>e.q===q&&e.r===r&&e.deathAnim===0);
+ 
+    let fill='#111827';
+    if(!hex.visible) fill='#0d1117';
+    if(isExit) fill='#052e16';
+ 
+    // Hex body
+    drawHex(px,py,HEX_SIZE-1,fill,
+      hex.visible?'#1e3a5a':'#131c30',
+      hex.visible?1:0.4);
+ 
+    if(!hex.visible) return;
+ 
+    // Highlight adjacent to player
+    const dist=hexDist(player.q,player.r,q,r);
+    if(dist===1){
+      // Find direction index
+      const dq=q-player.q, dr=r-player.r;
+      const di=dirIndex(dq,dr);
+      if(di>=0){
+        const noteIdx=DIR_NOTE[di];
+        const note=NOTES[noteIdx];
+        // Glow
+        drawHex(px,py,HEX_SIZE-1,null,'rgba(59,91,219,0.5)',1.5);
+        // Note label
+        ctx.fillStyle='#93c5fd';
+        ctx.font='bold 12px Cinzel,serif';
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillText(note.label,px,py);
+      }
+    }
+ 
+    // Exit marker
+    if(isExit){
+      ctx.fillStyle='#34d399';
+      ctx.font='bold 14px Cinzel,serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText('⬡',px,py);
+      ctx.fillStyle='#34d399';
+      ctx.font='9px Crimson Text,serif';
+      ctx.fillText('WYJŚCIE',px,py+16);
+    }
+  });
+ 
+  // Draw enemies
+  enemies.forEach(e=>{
+    const {x,y}=hexToPixel(e.q,e.r);
+    const px=cx+x, py=cy+y;
+    const hex=hexMap.get(hexKey(e.q,e.r));
+    if(!hex||!hex.visible) return;
+ 
+    if(e.deathAnim>0){
+      // Death animation
+      const t=1-e.deathAnim/30;
+      ctx.globalAlpha=1-t;
+      const s=HEX_SIZE*(1-t*0.5);
+      drawHex(px,py,s,null,'rgba(240,208,96,0.8)',2);
+      ctx.globalAlpha=1;
+      e.deathAnim--;
+      return;
+    }
+ 
+    // Enemy colors
+    const colors={
+      skeleton:{body:'#7f1d1d',border:'#f87171',symbol:'💀'},
+      demon:{body:'#4c1d95',border:'#a78bfa',symbol:'👿'},
+      troll:{body:'#78350f',border:'#fbbf24',symbol:'👹'}
+    };
+    const col=colors[e.type];
+ 
+    drawHex(px,py,HEX_SIZE-3,col.body,col.border,1.5);
+ 
+    // Enemy symbol
+    ctx.font='18px serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(col.symbol,px,py+2);
+ 
+    // HP bar
+    const bw=HEX_SIZE*1.4;
+    const bx=px-bw/2, by=py+HEX_SIZE-8;
+    ctx.fillStyle='#1a1a2e';
+    ctx.fillRect(bx,by,bw,4);
+    ctx.fillStyle=e.hp/e.maxHp>0.5?'#22c55e':'#ef4444';
+    ctx.fillRect(bx,by,bw*(e.hp/e.maxHp),4);
+ 
+    // Attack note above enemy (if adjacent to player)
+    const dist=hexDist(player.q,player.r,e.q,e.r);
+    if(dist===1){
+      const an=NOTES[e.noteIdx];
+      // Pulsing background
+      const pulse=0.7+0.3*Math.sin(performance.now()*0.006);
+      ctx.fillStyle=`rgba(212,175,55,${pulse*0.9})`;
+      ctx.beginPath();
+      ctx.roundRect(px-18,py-HEX_SIZE-22,36,18,4);
+      ctx.fill();
+      ctx.fillStyle='#0a0d14';
+      ctx.font='bold 11px Cinzel,serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(an.label,px,py-HEX_SIZE-13);
+ 
+      // Arrow down
+      ctx.fillStyle='rgba(212,175,55,0.7)';
+      ctx.font='10px serif';
+      ctx.fillText('▼',px,py-HEX_SIZE+2);
+    }
+ 
+    // Stun indicator
+    if(e.stunTimer>0){
+      ctx.fillStyle='rgba(147,197,253,0.6)';
+      ctx.font='14px serif';
+      ctx.textAlign='center';
+      ctx.fillText('★',px+HEX_SIZE-4,py-HEX_SIZE+4);
+    }
+  });
+ 
+  // Draw player
+  {
+    const {x,y}=hexToPixel(player.q,player.r);
+    const px=cx+x, py=cy+y;
+    const t=performance.now()*0.003;
+    const glow=0.5+0.5*Math.sin(t);
+    drawHex(px,py,HEX_SIZE-3,'#1e3a8a',`rgba(96,165,250,${0.5+glow*0.5})`,2);
+    ctx.font='20px serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('🧙',px,py+2);
+  }
+ 
+  // Flash overlay
+  if(flashTimer>0){
+    ctx.fillStyle=flashColor;
+    ctx.fillRect(-10,-10,W+20,H+20);
+    flashTimer--;
+  }
+ 
+  // Particles
+  ctx.restore(); // undo shake for particles (they follow canvas coords)
+  ctx.save();
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    ctx.globalAlpha=p.life;
+    ctx.fillStyle=p.color;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);
+    ctx.fill();
+    p.x+=p.vx; p.y+=p.vy;
+    p.vy+=0.08;
+    p.life-=p.decay;
+  });
+  ctx.globalAlpha=1;
+  ctx.restore();
+ 
+  // HUD overlay: detected note pulse
+  if(pendingNote!==null){
+    ctx.fillStyle='rgba(240,208,96,0.12)';
+    ctx.fillRect(0,0,W,H);
   }
 }
-
-// Water plant
-function waterPlant() {
-  const tile = mapTiles[playerPosition.x][playerPosition.y];
-  if (tile.hasSeed && tile.isGrowing) {
-    tile.watered = true;
-    updateTileVisual(playerPosition.x, playerPosition.y);
+ 
+function updateNoteGrid(){
+  const grid=document.getElementById('note-grid');
+  grid.innerHTML='';
+  NOTES.forEach((n,i)=>{
+    const div=document.createElement('div');
+    div.className='note-card';
+    div.id='nc-'+i;
+    // Find what this note does
+    const moveDir=DIR_NOTE.indexOf(i);
+    const dirNames=['→E','↗NE','↖NW','←W','↙SW','↘SE'];
+    const action=i===ATTACK_NOTE_IDX?'⚔ ATAK':moveDir>=0?dirNames[moveDir]:'—';
+    div.innerHTML=`<div class="note-card-name">${n.label}</div><div class="note-card-action">${action}</div>`;
+    grid.appendChild(div);
+  });
+}
+ 
+function highlightNote(idx){
+  document.querySelectorAll('.note-card').forEach((c,i)=>{
+    c.classList.toggle('target',i===idx);
+  });
+  // Mobile
+  const mn=document.getElementById('mobile-target');
+  if(mn&&idx!==null&&idx>=0) mn.textContent=NOTES[idx].label;
+  else if(mn) mn.textContent='—';
+}
+ 
+// ════════════════════════════════════════════════════════════
+// GAME LOOP
+// ════════════════════════════════════════════════════════════
+let lastTick=0;
+function gameLoop(now){
+  if(!gameActive){animFrame=requestAnimationFrame(gameLoop);return;}
+ 
+  resizeCanvas();
+  updateEnemies();
+ 
+  // Process pending note
+  if(pendingNote!==null){
+    tryAction(pendingNote);
+    pendingNote=null;
+  }
+ 
+  if(detectedCooldown>0) detectedCooldown--;
+ 
+  drawGame();
+  animFrame=requestAnimationFrame(gameLoop);
+}
+ 
+function resizeCanvas(){
+  const area=document.getElementById('game-area');
+  const panel=document.getElementById('right-panel');
+  const panelW=panel.offsetParent?panel.offsetWidth:0;
+  const W=area.offsetWidth-panelW;
+  const H=area.offsetHeight;
+  if(canvas.width!==W||canvas.height!==H){canvas.width=W;canvas.height=H;}
+}
+ 
+// ════════════════════════════════════════════════════════════
+// HUD
+// ════════════════════════════════════════════════════════════
+function updateHUD(){
+  const pct=player.hp/player.maxHp*100;
+  document.getElementById('hp-fill').style.width=pct+'%';
+  document.getElementById('hp-text').textContent=player.hp+'/'+player.maxHp;
+  document.getElementById('score-val').textContent=score;
+  document.getElementById('level-val').textContent=level;
+  document.getElementById('kills-val').textContent=kills;
+}
+ 
+function addLog(msg,type='info'){
+  logEntries.unshift({msg,type});
+  if(logEntries.length>50) logEntries.pop();
+  const list=document.getElementById('log-list');
+  if(!list) return;
+  list.innerHTML='';
+  logEntries.slice(0,20).forEach(e=>{
+    const div=document.createElement('div');
+    div.className='log-entry '+e.type;
+    div.textContent=e.msg;
+    list.appendChild(div);
+  });
+}
+ 
+// ════════════════════════════════════════════════════════════
+// MICROPHONE & PITCH DETECTION
+// ════════════════════════════════════════════════════════════
+async function toggleMic(){
+  if(micOn){stopMic();return;}
+  try{
+    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    aCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const src=aCtx.createMediaStreamSource(micStream);
+    const gainNode=aCtx.createGain(); gainNode.gain.value=4.0; src.connect(gainNode);
+    analyser=aCtx.createAnalyser(); analyser.fftSize=8192; analyser.smoothingTimeConstant=0.3;
+    gainNode.connect(analyser);
+    micOn=true;
+    document.getElementById('mic-btn').textContent='🎤 Mikrofon: ON';
+    document.getElementById('mic-btn').classList.add('on');
+    pitchInterval=setInterval(detectPitch,50);
+    addLog('🎤 Mikrofon włączony','info');
+  }catch(e){alert('Brak dostępu do mikrofonu: '+e.message);}
+}
+ 
+function stopMic(){
+  if(pitchInterval){clearInterval(pitchInterval);pitchInterval=null;}
+  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
+  if(aCtx){aCtx.close().catch(()=>{});aCtx=null;}
+  micOn=false;
+  document.getElementById('mic-btn').textContent='🎤 Mikrofon: OFF';
+  document.getElementById('mic-btn').classList.remove('on');
+  document.getElementById('detected-note').textContent='—';
+  document.getElementById('pitch-fill').style.width='0';
+}
+ 
+function detectPitch(){
+  if(!analyser) return;
+  const buf=new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  const vol=getRMS(buf);
+  document.getElementById('pitch-fill').style.width=Math.min(100,vol*500)+'%';
+ 
+  if(vol<0.002){
+    freqHistory=[];
+    document.getElementById('detected-note').textContent='—';
+    highlightNote(null);
+    return;
+  }
+ 
+  const freq=autoCorrelate(buf,aCtx.sampleRate);
+  if(freq<0){freqHistory=[];return;}
+ 
+  freqHistory.push(freq);
+  if(freqHistory.length>4) freqHistory.shift();
+ 
+  // Find closest note
+  let bestIdx=-1, bestDist=Infinity;
+  NOTES.forEach((n,i)=>{
+    const d=Math.abs(freq-n.freq)/n.freq;
+    if(d<bestDist){bestDist=d;bestIdx=i;}
+  });
+ 
+  if(bestDist>0.10){
+    document.getElementById('detected-note').textContent='?';
+    highlightNote(null);
+    return;
+  }
+ 
+  const noteName=NOTES[bestIdx].label;
+  document.getElementById('detected-note').textContent=noteName;
+  highlightNote(bestIdx);
+ 
+  // Stability check: 2 of last 4 match (more responsive)
+  const matchCount=freqHistory.filter(f=>{
+    let bi=-1,bd=Infinity;
+    NOTES.forEach((n,i)=>{const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bi=i;}});
+    return bi===bestIdx;
+  }).length;
+ 
+  if(matchCount>=2 && detectedCooldown===0){
+    // Trigger action
+    pendingNote=bestIdx;
+    detectedCooldown=12; // ~600ms cooldown
+    document.getElementById('detected-note').style.animation='none';
+    void document.getElementById('detected-note').offsetWidth;
+    document.getElementById('detected-note').style.animation='pulse-gold 0.3s ease';
   }
 }
-
-// Update tile visual
-function updateTileVisual(x, y, harvested=false) {
-  const hex = getHex(x, y);
-  const tile = mapTiles[x][y];
-  hex.innerHTML = '';
-  if (tile.hasSeed) {
-    const seedDiv = document.createElement('div');
-    seedDiv.innerText = tile.isGrowing ? '🌱' : '🌳';
-    if (tile.watered) seedDiv.innerText = '💧' + seedDiv.innerText;
-    hex.appendChild(seedDiv);
-  } else {
-    hex.innerText = '';
-  }
+ 
+function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.length);}
+ 
+function autoCorrelate(buf,sr){
+  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
+  if(rms<0.001)return-1;
+  let r1=0,r2=buf.length-1;
+  for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.12){r1=i;break;}}
+  for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.12){r2=buf.length-i;break;}}
+  const s=buf.slice(r1,r2);if(s.length<2)return-1;
+  const c=new Float32Array(s.length);
+  for(let i=0;i<s.length;i++)for(let j=0;j<s.length-i;j++)c[i]+=s[j]*s[j+i];
+  let d=0;while(d<c.length-1&&c[d]>c[d+1])d++;
+  let mv=-1,mp=-1;for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
+  if(mp<1)return-1;
+  let T=mp;
+  if(T>0&&T<c.length-1){const a=(c[T-1]+c[T+1]-2*c[T])/2,b2=(c[T+1]-c[T-1])/2;if(a)T-=b2/(2*a);}
+  const f=sr/T;return(f<60||f>2000)?-1:f;
 }
-
-// Update tile state when player moves
-function updateTileStatus() {
-  const tile = mapTiles[playerPosition.x][playerPosition.y];
-  if (tile.hasSeed && tile.isGrowing && tile.watered) {
-    // Grow seed over time
-    setTimeout(() => {
-      tile.isGrowing = false; // plant is ready
-      updateTileVisual(playerPosition.x, playerPosition.y);
-    }, 3000); // 3 seconds to grow
-  }
+ 
+// ════════════════════════════════════════════════════════════
+// START / END
+// ════════════════════════════════════════════════════════════
+function startGame(){
+  document.getElementById('overlay').style.display='none';
+  score=0; kills=0; level=1;
+  logEntries=[];
+  generateMap();
+  updateNoteGrid();
+  updateHUD();
+  gameActive=true;
+  lastEnemyTick=performance.now();
+  if(animFrame) cancelAnimationFrame(animFrame);
+  animFrame=requestAnimationFrame(gameLoop);
+  addLog('🗡 Gra rozpoczęta! Śpiewaj nuty aby się poruszać.','info');
+  addLog('🎵 C/D/E/F/G/A = ruch, H = atak wroga obok','info');
 }
-
+ 
+function endGame(won){
+  gameActive=false;
+  const ov=document.getElementById('overlay');
+  ov.style.display='flex';
+  const box=ov.querySelector('.overlay-box');
+  box.innerHTML=won
+    ?`<div class="overlay-title">🏆 Wygrana!</div>
+       <div class="overlay-sub">Wynik: <strong style="color:var(--gold)">${score}</strong><br>Zabiłeś: <strong style="color:var(--gold)">${kills}</strong> wrogów<br>Poziom: <strong style="color:var(--gold)">${level}</strong></div>
+       <button class="overlay-btn" onclick="restartGame()">Zagraj ponownie</button>`
+    :`<div class="overlay-title" style="color:#ef4444">💀 Poległeś!</div>
+       <div class="overlay-sub">Wynik: <strong style="color:var(--gold)">${score}</strong><br>Zabiłeś: <strong style="color:var(--gold)">${kills}</strong> wrogów<br>Przeżyłeś do poziomu: <strong style="color:var(--gold)">${level}</strong></div>
+       <button class="overlay-btn" onclick="restartGame()">Spróbuj ponownie</button>`;
+}
+ 
+function restartGame(){
+  score=0;kills=0;level=1;particles=[];logEntries=[];
+  document.getElementById('overlay').style.display='none';
+  generateMap();
+  updateNoteGrid();
+  updateHUD();
+  gameActive=true;
+  lastEnemyTick=performance.now();
+  addLog('🗡 Nowa gra!','info');
+}
+ 
+// Keyboard fallback (for testing without mic)
+document.addEventListener('keydown',e=>{
+  if(!gameActive) return;
+  const map={'c':0,'d':1,'e':2,'f':3,'g':4,'a':5,'h':6,
+             'C':0,'D':1,'E':2,'F':3,'G':4,'A':5,'H':6};
+  if(map[e.key]!==undefined){
+    pendingNote=map[e.key];
+    highlightNote(map[e.key]);
+    detectedCooldown=10;
+  }
+});
+ 
+// Initial resize
+window.addEventListener('resize',resizeCanvas);
+resizeCanvas();
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
