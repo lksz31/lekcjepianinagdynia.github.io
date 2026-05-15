@@ -1029,7 +1029,6 @@ function renderInv(){
   // Seeds
   Object.keys(CROPS).forEach(seed=>{
     const qty=player.inventory[seed]||0;
-    const info
     const info=CROPS[seed];
     const div=document.createElement('div');
     div.className='inv-item'+(player.selectedSeed===seed?' sel':'');
