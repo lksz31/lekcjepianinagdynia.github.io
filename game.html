@@ -2,148 +2,143 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Piano Invaders</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#000;overflow:hidden;display:flex;height:100vh;align-items:stretch;font-family:'Courier New',monospace;}
+body{background:#000;overflow:hidden;display:flex;font-family:'Courier New',monospace;}
  
-/* ── GAME CANVAS ── */
-#wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-width:0;background:#000;}
-#game{display:block;background:#000;image-rendering:pixelated;image-rendering:crisp-edges;}
+canvas{display:block;background:#000;flex-shrink:0;}
  
 /* ── SIDE PANEL ── */
-#panel{width:200px;flex-shrink:0;background:#080810;border-left:2px solid #1a1a3a;display:flex;flex-direction:column;gap:0;overflow-y:auto;}
-.ps{padding:12px 10px;border-bottom:1px solid #111122;}
-.ps-title{font-size:.6rem;color:#2233aa;text-transform:uppercase;letter-spacing:.18em;font-weight:700;margin-bottom:8px;}
+#panel{
+  width:180px;flex-shrink:0;
+  background:#06060e;border-left:2px solid #111133;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+.ps{padding:10px 9px;border-bottom:1px solid #0d0d22;}
+.ps-title{
+  font-size:.55rem;color:#1a2a88;
+  text-transform:uppercase;letter-spacing:.18em;
+  font-weight:700;margin-bottom:7px;
+}
  
-/* Mic indicator */
-.mic-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.mic-dot{width:13px;height:13px;border-radius:50%;background:#1a1a1a;flex-shrink:0;transition:background .06s,box-shadow .06s;}
-.mic-dot.on{background:#00ff44;box-shadow:0 0 10px #00ff44;}
-.mic-dot.off-quiet{background:#334433;}
-.mic-note-name{font-size:1.6rem;font-weight:700;color:#ffdd00;line-height:1;min-width:36px;text-shadow:0 0 8px rgba(255,220,0,.6);}
-.mic-hz{font-size:.55rem;color:#333;margin-top:1px;}
-.vu-wrap{height:5px;background:#0a0a0a;border:1px solid #111;border-radius:2px;overflow:hidden;margin-bottom:2px;}
-.vu-fill{height:100%;width:0;background:linear-gradient(90deg,#00aa00,#ffcc00,#ff4400);transition:width .04s;}
-.mic-status{font-size:.6rem;color:#444;letter-spacing:.08em;}
+/* mic indicator */
+.mic-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
+.mic-dot{
+  width:11px;height:11px;border-radius:50%;
+  background:#111;flex-shrink:0;
+  transition:background .05s,box-shadow .05s;
+}
+.mic-dot.hear{background:#00ff44;box-shadow:0 0 8px #00ff44;}
+.mic-dot.quiet{background:#223322;}
+.mic-name{
+  font-size:1.5rem;font-weight:700;
+  color:#ffdd00;line-height:1;
+  text-shadow:0 0 7px rgba(255,220,0,.5);
+  min-width:32px;
+}
+.mic-hz{font-size:.5rem;color:#222;margin-top:1px;}
+.vu{height:4px;background:#0a0a0a;border:1px solid #111;overflow:hidden;margin-bottom:3px;}
+.vu-f{height:100%;width:0;background:linear-gradient(90deg,#00aa00,#ffcc00,#ff3300);transition:width .04s;}
+.mic-st{font-size:.55rem;color:#333;letter-spacing:.07em;}
  
-/* Note reference rows */
-.nref{display:flex;align-items:center;gap:5px;padding:4px 2px;border-bottom:1px solid #0a0a0a;border-radius:2px;transition:background .08s;}
-.nref:last-child{border:none;}
-.nref.active{background:rgba(255,220,0,.12);}
-.nref.just-fired{animation:fireFlash .35s ease;}
-@keyframes fireFlash{0%{background:rgba(255,220,0,.5);}100%{background:transparent;}}
-.nref-note{font-size:.95rem;font-weight:700;min-width:28px;font-family:'Courier New',monospace;}
-.nref-arrow{font-size:.7rem;color:#222;}
-.nref-action{font-size:.62rem;color:#667;flex:1;}
-.nref-hz{font-size:.52rem;color:#2a2a2a;margin-left:auto;white-space:nowrap;}
+/* note rows */
+.nrow{
+  display:flex;align-items:center;gap:4px;
+  padding:3px 1px;border-bottom:1px solid #0a0a0a;
+}
+.nrow:last-child{border:none;}
+.nrow.lit{background:rgba(255,220,0,.13);}
+.nrow.flash{animation:nflash .3s ease;}
+@keyframes nflash{0%{background:rgba(255,220,0,.45);}100%{background:transparent;}}
+.nn{font-size:.9rem;font-weight:700;min-width:26px;font-family:'Courier New',monospace;}
+.na{font-size:.6rem;color:#555;flex:1;}
+.nhz{font-size:.48rem;color:#1e1e1e;margin-left:auto;white-space:nowrap;}
+.move .nn{color:#44aaff;}
+.atk  .nn{color:#ff4444;}
  
-/* colour codes */
-.move-l .nref-note{color:#44aaff;}
-.move-r .nref-note{color:#44aaff;}
-.shoot   .nref-note{color:#ff4444;}
- 
-/* Score / level */
-.hud-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
-.hud-lbl{font-size:.58rem;color:#333;text-transform:uppercase;letter-spacing:.1em;}
-.hud-val{font-size:1.1rem;font-weight:700;color:#ffdd00;font-family:'Courier New',monospace;}
-.hud-val.blue{color:#44aaff;}
-.hud-val.green{color:#44ff88;}
- 
-/* Legend dots */
-.lvl-row{display:flex;align-items:center;gap:4px;font-size:.6rem;color:#444;margin-bottom:4px;}
-.lvl-dot{width:8px;height:8px;border-radius:1px;flex-shrink:0;}
+.sv{font-size:1rem;font-weight:700;color:#ffdd00;}
+.sv.b{color:#44aaff;}
 </style>
 </head>
 <body>
  
-<!-- Canvas area -->
-<div id="wrap">
-  <canvas id="game"></canvas>
-</div>
+<canvas id="game" width="600" height="600"></canvas>
  
-<!-- Side panel -->
 <div id="panel">
  
-  <!-- Mic indicator -->
   <div class="ps">
     <div class="ps-title">🎤 Mikrofon</div>
-    <div class="mic-row">
-      <div class="mic-dot" id="mic-dot"></div>
+    <div class="mic-top">
+      <div class="mic-dot" id="mdot"></div>
       <div>
-        <div class="mic-note-name" id="mic-note">—</div>
-        <div class="mic-hz" id="mic-hz">— Hz</div>
+        <div class="mic-name" id="mname">—</div>
+        <div class="mic-hz"  id="mhz">— Hz</div>
       </div>
     </div>
-    <div class="vu-wrap"><div class="vu-fill" id="vu-fill"></div></div>
-    <div class="mic-status" id="mic-status">Uruchamianie mikrofonu...</div>
+    <div class="vu"><div class="vu-f" id="vuf"></div></div>
+    <div class="mic-st" id="mst">Uruchamianie...</div>
   </div>
  
-  <!-- Note reference -->
   <div class="ps">
     <div class="ps-title">🎵 Sterowanie</div>
-    <div class="nref move-l" id="nref-C1">
-      <span class="nref-note">c¹</span>
-      <span class="nref-arrow">→</span>
-      <span class="nref-action">◀ lewo</span>
-      <span class="nref-hz">262Hz</span>
+    <div class="nrow move" id="nr-C1">
+      <span class="nn">c¹</span>
+      <span class="na">◀ lewo</span>
+      <span class="nhz">262Hz</span>
     </div>
-    <div class="nref move-r" id="nref-D1">
-      <span class="nref-note">d¹</span>
-      <span class="nref-arrow">→</span>
-      <span class="nref-action">▶ prawo</span>
-      <span class="nref-hz">294Hz</span>
-    </div>
-    <div class="ps-title" style="margin-top:8px;">🔫 Strzelanie</div>
-    <div class="nref shoot" id="nref-A">
-      <span class="nref-note">a¹</span>
-      <span class="nref-arrow">→</span>
-      <span class="nref-action">strzelaj A</span>
-      <span class="nref-hz">440Hz</span>
-    </div>
-    <div class="nref shoot" id="nref-H">
-      <span class="nref-note">h¹</span>
-      <span class="nref-arrow">→</span>
-      <span class="nref-action">strzelaj H</span>
-      <span class="nref-hz">494Hz</span>
-    </div>
-    <div class="nref shoot" id="nref-G">
-      <span class="nref-note">g¹</span>
-      <span class="nref-arrow">→</span>
-      <span class="nref-action">strzelaj G</span>
-      <span class="nref-hz">392Hz</span>
-    </div>
-    <div style="font-size:.55rem;color:#222;margin-top:6px;line-height:1.5;">
-      Śpiewaj / graj nutę<br>odpowiadającą literze<br>nad potworem!
+    <div class="nrow move" id="nr-D1">
+      <span class="nn">d¹</span>
+      <span class="na">▶ prawo</span>
+      <span class="nhz">294Hz</span>
     </div>
   </div>
  
-  <!-- Score / stats -->
   <div class="ps">
-    <div class="ps-title">📊 Wyniki</div>
-    <div class="hud-row">
-      <span class="hud-lbl">Wynik</span>
-      <span class="hud-val" id="hud-score">0</span>
+    <div class="ps-title">🔫 Strzelanie</div>
+    <div class="nrow atk" id="nr-A">
+      <span class="nn">a¹</span>
+      <span class="na">strzelaj A</span>
+      <span class="nhz">440Hz</span>
     </div>
-    <div class="hud-row">
-      <span class="hud-lbl">Poziom</span>
-      <span class="hud-val blue" id="hud-level">1</span>
+    <div class="nrow atk" id="nr-H">
+      <span class="nn">h¹</span>
+      <span class="na">strzelaj H</span>
+      <span class="nhz">494Hz</span>
     </div>
-    <div class="hud-row">
-      <span class="hud-lbl">Życia</span>
-      <span class="hud-val green" id="hud-lives">❤❤❤</span>
+    <div class="nrow atk" id="nr-G">
+      <span class="nn">g¹</span>
+      <span class="na">strzelaj G</span>
+      <span class="nhz">392Hz</span>
     </div>
   </div>
  
-  <!-- Legend -->
+  <div class="ps">
+    <div class="ps-title">📊 Wynik</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+      <span style="font-size:.52rem;color:#333;">PUNKTY</span>
+      <span class="sv" id="p-score">0</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <span style="font-size:.52rem;color:#333;">ŻYCIA</span>
+      <span class="sv b" id="p-lives">❤❤❤</span>
+    </div>
+  </div>
+ 
   <div class="ps" style="flex:1;">
     <div class="ps-title">👾 Potwory</div>
-    <div class="lvl-row"><div class="lvl-dot" style="background:#ff4444;"></div> Wiersz A — strzelaj a¹</div>
-    <div class="lvl-row"><div class="lvl-dot" style="background:#ffaa00;"></div> Wiersz H — strzelaj h¹</div>
-    <div class="lvl-row"><div class="lvl-dot" style="background:#44ff88;"></div> Wiersz G — strzelaj g¹</div>
-    <div style="font-size:.55rem;color:#222;margin-top:8px;line-height:1.6;">
-      c¹ = restart / następny poziom
+    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;margin-bottom:4px;">
+      <div style="width:8px;height:8px;background:#ff4444;flex-shrink:0;"></div>A — śpiewaj a¹
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;margin-bottom:4px;">
+      <div style="width:8px;height:8px;background:#ffaa44;flex-shrink:0;"></div>H — śpiewaj h¹
+    </div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;">
+      <div style="width:8px;height:8px;background:#44ff88;flex-shrink:0;"></div>G — śpiewaj g¹
+    </div>
+    <div style="font-size:.52rem;color:#1a1a1a;margin-top:8px;line-height:1.6;">
+      Zaśpiewaj c¹<br>aby zrestartować
     </div>
   </div>
  
@@ -151,507 +146,344 @@ body{background:#000;overflow:hidden;display:flex;height:100vh;align-items:stret
  
 <script>
 'use strict';
+// ─────────────────────────────────────────
+// CANVAS
+// ─────────────────────────────────────────
+const canvas = document.getElementById("game");
+const ctx    = canvas.getContext("2d");
+const W=600, H=600;
  
-// ══════════════════════════════════════════════
-// CANVAS SETUP — responsive
-// ══════════════════════════════════════════════
-const canvas = document.getElementById('game');
-const ctx    = canvas.getContext('2d');
- 
-// Fixed logical resolution — CSS scales to fit container
-canvas.width  = 520;
-canvas.height = 520;
-// Scale canvas visually to fill #wrap without distortion
-function fitCanvas(){
-  const wrap = document.getElementById('wrap');
-  const avW  = wrap.clientWidth  || 520;
-  const avH  = wrap.clientHeight || 520;
-  const scale = Math.min(avW / 520, avH / 520, 1.4);
-  canvas.style.width  = Math.round(520 * scale) + 'px';
-  canvas.style.height = Math.round(520 * scale) + 'px';
-}
-window.addEventListener('load',   fitCanvas);
-window.addEventListener('resize', fitCanvas);
-setTimeout(fitCanvas, 50);
- 
-// ══════════════════════════════════════════════
-// NOTE DEFINITIONS
-// c¹=262 d¹=294 e¹=330 f¹=349 g¹=392 a¹=440 h¹=494
-// ══════════════════════════════════════════════
+// ─────────────────────────────────────────
+// NUTY  +  MARGINESY
+// Tolerancja ±20% (względna) ≈ ±3.5 półtonu
+// c¹: 209–314 Hz | d¹: 235–352 Hz
+// g¹: 314–470 Hz | a¹: 352–528 Hz | h¹: 395–593 Hz
+// ─────────────────────────────────────────
 const NOTES = {
-  C1: {label:'c¹', freq:261.63, role:'moveL'},
-  D1: {label:'d¹', freq:293.66, role:'moveR'},
-  G:  {label:'g¹', freq:392.00, role:'shoot', letter:'G'},
-  A:  {label:'a¹', freq:440.00, role:'shoot', letter:'A'},
-  H:  {label:'h¹', freq:493.88, role:'shoot', letter:'H'},
+  C1:{label:'c¹',freq:261.63,role:'moveL'},
+  D1:{label:'d¹',freq:293.66,role:'moveR'},
+  G: {label:'g¹',freq:392.00,role:'shoot',letter:'G'},
+  A: {label:'a¹',freq:440.00,role:'shoot',letter:'A'},
+  H: {label:'h¹',freq:493.88,role:'shoot',letter:'H'},
 };
+const TOL=0.20; // 20%
  
-// ══════════════════════════════════════════════
+function closestNote(freq){
+  let best=null,bd=Infinity;
+  for(const [k,n] of Object.entries(NOTES)){
+    const d=Math.abs(freq-n.freq)/n.freq;
+    if(d<bd){bd=d;best=k;}
+  }
+  return bd<=TOL?best:null;
+}
+ 
+// ─────────────────────────────────────────
 // GAME STATE
-// ══════════════════════════════════════════════
-const monsterLetters = ['A','H','G'];
-const rowColors = {A:'#ff4444', H:'#ffaa44', G:'#44ff88'};
+// ─────────────────────────────────────────
+const mLetters=['A','H','G'];
+const mColor={A:'#ff4444',H:'#ffaa44',G:'#44ff88'};
  
-let monsters=[], bullets=[], particles=[];
-let player = {x:0.5, y:0, width:0, height:0}; // x/y as fraction of canvas
-let lives=3, score=0, level=1;
-let gameOver=false, win=false;
-let moveDir=0; // -1 left +1 right (held from mic)
-let moveDirTimer=0;
- 
-// monster march
-let marchDirX=1, marchSpeedX=0.4, marchY=0;
-let marchTick=0, marchInterval=45; // frames between march steps
- 
-// shoot cooldowns
-const shootCooldowns={};
+let monsters=[],bullets=[],parts=[];
+let player={x:300,y:555};
+let score=0,lives=3,gameOver=false,winFlag=false;
+const lastShot={A:0,H:0,G:0};
+const SHOTCD=350;
  
 function resetGame(){
-  lives=3; score=0; level=1; gameOver=false; win=false;
-  marchDirX=1; marchY=0; marchInterval=45;
-  player.x=0.5;
-  bullets=[]; particles=[];
+  score=0;lives=3;gameOver=false;winFlag=false;
+  player.x=300;bullets=[];parts=[];
   resetMonsters();
-  updateHUD();
+  updatePanel();
 }
  
 function resetMonsters(){
   monsters=[];
-  const cols=10, rows=3;
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const letter=monsterLetters[r%monsterLetters.length];
+  for(let r=0;r<3;r++)
+    for(let c=0;c<10;c++)
       monsters.push({
-        fx: 0.05 + c*(0.90/(cols-1)),  // 0.05 … 0.95
-        fy: 0.10 + r*0.12,              // 0.10 / 0.22 / 0.34
-        letter,
-        alive:true,
-        hitFlash:0
+        x:40+c*52, y:55+r*52,
+        letter:mLetters[r%mLetters.length],
+        alive:true
       });
-    }
-  }
+}
+resetMonsters();
+ 
+// ─────────────────────────────────────────
+// DRAW
+// ─────────────────────────────────────────
+// Static stars (generated once)
+const STARS=Array.from({length:50},()=>({
+  x:Math.random()*W, y:Math.random()*H,
+  r:Math.random()<0.3?2:1,
+  sp:0.5+Math.random(), ph:Math.random()*Math.PI*2
+}));
+ 
+function drawStars(){
+  STARS.forEach(s=>{
+    ctx.globalAlpha=0.15+0.35*Math.sin(Date.now()*0.001*s.sp+s.ph);
+    ctx.fillStyle='#fff';
+    ctx.fillRect(s.x,s.y,s.r,s.r);
+  });
+  ctx.globalAlpha=1;
 }
  
-// ══════════════════════════════════════════════
-// DRAWING
-// ══════════════════════════════════════════════
 function drawMonsters(){
-  const W=canvas.width, H=canvas.height;
-  const mSize = Math.max(14, W*0.038);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
   monsters.forEach(m=>{
     if(!m.alive) return;
-    const px = m.fx * W;
-    const py = m.fy * H;
-    const col = rowColors[m.letter]||'#aaffaa';
-    const sw=mSize*0.9, sh=mSize*0.6;
- 
-    // Body
-    ctx.fillStyle = m.hitFlash>0 ? '#ffffff' : col;
-    if(m.hitFlash>0) m.hitFlash--;
-    ctx.fillRect(px - sw/2, py - sh, sw, sh);
- 
-    // Legs
-    ctx.fillRect(px - sw/2,          py, sw*0.28, sh*0.4);
-    ctx.fillRect(px + sw/2 - sw*0.28, py, sw*0.28, sh*0.4);
- 
-    // Letter inside body
+    ctx.fillStyle=mColor[m.letter];
+    // body
+    ctx.fillRect(m.x-14,m.y-13,28,18);
+    // legs
+    ctx.fillRect(m.x-14,m.y+5,8,6);
+    ctx.fillRect(m.x+6, m.y+5,8,6);
+    // letter
     ctx.fillStyle='#000';
-    ctx.font=`bold ${mSize*0.62}px 'Courier New',monospace`;
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    ctx.fillText(m.letter, px, py - sh/2);
+    ctx.font="bold 14px 'Courier New',monospace";
+    ctx.fillText(m.letter,m.x,m.y-2);
   });
 }
  
 function drawPlayer(){
-  const W=canvas.width, H=canvas.height;
-  const pw=W*0.07, ph=H*0.04;
-  const px=player.x*W, py=H*0.88;
-  // Ship body
   ctx.fillStyle='#00ccff';
   ctx.beginPath();
-  ctx.moveTo(px, py-ph);
-  ctx.lineTo(px+pw/2, py+ph*0.3);
-  ctx.lineTo(px+pw*0.18, py+ph*0.3);
-  ctx.lineTo(px+pw*0.18, py+ph);
-  ctx.lineTo(px-pw*0.18, py+ph);
-  ctx.lineTo(px-pw*0.18, py+ph*0.3);
-  ctx.lineTo(px-pw/2, py+ph*0.3);
+  ctx.moveTo(player.x,     player.y-18);
+  ctx.lineTo(player.x+16,  player.y+8);
+  ctx.lineTo(player.x+6,   player.y+8);
+  ctx.lineTo(player.x+6,   player.y+14);
+  ctx.lineTo(player.x-6,   player.y+14);
+  ctx.lineTo(player.x-6,   player.y+8);
+  ctx.lineTo(player.x-16,  player.y+8);
   ctx.closePath();
-  ctx.fill();
-  // Glow
-  ctx.shadowColor='#00ccff';
-  ctx.shadowBlur=10;
-  ctx.fill();
-  ctx.shadowBlur=0;
+  ctx.shadowColor='#00ccff'; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
 }
  
 function drawBullets(){
-  const W=canvas.width, H=canvas.height;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
   bullets.forEach(b=>{
-    const col=rowColors[b.letter]||'#ffffff';
-    ctx.fillStyle=col;
-    ctx.shadowColor=col; ctx.shadowBlur=8;
-    ctx.fillRect(b.x*W - 2, b.y*H - 14, 4, 14);
-    ctx.shadowBlur=0;
-    // letter on bullet
+    ctx.fillStyle=mColor[b.letter]||'#fff';
+    ctx.shadowColor=mColor[b.letter]; ctx.shadowBlur=6;
+    ctx.fillRect(b.x-2,b.y,4,12); ctx.shadowBlur=0;
     ctx.fillStyle='#fff';
-    ctx.font=`bold ${Math.max(9,W*0.018)}px 'Courier New',monospace`;
-    ctx.textAlign='center';
-    ctx.textBaseline='bottom';
-    ctx.fillText(b.letter, b.x*W, b.y*H - 14);
+    ctx.font="bold 8px 'Courier New'";
+    ctx.fillText(b.letter,b.x,b.y-6);
   });
 }
  
-function drawParticles(){
-  const W=canvas.width,H=canvas.height;
-  particles=particles.filter(p=>p.life>0);
-  particles.forEach(p=>{
+function drawParts(){
+  parts=parts.filter(p=>p.life>0);
+  parts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.life-=0.04;
     ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.color;
-    ctx.beginPath();
-    ctx.arc(p.x*W,p.y*H,p.size*p.life,0,Math.PI*2);
-    ctx.fill();
-    p.x+=p.vx; p.y+=p.vy; p.vy+=0.0002; p.life-=0.035;
+    ctx.fillStyle=p.col;
+    ctx.fillRect(p.x-2,p.y-2,4,4);
   });
   ctx.globalAlpha=1;
 }
  
 function drawHUD(){
-  const W=canvas.width,H=canvas.height;
-  // Ground line
-  ctx.strokeStyle='#00ccff33';
-  ctx.lineWidth=1;
-  ctx.beginPath();
-  ctx.moveTo(0,H*0.94);
-  ctx.lineTo(W,H*0.94);
-  ctx.stroke();
-  // Lives on canvas
-  ctx.fillStyle='#00ccff';
-  ctx.font=`${Math.max(10,W*0.025)}px 'Courier New'`;
-  ctx.textAlign='left';
-  ctx.textBaseline='top';
-  ctx.fillText('❤'.repeat(lives),6,6);
-  // Score on canvas
-  ctx.fillStyle='#ffdd00';
-  ctx.textAlign='right';
-  ctx.fillText(score, W-6, 6);
+  ctx.strokeStyle='rgba(0,204,255,0.18)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(0,582); ctx.lineTo(W,582); ctx.stroke();
+  ctx.fillStyle='#00ccff'; ctx.font="14px 'Courier New'";
+  ctx.textAlign='left'; ctx.textBaseline='top';
+  ctx.fillText('❤'.repeat(lives),8,8);
+  ctx.fillStyle='#ffdd00'; ctx.textAlign='right';
+  ctx.fillText(score,W-8,8);
 }
  
-function drawGameOver(){
-  const W=canvas.width,H=canvas.height;
-  ctx.fillStyle='rgba(0,0,0,0.7)';
-  ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#ff4444';
-  ctx.font=`bold ${W*0.1}px 'Courier New'`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText('GAME OVER',W/2,H*0.42);
-  ctx.fillStyle='#ffdd00';
-  ctx.font=`${W*0.04}px 'Courier New'`;
+function drawScreen(title,color,sub){
+  ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=color; ctx.font="bold 52px 'Courier New'";
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(title,W/2,H*0.42);
+  ctx.fillStyle='#ffdd00'; ctx.font="20px 'Courier New'";
   ctx.fillText('Wynik: '+score,W/2,H*0.55);
-  ctx.fillStyle='#888';
-  ctx.font=`${W*0.03}px 'Courier New'`;
-  ctx.fillText('[ZAŚPIEWAJ c¹ = restart]',W/2,H*0.64);
+  ctx.fillStyle='#444'; ctx.font="13px 'Courier New'";
+  ctx.fillText(sub,W/2,H*0.65);
 }
  
-function drawWin(){
-  const W=canvas.width,H=canvas.height;
-  ctx.fillStyle='rgba(0,0,0,0.7)';
-  ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='#44ff88';
-  ctx.font=`bold ${W*0.09}px 'Courier New'`;
-  ctx.textAlign='center';
-  ctx.textBaseline='middle';
-  ctx.fillText('POZIOM '+level+'!',W/2,H*0.42);
-  ctx.fillStyle='#ffdd00';
-  ctx.font=`${W*0.035}px 'Courier New'`;
-  ctx.fillText('Wynik: '+score,W/2,H*0.55);
-  ctx.fillStyle='#888';
-  ctx.font=`${W*0.03}px 'Courier New'`;
-  ctx.fillText('[ZAŚPIEWAJ c¹ = następny poziom]',W/2,H*0.65);
-}
- 
-// ══════════════════════════════════════════════
-// GAME LOGIC
-// ══════════════════════════════════════════════
+// ─────────────────────────────────────────
+// LOGIC
+// ─────────────────────────────────────────
 function shoot(letter){
   const now=performance.now();
-  if(!shootCooldowns[letter]) shootCooldowns[letter]=0;
-  if(now - shootCooldowns[letter] < 320) return; // 320ms between shots of same letter
-  shootCooldowns[letter]=now;
-  bullets.push({x:player.x, y:0.88, letter, vy:0.018});
+  if(now-(lastShot[letter]||0)<SHOTCD) return;
+  lastShot[letter]=now;
+  bullets.push({x:player.x,y:player.y-20,letter,vy:8});
   playShoot();
 }
  
 function updateBullets(){
-  const W=canvas.width,H=canvas.height;
-  bullets=bullets.filter(b=>b.y>0);
-  bullets.forEach(b=>{b.y-=b.vy;});
- 
+  bullets.forEach(b=>b.y-=b.vy);
+  bullets=bullets.filter(b=>b.y>-10);
   bullets.forEach(b=>{
     monsters.forEach(m=>{
-      if(!m.alive) return;
-      const dx=Math.abs(b.x - m.fx)*W;
-      const dy=Math.abs(b.y - m.fy)*H;
-      if(dx<W*0.05 && dy<H*0.06 && b.letter===m.letter){
-        m.alive=false;
-        m.hitFlash=5;
-        score+=10*(level);
-        spawnParticles(m.fx, m.fy, rowColors[m.letter]);
-        playPop(rowColors[m.letter]);
-        updateHUD();
-        b.y=-1;
-        checkWin();
+      if(!m.alive||b.y<-10) return;
+      if(b.letter===m.letter &&
+         Math.abs(b.x-m.x)<22 &&
+         b.y<m.y+12 && b.y>m.y-28){
+        m.alive=false; b.vy=-999;
+        score+=10; updatePanel(); playPop();
+        spawnParts(m.x,m.y,mColor[m.letter]);
       }
     });
   });
-}
- 
-function checkWin(){
-  if(monsters.filter(m=>m.alive).length===0) triggerWin();
-}
- 
-function updatePlayer(){
-  if(moveDirTimer>0){
-    player.x+=moveDir*0.012;
-    player.x=Math.max(0.04,Math.min(0.96,player.x));
-    moveDirTimer--;
+  bullets=bullets.filter(b=>b.vy>0);
+  if(!winFlag && monsters.every(m=>!m.alive)){
+    winFlag=true;
+    setTimeout(()=>{
+      score+=50; winFlag=false;
+      resetMonsters(); updatePanel();
+    },2200);
   }
 }
  
-function triggerGameOver(){
-  gameOver=true;
-  playGameOver();
-}
- 
-function triggerWin(){
-  win=true;
-}
- 
-function nextLevel(){
-  level++;
-  win=false;
-  bullets=[];
-  particles=[];
-  resetMonsters();
-  updateHUD();
-}
- 
-function spawnParticles(fx,fy,color){
-  for(let i=0;i<12;i++){
-    const a=Math.random()*Math.PI*2;
-    const s=0.004+Math.random()*0.008;
-    particles.push({
-      x:fx,y:fy,
-      vx:Math.cos(a)*s,
-      vy:Math.sin(a)*s,
-      life:1,size:3+Math.random()*4,
-      color
-    });
+function spawnParts(x,y,col){
+  for(let i=0;i<10;i++){
+    const a=Math.random()*Math.PI*2,sp=1.5+Math.random()*3;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,col});
   }
 }
  
-function updateHUD(){
-  document.getElementById('hud-score').textContent=score;
-  document.getElementById('hud-level').textContent=level;
-  document.getElementById('hud-lives').textContent='❤'.repeat(Math.max(0,lives));
+function updatePanel(){
+  document.getElementById('p-score').textContent=score;
+  document.getElementById('p-lives').textContent='❤'.repeat(Math.max(0,lives));
 }
  
-// ══════════════════════════════════════════════
-// AUDIO — SOUND EFFECTS
-// ══════════════════════════════════════════════
-let sfxCtx=null;
-function getSfxCtx(){
-  if(!sfxCtx||sfxCtx.state==='closed') sfxCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(sfxCtx.state==='suspended') sfxCtx.resume();
-  return sfxCtx;
+// ─────────────────────────────────────────
+// SOUND
+// ─────────────────────────────────────────
+let sfxAC=null;
+function getSFX(){
+  if(!sfxAC||sfxAC.state==='closed') sfxAC=new(window.AudioContext||window.webkitAudioContext)();
+  if(sfxAC.state==='suspended') sfxAC.resume();
+  return sfxAC;
 }
- 
 function playShoot(){
-  try{
-    const ac=getSfxCtx(),now=ac.currentTime;
+  try{const ac=getSFX(),t=ac.currentTime;
     const o=ac.createOscillator(),g=ac.createGain();
-    o.type='square'; o.frequency.setValueAtTime(880,now); o.frequency.exponentialRampToValueAtTime(440,now+0.08);
-    g.gain.setValueAtTime(0.15,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.1);
-    o.connect(g); g.connect(ac.destination);
-    o.start(now); o.stop(now+0.1);
+    o.type='square';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(500,t+0.07);
+    g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.08);
   }catch(e){}
 }
- 
-function playPop(color){
-  try{
-    const ac=getSfxCtx(),now=ac.currentTime;
+function playPop(){
+  try{const ac=getSFX(),t=ac.currentTime;
     const o=ac.createOscillator(),g=ac.createGain();
-    o.type='sine'; o.frequency.setValueAtTime(600,now); o.frequency.exponentialRampToValueAtTime(300,now+0.12);
-    g.gain.setValueAtTime(0.3,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.15);
-    o.connect(g); g.connect(ac.destination);
-    o.start(now); o.stop(now+0.15);
+    o.type='sine';o.frequency.setValueAtTime(700,t);o.frequency.exponentialRampToValueAtTime(280,t+0.13);
+    g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.14);
   }catch(e){}
 }
  
-function playGameOver(){
-  try{
-    const ac=getSfxCtx(),now=ac.currentTime;
-    [220,196,165,131].forEach((f,i)=>{
-      const o=ac.createOscillator(),g=ac.createGain();
-      o.type='sawtooth'; o.frequency.value=f;
-      g.gain.setValueAtTime(0.2,now+i*0.18); g.gain.exponentialRampToValueAtTime(0.001,now+i*0.18+0.25);
-      o.connect(g); g.connect(ac.destination);
-      o.start(now+i*0.18); o.stop(now+i*0.18+0.25);
-    });
-  }catch(e){}
-}
- 
-// ══════════════════════════════════════════════
-// MICROPHONE & PITCH DETECTION
-// ══════════════════════════════════════════════
-let micACtx=null, micAnalyser=null, micStream=null;
-let freqHistory=[], detCooldown=0;
-let micReady=false;
+// ─────────────────────────────────────────
+// MIKROFON — czuły detektor wysokości
+// ─────────────────────────────────────────
+let micAC=null,micAn=null,micStream=null;
+let fHist=[],detCD=0,micReady=false;
  
 async function startMic(){
   try{
-    micStream=await navigator.mediaDevices.getUserMedia({
-      audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:1}
-    });
-    micACtx=new(window.AudioContext||window.webkitAudioContext)();
-    const src=micACtx.createMediaStreamSource(micStream);
-    const gainNode=micACtx.createGain();
-    gainNode.gain.value=6.0; // high gain for quiet instruments / voices
-    src.connect(gainNode);
-    micAnalyser=micACtx.createAnalyser();
-    micAnalyser.fftSize=8192;
-    micAnalyser.smoothingTimeConstant=0.2;
-    gainNode.connect(micAnalyser);
+    micStream=await navigator.mediaDevices.getUserMedia(
+      {audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    micAC=new(window.AudioContext||window.webkitAudioContext)();
+    const src=micAC.createMediaStreamSource(micStream);
+    const gain=micAC.createGain(); gain.gain.value=6.0;
+    src.connect(gain);
+    micAn=micAC.createAnalyser();
+    micAn.fftSize=8192;
+    micAn.smoothingTimeConstant=0.2;
+    gain.connect(micAn);
     micReady=true;
-    document.getElementById('mic-status').textContent='Aktywny — śpiewaj!';
-    document.getElementById('mic-status').style.color='#225522';
+    document.getElementById('mst').textContent='Aktywny — śpiewaj!';
+    document.getElementById('mst').style.color='#224422';
   }catch(e){
-    document.getElementById('mic-status').textContent='Brak mikrofonu';
-    document.getElementById('mic-status').style.color='#662222';
+    document.getElementById('mst').textContent='Brak mikrofonu';
+    document.getElementById('mst').style.color='#662222';
   }
 }
 startMic();
  
-function setMicDot(state){
-  // state: 'off' | 'quiet' | 'on'
-  const d=document.getElementById('mic-dot');
-  d.className='mic-dot';
-  if(state==='on') d.classList.add('on');
-  else if(state==='quiet') d.classList.add('off-quiet');
-}
- 
-function setSPNote(label,hz){
-  document.getElementById('mic-note').textContent=label;
-  document.getElementById('mic-hz').textContent=hz;
-}
- 
-function flashNoteRow(key){
-  const el=document.getElementById('nref-'+key);
-  if(!el) return;
-  el.classList.remove('just-fired');
-  void el.offsetWidth;
-  el.classList.add('just-fired');
-  setTimeout(()=>el.classList.remove('just-fired'),350);
-}
- 
-function highlightNoteRow(key){
-  Object.keys(NOTES).forEach(k=>{
-    const el=document.getElementById('nref-'+k);
-    if(el) el.classList.toggle('active', k===key);
-  });
-}
- 
 function detectPitch(){
-  if(!micAnalyser||!micReady) return;
-  const buf=new Float32Array(micAnalyser.fftSize);
-  micAnalyser.getFloatTimeDomainData(buf);
+  if(!micAn||!micReady) return;
+  const buf=new Float32Array(micAn.fftSize);
+  micAn.getFloatTimeDomainData(buf);
  
-  const vol=getRMS(buf);
-  const vuPct=Math.min(100,vol*700);
-  document.getElementById('vu-fill').style.width=vuPct+'%';
+  let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
+  document.getElementById('vuf').style.width=Math.min(100,rms*700)+'%';
  
-  // Very low silence threshold
-  if(vol<0.0008){
-    setMicDot('quiet');
-    setSPNote('—','— Hz');
-    highlightNoteRow(null);
-    freqHistory=[];
-    return;
+  const mdot=document.getElementById('mdot');
+  if(rms<0.0008){
+    fHist=[];detCD=0;
+    mdot.className='mic-dot quiet';
+    document.getElementById('mname').textContent='—';
+    document.getElementById('mhz').textContent='— Hz';
+    clearLit(); return;
   }
  
-  const freq=autoCorrelate(buf, micACtx.sampleRate);
-  if(freq<0){
-    setMicDot('quiet');
-    return;
+  const freq=autoCorr(buf,micAC.sampleRate);
+  if(freq<0){mdot.className='mic-dot quiet';return;}
+  mdot.className='mic-dot hear';
+ 
+  fHist.push(freq); if(fHist.length>3) fHist.shift();
+ 
+  const key=closestNote(freq);
+  if(!key){
+    document.getElementById('mname').textContent='~'+Math.round(freq);
+    document.getElementById('mhz').textContent='? Hz';
+    clearLit(); return;
   }
-  setMicDot('on');
+  const note=NOTES[key];
+  document.getElementById('mname').textContent=note.label;
+  document.getElementById('mhz').textContent=Math.round(freq)+' Hz';
+  litRow(key);
  
-  freqHistory.push(freq);
-  if(freqHistory.length>3) freqHistory.shift();
- 
-  // Find closest note — 20% tolerance (~3.5 semitones, very generous)
-  let bestKey=null, bestDist=Infinity;
-  Object.entries(NOTES).forEach(([k,n])=>{
-    const d=Math.abs(freq-n.freq)/n.freq;
-    if(d<bestDist){bestDist=d; bestKey=k;}
-  });
- 
-  if(bestDist>0.20){
-    setSPNote('~'+Math.round(freq)+'Hz','?');
-    highlightNoteRow(null);
-    return;
-  }
- 
-  const note=NOTES[bestKey];
-  setSPNote(note.label, Math.round(freq)+' Hz');
-  highlightNoteRow(bestKey);
- 
-  // Stability: 1 of last 3 readings (very responsive)
-  const matchCount=freqHistory.filter(f=>{
+  // 1 of last 3 readings = trigger (very responsive)
+  const match=fHist.filter(f=>{
     let bk=null,bd=Infinity;
-    Object.entries(NOTES).forEach(([k,n])=>{const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bk=k;}});
-    return bk===bestKey;
+    for(const [k,n] of Object.entries(NOTES)){const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bk=k;}}
+    return bk===key;
   }).length;
  
-  if(matchCount>=1 && detCooldown===0){
-    detCooldown=8; // ~130ms between triggers at 60fps
-    flashNoteRow(bestKey);
-    handleNote(bestKey);
+  if(match>=1&&detCD===0){
+    detCD=9; // ~150ms at 60fps
+    flashRow(key);
+    handleNote(key);
   }
-  if(detCooldown>0) detCooldown--;
+  if(detCD>0) detCD--;
 }
  
 function handleNote(key){
-  if(gameOver){
-    if(key==='C1'){ resetGame(); return; }
+  if(gameOver||winFlag){
+    if(key==='C1') resetGame();
     return;
   }
-  if(win){
-    if(key==='C1'){ nextLevel(); return; }
-    return;
-  }
-  const note=NOTES[key];
-  if(note.role==='moveL'){ moveDir=-1; moveDirTimer=18; }
-  else if(note.role==='moveR'){ moveDir=1; moveDirTimer=18; }
-  else if(note.role==='shoot'){ shoot(note.letter); }
+  const n=NOTES[key];
+  if(n.role==='moveL') player.x=Math.max(20,player.x-9);
+  else if(n.role==='moveR') player.x=Math.min(580,player.x+9);
+  else if(n.role==='shoot') shoot(n.letter);
 }
  
-function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.length);}
+function clearLit(){document.querySelectorAll('.nrow').forEach(r=>r.classList.remove('lit'));}
+function litRow(key){clearLit();const el=document.getElementById('nr-'+key);if(el)el.classList.add('lit');}
+function flashRow(key){
+  const el=document.getElementById('nr-'+key);if(!el)return;
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+  setTimeout(()=>el.classList.remove('flash'),300);
+}
  
-function autoCorrelate(buf,sr){
-  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
+// ─────────────────────────────────────────
+// AUTOKORELACJA z interpolacją paraboliczną
+// ─────────────────────────────────────────
+function autoCorr(buf,sr){
+  let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
   if(rms<0.0005) return -1;
  
-  // Zero-crossing trim with low threshold (catches quiet signals)
   let r1=0,r2=buf.length-1;
   for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.04){r1=i;break;}}
   for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.04){r2=buf.length-i;break;}}
-  const s=buf.slice(r1,r2);
-  if(s.length<2) return -1;
+  const s=buf.slice(r1,r2); if(s.length<2) return -1;
  
-  // Autocorrelation
   const c=new Float32Array(s.length);
   for(let i=0;i<s.length;i++) for(let j=0;j<s.length-i;j++) c[i]+=s[j]*s[j+i];
  
@@ -660,69 +492,45 @@ function autoCorrelate(buf,sr){
   for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
   if(mp<1) return -1;
  
-  // Parabolic interpolation
   let T=mp;
   if(T>0&&T<c.length-1){
-    const a=(c[T-1]+c[T+1]-2*c[T])/2;
-    const b=(c[T+1]-c[T-1])/2;
+    const a=(c[T-1]+c[T+1]-2*c[T])/2,b=(c[T+1]-c[T-1])/2;
     if(a) T-=b/(2*a);
   }
   const f=sr/T;
   return(f<80||f>2000)?-1:f;
 }
  
-// (keyboard disabled — mic only)
- 
-// ══════════════════════════════════════════════
-// STAR BACKGROUND
-// ══════════════════════════════════════════════
-const stars=Array.from({length:60},()=>({
-  x:Math.random(),y:Math.random(),
-  s:Math.random()*1.5+0.3,
-  b:Math.random()
-}));
- 
-function drawStars(){
-  const W=canvas.width,H=canvas.height;
-  stars.forEach(st=>{
-    const flicker=st.b+Math.sin(performance.now()*0.001+st.x*10)*0.2;
-    ctx.fillStyle=`rgba(255,255,255,${Math.max(0.05,flicker*0.6)})`;
-    ctx.beginPath();
-    ctx.arc(st.x*W,st.y*H,st.s,0,Math.PI*2);
-    ctx.fill();
-  });
-}
- 
-// ══════════════════════════════════════════════
-// MAIN LOOP
-// ══════════════════════════════════════════════
-let lastTime=0;
-function loop(now){
-  const dt=now-lastTime; lastTime=now;
- 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+// ─────────────────────────────────────────
+// PĘTLA GRY
+// ─────────────────────────────────────────
+function loop(){
+  ctx.clearRect(0,0,W,H);
   drawStars();
  
-  if(!gameOver && !win){
-    updatePlayer();
-    updateBullets();
+  if(winFlag){
+    drawMonsters(); drawPlayer(); drawHUD();
+    drawScreen('BRAWO!','#44ff88','Zaśpiewaj c¹ = nowy poziom');
+    detectPitch();
+    requestAnimationFrame(loop); return;
+  }
+  if(gameOver){
+    drawScreen('GAME OVER','#ff4444','Zaśpiewaj c¹ = restart');
+    detectPitch();
+    requestAnimationFrame(loop); return;
   }
  
+  updateBullets();
+  drawParts();
   drawMonsters();
   drawBullets();
-  drawParticles();
   drawPlayer();
   drawHUD();
- 
-  // Pitch detection every frame (analyser is non-blocking)
   detectPitch();
- 
-  if(gameOver) drawGameOver();
-  else if(win) drawWin();
  
   requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
+loop();
 </script>
 </body>
 </html>
