@@ -2,1316 +2,210 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Muzyczna Farma</title>
-<link href="[fonts.googleapis.com](https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Crimson+Text:wght@400;600&display=swap)" rel="stylesheet">
+<title>Piano Invaders</title>
 <style>
-:root{--gold:#d4af37;--dark:#1a1208;--ui-bg:rgba(18,12,4,0.96);--ui-border:#5a3e1b;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#1a1208;font-family:'Crimson Text',serif;color:#f0e4c4;overflow:hidden;height:100vh;display:flex;flex-direction:column;}
-#topbar{display:flex;align-items:center;gap:8px;padding:5px 10px;background:var(--ui-bg);border-bottom:2px solid var(--ui-border);flex-shrink:0;flex-wrap:wrap;z-index:50;}
-.tb-pix{font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--gold);}
-.tb-sep{width:1px;height:18px;background:var(--ui-border);}
-.tb-s{display:flex;align-items:center;gap:4px;}
-.tb-lbl{color:#8a6a3a;font-size:0.65rem;font-weight:600;text-transform:uppercase;}
-.gold-v{font-family:'Press Start 2P',monospace;font-size:0.58rem;color:var(--gold);}
-.mic-btn{padding:3px 10px;border-radius:3px;border:1.5px solid var(--ui-border);background:transparent;color:#f0e4c4;font-size:0.72rem;cursor:pointer;font-family:'Crimson Text',serif;}
-.mic-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.12);}
-.note-disp{font-family:'Press Start 2P',monospace;font-size:0.62rem;color:#7fff7f;min-width:38px;text-align:center;}
-.oct-row{display:flex;gap:3px;}
-.oct-b{padding:2px 7px;border-radius:3px;border:1px solid var(--ui-border);background:transparent;color:#8a6a3a;font-size:0.65rem;cursor:pointer;font-family:'Crimson Text',serif;}
-.oct-b.active{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.14);}
-.tool-v{font-size:0.78rem;color:#c8e4a0;}
-#game-wrap{flex:1;display:flex;overflow:hidden;min-height:0;}
-#gc{display:block;cursor:crosshair;}
-#rpanel{width:185px;flex-shrink:0;background:var(--ui-bg);border-left:2px solid var(--ui-border);display:flex;flex-direction:column;overflow-y:auto;}
-.rp-s{padding:9px;border-bottom:1px solid var(--ui-border);}
-.rp-t{font-family:'Press Start 2P',monospace;font-size:0.48rem;color:var(--gold);margin-bottom:7px;letter-spacing:.04em;}
-.nm-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
-.nm-cell{background:#110d04;border:1px solid var(--ui-border);border-radius:3px;padding:3px 2px;text-align:center;}
-.nm-cell.lit{border-color:#7fff7f;background:rgba(127,255,127,0.1);}
-.nm-note{font-family:'Press Start 2P',monospace;font-size:0.46rem;color:var(--gold);}
-.nm-act{font-size:0.6rem;color:#8a6a3a;margin-top:1px;}
-.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
-.inv-item{background:#110d04;border:1px solid var(--ui-border);border-radius:3px;padding:5px;text-align:center;cursor:pointer;transition:.15s;}
-.inv-item.sel{border-color:var(--gold);}
-.inv-icon{font-size:1.1rem;}.inv-lbl{font-size:0.58rem;color:#8a6a3a;margin-top:1px;}.inv-cnt{font-size:0.6rem;color:var(--gold);}
-.log-list{max-height:130px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
-.log-e{font-size:0.67rem;padding:2px 0;border-bottom:1px solid rgba(90,62,27,0.3);}
-.log-e.good{color:#7fff7f;}.log-e.bad{color:#ff8080;}.log-e.info{color:#93c5fd;}.log-e.gld{color:var(--gold);}
-#dlg{position:fixed;bottom:48px;left:50%;transform:translateX(-50%);width:min(500px,92vw);background:#100c04;border:2px solid var(--ui-border);border-radius:6px;padding:14px 18px;z-index:200;display:none;}
-#dlg.show{display:block;}
-.dlg-name{font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--gold);margin-bottom:6px;}
-.dlg-txt{font-size:0.88rem;line-height:1.55;}
-.dlg-close{margin-top:9px;padding:4px 14px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:0.75rem;cursor:pointer;border-radius:3px;font-family:'Crimson Text',serif;}
-#shop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(540px,94vw);background:#100c04;border:2px solid var(--ui-border);border-radius:8px;padding:18px;z-index:300;display:none;max-height:88vh;overflow-y:auto;}
-#shop.show{display:block;}
-.sh-title{font-family:'Press Start 2P',monospace;font-size:0.58rem;color:var(--gold);text-align:center;margin-bottom:12px;}
-.sh-tabs{display:flex;gap:6px;margin-bottom:10px;}
-.sh-tab{padding:4px 12px;border:1px solid var(--ui-border);background:transparent;color:#8a6a3a;font-size:0.72rem;cursor:pointer;border-radius:3px;font-family:'Crimson Text',serif;}
-.sh-tab.on{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,0.1);}
-.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.sh-card{background:#1a1208;border:1px solid var(--ui-border);border-radius:5px;padding:9px;text-align:center;}
-.sh-icon{font-size:1.4rem;}.sh-name{font-size:0.75rem;font-weight:600;color:#f0e4c4;margin:3px 0 2px;}
-.sh-desc{font-size:0.6rem;color:#8a6a3a;margin-bottom:5px;}
-.sh-price{font-family:'Press Start 2P',monospace;font-size:0.46rem;color:var(--gold);margin-bottom:5px;}
-.sh-btn{padding:3px 10px;border-radius:3px;border:1px solid var(--ui-border);background:transparent;color:#f0e4c4;font-size:0.68rem;cursor:pointer;}
-.sh-btn:hover{border-color:var(--gold);color:var(--gold);}
-.sh-btn:disabled{opacity:.35;cursor:not-allowed;}
-.sh-close{display:block;margin:10px auto 0;padding:5px 18px;border-radius:4px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:0.75rem;cursor:pointer;font-family:'Crimson Text',serif;}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;align-items:center;justify-content:center;}
-.ov-box{background:#100c04;border:2px solid var(--ui-border);border-radius:10px;padding:28px 32px;text-align:center;max-width:400px;width:92%;}
-.ov-title{font-family:'Press Start 2P',monospace;font-size:0.85rem;color:var(--gold);line-height:1.7;margin-bottom:12px;}
-.ov-sub{font-size:0.87rem;color:#c8b090;line-height:1.65;margin-bottom:16px;}
-.ov-btn{padding:9px 24px;border:2px solid var(--gold);background:transparent;color:var(--gold);font-family:'Press Start 2P',monospace;font-size:0.52rem;cursor:pointer;border-radius:5px;}
-.ov-btn:hover{background:var(--gold);color:#100c04;}
-#btmbar{display:flex;align-items:center;gap:8px;padding:4px 10px;background:var(--ui-bg);border-top:2px solid var(--ui-border);flex-shrink:0;flex-wrap:wrap;}
-.btm-hint{font-size:0.7rem;color:#8a6a3a;}
-.btm-active{font-family:'Press Start 2P',monospace;font-size:0.55rem;color:#7fff7f;}
-@media(max-width:600px){#rpanel{display:none;}}
+body { background:black; margin:0; overflow:hidden; }
+canvas { display:block; margin:0 auto; background:black; }
 </style>
 </head>
 <body>
-<div id="topbar">
-  <span class="tb-pix">🌾 MUZYCZNA FARMA</span>
-  <div class="tb-sep"></div>
-  <div class="tb-s"><span class="tb-lbl">💰</span><span class="gold-v" id="gv">50</span></div>
-  <div class="tb-sep"></div>
-  <div class="tb-s"><span class="tb-lbl">Dzień</span><span class="gold-v" id="dayv">1</span></div>
-  <div class="tb-sep"></div>
-  <div class="tb-s"><span class="tb-lbl">Narzędzie:</span><span class="tool-v" id="toolv">👢 Chód</span></div>
-  <div class="tb-sep"></div>
-  <div class="tb-s"><span class="tb-lbl">Oktawa:</span>
-    <div class="oct-row">
-      <button class="oct-b" id="ob-small" onclick="setOctave('small')">Mała</button>
-      <button class="oct-b active" id="ob-one" onclick="setOctave('one')">Razk.</button>
-      <button class="oct-b" id="ob-two" onclick="setOctave('two')">Dwuk.</button>
-    </div>
-  </div>
-  <button class="mic-btn" id="micbtn" onclick="toggleMic()">🎤 Mikrofon: OFF</button>
-  <div class="tb-s"><span class="tb-lbl">Nuta:</span><span class="note-disp" id="notedisp">—</span></div>
-</div>
-<div id="game-wrap">
-  <canvas id="gc"></canvas>
-  <div id="rpanel">
-    <div class="rp-s">
-      <div class="rp-t">🎵 NUTY → AKCJE</div>
-      <div class="nm-grid" id="nm-grid"></div>
-    </div>
-    <div class="rp-s">
-      <div class="rp-t">🎒 EKWIPUNEK</div>
-      <div class="inv-grid" id="inv-grid"></div>
-    </div>
-    <div class="rp-s" style="flex:1;">
-      <div class="rp-t">📜 DZIENNIK</div>
-      <div class="log-list" id="log-list"></div>
-    </div>
-  </div>
-</div>
-<div id="btmbar">
-  <span class="btm-hint" id="btm-hint">Poruszaj się śpiewając nuty. G=Akcja, A=Zmień narzędzie, H=Rozmowa</span>
-</div>
-<div id="dlg">
-  <div class="dlg-name" id="dlg-name">NPC</div>
-  <div class="dlg-txt" id="dlg-txt"></div>
-  <button class="dlg-close" onclick="closeDlg()">[ Zamknij ]</button>
-</div>
-<div id="shop">
-  <div class="sh-title" id="sh-title">🏪 SKLEP</div>
-  <div class="sh-tabs">
-    <button class="sh-tab on" id="sh-tab-buy" onclick="shopTab('buy')">Kup</button>
-    <button class="sh-tab" id="sh-tab-sell" onclick="shopTab('sell')">Sprzedaj</button>
-    <button class="sh-tab" id="sh-tab-oct" onclick="shopTab('oct')">Oktawy</button>
-  </div>
-  <div class="sh-grid" id="sh-content"></div>
-  <button class="sh-close" onclick="closeShop()">Zamknij sklep</button>
-</div>
-<div id="overlay">
-  <div class="ov-box">
-    <div class="ov-title">🌾 MUZYCZNA<br>FARMA</div>
-    <div class="ov-sub">
-      Śpiewaj nuty przez mikrofon!<br><br>
-      <b style="color:var(--gold)">C/D/E/F</b> = ruch ↑→↓←<br>
-      <b style="color:var(--gold)">G</b> = użyj narzędzia / akcja<br>
-      <b style="color:var(--gold)">A</b> = zmień narzędzie<br>
-      <b style="color:var(--gold)">H</b> = rozmawiaj / wejdź<br><br>
-      🌱 Sadź, podlewaj, zbieraj<br>
-      🏪 Kupuj i sprzedawaj w sklepie<br>
-      🕷️ Walcz z pająkami w dungeonie
-    </div>
-    <button class="ov-btn" onclick="startGame()">Rozpocznij!</button>
-  </div>
-</div>
+<canvas id="game" width="600" height="600"></canvas>
 <script>
-// ══════════════════════════════════════════
-// OCTAVES
-// ══════════════════════════════════════════
-const OCTAVES={
-  small:{label:'Mała',   mult:0.5, notes:[{n:'c', f:130.81},{n:'d',f:146.83},{n:'e',f:164.81},{n:'f',f:174.61},{n:'g',f:196.00},{n:'a',f:220.00},{n:'h',f:246.94}]},
-  one:  {label:'Razk.',  mult:1.0, notes:[{n:'c¹',f:261.63},{n:'d¹',f:293.66},{n:'e¹',f:329.63},{n:'f¹',f:349.23},{n:'g¹',f:392.00},{n:'a¹',f:440.00},{n:'h¹',f:493.88}]},
-  two:  {label:'Dwuk.',  mult:2.0, notes:[{n:'c²',f:523.25},{n:'d²',f:587.33},{n:'e²',f:659.25},{n:'f²',f:698.46},{n:'g²',f:783.99},{n:'a²',f:880.00},{n:'h²',f:987.77}]}
+// ------------------------------------------
+// USTAWIENIA GRY
+// ------------------------------------------
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+const NOTES = {
+  C1: {freq:261.63},
+  D1: {freq:293.66},
+  G:  {freq:392.00},
+  A:  {freq:440.00},
+  H:  {freq:493.88}
 };
-let curOct='one';
-let unlockedOct={small:false,one:true,two:false};
-function setOctave(o){
-  if(!unlockedOct[o]){addLog('Kup tę oktawę w sklepie!','bad');return;}
-  curOct=o;
-  document.querySelectorAll('.oct-b').forEach(b=>b.classList.remove('active'));
-  document.getElementById('ob-'+o).classList.add('active');
-  renderNoteMap();
-  addLog('Oktawa: '+OCTAVES[o].label,'info');
-}
-function getNotes(){return OCTAVES[curOct].notes;}
-// ══════════════════════════════════════════
-// NOTE → ACTION
-// ══════════════════════════════════════════
-// idx: 0=C 1=D 2=E 3=F 4=G 5=A 6=H
-const NOTE_ACTS=[
-  {key:'up',   icon:'↑', label:'Ruch Góra'},
-  {key:'right',icon:'→', label:'Ruch Prawo'},
-  {key:'down', icon:'↓', label:'Ruch Dół'},
-  {key:'left', icon:'←', label:'Ruch Lewo'},
-  {key:'use',  icon:'✅', label:'Użyj narzędzia'},
-  {key:'tool', icon:'🔧', label:'Zmień narzędzie'},
-  {key:'talk', icon:'💬', label:'Rozmawiaj/Wejdź'},
-];
-// ══════════════════════════════════════════
-// TILE SYSTEM
-// ══════════════════════════════════════════
-const TS=40;
-const WW=30,WH=26;
-const T={
-  GRASS:0,GRASS2:1,GRASS3:2,PATH:3,DIRT:4,WATER:5,
-  TREE:6,BUSH:7,FLOWER:8,WEED:9,FENCE:10,
-  HOUSE:11,SHOP:12,BARN:13,WELL:14,SIGN:15,SELL:16,
-  TILLED:17,WET:18,
-  CROP0:20,CROP1:21,CROP2:22,CROP3:23,
-  DNG_WALL:30,DNG_FLOOR:31,ROCK:32,ORE:33,CHEST:34,EXIT:35,
-};
-const TC={
-  [T.GRASS]:'#4a8c35',[T.GRASS2]:'#438029',[T.GRASS3]:'#3a7020',
-  [T.PATH]:'#c8a870',[T.DIRT]:'#8b6340',[T.WATER]:'#1a63b8',
-  [T.TREE]:'#1a5c0e',[T.BUSH]:'#2a6e1e',[T.FLOWER]:'#4a8c35',
-  [T.WEED]:'#3a6428',[T.FENCE]:'#9b7840',
-  [T.HOUSE]:'#8b4513',[T.SHOP]:'#5a30a0',[T.BARN]:'#b03818',
-  [T.WELL]:'#506878',[T.SIGN]:'#b88040',[T.SELL]:'#a07820',
-  [T.TILLED]:'#6b4420',[T.WET]:'#4a2e10',
-  [T.CROP0]:'#7a5230',[T.CROP1]:'#60a020',[T.CROP2]:'#40b018',[T.CROP3]:'#e8c820',
-  [T.DNG_WALL]:'#1e1e2e',[T.DNG_FLOOR]:'#2a2a3e',
-  [T.ROCK]:'#607080',[T.ORE]:'#7a5840',[T.CHEST]:'#c08820',[T.EXIT]:'#4040a0',
-};
-const TE={
-  [T.TREE]:'🌲',[T.BUSH]:'🌳',[T.FLOWER]:'🌸',[T.WEED]:'🌿',
-  [T.HOUSE]:'🏠',[T.SHOP]:'🏪',[T.BARN]:'🏚',[T.WELL]:'🪣',
-  [T.SIGN]:'🪧',[T.SELL]:'📦',[T.WATER]:'〰',
-  [T.CROP0]:'·',[T.CROP1]:'🌱',[T.CROP2]:'🌿',[T.CROP3]:'🌾',
-  [T.ROCK]:'🪨',[T.ORE]:'💎',[T.CHEST]:'🎁',[T.EXIT]:'🚪',
-  [T.FENCE]:'|',
-};
-// ══════════════════════════════════════════
-// WORLD DATA
-// ══════════════════════════════════════════
-// Each cell: {t:tileType, obj:null|string, data:{}}
-let village=[], dungeon=[];
-let inDungeon=false;
-function mkCell(t,obj=null,data={}){return{t,obj,data};}
-function buildVillage(){
-  const m=[];
-  for(let y=0;y<WH;y++){
-    m[y]=[];
-    for(let x=0;x<WW;x++){
-      const r=Math.random();
-      m[y][x]=mkCell(r<0.07?T.GRASS2:r<0.12?T.GRASS3:T.GRASS);
+// MONSTERS (nuty)
+const monsterRows = 3;
+const monsterCols = 10;
+const monsterLetters = ["A","H","G"]; 
+let monsters = [];
+// PLAYER
+let player = {x:300, y:550, width:30, height:20};
+// BULLETS
+let bullets = [];
+// ------------------------------------------
+// TWORZENIE POTWORÓW
+// ------------------------------------------
+function resetMonsters(){
+  monsters = [];
+  for(let r=0;r<monsterRows;r++){
+    for(let c=0;c<monsterCols;c++){
+      monsters.push({
+        x: 40 + c*50,
+        y: 40 + r*50,
+        letter: monsterLetters[Math.floor(Math.random()*monsterLetters.length)],
+        alive:true
+      });
     }
   }
-  // Main paths
-  for(let x=0;x<WW;x++) m[6][x]=mkCell(T.PATH);
-  for(let y=0;y<WH;y++) m[y][9]=mkCell(T.PATH);
-  // Water stream right edge
-  for(let y=0;y<WH;y++) m[y][WW-2]=mkCell(T.WATER);
-  for(let y=0;y<WH;y++) m[y][WW-1]=mkCell(T.WATER);
-  // Village structures (top-left)
-  st(m,2,1,T.HOUSE,'house');st(m,3,1,T.HOUSE,'house');
-  st(m,2,3,T.HOUSE,'house2');st(m,3,3,T.HOUSE,'house2');
-  st(m,5,1,T.SHOP,'shop');st(m,6,1,T.SHOP,'shop');st(m,5,2,T.SHOP,'shop');st(m,6,2,T.SHOP,'shop');
-  st(m,2,5,T.BARN,'barn');
-  st(m,5,4,T.WELL,'well');
-  st(m,7,4,T.SIGN,'sign');
-  st(m,7,5,T.SELL,'sell');
-  // Village deco
-  for(const[x,y]of[[1,0],[8,0],[0,1],[8,2],[0,5],[8,5]])st(m,x,y,T.TREE);
-  for(const[x,y]of[[1,4],[4,4],[6,5],[3,5]])st(m,x,y,T.FLOWER);
-  // Forest left side
-  for(let y=7;y<WH;y++)for(let x=0;x<9;x++)
-    if(m[y][x].t===T.GRASS&&Math.random()<0.3)m[y][x]=mkCell(T.TREE);
-  // Farm zone (right of center, rows 8–19, cols 10–22)
-  for(let y=8;y<=19;y++)for(let x=10;x<=22;x++)
-m[y][x] = mkCell(T.DIRT,'field',{
-  tilled:false,
-  wet:false,
-  crop:null,
-  growDay:0,
-  growStage:0
-});
-  // Farm fences
-  for(let x=9;x<=23;x++){m[7][x]=mkCell(T.FENCE);m[20][x]=mkCell(T.FENCE);}
-  for(let y=7;y<=20;y++){m[y][9]=mkCell(T.FENCE);m[y][23]=mkCell(T.FENCE);}
-  m[7][9]=mkCell(T.FENCE);m[20][9]=mkCell(T.FENCE);
-  // Weeds scattered in farm
-  for(const[x,y]of[[11,9],[15,12],[19,10],[12,15],[21,14],[16,17]])
-    if(m[y]&&m[y][x]&&m[y][x].obj==='field')m[y][x].data.weed=true;
-  // Bush line separating farm from dungeon
-  for(let x=10;x<=22;x++) m[21][x]=mkCell(T.BUSH);
-  m[21][16]=mkCell(T.PATH,'dungeon_gate'); // gap = dungeon entrance
-  // Right side bushes
-  for(let y=0;y<WH;y++)for(let x=WW-6;x<WW-2;x++)
-    if(m[y][x].t===T.GRASS&&Math.random()<0.35)m[y][x]=mkCell(T.BUSH);
-  return m;
 }
-function buildDungeon(){
-  const m=[];
-  for(let y=0;y<WH;y++){
-    m[y]=[];
-    for(let x=0;x<WW;x++){
-      const wall=x===0||x===WW-1||y===0||y===WH-1;
-      m[y][x]=mkCell(wall?T.DNG_WALL:T.DNG_FLOOR);
-    }
-  }
-  // Interior walls forming corridors
-  const walls=[[5,2,12,1],[5,6,12,1],[3,9,1,9],[17,2,1,13],[21,7,7,1],[21,11,7,1],[10,14,8,1]];
-  walls.forEach(([x,y,w,h])=>{
-    for(let dy=0;dy<h;dy++)for(let dx=0;dx<w;dx++){
-      const ty=y+dy,tx=x+dx;
-      if(ty>0&&ty<WH-1&&tx>0&&tx<WW-1)m[ty][tx]=mkCell(T.DNG_WALL);
+resetMonsters();
+// ------------------------------------------
+// RYSOWANIE
+// ------------------------------------------
+function drawMonsters(){
+  ctx.fillStyle = "lime";
+  ctx.font = "28px monospace";
+  monsters.forEach(m=>{
+    if(m.alive){
+      ctx.fillText(m.letter, m.x, m.y);
     }
   });
-  // Rocks
-  for(const[x,y]of[[7,4],[11,7],[15,10],[20,5],[24,3],[8,12],[13,15],[22,14],[18,17],[25,17]])
-    if(m[y]&&m[y][x])m[y][x]=mkCell(T.ROCK,'rock',{hp:3});
-  // Ore
-  for(const[x,y]of[[9,5],[14,8],[23,4],[12,13],[20,16]])
-    if(m[y]&&m[y][x])m[y][x]=mkCell(T.ORE,'ore',{hp:2,gives:'ore'});
-  // Chest
-  if(m[2]&&m[2][25])m[2][25]=mkCell(T.CHEST,'chest',{opened:false});
-  // Exit
-  if(m[1]&&m[1][1])m[1][1]=mkCell(T.EXIT,'exit');
-  // Spiders spawn positions
-  spiders=[];
-  for(const[x,y]of[[4,3],[10,5],[16,3],[6,10],[13,12],[22,9],[18,15],[25,13]]){
-    if(m[y]&&m[y][x]&&m[y][x].t===T.DNG_FLOOR)
-      spiders.push({x,y,hp:3,maxHp:3,moveTimer:0,stunTimer:0,dead:false,deathAnim:0});
-  }
-  return m;
 }
-function st(m,x,y,t,obj=null,data={}){
-  if(y>=0&&y<WH&&x>=0&&x<WW)m[y][x]=mkCell(t,obj,data);
+function drawPlayer(){
+  ctx.fillStyle = "cyan";
+  ctx.fillRect(player.x - 15, player.y, 30, 20);
 }
-// ══════════════════════════════════════════
-// NPCS
-// ══════════════════════════════════════════
-const NPC_LIST=[
-  {id:'boleslaw',wx:6.5,wy:1.5,emoji:'👴',name:'Pan Bolesław',color:'#d4af37',
-   lines:[
-    'Witaj, wędrowcze! Sklep otwarty — śpiewaj G by wejść.',
-    'Kupiłem dziś nowe sadzonki. Dobra ziemia to podstawa!',
-    'Sprzedaj mi dojrzałe plony — dam dobrą cenę.',
-    'Słyszałem, że w dungeonie jest skarb. Ostrożnie z pająkami!',
-   ]},
-  {id:'marta',wx:3.5,wy:2.5,emoji:'👩',name:'Marta',color:'#e87040',
-   lines:[
-    'Dzień dobry! Ładna dziś pogoda na uprawy.',
-    'Pamiętaj podlewać codziennie — rośliny lubią wodę!',
-    'Kultywator z boku robi cuda na glebie, wiesz?',
-    'Mój ogródek kwitnie dzięki nowej sadzonicy pomidorów.',
-   ]},
-  {id:'dziadzio',wx:2.5,wy:4.5,emoji:'🧓',name:'Dziadek Kazimierz',color:'#80a0ff',
-   lines:[
-    'Za moich czasów wszystko śpiewaniem robiliśmy... Ha!',
-    'Dungeon pod wsią istnieje od wieków. Tam rudy pełno.',
-    'Aerator ziemię napowietrza, zbiory trzy razy lepsze!',
-    'Odblokuj wyższe oktawy — silniejszy głos, szybsza praca.',
-   ]},
-];
-let npcDialogIdx={};
-NPC_LIST.forEach(n=>npcDialogIdx[n.id]=0);
-// ══════════════════════════════════════════
-// PLAYER & GAME STATE
-// ══════════════════════════════════════════
-const TOOLS=['walk','hoe','water','cult','aer','shovel'];
-const TOOL_INFO={
-  walk: {icon:'👢',label:'Chód',      owned:true},
-  hoe:  {icon:'⚒',label:'Motyka',    owned:true},
-  water:{icon:'💧',label:'Konewka',   owned:true},
-  cult: {icon:'🔧',label:'Kultywator',owned:false},
-  aer:  {icon:'🌬',label:'Aerator',   owned:false},
-  shovel:{icon:'⛏',label:'Łopata',   owned:false},
-};
-let player={
-  x:5,y:4,   // world tile coords
-  hp:10,maxHp:10,
-  gold:50,
-  day:1,
-  toolIdx:0,
-  inventory:{
-    seeds_wheat:3, seeds_carrot:0, seeds_tomato:0,
-    wheat:0, carrot:0, tomato:0,
-    ore:0, crystal:0,
-  },
-  selectedSeed:'seeds_wheat',
-};
-let spiders=[];
-let particles=[];
-let shopTabActive='buy';
-let gameRunning=false;
-let pendingAction=null;
-let actionCooldown=0;
-let animTick=0;
-let dayTimer=0;   // counts frames, every 1800 frames = new day
-const DAY_FRAMES=1800;
-// ══════════════════════════════════════════
-// CROP DEFINITIONS
-// ══════════════════════════════════════════
-const CROPS={
-  seeds_wheat: {name:'Pszenica', icon:'🌾', growDays:2, sellPrice:8,  buyPrice:5},
-  seeds_carrot:{name:'Marchew',  icon:'🥕', growDays:3, sellPrice:15, buyPrice:10},
-  seeds_tomato:{name:'Pomidor',  icon:'🍅', growDays:4, sellPrice:25, buyPrice:18},
-};
-const HARVEST_ITEM={seeds_wheat:'wheat',seeds_carrot:'carrot',seeds_tomato:'tomato'};
-const ITEM_INFO={
-  wheat: {name:'Pszenica',icon:'🌾',sellPrice:8},
-  carrot:{name:'Marchew', icon:'🥕',sellPrice:15},
-  tomato:{name:'Pomidor', icon:'🍅',sellPrice:25},
-  ore:   {name:'Ruda',    icon:'💎',sellPrice:20},
-  crystal:{name:'Kryształ',icon:'💠',sellPrice:50},
-};
-// ══════════════════════════════════════════
-// SHOP CATALOG
-// ══════════════════════════════════════════
-const SHOP_BUY=[
-  {id:'seeds_wheat', name:'Nasiona Pszenicy',icon:'🌾',desc:'Rośnie 2 dni',price:5,  type:'seed'},
-  {id:'seeds_carrot',name:'Nasiona Marchew', icon:'🥕',desc:'Rośnie 3 dni',price:10, type:'seed'},
-  {id:'seeds_tomato',name:'Nasiona Pomidora',icon:'🍅',desc:'Rośnie 4 dni',price:18, type:'seed'},
-  {id:'cult', name:'Kultywator', icon:'🔧',desc:'Szybsze motykowanie',price:80, type:'tool'},
-  {id:'aer',  name:'Aerator',    icon:'🌬',desc:'+50% wzrost plonów',  price:120,type:'tool'},
-  {id:'shovel',name:'Łopata',   icon:'⛏',desc:'Kopie rudy w dungeonie',price:100,type:'tool'},
-];
-const SHOP_OCT=[
-  {id:'small',name:'Oktawa Mała',  icon:'🎵',desc:'c–h (130–247 Hz)',price:60},
-  {id:'two',  name:'Oktawa Dwuk.', icon:'🎶',desc:'c²–h² (523–988 Hz)',price:100},
-];
-// ══════════════════════════════════════════
-// CANVAS SETUP
-// ══════════════════════════════════════════
-const canvas=document.getElementById('gc');
-const ctx=canvas.getContext('2d');
-let camX=0,camY=0; // camera offset in pixels
-function resizeCanvas(){
-  const wrap=document.getElementById('game-wrap');
-  const rp=document.getElementById('rpanel');
-  const pw=rp.offsetParent?rp.offsetWidth:0;
-  canvas.width=wrap.offsetWidth-pw;
-  canvas.height=wrap.offsetHeight;
-  clampCamera();
+function drawBullets(){
+  ctx.fillStyle = "white";
+  bullets.forEach(b=>{
+    ctx.fillRect(b.x-2, b.y-10, 4, 10);
+  });
 }
-window.addEventListener('resize',resizeCanvas);
-function clampCamera(){
-  const map=inDungeon?dungeon:village;
-  const maxX=WW*TS-canvas.width;
-  const maxY=WH*TS-canvas.height;
-  camX=Math.max(0,Math.min(maxX,player.x*TS-canvas.width/2));
-  camY=Math.max(0,Math.min(maxY,player.y*TS-canvas.height/2));
+// ------------------------------------------
+// STRZELANIE
+// ------------------------------------------
+function shoot(letter){
+  bullets.push({
+    x: player.x,
+    y: player.y - 10,
+    letter: letter
+  });
 }
-// ══════════════════════════════════════════
-// DRAWING
-// ══════════════════════════════════════════
-function drawGame(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(-camX,-camY);
-  const map=inDungeon?dungeon:village;
-  const startX=Math.max(0,Math.floor(camX/TS)-1);
-  const endX=Math.min(WW,Math.ceil((camX+canvas.width)/TS)+1);
-  const startY=Math.max(0,Math.floor(camY/TS)-1);
-  const endY=Math.min(WH,Math.ceil((camY+canvas.height)/TS)+1);
-  // Draw tiles
-  for(let y=startY;y<endY;y++){
-    for(let x=startX;x<endX;x++){
-      const cell=map[y][x];
-      const px=x*TS, py=y*TS;
-      // Base color
-      ctx.fillStyle=TC[cell.t]||'#3a7d2c';
-      ctx.fillRect(px,py,TS,TS);
-      // Tile grid line
-      ctx.strokeStyle='rgba(0,0,0,0.12)';
-      ctx.lineWidth=0.5;
-      ctx.strokeRect(px,py,TS,TS);
-      // Grass texture dots
-      if(cell.t===T.GRASS||cell.t===T.GRASS2||cell.t===T.GRASS3){
-        ctx.fillStyle='rgba(0,0,0,0.08)';
-        const seed=(x*31+y*17)%7;
-        if(seed<3){ctx.fillRect(px+6,py+8,2,2);ctx.fillRect(px+22,py+18,2,2);}
-      }
-      // Field overlay
-      if(cell.obj==='field'){
-        const d=cell.data;
-        if(d.weed){
-          ctx.fillStyle='rgba(60,100,20,0.6)';
-          ctx.fillRect(px+2,py+2,TS-4,TS-4);
-          ctx.font='16px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-          ctx.fillText('🌿',px+TS/2,py+TS/2);
-        } else if(d.tilled||d.crop){
-          ctx.fillStyle=d.wet?TC[T.WET]:TC[T.TILLED];
-          ctx.fillRect(px+1,py+1,TS-2,TS-2);
-          // Draw crop
-          if(d.crop&&d.growStage>=0){
-            const stage=d.growStage;
-            ctx.font=(14+stage*4)+'px serif';
-            ctx.textAlign='center';ctx.textBaseline='middle';
-            const emojis=['·','🌱','🌿','🌾'];
-            if(d.crop==='seeds_carrot'){emojis[3]='🥕';}
-            if(d.crop==='seeds_tomato'){emojis[3]='🍅';}
-            ctx.fillText(emojis[Math.min(stage,3)],px+TS/2,py+TS/2);
-          }
-          // Wet shimmer
-          if(d.wet){
-            ctx.fillStyle='rgba(30,100,200,0.18)';
-            ctx.fillRect(px+1,py+1,TS-2,TS-2);
-          }
-        }
-      }
-      // Emoji overlay for special tiles
-      const em=TE[cell.t];
-      if(em){
-        ctx.font=(cell.t===T.TREE||cell.t===T.HOUSE||cell.t===T.SHOP||cell.t===T.BARN?'24px':'18px')+' serif';
-        ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText(em,px+TS/2,py+TS/2);
-      }
-      // Special labels
-      if(cell.t===T.SELL){
-        ctx.fillStyle='rgba(212,175,55,0.85)';
-        ctx.font='bold 8px Press Start 2P,monospace';
-        ctx.textAlign='center';ctx.textBaseline='bottom';
-        ctx.fillText('SPRZEDAJ',px+TS/2,py+TS-2);
-      }
-      if(cell.obj==='dungeon_gate'){
-        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText('⛩',px+TS/2,py+TS/2);
-      }
-      if(cell.obj==='exit'){
-        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText('🚪',px+TS/2,py+TS/2);
-        ctx.fillStyle='rgba(100,100,255,0.3)';
-        ctx.fillRect(px,py,TS,TS);
-      }
-    }
-  }
-  // Draw NPCs (only in village)
-  if(!inDungeon){
-    NPC_LIST.forEach(npc=>{
-      const px=npc.wx*TS, py=npc.wy*TS;
-      if(px<camX-TS||px>camX+canvas.width+TS||py<camY-TS||py>camY+canvas.height+TS)return;
-      // Shadow
-      ctx.fillStyle='rgba(0,0,0,0.2)';
-      ctx.beginPath();ctx.ellipse(px,py+TS*0.45,TS*0.28,TS*0.1,0,0,Math.PI*2);ctx.fill();
-      // Bob animation
-      const bob=Math.sin(animTick*0.04+npc.wx)*2;
-      ctx.font='22px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(npc.emoji,px,py+bob);
-      // Name tag
-      const dist=Math.hypot(player.x-npc.wx,player.y-npc.wy);
-      if(dist<3){
-        ctx.fillStyle='rgba(0,0,0,0.65)';
-        const tw=ctx.measureText(npc.name).width+8;
-        ctx.fillRect(px-tw/2,py-TS*0.65,tw,14);
-        ctx.fillStyle=npc.color;
-        ctx.font='bold 9px Crimson Text,serif';
-        ctx.textAlign='center';ctx.textBaseline='top';
-        ctx.fillText(npc.name,px,py-TS*0.63);
-        // Talk hint
-        ctx.fillStyle='rgba(212,175,55,0.9)';
-        ctx.font='8px Press Start 2P,monospace';
-        ctx.fillText('[H] Rozmawiaj',px,py+TS*0.55);
+// ------------------------------------------
+// KOLIZJE
+// ------------------------------------------
+function updateBullets(){
+  bullets.forEach(b=>b.y -= 5);
+  bullets = bullets.filter(b => b.y > 0);
+  bullets.forEach(b=>{
+    monsters.forEach(m=>{
+      if(m.alive &&
+         b.x > m.x - 15 &&
+         b.x < m.x + 15 &&
+         b.y < m.y &&
+         b.letter === m.letter)
+      {
+        m.alive = false;
+        playPop();
       }
     });
-  }
-  // Draw spiders (dungeon)
-  if(inDungeon){
-    spiders.forEach(sp=>{
-      if(sp.dead&&sp.deathAnim<=0)return;
-      const px=sp.x*TS,py=sp.y*TS;
-      if(sp.deathAnim>0){
-        ctx.globalAlpha=sp.deathAnim/20;
-        ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-        ctx.fillText('🕷️',px+TS/2,py+TS/2);
-        ctx.globalAlpha=1;sp.deathAnim--;
-        return;
-      }
-      const bob=Math.sin(animTick*0.08+sp.x)*2;
-      ctx.font='20px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText('🕷️',px+TS/2,py+TS/2+bob);
-      // HP bar
-      const bw=TS-4;
-      ctx.fillStyle='#3a0000';ctx.fillRect(px+2,py+TS-6,bw,4);
-      ctx.fillStyle=sp.hp/sp.maxHp>0.5?'#22c55e':'#ef4444';
-      ctx.fillRect(px+2,py+TS-6,bw*(sp.hp/sp.maxHp),4);
-      // Stun stars
-      if(sp.stunTimer>0){
-        ctx.font='10px serif';ctx.fillText('⭐',px+TS-6,py+4);
-      }
-    });
-  }
-  // Draw player
-  {
-    const px=player.x*TS, py=player.y*TS;
-    // Shadow
-    ctx.fillStyle='rgba(0,0,0,0.25)';
-    ctx.beginPath();ctx.ellipse(px+TS/2,py+TS*0.85,TS*0.3,TS*0.1,0,0,Math.PI*2);ctx.fill();
-    // Player sprite
-    const t=TOOL_INFO[TOOLS[player.toolIdx]];
-    ctx.font='24px serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('🧑‍🌾',px+TS/2,py+TS/2);
-    // Tool indicator
-    ctx.font='13px serif';
-    ctx.fillText(t.icon,px+TS-4,py+4);
-    // Selection ring
-    ctx.strokeStyle='rgba(255,255,255,0.5)';ctx.lineWidth=1.5;
-    ctx.strokeRect(px+1,py+1,TS-2,TS-2);
-  }
-  // Particles
-  particles=particles.filter(p=>p.life>0);
-  particles.forEach(p=>{
-    ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.color;
-    ctx.font=p.size+'px serif';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(p.emoji,p.x,p.y);
-    p.x+=p.vx;p.y+=p.vy;p.vy+=0.06;p.life-=p.decay;
-  });
-  ctx.globalAlpha=1;
-  ctx.restore();
-  // Day timer overlay bar
-  const prog=dayTimer/DAY_FRAMES;
-  ctx.fillStyle='rgba(0,0,0,0.4)';
-  ctx.fillRect(0,canvas.height-4,canvas.width,4);
-  const dc=prog<0.7?'#a0d040':prog<0.9?'#f0a020':'#e04020';
-  ctx.fillStyle=dc
-  ctx.fillRect(0,canvas.height-4,canvas.width*(1-prog),4);
-  // Day label
-  ctx.fillStyle='rgba(255,255,255,0.7)';
-  ctx.font='8px Press Start 2P,monospace';
-  ctx.textAlign='right';ctx.textBaseline='bottom';
-  ctx.fillText('Dzień '+player.day+' | '+(inDungeon?'DUNGEON':'Wioska'),canvas.width-6,canvas.height-6);
-}
-function spawnParticle(wx,wy,emoji,color='#fff'){
-  particles.push({x:wx*TS+TS/2,y:wy*TS+TS/2,vx:(Math.random()-0.5)*2,vy:-2-Math.random()*2,life:1,decay:0.04,emoji,color,size:16});
-}
-// ══════════════════════════════════════════
-// MOVEMENT & COLLISION
-// ══════════════════════════════════════════
-function canWalk(x,y){
-  if(x<0||y<0||x>=WW||y>=WH)return false;
-  const map=inDungeon?dungeon:village;
-  const cell=map[y][x];
-  const blocked=[T.TREE,T.BUSH,T.FENCE,T.WATER,T.HOUSE,T.SHOP,T.BARN,T.DNG_WALL,T.ROCK,T.ORE,T.CHEST];
-  if(blocked.includes(cell.t))return false;
-  if(inDungeon&&spiders.find(s=>!s.dead&&s.x===x&&s.y===y))return false;
-  return true;
-}
-function tryMove(dx,dy){
-  const nx=Math.round(player.x)+dx;
-  const ny=Math.round(player.y)+dy;
-  if(canWalk(nx,ny)){
-    player.x=nx; player.y=ny;
-    clampCamera();
-    checkProximityHint();
-    return true;
-  }
-  return false;
-}
-// ══════════════════════════════════════════
-// TOOL ACTIONS
-// ══════════════════════════════════════════
-function currentTool(){return TOOLS[player.toolIdx];}
-function useTool(){
-  const map=inDungeon?dungeon:village;
-  const px=Math.round(player.x), py=Math.round(player.y);
-  const tool=currentTool();
-  // Check adjacent cells for action targets
-  const dirs=[[0,0],[0,-1],[0,1],[-1,0],[1,0]];
-  for(const[dx,dy]of dirs){
-    const tx=px+dx, ty=py+dy;
-    if(tx<0||ty<0||tx>=WW||ty>=WH)continue;
-    const cell=map[ty][tx];
-    // DUNGEON ACTIONS
-    if(inDungeon){
-      if(tool==='shovel'&&cell.obj==='ore'){
-        cell.data.hp--;
-        spawnParticle(tx,ty,'💥');
-        if(cell.data.hp<=0){
-          player.inventory.ore++;
-          map[ty][tx]=mkCell(T.DNG_FLOOR);
-          addLog('Wydobyto rudę! +1 💎','good');
-          updateHUD();
-        } else addLog('Kopiesz rudę... (HP:'+cell.data.hp+')','info');
-        return;
-      }
-      if(tool==='shovel'&&cell.obj==='rock'){
-        cell.data.hp--;
-        spawnParticle(tx,ty,'💥');
-        if(cell.data.hp<=0){
-          map[ty][tx]=mkCell(T.DNG_FLOOR);
-          // Chance of crystal
-          if(Math.random()<0.3){player.inventory.crystal++;addLog('Znaleziono kryształ! +1 💠','good');}
-          else addLog('Kamień rozbity!','info');
-          updateHUD();
-        } else addLog('Rozbijasz kamień...','info');
-        return;
-      }
-      // Attack spider
-      const spider=spiders.find(s=>!s.dead&&s.x===tx&&s.y===ty);
-      if(spider){
-        spider.hp--;spider.stunTimer=60;
-        spawnParticle(tx,ty,'⚔️','#ff4040');
-        if(spider.hp<=0){
-          spider.dead=true;spider.deathAnim=20;
-          player.gold+=5;
-          addLog('Pokonano pająka! +5💰','good');
-          updateHUD();
-        } else addLog('Uderzasz pająka! (HP:'+spider.hp+')','info');
-        return;
-      }
-      // Open chest
-      if(cell.obj==='chest'&&!cell.data.opened){
-        cell.data.opened=true;
-        map[ty][tx].t=T.DNG_FLOOR;
-        const bonus=30+Math.floor(Math.random()*40);
-        player.gold+=bonus;
-        player.inventory.crystal+=1;
-        addLog('Otworzyłeś skrzynię! +'+bonus+'💰 +1💠','gld');
-        updateHUD();spawnParticle(tx,ty,'🎁');
-        return;
-      }
-      return;
-    }
-    // VILLAGE ACTIONS
-    if(cell.obj==='field'){
-      const d=cell.data;
-      // Remove weed first
-      if(d.weed){
-        if(tool==='hoe'||tool==='cult'){
-          d.weed=false;
-          addLog('Usunięto chwast!','good');
-          spawnParticle(tx,ty,'✨');
-          return;
-        } else {addLog('Użyj motyki lub kultyvatora aby usunąć chwast!','bad');return;}
-      }
-      // HOE: till soil
-      if((tool==='hoe'||tool==='cult')&&!d.tilled&&!d.crop){
-        d.tilled=true;
-        addLog('Ziemia zaorana!','good');
-        spawnParticle(tx,ty,'⛏');
-        return;
-      }
-      // WATER: water tilled/planted
-      if(tool==='water'&&(d.tilled||d.crop)){
-        d.wet=true;
-        addLog('Pole podlane!','info');
-        spawnParticle(tx,ty,'💧');
-        return;
-      }
-      // AERATOR: boost growth on wet tilled soil
-      if(tool==='aer'&&d.tilled&&d.wet&&!d.crop){
-        d.aerated=true;
-        addLog('Gleba napowietrzona — szybszy wzrost!','good');
-        spawnParticle(tx,ty,'🌬');
-        return;
-      }
-      // HAND: plant seed if tilled, or harvest if ready
-      if(tool==='walk'){
-        if(d.tilled&&!d.crop){
-          // Plant selected seed
-          const seed=player.selectedSeed;
-          if(player.inventory[seed]>0){
-            player.inventory[seed]--;
-            d.crop=seed; d.growStage=0; d.growDay=player.day;
-            addLog('Posadzono: '+CROPS[seed].name,'good');
-            spawnParticle(tx,ty,'🌱');
-            updateHUD();
-          } else addLog('Brak nasion! Kup w sklepie.','bad');
-          return;
-        }
-        if(d.crop&&d.growStage>=3){
-          // Harvest
-          const harvestItem=HARVEST_ITEM[d.crop];
-          const qty=d.aerated?2:1;
-          player.inventory[harvestItem]=(player.inventory[harvestItem]||0)+qty;
-          addLog('Zebrano: '+ITEM_INFO[harvestItem].name+(qty>1?' x'+qty:'')+'!','good');
-          spawnParticle(tx,ty,'🌾');
-          d.crop=null;d.tilled=false;d.wet=false;d.growStage=0;d.aerated=false;
-          updateHUD();
-          return;
-        }
-        if(d.crop&&d.growStage<3){
-          const days=CROPS[d.crop].growDays-d.growStage;
-          addLog('Rośnie jeszcze '+days+' dni...','info');
-          return;
-        }
-      }
-    }
-  }
-  addLog('Nic tu nie ma do zrobienia tym narzędziem.','info');
-}
-// ══════════════════════════════════════════
-// TALK / INTERACT
-// ══════════════════════════════════════════
-function tryTalk(){
-  const px=Math.round(player.x),py=Math.round(player.y);
-  const map=inDungeon?dungeon:village;
-  // Check dungeon exit
-  if(inDungeon){
-    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
-      const cell=map[py+dy]?.[px+dx];
-      if(cell&&cell.obj==='exit'){exitDungeon();return;}
-    }
-    addLog('Idź do drzwi wyjściowych (🚪) aby wyjść.','info');
-    return;
-  }
-  // Check NPC proximity
-  for(const npc of NPC_LIST){
-    const dist=Math.hypot(player.x-npc.wx,player.y-npc.wy);
-    if(dist<2){
-      const idx=npcDialogIdx[npc.id];
-      const line=npc.lines[idx%npc.lines.length];
-      npcDialogIdx[npc.id]++;
-      showDlg(npc.name,npc.emoji+' '+line);
-      return;
-    }
-  }
-  // Check shop proximity
-  const shopDist=Math.hypot(player.x-5.5,player.y-1.5);
-  if(shopDist<3){openShop();return;}
-  // Check sell box proximity
-  for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
-    const tx=px+dx,ty=py+dy;
-    if(ty>=0&&ty<WH&&tx>=0&&tx<WW&&map[ty][tx].t===T.SELL){
-      openSell();return;
-    }
-  }
-  // Check dungeon gate
-  for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
-    const tx=px+dx,ty=py+dy;
-    if(ty>=0&&ty<WH&&tx>=0&&tx<WW&&map[ty][tx].obj==='dungeon_gate'){
-      enterDungeon();return;
-    }
-  }
-  addLog('Podejdź bliżej NPC, sklepu lub wejścia do dungeonu.','info');
-}
-// ══════════════════════════════════════════
-// DUNGEON
-// ══════════════════════════════════════════
-function enterDungeon(){
-  inDungeon=true;
-  player.x=2;player.y=2;
-  if(!dungeon.length) dungeon=buildDungeon();
-  // Respawn spiders if all dead
-  const alive=spiders.filter(s=>!s.dead);
-  if(alive.length===0){
-    dungeon=buildDungeon(); // rebuild respawns spiders
-  }
-  addLog('Wchodzisz do dungeonu! Pająki czuwają...','bad');
-  clampCamera();
-}
-function exitDungeon(){
-  inDungeon=false;
-  player.x=16;player.y=21;
-  addLog('Wyszedłeś z dungeonu.','info');
-  clampCamera();
-}
-// ══════════════════════════════════════════
-// SPIDER AI
-// ══════════════════════════════════════════
-let spiderTick=0;
-function updateSpiders(){
-  if(!inDungeon)return;
-  spiderTick++;
-  if(spiderTick%40!==0)return; // move every 40 frames
-  spiders.forEach(sp=>{
-    if(sp.dead)return;
-    if(sp.stunTimer>0){sp.stunTimer-=40;return;}
-    const dist=Math.hypot(player.x-sp.x,player.y-sp.y);
-    // Attack player if adjacent
-    if(dist<1.5){
-      player.hp=Math.max(0,player.hp-1);
-      addLog('Pająk cię gryzie! -1 HP','bad');
-      updateHUD();
-      if(player.hp<=0){gameOver();return;}
-      return;
-    }
-    // Chase if within 6 tiles
-    if(dist<6){
-      const dx=player.x>sp.x?1:player.x<sp.x?-1:0;
-      const dy=player.y>sp.y?1:player.y<sp.y?-1:0;
-      const dirs=[[dx,0],[0,dy],[dx,dy],[-dx,0],[0,-dy]];
-      for(const[mx,my]of dirs){
-        if(mx===0&&my===0)continue;
-        const nx=sp.x+mx,ny=sp.y+my;
-        if(nx<0||ny<0||nx>=WW||ny>=WH)continue;
-        if(dungeon[ny][nx].t===T.DNG_FLOOR&&!spiders.find(s=>s!==sp&&!s.dead&&s.x===nx&&s.y===ny)&&!(nx===Math.round(player.x)&&ny===Math.round(player.y))){
-          sp.x=nx;sp.y=ny;break;
-        }
-      }
-    } else {
-      // Random wander
-      if(Math.random()<0.4){
-        const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
-        const[mx,my]=dirs[Math.floor(Math.random()*4)];
-        const nx=sp.x+mx,ny=sp.y+my;
-        if(nx>0&&ny>0&&nx<WW-1&&ny<WH-1&&dungeon[ny][nx].t===T.DNG_FLOOR)
-          {sp.x=nx;sp.y=ny;}
-      }
-    }
   });
 }
-// ══════════════════════════════════════════
-// DAY CYCLE
-// ══════════════════════════════════════════
-function advanceDay(){
-  player.day++;
-  dayTimer=0;
-  addLog('─── Nowy dzień: '+player.day+' ───','gld');
-  // Grow crops
-  const map=village;
-  let grew=0;
-  for(let y=0;y<WH;y++){
-    for(let x=0;x<WW;x++){
-      const cell=map[y][x];
-      if(cell.obj==='field'&&cell.data.crop){
-        const d=cell.data;
-        if(d.wet){
-          const maxStage=3;
-          if(d.growStage<maxStage){
-            d.growStage++;grew++;
-            if(d.growStage===maxStage) addLog(CROPS[d.crop].name+' gotowa do zbioru!','good');
-          }
-        }
-        d.wet=false; // needs re-watering each day
-        // Weeds can spread
-        if(Math.random()<0.05){
-          const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
-          const[dx,dy]=dirs[Math.floor(Math.random()*4)];
-          const nx=x+dx,ny=y+dy;
-          if(nx>=0&&ny>=0&&nx<WW&&ny<WH&&map[ny][nx].obj==='field'&&!map[ny][nx].data.crop&&!map[ny][nx].data.weed)
-            map[ny][nx].data.weed=true;
-        }
-      }
+// ------------------------------------------
+// DŹWIĘK POP
+// ------------------------------------------
+function playPop(){
+  let ac = new AudioContext();
+  let osc = ac.createOscillator();
+  osc.frequency.value = 600;
+  osc.connect(ac.destination);
+  osc.start();
+  osc.stop(ac.currentTime + 0.1);
+}
+// ------------------------------------------
+// MIKROFON + WYKRYWANIE NUT
+// ------------------------------------------
+let audioCtx, analyser, micStream;
+async function startMic(){
+  micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const src = audioCtx.createMediaStreamSource(micStream);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 4096;
+  src.connect(analyser);
+  listenPitch();
+}
+startMic();
+function listenPitch(){
+  const buf = new Float32Array(analyser.fftSize);
+  function detect(){
+    analyser.getFloatTimeDomainData(buf);
+    let pitch = autoCorrelate(buf, audioCtx.sampleRate);
+    if(pitch>0){
+      handlePitch(pitch);
     }
+    requestAnimationFrame(detect);
   }
-  if(grew>0) addLog(grew+' roślin urosło tej nocy.','info');
-  updateHUD();
+  detect();
 }
-// ══════════════════════════════════════════
-// SHOP
-// ══════════════════════════════════════════
-let shopTab='buy';
-function openShop(){
-  document.getElementById('shop').classList.add('show');
-  shopTab='buy';renderShop();
-}
-function closeShop(){document.getElementById('shop').classList.remove('show');}
-function shopTab2(t){shopTab=t;renderShop();}
-function renderShop(){
-  const el=document.getElementById('sh-content');
-  el.innerHTML='';
-  // Tab buttons
-  document.querySelectorAll('.sh-tab').forEach(b=>{
-    b.classList.toggle('on',b.dataset.tab===shopTab);
-  });
-  if(shopTab==='buy'){
-    document.getElementById('sh-title').textContent='🏪 SKLEP — Kup (Złoto: '+player.gold+')';
-    SHOP_BUY.forEach(item=>{
-      const owned=item.type==='tool'?TOOL_INFO[item.id]?.owned:false;
-      const canAfford=player.gold>=item.price;
-      const div=document.createElement('div');div.className='sh-card';
-      div.innerHTML=`<div class="sh-icon">${item.icon}</div>
-        <div class="sh-name">${item.name}</div>
-        <div class="sh-desc">${item.desc}</div>
-        <div class="sh-price">${item.price} 💰</div>
-        <button class="sh-btn" ${(owned||!canAfford)?'disabled':''} onclick="buyItem('${item.id}',${item.price},'${item.type}')">
-          ${owned?'Posiadasz':canAfford?'Kup':'Za mało złota'}
-        </button>`;
-      el.appendChild(div);
-    });
-  } else if(shopTab==='sell'){
-    document.getElementById('sh-title').textContent='💰 SPRZEDAJ PLONY';
-    const sellable=['wheat','carrot','tomato','ore','crystal'];
-    sellable.forEach(id=>{
-      const qty=player.inventory[id]||0;
-      if(!ITEM_INFO[id])return;
-      const info=ITEM_INFO[id];
-      const div=document.createElement('div');div.className='sh-card';
-      div.innerHTML=`<div class="sh-icon">${info.icon}</div>
-        <div class="sh-name">${info.name}</div>
-        <div class="sh-desc">Masz: ${qty} szt.</div>
-        <div class="sh-price">${info.sellPrice} 💰 / szt.</div>
-        <button class="sh-btn" ${qty===0?'disabled':''} onclick="sellItem('${id}',1)">Sprzedaj 1</button>
-        <button class="sh-btn" style="margin-top:3px" ${qty===0?'disabled':''} onclick="sellItem('${id}',${qty})">Sprzedaj wszystko</button>`;
-      el.appendChild(div);
-    });
-  } else if(shopTab==='oct'){
-    document.getElementById('sh-title').textContent='🎵 ODBLOKUJ OKTAWY';
-    SHOP_OCT.forEach(item=>{
-      const already=unlockedOct[item.id];
-      const canAfford=player.gold>=item.price;
-      const div=document.createElement('div');div.className='sh-card';
-      div.innerHTML=`<div class="sh-icon">${item.icon}</div>
-        <div class="sh-name">${item.name}</div>
-        <div class="sh-desc">${item.desc}</div>
-        <div class="sh-price">${item.price} 💰</div>
-        <button class="sh-btn" ${(already||!canAfford)?'disabled':''} onclick="buyOctave('${item.id}',${item.price})">
-          ${already?'Odblokowano':canAfford?'Kup':'Za mało złota'}
-        </button>`;
-      el.appendChild(div);
-    });
+function handlePitch(freq){
+  let dist = (a,b)=>Math.abs(a-b);
+  // sterowanie
+  if(dist(freq, NOTES.C1.freq) < 15){
+    player.x -= 6;
   }
-}
-function buyItem(id,price,type){
-  if(player.gold<price){addLog('Za mało złota!','bad');return;}
-  player.gold-=price;
-  if(type==='seed'){
-    player.inventory[id]=(player.inventory[id]||0)+3;
-    addLog('Kupiono 3x '+CROPS[id].name,'gld');
-  } else if(type==='tool'){
-    TOOL_INFO[id].owned=true;
-    addLog('Kupiono narzędzie: '+TOOL_INFO[id].label,'gld');
+  if(dist(freq, NOTES.D1.freq) < 15){
+    player.x += 6;
   }
-  updateHUD();renderShop();
+  // strzały
+  if(dist(freq, NOTES.A.freq) < 20){
+    shoot("A");
+  }
+  if(dist(freq, NOTES.H.freq) < 20){
+    shoot("H");
+  }
+  if(dist(freq, NOTES.G.freq) < 20){
+    shoot("G");
+  }
+  // ograniczenia ekranu
+  player.x = Math.max(20, Math.min(580, player.x));
 }
-function sellItem(id,qty){
-  const have=player.inventory[id]||0;
-  const q=Math.min(qty,have);
-  if(q===0){addLog('Nie masz tego!','bad');return;}
-  player.inventory[id]-=q;
-  const earned=q*ITEM_INFO[id].sellPrice;
-  player.gold+=earned;
-  addLog('Sprzedano '+q+'x '+ITEM_INFO[id].name+' za '+earned+'💰','gld');
-  updateHUD();renderShop();
-}
-function buyOctave(id,price){
-  if(player.gold<price){addLog('Za mało złota!','bad');return;}
-  player.gold-=price;
-  unlockedOct[id]=true;
-  addLog('Odblokowano oktawę: '+OCTAVES[id].label,'gld');
-  updateHUD();renderShop();
-}
-// ══════════════════════════════════════════
-// DIALOG
-// ══════════════════════════════════════════
-function showDlg(name,text){
-  document.getElementById('dlg-name').textContent=name;
-  document.getElementById('dlg-txt').textContent=text;
-  document.getElementById('dlg').classList.add('show');
-}
-function closeDlg(){document.getElementById('dlg').classList.remove('show');}
-// ══════════════════════════════════════════
-// HUD & INVENTORY
-// ══════════════════════════════════════════
-function updateHUD(){
-  document.getElementById('gv').textContent=player.gold;
-  document.getElementById('dayv').textContent=player.day;
-  const t=TOOL_INFO[TOOLS[player.toolIdx]];
-  document.getElementById('toolv').textContent=t.icon+' '+t.label;
-  renderInv();
-}
-function renderInv(){
-  const grid=document.getElementById('inv-grid');
-  if(!grid)return;
-  grid.innerHTML='';
-  // Seeds
-  Object.keys(CROPS).forEach(seed=>{
-    const qty=player.inventory[seed]||0;
-    const info=CROPS[seed];
-    const div=document.createElement('div');
-    div.className='inv-item'+(player.selectedSeed===seed?' sel':'');
-    div.innerHTML=`<div class="inv-icon">${info.icon}</div><div class="inv-lbl">${info.name}</div><div class="inv-cnt">${qty}</div>`;
-    div.onclick=()=>{player.selectedSeed=seed;renderInv();addLog('Wybrano nasiona: '+info.name,'info');};
-    grid.appendChild(div);
-  });
-  // Harvested items & resources
-  ['wheat','carrot','tomato','ore','crystal'].forEach(id=>{
-    const qty=player.inventory[id]||0;
-    if(!qty)return;
-    const info=ITEM_INFO[id];
-    const div=document.createElement('div');div.className='inv-item';
-    div.innerHTML=`<div class="inv-icon">${info.icon}</div><div class="inv-lbl">${info.name}</div><div class="inv-cnt">${qty}</div>`;
-    grid.appendChild(div);
-  });
-}
-function renderNoteMap(){
-  const grid=document.getElementById('nm-grid');
-  if(!grid)return;
-  grid.innerHTML='';
-  const notes=getNotes();
-  notes.forEach((note,i)=>{
-    const act=NOTE_ACTS[i];
-    const cell=document.createElement('div');
-    cell.className='nm-cell';
-    cell.id='nm-'+i;
-    cell.innerHTML=`<div class="nm-note">${note.n}</div><div class="nm-act">${act.icon} ${act.label}</div>`;
-    grid.appendChild(cell);
-  });
-}
-function highlightNote(idx){
-  document.querySelectorAll('.nm-cell').forEach((c,i)=>{
-    c.classList.toggle('lit',i===idx);
-  });
-}
-function addLog(msg,type='info'){
-  const list=document.getElementById('log-list');
-  if(!list)return;
-  const div=document.createElement('div');
-  div.className='log-e '+type;
-  div.textContent=msg;
-  list.prepend(div);
-  while(list.children.length>30)list.removeChild(list.lastChild);
-}
-function checkProximityHint(){
-  const px=Math.round(player.x),py=Math.round(player.y);
-  let hint='Śpiewaj nuty aby się poruszać. G=Akcja, A=Zmień narzędzie, H=Rozmawiaj';
-  if(!inDungeon){
-    for(const npc of NPC_LIST){
-      if(Math.hypot(player.x-npc.wx,player.y-npc.wy)<2){hint='Blisko: '+npc.name+' — H aby porozmawiać';break;}
+// ------------------------------------------
+// AUTOCORRELATION - wykrywanie częstotliwości
+// ------------------------------------------
+function autoCorrelate(buf, sampleRate) {
+  let SIZE = buf.length;
+  let MAX_SAMPLES = Math.floor(SIZE/2);
+  let bestOffset = -1;
+  let bestCorrelation = 0;
+  let rms = 0;
+  for (let i=0;i<SIZE;i++) {
+    let val = buf[i];
+    rms += val*val;
+  }
+  rms = Math.sqrt(rms/SIZE);
+  if(rms < 0.01) return -1;
+  let prevCorrelation = 1;
+  for (let offset = 0; offset < MAX_SAMPLES; offset++) {
+    let correlation = 0;
+    for (let i=0; i<MAX_SAMPLES; i++){
+      correlation += Math.abs( (buf[i]) - (buf[i+offset]) );
     }
-    if(Math.hypot(player.x-5.5,player.y-1.5)<3)hint='Blisko sklepu — H aby wejść';
-    const map=village;
-    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
-      const tx=px+dx,ty=py+dy;
-      if(ty>=0&&ty<WH&&tx>=0&&tx<WW){
-        if(map[ty][tx].t===T.SELL)hint='Blisko skrzynki sprzedaży — H aby sprzedać';
-        if(map[ty][tx].obj==='dungeon_gate')hint='Wejście do dungeonu — H aby wejść';
-        if(map[ty][tx].obj==='field'){
-          const d=map[ty][tx].data;
-          if(d.weed)hint='Pole: chwast! Użyj motyki (G) aby usunąć';
-          else if(!d.tilled&&!d.crop)hint='Pole: użyj motyki (G) aby zaorać';
-          else if(d.tilled&&!d.crop)hint='Pole: zaoranie gotowe — G (ręką) aby posadzić nasiona';
-          else if(d.crop&&!d.wet)hint='Pole: podlej konewką (G)!';
-          else if(d.crop&&d.growStage>=3)hint='Pole: GOTOWE! G (ręką) aby zebrać plony';
-          else if(d.crop)hint='Pole: rośnie (etap '+d.growStage+'/3) — podlewaj każdy dzień';
-        }
-      }
+    correlation = 1 - (correlation/MAX_SAMPLES);
+    if(correlation>bestCorrelation){
+      bestCorrelation = correlation;
+      bestOffset = offset;
     }
-  } else {
-    for(const sp of spiders){
-      if(!sp.dead&&Math.hypot(player.x-sp.x,player.y-sp.y)<2){hint='Pająk obok! G=Atak (potrzebujesz łopaty)';break;}
-    }
-    const map=dungeon;
-    for(const[dx,dy]of[[0,0],[0,-1],[0,1],[-1,0],[1,0]]){
-      const tx=px+dx,ty=py+dy;
-      if(ty>=0&&ty<WH&&tx>=0&&tx<WW){
-        if(map[ty]?.[tx]?.obj==='ore')hint='Ruda! G=Kopaj (potrzebujesz łopaty)';
-        if(map[ty]?.[tx]?.obj==='chest')hint='Skrzynka! G aby otworzyć';
-        if(map[ty]?.[tx]?.obj==='exit')hint='Wyjście! H aby opuścić dungeon';
-      }
-    }
+    prevCorrelation = correlation;
   }
-  const el=document.getElementById('btm-hint');
-  if(el)el.textContent=hint;
-}
-// ══════════════════════════════════════════
-// TOOL CYCLE
-// ══════════════════════════════════════════
-function cycleTool(){
-  let tries=0;
-  do{
-    player.toolIdx=(player.toolIdx+1)%TOOLS.length;
-    tries++;
-  } while(!TOOL_INFO[TOOLS[player.toolIdx]].owned&&tries<TOOLS.length);
-  const t=TOOL_INFO[TOOLS[player.toolIdx]];
-  addLog('Narzędzie: '+t.icon+' '+t.label,'info');
-  updateHUD();
-}
-// ══════════════════════════════════════════
-// ACTION DISPATCH
-// ══════════════════════════════════════════
-function dispatchAction(key){
-  if(!gameRunning)return;
-  if(document.getElementById('dlg').classList.contains('show')){
-    if(key==='talk')closeDlg();
-    return;
+  if(bestCorrelation > 0.01){
+    let freq = sampleRate/bestOffset;
+    return freq;
   }
-  if(document.getElementById('shop').classList.contains('show')){
-    if(key==='talk')closeShop();
-    return;
-  }
-  switch(key){
-    case'up':   tryMove(0,-1);break;
-    case'down': tryMove(0,1);break;
-    case'left': tryMove(-1,0);break;
-    case'right':tryMove(1,0);break;
-    case'use':  useTool();break;
-    case'tool': cycleTool();break;
-    case'talk': tryTalk();break;
-  }
+  return -1;
 }
-// ══════════════════════════════════════════
-// MICROPHONE & PITCH DETECTION
-// ══════════════════════════════════════════
-let micOn=false,aCtx=null,analyser=null,micStream=null,pitchInterval=null;
-let freqHistory=[];
-let detCooldown=0;
-async function toggleMic(){
-  if(micOn){stopMic();return;}
-  try{
-    micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    aCtx=new(window.AudioContext||window.webkitAudioContext)();
-    const src=aCtx.createMediaStreamSource(micStream);
-    const gain=aCtx.createGain();gain.gain.value=4.0;src.connect(gain);
-    analyser=aCtx.createAnalyser();analyser.fftSize=8192;analyser.smoothingTimeConstant=0.3;
-    gain.connect(analyser);
-    micOn=true;
-    document.getElementById('micbtn').textContent='🎤 Mikrofon: ON';
-    document.getElementById('micbtn').classList.add('on');
-    pitchInterval=setInterval(detectPitch,50);
-    addLog('🎤 Mikrofon włączony','info');
-  }catch(e){alert('Brak dostępu do mikrofonu: '+e.message);}
+// ------------------------------------------
+// PĘTLA GRY
+// ------------------------------------------
+function loop(){
+  ctx.clearRect(0,0,600,600);
+  drawMonsters();
+  drawPlayer();
+  drawBullets();
+  updateBullets();
+  requestAnimationFrame(loop);
 }
-function stopMic(){
-  if(pitchInterval){clearInterval(pitchInterval);pitchInterval=null;}
-  if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null;}
-  if(aCtx){aCtx.close().catch(()=>{});aCtx=null;}
-  micOn=false;
-  document.getElementById('micbtn').textContent='🎤 Mikrofon: OFF';
-  document.getElementById('micbtn').classList.remove('on');
-  document.getElementById('notedisp').textContent='—';
-  highlightNote(-1);
-}
-function detectPitch(){
-  if(!analyser)return;
-  const buf=new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
-  const vol=getRMS(buf);
-  if(vol<0.002){freqHistory=[];document.getElementById('notedisp').textContent='—';highlightNote(-1);return;}
-  const freq=autoCorrelate(buf,aCtx.sampleRate);
-  if(freq<0){return;}
-  freqHistory.push(freq);
-  if(freqHistory.length>4)freqHistory.shift();
-  const notes=getNotes();
-  let bestIdx=-1,bestDist=Infinity;
-  notes.forEach((note,i)=>{
-    const d=Math.abs(freq-note.f)/note.f;
-    if(d<bestDist){bestDist=d;bestIdx=i;}
-  });
-  if(bestDist>0.12){document.getElementById('notedisp').textContent='?';highlightNote(-1);return;}
-  document.getElementById('notedisp').textContent=notes[bestIdx].n;
-  highlightNote(bestIdx);
-  const matchCount=freqHistory.filter(f=>{
-    let bi=-1,bd=Infinity;
-    notes.forEach((n,i)=>{const d=Math.abs(f-n.f)/n.f;if(d<bd){bd=d;bi=i;}});
-    return bi===bestIdx;
-  }).length;
-  if(matchCount>=2&&detCooldown===0){
-    const act=NOTE_ACTS[bestIdx];
-    dispatchAction(act.key);
-    detCooldown=12;
-    setTimeout(()=>{detCooldown=0;},600);
-  }
-}
-function getRMS(buf){let s=0;for(const v of buf)s+=v*v;return Math.sqrt(s/buf.length);}
-function autoCorrelate(buf,sr){
-  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
-  if(rms<0.001)return-1;
-  let r1=0,r2=buf.length-1;
-  for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.12){r1=i;break;}}
-  for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.12){r2=buf.length-i;break;}}
-  const s=buf.slice(r1,r2);if(s.length<2)return-1;
-  const c=new Float32Array(s.length);
-  for(let i=0;i<s.length;i++)for(let j=0;j<s.length-i;j++)c[i]+=s[j]*s[j+i];
-  let d=0;while(d<c.length-1&&c[d]>c[d+1])d++;
-  let mv=-1,mp=-1;for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
-  if(mp<1)return-1;
-  let T0=mp;
-  if(T0>0&&T0<c.length-1){const a=(c[T0-1]+c[T0+1]-2*c[T0])/2,b2=(c[T0+1]-c[T0-1])/2;if(a)T0-=b2/(2*a);}
-  const f=sr/T0;return(f<55||f>2100)?-1:f;
-}
-// ══════════════════════════════════════════
-// KEYBOARD FALLBACK
-// ══════════════════════════════════════════
-document.addEventListener('keydown',e=>{
-  if(!gameRunning)return;
-  const map={
-    ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',
-    w:'up',s:'down',a:'left',d:'right',
-    ' ':'use',e:'use',q:'tool',f:'talk',
-    W:'up',S:'down',A:'left',D:'right',
-  };
-  if(map[e.key]){e.preventDefault();dispatchAction(map[e.key]);}
-  // Direct note keys for testing
-  const noteMap={c:'up',v:'right',b:'down',n:'left',m:'use',',':'tool','.':'talk'};
-  if(noteMap[e.key]){e.preventDefault();dispatchAction(noteMap[e.key]);}
-});
-// ══════════════════════════════════════════
-// GAME LOOP
-// ══════════════════════════════════════════
-let rafId=null;
-function gameLoop(){
-  animTick++;
-  dayTimer++;
-  if(dayTimer>=DAY_FRAMES)advanceDay();
-  if(detCooldown>0)detCooldown--;
-  updateSpiders();
-  clampCamera();
-  drawGame();
-  rafId=requestAnimationFrame(gameLoop);
-}
-// ══════════════════════════════════════════
-// START / GAME OVER
-// ══════════════════════════════════════════
-function startGame(){
-  document.getElementById('overlay').style.display='none';
-  village=buildVillage();
-  dungeon=buildDungeon();
-  player.x=5;player.y=4;
-  player.hp=10;player.maxHp=10;
-  player.gold=50;player.day=1;player.toolIdx=0;
-  player.inventory={seeds_wheat:3,seeds_carrot:0,seeds_tomato:0,wheat:0,carrot:0,tomato:0,ore:0,crystal:0};
-  player.selectedSeed='seeds_wheat';
-  inDungeon=false;dayTimer=0;animTick=0;particles=[];
-  gameRunning=true;
-  resizeCanvas();
-  clampCamera();
-  renderNoteMap();
-  updateHUD();
-  addLog('🌾 Witaj w Muzycznej Farmie!','gld');
-  addLog('Śpiewaj nuty lub użyj klawiszy W/A/S/D + E/Q/F','info');
-  addLog('G=Akcja, A=Zmień narzędzie, H=Rozmawiaj','info');
-  if(rafId)cancelAnimationFrame(rafId);
-  rafId=requestAnimationFrame(gameLoop);
-  // Wire shop tabs
-  document.querySelectorAll('.sh-tab').forEach(b=>{
-    b.onclick=()=>shopTab2(b.dataset.tab);
-  });
-}
-function gameOver(){
-  gameRunning=false;
-  if(rafId)cancelAnimationFrame(rafId);
-  const ov=document.getElementById('overlay');
-  ov.style.display='flex';
-  ov.querySelector('.ov-box').innerHTML=`
-    <div class="ov-title">💀 GAME OVER</div>
-    <div class="ov-sub">Pająki cię pokonały...<br><br>Złoto: ${player.gold} 💰<br>Dzień: ${player.day}<br><br>Wróć silniejszy!</div>
-    <button class="ov-btn" onclick="startGame()">Zagraj ponownie</button>`;
-}
-// Init
-resizeCanvas();
-requestAnimationFrame(()=>drawGame());
-</script>
-<!-- Shop tab data attributes fix -->
-<script>
-document.addEventListener('DOMContentLoaded',()=>{
-  // Assign data-tab to shop tab buttons after DOM ready
-  const tabs=document.querySelectorAll('.sh-tab');
-  const tabKeys=['buy','sell','oct'];
-  tabs.forEach((b,i)=>{if(tabKeys[i])b.dataset.tab=tabKeys[i];});
-});
+loop();
 </script>
 </body>
 </html>
