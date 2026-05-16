@@ -108,7 +108,7 @@ function resetMonsters(){
     for(let col=0;col<COLS;col++){
       monsters.push({
         col, x:colX(col), y:my[r],
-        letter:SHOOT_LETTERS[col], // col 0=C, 1=D, ... 6=H
+        letter:SHOOT_LETTERS[Math.floor(Math.random()*SHOOT_LETTERS.length)],
         alive:true
       });
     }
