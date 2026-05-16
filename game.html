@@ -1,536 +1,291 @@
+Piano invaders · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <title>Piano Invaders</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#000;overflow:hidden;display:flex;font-family:'Courier New',monospace;}
- 
-canvas{display:block;background:#000;flex-shrink:0;}
- 
-/* ── SIDE PANEL ── */
-#panel{
-  width:180px;flex-shrink:0;
-  background:#06060e;border-left:2px solid #111133;
-  display:flex;flex-direction:column;
-  overflow-y:auto;
-}
-.ps{padding:10px 9px;border-bottom:1px solid #0d0d22;}
-.ps-title{
-  font-size:.55rem;color:#1a2a88;
-  text-transform:uppercase;letter-spacing:.18em;
-  font-weight:700;margin-bottom:7px;
-}
- 
-/* mic indicator */
-.mic-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
-.mic-dot{
-  width:11px;height:11px;border-radius:50%;
-  background:#111;flex-shrink:0;
-  transition:background .05s,box-shadow .05s;
-}
-.mic-dot.hear{background:#00ff44;box-shadow:0 0 8px #00ff44;}
-.mic-dot.quiet{background:#223322;}
-.mic-name{
-  font-size:1.5rem;font-weight:700;
-  color:#ffdd00;line-height:1;
-  text-shadow:0 0 7px rgba(255,220,0,.5);
-  min-width:32px;
-}
-.mic-hz{font-size:.5rem;color:#222;margin-top:1px;}
-.vu{height:4px;background:#0a0a0a;border:1px solid #111;overflow:hidden;margin-bottom:3px;}
-.vu-f{height:100%;width:0;background:linear-gradient(90deg,#00aa00,#ffcc00,#ff3300);transition:width .04s;}
-.mic-st{font-size:.55rem;color:#333;letter-spacing:.07em;}
- 
-/* note rows */
-.nrow{
-  display:flex;align-items:center;gap:4px;
-  padding:3px 1px;border-bottom:1px solid #0a0a0a;
-}
-.nrow:last-child{border:none;}
-.nrow.lit{background:rgba(255,220,0,.13);}
-.nrow.flash{animation:nflash .3s ease;}
-@keyframes nflash{0%{background:rgba(255,220,0,.45);}100%{background:transparent;}}
-.nn{font-size:.9rem;font-weight:700;min-width:26px;font-family:'Courier New',monospace;}
-.na{font-size:.6rem;color:#555;flex:1;}
-.nhz{font-size:.48rem;color:#1e1e1e;margin-left:auto;white-space:nowrap;}
-.move .nn{color:#44aaff;}
-.atk  .nn{color:#ff4444;}
- 
-.sv{font-size:1rem;font-weight:700;color:#ffdd00;}
-.sv.b{color:#44aaff;}
+body{margin:0;background:#000;display:flex;overflow:hidden;}
+canvas{display:block;background:#000;}
+#panel{width:160px;background:#050510;border-left:1px solid #111;color:#aaa;font:11px 'Courier New',monospace;padding:8px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+.pt{font-size:9px;color:#223;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;}
+.nr{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #0a0a0a;}
+.nr span:first-child{color:#ffdd00;}
+.nr.move span:first-child{color:#44aaff;}
+.nr.lit{background:rgba(255,220,0,.15);}
+/* mic */
+.mdot{width:9px;height:9px;border-radius:50%;background:#111;display:inline-block;margin-right:5px;vertical-align:middle;}
+.mdot.on{background:#0f0;box-shadow:0 0 6px #0f0;}
+#mdet{font-size:18px;color:#ffdd00;font-weight:bold;display:block;min-height:22px;}
+.vu{height:3px;background:#111;margin:3px 0;}
+.vuf{height:100%;width:0;background:linear-gradient(90deg,#0a0,#ff0,#f00);transition:width .04s;}
 </style>
 </head>
 <body>
- 
-<canvas id="game" width="600" height="600"></canvas>
- 
+<canvas id="c"></canvas>
 <div id="panel">
- 
-  <div class="ps">
-    <div class="ps-title">🎤 Mikrofon</div>
-    <div class="mic-top">
-      <div class="mic-dot" id="mdot"></div>
-      <div>
-        <div class="mic-name" id="mname">—</div>
-        <div class="mic-hz"  id="mhz">— Hz</div>
-      </div>
-    </div>
-    <div class="vu"><div class="vu-f" id="vuf"></div></div>
-    <div class="mic-st" id="mst">Uruchamianie...</div>
+  <div>
+    <div class="pt">Mikrofon</div>
+    <span class="mdot" id="mdot"></span><span id="mst">—</span><br>
+    <span id="mdet">—</span>
+    <div class="vu"><div class="vuf" id="vuf"></div></div>
   </div>
- 
-  <div class="ps">
-    <div class="ps-title">🎵 Sterowanie</div>
-    <div class="nrow move" id="nr-C1">
-      <span class="nn">c¹</span>
-      <span class="na">◀ lewo</span>
-      <span class="nhz">262Hz</span>
-    </div>
-    <div class="nrow move" id="nr-D1">
-      <span class="nn">d¹</span>
-      <span class="na">▶ prawo</span>
-      <span class="nhz">294Hz</span>
-    </div>
+  <div>
+    <div class="pt">Ruch (mała)</div>
+    <div class="nr move" id="nr-c">  <span>c</span><span>kol 1</span></div>
+    <div class="nr move" id="nr-d">  <span>d</span><span>kol 2</span></div>
+    <div class="nr move" id="nr-e">  <span>e</span><span>kol 3</span></div>
+    <div class="nr move" id="nr-f">  <span>f</span><span>kol 4</span></div>
+    <div class="nr move" id="nr-g">  <span>g</span><span>kol 5</span></div>
+    <div class="nr move" id="nr-a">  <span>a</span><span>kol 6</span></div>
+    <div class="nr move" id="nr-h">  <span>h</span><span>kol 7</span></div>
   </div>
- 
-  <div class="ps">
-    <div class="ps-title">🔫 Strzelanie</div>
-    <div class="nrow atk" id="nr-A">
-      <span class="nn">a¹</span>
-      <span class="na">strzelaj A</span>
-      <span class="nhz">440Hz</span>
-    </div>
-    <div class="nrow atk" id="nr-H">
-      <span class="nn">h¹</span>
-      <span class="na">strzelaj H</span>
-      <span class="nhz">494Hz</span>
-    </div>
-    <div class="nrow atk" id="nr-G">
-      <span class="nn">g¹</span>
-      <span class="na">strzelaj G</span>
-      <span class="nhz">392Hz</span>
-    </div>
+  <div>
+    <div class="pt">Strzał (razkreślna)</div>
+    <div class="nr" id="nr-C1"><span>c¹</span><span>strzel C</span></div>
+    <div class="nr" id="nr-D1"><span>d¹</span><span>strzel D</span></div>
+    <div class="nr" id="nr-E1"><span>e¹</span><span>strzel E</span></div>
+    <div class="nr" id="nr-F1"><span>f¹</span><span>strzel F</span></div>
+    <div class="nr" id="nr-G1"><span>g¹</span><span>strzel G</span></div>
+    <div class="nr" id="nr-A1"><span>a¹</span><span>strzel A</span></div>
+    <div class="nr" id="nr-H1"><span>h¹</span><span>strzel H</span></div>
   </div>
- 
-  <div class="ps">
-    <div class="ps-title">📊 Wynik</div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
-      <span style="font-size:.52rem;color:#333;">PUNKTY</span>
-      <span class="sv" id="p-score">0</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-      <span style="font-size:.52rem;color:#333;">ŻYCIA</span>
-      <span class="sv b" id="p-lives">❤❤❤</span>
-    </div>
-  </div>
- 
-  <div class="ps" style="flex:1;">
-    <div class="ps-title">👾 Potwory</div>
-    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;margin-bottom:4px;">
-      <div style="width:8px;height:8px;background:#ff4444;flex-shrink:0;"></div>A — śpiewaj a¹
-    </div>
-    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;margin-bottom:4px;">
-      <div style="width:8px;height:8px;background:#ffaa44;flex-shrink:0;"></div>H — śpiewaj h¹
-    </div>
-    <div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#444;">
-      <div style="width:8px;height:8px;background:#44ff88;flex-shrink:0;"></div>G — śpiewaj g¹
-    </div>
-    <div style="font-size:.52rem;color:#1a1a1a;margin-top:8px;line-height:1.6;">
-      Zaśpiewaj c¹<br>aby zrestartować
-    </div>
-  </div>
- 
 </div>
- 
 <script>
 'use strict';
-// ─────────────────────────────────────────
-// CANVAS
-// ─────────────────────────────────────────
-const canvas = document.getElementById("game");
-const ctx    = canvas.getContext("2d");
-const W=600, H=600;
+const cv=document.getElementById('c'), cx=cv.getContext('2d');
+const PW=window.innerWidth-160, PH=window.innerHeight;
+cv.width=PW; cv.height=PH;
  
-// ─────────────────────────────────────────
-// NUTY  +  MARGINESY
-// Tolerancja ±20% (względna) ≈ ±3.5 półtonu
-// c¹: 209–314 Hz | d¹: 235–352 Hz
-// g¹: 314–470 Hz | a¹: 352–528 Hz | h¹: 395–593 Hz
-// ─────────────────────────────────────────
-const NOTES = {
-  C1:{label:'c¹',freq:261.63,role:'moveL'},
-  D1:{label:'d¹',freq:293.66,role:'moveR'},
-  G: {label:'g¹',freq:392.00,role:'shoot',letter:'G'},
-  A: {label:'a¹',freq:440.00,role:'shoot',letter:'A'},
-  H: {label:'h¹',freq:493.88,role:'shoot',letter:'H'},
-};
-const TOL=0.20; // 20%
+// 7 columns
+const COLS=7;
+const COL_W=PW/COLS;
+// column centers
+const colX=i=>COL_W*i+COL_W/2;
  
-function closestNote(freq){
-  let best=null,bd=Infinity;
-  for(const [k,n] of Object.entries(NOTES)){
-    const d=Math.abs(freq-n.freq)/n.freq;
-    if(d<bd){bd=d;best=k;}
-  }
+// Notes — small octave → move (C=130Hz range)
+// C=130.81 D=146.83 E=164.81 F=174.61 G=196.00 A=220.00 H=246.94
+// Notes — one-line octave → shoot (C1=261.63 ... H1=493.88)
+const MOVE_NOTES=[
+  {id:'c', freq:130.81, col:0},
+  {id:'d', freq:146.83, col:1},
+  {id:'e', freq:164.81, col:2},
+  {id:'f', freq:174.61, col:3},
+  {id:'g', freq:196.00, col:4},
+  {id:'a', freq:220.00, col:5},
+  {id:'h', freq:246.94, col:6},
+];
+const SHOOT_NOTES=[
+  {id:'C1', freq:261.63, letter:'C'},
+  {id:'D1', freq:293.66, letter:'D'},
+  {id:'E1', freq:329.63, letter:'E'},
+  {id:'F1', freq:349.23, letter:'F'},
+  {id:'G1', freq:392.00, letter:'G'},
+  {id:'A1', freq:440.00, letter:'A'},
+  {id:'H1', freq:493.88, letter:'H'},
+];
+const ALL_NOTES=[...MOVE_NOTES,...SHOOT_NOTES];
+const TOL=0.18; // 18% tolerance
+ 
+function closest(freq){
+  let best=null,bd=1e9;
+  for(const n of ALL_NOTES){const d=Math.abs(freq-n.freq)/n.freq;if(d<bd){bd=d;best=n;}}
   return bd<=TOL?best:null;
 }
  
-// ─────────────────────────────────────────
-// GAME STATE
-// ─────────────────────────────────────────
-const mLetters=['A','H','G'];
-const mColor={A:'#ff4444',H:'#ffaa44',G:'#44ff88'};
- 
-let monsters=[],bullets=[],parts=[];
-let player={x:300,y:555};
-let score=0,lives=3,gameOver=false,winFlag=false;
-const lastShot={A:0,H:0,G:0};
-const SHOTCD=350;
- 
-function resetGame(){
-  score=0;lives=3;gameOver=false;winFlag=false;
-  player.x=300;bullets=[];parts=[];
-  resetMonsters();
-  updatePanel();
-}
- 
+// MONSTERS — 3 rows × 7 cols, each col has letter matching col index mod 7
+// monster letter = one of C D E F G A H (shoot note letters)
+const SHOOT_LETTERS=['C','D','E','F','G','A','H'];
+const MCOL=['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
+let monsters=[];
 function resetMonsters(){
   monsters=[];
-  for(let r=0;r<3;r++)
-    for(let c=0;c<10;c++)
+  const rows=3;
+  const my=[80,130,180];
+  for(let r=0;r<rows;r++){
+    for(let col=0;col<COLS;col++){
       monsters.push({
-        x:40+c*52, y:55+r*52,
-        letter:mLetters[r%mLetters.length],
+        col, x:colX(col), y:my[r],
+        letter:SHOOT_LETTERS[col], // col 0=C, 1=D, ... 6=H
         alive:true
       });
+    }
+  }
 }
 resetMonsters();
  
-// ─────────────────────────────────────────
-// DRAW
-// ─────────────────────────────────────────
-// Static stars (generated once)
-const STARS=Array.from({length:50},()=>({
-  x:Math.random()*W, y:Math.random()*H,
-  r:Math.random()<0.3?2:1,
-  sp:0.5+Math.random(), ph:Math.random()*Math.PI*2
-}));
+// PLAYER
+let playerCol=3; // start center
+const PLAYER_Y=PH-40;
+const PLAYER_W=40, PLAYER_H=14;
  
-function drawStars(){
-  STARS.forEach(s=>{
-    ctx.globalAlpha=0.15+0.35*Math.sin(Date.now()*0.001*s.sp+s.ph);
-    ctx.fillStyle='#fff';
-    ctx.fillRect(s.x,s.y,s.r,s.r);
-  });
-  ctx.globalAlpha=1;
-}
+// BULLETS
+let bullets=[];
+const BULLET_SPEED=9;
+const SHOT_CD=300; // ms per letter
+const lastShot={};
  
-function drawMonsters(){
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  monsters.forEach(m=>{
-    if(!m.alive) return;
-    ctx.fillStyle=mColor[m.letter];
-    // body
-    ctx.fillRect(m.x-14,m.y-13,28,18);
-    // legs
-    ctx.fillRect(m.x-14,m.y+5,8,6);
-    ctx.fillRect(m.x+6, m.y+5,8,6);
-    // letter
-    ctx.fillStyle='#000';
-    ctx.font="bold 14px 'Courier New',monospace";
-    ctx.fillText(m.letter,m.x,m.y-2);
-  });
-}
- 
-function drawPlayer(){
-  ctx.fillStyle='#00ccff';
-  ctx.beginPath();
-  ctx.moveTo(player.x,     player.y-18);
-  ctx.lineTo(player.x+16,  player.y+8);
-  ctx.lineTo(player.x+6,   player.y+8);
-  ctx.lineTo(player.x+6,   player.y+14);
-  ctx.lineTo(player.x-6,   player.y+14);
-  ctx.lineTo(player.x-6,   player.y+8);
-  ctx.lineTo(player.x-16,  player.y+8);
-  ctx.closePath();
-  ctx.shadowColor='#00ccff'; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
-}
- 
-function drawBullets(){
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  bullets.forEach(b=>{
-    ctx.fillStyle=mColor[b.letter]||'#fff';
-    ctx.shadowColor=mColor[b.letter]; ctx.shadowBlur=6;
-    ctx.fillRect(b.x-2,b.y,4,12); ctx.shadowBlur=0;
-    ctx.fillStyle='#fff';
-    ctx.font="bold 8px 'Courier New'";
-    ctx.fillText(b.letter,b.x,b.y-6);
-  });
-}
- 
-function drawParts(){
-  parts=parts.filter(p=>p.life>0);
-  parts.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy; p.vy+=0.15; p.life-=0.04;
-    ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.col;
-    ctx.fillRect(p.x-2,p.y-2,4,4);
-  });
-  ctx.globalAlpha=1;
-}
- 
-function drawHUD(){
-  ctx.strokeStyle='rgba(0,204,255,0.18)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(0,582); ctx.lineTo(W,582); ctx.stroke();
-  ctx.fillStyle='#00ccff'; ctx.font="14px 'Courier New'";
-  ctx.textAlign='left'; ctx.textBaseline='top';
-  ctx.fillText('❤'.repeat(lives),8,8);
-  ctx.fillStyle='#ffdd00'; ctx.textAlign='right';
-  ctx.fillText(score,W-8,8);
-}
- 
-function drawScreen(title,color,sub){
-  ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,0,W,H);
-  ctx.fillStyle=color; ctx.font="bold 52px 'Courier New'";
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(title,W/2,H*0.42);
-  ctx.fillStyle='#ffdd00'; ctx.font="20px 'Courier New'";
-  ctx.fillText('Wynik: '+score,W/2,H*0.55);
-  ctx.fillStyle='#444'; ctx.font="13px 'Courier New'";
-  ctx.fillText(sub,W/2,H*0.65);
-}
- 
-// ─────────────────────────────────────────
-// LOGIC
-// ─────────────────────────────────────────
 function shoot(letter){
   const now=performance.now();
-  if(now-(lastShot[letter]||0)<SHOTCD) return;
+  if(now-(lastShot[letter]||0)<SHOT_CD) return;
   lastShot[letter]=now;
-  bullets.push({x:player.x,y:player.y-20,letter,vy:8});
-  playShoot();
+  bullets.push({x:colX(playerCol), y:PLAYER_Y-PLAYER_H, letter});
 }
  
-function updateBullets(){
-  bullets.forEach(b=>b.y-=b.vy);
-  bullets=bullets.filter(b=>b.y>-10);
-  bullets.forEach(b=>{
-    monsters.forEach(m=>{
-      if(!m.alive||b.y<-10) return;
-      if(b.letter===m.letter &&
-         Math.abs(b.x-m.x)<22 &&
-         b.y<m.y+12 && b.y>m.y-28){
-        m.alive=false; b.vy=-999;
-        score+=10; updatePanel(); playPop();
-        spawnParts(m.x,m.y,mColor[m.letter]);
+// DRAW
+function draw(){
+  cx.clearRect(0,0,PW,PH);
+ 
+  // column grid (faint)
+  cx.strokeStyle='#0a0a0a'; cx.lineWidth=1;
+  for(let i=1;i<COLS;i++){cx.beginPath();cx.moveTo(i*COL_W,0);cx.lineTo(i*COL_W,PH);cx.stroke();}
+ 
+  // monsters
+  cx.textAlign='center'; cx.textBaseline='middle'; cx.font='bold 13px Courier New';
+  for(const m of monsters){
+    if(!m.alive) continue;
+    cx.fillStyle=MCOL[m.col];
+    cx.fillRect(m.x-18,m.y-12,36,20);
+    cx.fillStyle='#000';
+    cx.fillText(m.letter,m.x,m.y);
+  }
+ 
+  // bullets
+  cx.font='bold 9px Courier New';
+  for(const b of bullets){
+    cx.fillStyle='#fff';
+    cx.fillRect(b.x-2,b.y,4,10);
+    cx.fillStyle='#ff8';
+    cx.fillText(b.letter,b.x,b.y-6);
+  }
+ 
+  // player
+  const px=colX(playerCol);
+  cx.fillStyle='#0cf';
+  cx.fillRect(px-PLAYER_W/2, PLAYER_Y-PLAYER_H, PLAYER_W, PLAYER_H);
+ 
+  // column labels at bottom
+  cx.fillStyle='#222'; cx.font='10px Courier New'; cx.textAlign='center';
+  for(let i=0;i<COLS;i++){
+    cx.fillText(SHOOT_LETTERS[i],colX(i),PH-8);
+  }
+}
+ 
+// UPDATE
+function update(){
+  // move bullets up
+  for(const b of bullets) b.y-=BULLET_SPEED;
+ 
+  // collision
+  for(const b of bullets){
+    if(b.y<-20){b.dead=true;continue;}
+    for(const m of monsters){
+      if(!m.alive) continue;
+      if(Math.abs(b.x-m.x)<22 && b.y<m.y+14 && b.y>m.y-20){
+        // always remove bullet
+        b.dead=true;
+        // only kill monster if letters match
+        if(b.letter===m.letter) m.alive=false;
+        break;
       }
-    });
-  });
-  bullets=bullets.filter(b=>b.vy>0);
-  if(!winFlag && monsters.every(m=>!m.alive)){
-    winFlag=true;
-    setTimeout(()=>{
-      score+=50; winFlag=false;
-      resetMonsters(); updatePanel();
-    },2200);
+    }
   }
+  bullets=bullets.filter(b=>!b.dead);
+ 
+  // win check
+  if(monsters.every(m=>!m.alive)) setTimeout(()=>resetMonsters(),600);
 }
  
-function spawnParts(x,y,col){
-  for(let i=0;i<10;i++){
-    const a=Math.random()*Math.PI*2,sp=1.5+Math.random()*3;
-    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,col});
-  }
-}
- 
-function updatePanel(){
-  document.getElementById('p-score').textContent=score;
-  document.getElementById('p-lives').textContent='❤'.repeat(Math.max(0,lives));
-}
- 
-// ─────────────────────────────────────────
-// SOUND
-// ─────────────────────────────────────────
-let sfxAC=null;
-function getSFX(){
-  if(!sfxAC||sfxAC.state==='closed') sfxAC=new(window.AudioContext||window.webkitAudioContext)();
-  if(sfxAC.state==='suspended') sfxAC.resume();
-  return sfxAC;
-}
-function playShoot(){
-  try{const ac=getSFX(),t=ac.currentTime;
-    const o=ac.createOscillator(),g=ac.createGain();
-    o.type='square';o.frequency.setValueAtTime(900,t);o.frequency.exponentialRampToValueAtTime(500,t+0.07);
-    g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
-    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.08);
-  }catch(e){}
-}
-function playPop(){
-  try{const ac=getSFX(),t=ac.currentTime;
-    const o=ac.createOscillator(),g=ac.createGain();
-    o.type='sine';o.frequency.setValueAtTime(700,t);o.frequency.exponentialRampToValueAtTime(280,t+0.13);
-    g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
-    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.14);
-  }catch(e){}
-}
- 
-// ─────────────────────────────────────────
-// MIKROFON — czuły detektor wysokości
-// ─────────────────────────────────────────
-let micAC=null,micAn=null,micStream=null;
-let fHist=[],detCD=0,micReady=false;
- 
-async function startMic(){
-  try{
-    micStream=await navigator.mediaDevices.getUserMedia(
-      {audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    micAC=new(window.AudioContext||window.webkitAudioContext)();
-    const src=micAC.createMediaStreamSource(micStream);
-    const gain=micAC.createGain(); gain.gain.value=6.0;
-    src.connect(gain);
-    micAn=micAC.createAnalyser();
-    micAn.fftSize=8192;
-    micAn.smoothingTimeConstant=0.2;
-    gain.connect(micAn);
-    micReady=true;
-    document.getElementById('mst').textContent='Aktywny — śpiewaj!';
-    document.getElementById('mst').style.color='#224422';
-  }catch(e){
-    document.getElementById('mst').textContent='Brak mikrofonu';
-    document.getElementById('mst').style.color='#662222';
-  }
-}
-startMic();
- 
-function detectPitch(){
-  if(!micAn||!micReady) return;
-  const buf=new Float32Array(micAn.fftSize);
-  micAn.getFloatTimeDomainData(buf);
- 
-  let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
-  document.getElementById('vuf').style.width=Math.min(100,rms*700)+'%';
- 
-  const mdot=document.getElementById('mdot');
-  if(rms<0.0008){
-    fHist=[];detCD=0;
-    mdot.className='mic-dot quiet';
-    document.getElementById('mname').textContent='—';
-    document.getElementById('mhz').textContent='— Hz';
-    clearLit(); return;
-  }
- 
-  const freq=autoCorr(buf,micAC.sampleRate);
-  if(freq<0){mdot.className='mic-dot quiet';return;}
-  mdot.className='mic-dot hear';
- 
-  fHist.push(freq); if(fHist.length>3) fHist.shift();
- 
-  const key=closestNote(freq);
-  if(!key){
-    document.getElementById('mname').textContent='~'+Math.round(freq);
-    document.getElementById('mhz').textContent='? Hz';
-    clearLit(); return;
-  }
-  const note=NOTES[key];
-  document.getElementById('mname').textContent=note.label;
-  document.getElementById('mhz').textContent=Math.round(freq)+' Hz';
-  litRow(key);
- 
-  // 1 of last 3 readings = trigger (very responsive)
-  const match=fHist.filter(f=>{
-    let bk=null,bd=Infinity;
-    for(const [k,n] of Object.entries(NOTES)){const d=Math.abs(f-n.freq)/n.freq;if(d<bd){bd=d;bk=k;}}
-    return bk===key;
-  }).length;
- 
-  if(match>=1&&detCD===0){
-    detCD=9; // ~150ms at 60fps
-    flashRow(key);
-    handleNote(key);
-  }
-  if(detCD>0) detCD--;
-}
- 
-function handleNote(key){
-  if(gameOver||winFlag){
-    if(key==='C1') resetGame();
-    return;
-  }
-  const n=NOTES[key];
-  if(n.role==='moveL') player.x=Math.max(20,player.x-9);
-  else if(n.role==='moveR') player.x=Math.min(580,player.x+9);
-  else if(n.role==='shoot') shoot(n.letter);
-}
- 
-function clearLit(){document.querySelectorAll('.nrow').forEach(r=>r.classList.remove('lit'));}
-function litRow(key){clearLit();const el=document.getElementById('nr-'+key);if(el)el.classList.add('lit');}
-function flashRow(key){
-  const el=document.getElementById('nr-'+key);if(!el)return;
-  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
-  setTimeout(()=>el.classList.remove('flash'),300);
-}
- 
-// ─────────────────────────────────────────
-// AUTOKORELACJA z interpolacją paraboliczną
-// ─────────────────────────────────────────
-function autoCorr(buf,sr){
-  let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
-  if(rms<0.0005) return -1;
- 
-  let r1=0,r2=buf.length-1;
-  for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.04){r1=i;break;}}
-  for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.04){r2=buf.length-i;break;}}
-  const s=buf.slice(r1,r2); if(s.length<2) return -1;
- 
-  const c=new Float32Array(s.length);
-  for(let i=0;i<s.length;i++) for(let j=0;j<s.length-i;j++) c[i]+=s[j]*s[j+i];
- 
-  let d=0; while(d<c.length-1&&c[d]>c[d+1]) d++;
-  let mv=-1,mp=-1;
-  for(let i=d;i<s.length;i++){if(c[i]>mv){mv=c[i];mp=i;}}
-  if(mp<1) return -1;
- 
-  let T=mp;
-  if(T>0&&T<c.length-1){
-    const a=(c[T-1]+c[T+1]-2*c[T])/2,b=(c[T+1]-c[T-1])/2;
-    if(a) T-=b/(2*a);
-  }
-  const f=sr/T;
-  return(f<80||f>2000)?-1:f;
-}
- 
-// ─────────────────────────────────────────
-// PĘTLA GRY
-// ─────────────────────────────────────────
+// MAIN LOOP — single RAF, no extra intervals
 function loop(){
-  ctx.clearRect(0,0,W,H);
-  drawStars();
- 
-  if(winFlag){
-    drawMonsters(); drawPlayer(); drawHUD();
-    drawScreen('BRAWO!','#44ff88','Zaśpiewaj c¹ = nowy poziom');
-    detectPitch();
-    requestAnimationFrame(loop); return;
-  }
-  if(gameOver){
-    drawScreen('GAME OVER','#ff4444','Zaśpiewaj c¹ = restart');
-    detectPitch();
-    requestAnimationFrame(loop); return;
-  }
- 
-  updateBullets();
-  drawParts();
-  drawMonsters();
-  drawBullets();
-  drawPlayer();
-  drawHUD();
-  detectPitch();
- 
+  update();
+  draw();
   requestAnimationFrame(loop);
 }
 loop();
+ 
+// ─── MICROPHONE ───────────────────────────────
+let mAC=null, mAn=null, fH=[], dCD=0, mReady=false;
+ 
+async function startMic(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia(
+      {audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    mAC=new AudioContext();
+    const src=mAC.createMediaStreamSource(stream);
+    const gain=mAC.createGain(); gain.gain.value=5;
+    src.connect(gain);
+    mAn=mAC.createAnalyser(); mAn.fftSize=4096; mAn.smoothingTimeConstant=0.15;
+    gain.connect(mAn);
+    mReady=true;
+    document.getElementById('mst').textContent='ON';
+    document.getElementById('mst').style.color='#0f0';
+    detect();
+  }catch(e){document.getElementById('mst').textContent='brak';}
+}
+startMic();
+ 
+const buf=new Float32Array(4096);
+function detect(){
+  if(!mReady){requestAnimationFrame(detect);return;}
+  mAn.getFloatTimeDomainData(buf);
+ 
+  // RMS
+  let rms=0; for(let i=0;i<buf.length;i++) rms+=buf[i]*buf[i]; rms=Math.sqrt(rms/buf.length);
+  document.getElementById('vuf').style.width=Math.min(100,rms*600)+'%';
+ 
+  const mdot=document.getElementById('mdot');
+  if(rms<0.001){fH=[];dCD=0;mdot.className='mdot';document.getElementById('mdet').textContent='—';clearLit();requestAnimationFrame(detect);return;}
+ 
+  const freq=acorr(buf,mAC.sampleRate);
+  if(freq<0){requestAnimationFrame(detect);return;}
+ 
+  mdot.className='mdot on';
+  fH.push(freq); if(fH.length>3) fH.shift();
+ 
+  const note=closest(freq);
+  document.getElementById('mdet').textContent=note?note.id+'  '+Math.round(freq)+'Hz':'~'+Math.round(freq)+'Hz';
+ 
+  if(note){
+    litRow(note.id);
+    // stability: 1 of 3
+    const ok=fH.filter(f=>{const n=closest(f);return n&&n.id===note.id;}).length;
+    if(ok>=1&&dCD===0){
+      dCD=7;
+      if(note.col!==undefined) playerCol=note.col;       // move
+      else shoot(note.letter);                            // shoot
+    }
+  } else clearLit();
+  if(dCD>0) dCD--;
+  requestAnimationFrame(detect);
+}
+ 
+function acorr(buf,sr){
+  let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
+  if(rms<0.0005) return -1;
+  const N=buf.length, H=N>>1;
+  // find first zero crossing
+  let r1=0;
+  for(let i=0;i<H;i++){if(Math.abs(buf[i])<0.04){r1=i;break;}}
+  const s=buf.subarray(r1,r1+H);
+  const L=s.length;
+  // autocorrelation
+  const c=new Float32Array(L);
+  for(let i=0;i<L;i++) for(let j=0;j<L-i;j++) c[i]+=s[j]*s[j+i];
+  let d=0; while(d<L-1&&c[d]>c[d+1]) d++;
+  let mv=-1,mp=-1; for(let i=d;i<L;i++){if(c[i]>mv){mv=c[i];mp=i;}}
+  if(mp<1) return -1;
+  // parabolic interpolation
+  let T=mp;
+  if(mp>0&&mp<L-1){const a=(c[mp-1]+c[mp+1]-2*c[mp])/2,b=(c[mp+1]-c[mp-1])/2;if(a)T-=b/(2*a);}
+  const f=sr/T;
+  return (f<80||f>2000)?-1:f;
+}
+ 
+function clearLit(){document.querySelectorAll('.nr').forEach(r=>r.classList.remove('lit'));}
+function litRow(id){clearLit();const el=document.getElementById('nr-'+id);if(el)el.classList.add('lit');}
 </script>
 </body>
 </html>
