@@ -1,3 +1,6 @@
+Piano invaders · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -55,10 +58,8 @@ canvas{display:block;background:#000;flex-shrink:0;}
 #cal-tol-mark{position:absolute;top:-1px;left:50%;width:2px;height:8px;background:#333;transform:translateX(-50%);}
 .cal-tol-lbl{font-size:9px;color:#333;}
  
-#cal-skip{background:none;border:1px solid #223;color:#445;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;margin-right:6px;}
-#cal-skip:hover{border-color:#446;color:#778;}
-#cal-close{background:none;border:1px solid #446;color:#778;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;}
-#cal-close:hover{border-color:#aaa;color:#aaa;}
+#cal-skip,#cal-close,#btn-back{background:none;border:1px solid #446;color:#778;font:10px 'Courier New';padding:4px 10px;border-radius:3px;cursor:pointer;}
+#cal-skip:hover,#cal-close:hover,#btn-back:hover{border-color:#aaa;color:#aaa;}
 #cal-reset{background:none;border:1px solid #330000;color:#663333;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;margin-top:8px;}
 #cal-reset:hover{border-color:#f44;color:#f44;}
 </style>
@@ -119,11 +120,22 @@ canvas{display:block;background:#000;flex-shrink:0;}
     </div>
     <div id="cal-status">Zagraj nutę...</div>
     <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+      <button id="btn-back" onclick="calBack()" style="visibility:hidden;">← Wróć</button>
       <button id="cal-skip" onclick="calSkip()">Pomiń →</button>
       <button id="cal-close" onclick="closeCal()">Zamknij</button>
     </div>
     <div style="margin-top:10px;">
       <button id="cal-reset" onclick="calReset()">↺ Przywróć domyślne</button>
+    </div>
+    <div style="border-top:1px solid #1a1a2a;margin-top:14px;padding-top:12px;">
+      <div style="font-size:9px;color:#223;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Nuty potworków</div>
+      <div style="display:flex;gap:6px;justify-content:center;">
+        <button id="btn-mode-random"  onclick="setMonsterMode('random')"  style="flex:1;background:#0a0a18;border:1px solid #44aaff;color:#44aaff;font:10px 'Courier New';padding:5px 4px;border-radius:3px;cursor:pointer;">🎲 Losowe</button>
+        <button id="btn-mode-ordered" onclick="setMonsterMode('ordered')" style="flex:1;background:#0a0a18;border:1px solid #223;color:#446;font:10px 'Courier New';padding:5px 4px;border-radius:3px;cursor:pointer;">🎼 Po kolei</button>
+      </div>
+      <div id="mode-desc" style="font-size:9px;color:#334;margin-top:6px;text-align:center;line-height:1.5;">
+        Każdy potworek ma losową nutę
+      </div>
     </div>
   </div>
 </div>
@@ -178,16 +190,18 @@ const colX=i=>COL_W*i+COL_W/2;
 const SHOOT_LETTERS=['C','D','E','F','G','A','H'];
 const MCOL=['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
 let monsters=[];
+let monsterMode='random'; // 'random' | 'ordered'
+ 
 function resetMonsters(){
   monsters=[];
   const my=[80,130,180];
   for(let r=0;r<3;r++)
-    for(let col=0;col<COLS;col++)
-      monsters.push({
-        col, x:colX(col), y:my[r],
-        letter:SHOOT_LETTERS[Math.floor(Math.random()*SHOOT_LETTERS.length)],
-        alive:true
-      });
+    for(let col=0;col<COLS;col++){
+      const letter = monsterMode==='ordered'
+        ? SHOOT_LETTERS[col]  // col 0=C, 1=D, … 6=H — same letter every row
+        : SHOOT_LETTERS[Math.floor(Math.random()*SHOOT_LETTERS.length)];
+      monsters.push({col, x:colX(col), y:my[r], letter, alive:true});
+    }
 }
 resetMonsters();
  
@@ -326,23 +340,46 @@ const CAL_ORDER=[...MOVE_NOTES,...SHOOT_NOTES];
 // We accept if detected is within 1 semitone of the default expected freq
 // AND we hold it stable for ~20 frames before accepting
 const CAL_TOL=0.059; // ±1 semitone for acceptance
-const CAL_STABLE=18;  // frames the pitch must be stable
+const CAL_STABLE=3;   // 3 clean detections of the note to accept
  
 let calActive=false;
 let calIdx=0;
 let calStable=0;
 let calLastFreq=-1;
 let calFreqBuf=[];
+let calWasBelow=true; // tracks silence between hits so each blow counts once
  
 function openCal(){
-  calIdx=0; calStable=0; calLastFreq=-1; calFreqBuf=[];
+  calIdx=0; calStable=0; calLastFreq=-1; calFreqBuf=[]; calWasBelow=true;
   calActive=true;
   document.getElementById('cal-overlay').classList.add('open');
   updateCalUI();
+  syncModeButtons();
 }
 function closeCal(){
   calActive=false;
   document.getElementById('cal-overlay').classList.remove('open');
+}
+ 
+function setMonsterMode(mode){
+  monsterMode=mode;
+  resetMonsters();   // rebuild immediately
+  syncModeButtons();
+}
+ 
+function syncModeButtons(){
+  const isRandom=monsterMode==='random';
+  const btnR=document.getElementById('btn-mode-random');
+  const btnO=document.getElementById('btn-mode-ordered');
+  const desc=document.getElementById('mode-desc');
+  if(!btnR||!btnO) return;
+  btnR.style.borderColor=isRandom?'#44aaff':'#223';
+  btnR.style.color=isRandom?'#44aaff':'#446';
+  btnO.style.borderColor=isRandom?'#223':'#44aaff';
+  btnO.style.color=isRandom?'#446':'#44aaff';
+  desc.textContent=isRandom
+    ?'Każdy potworek ma losową nutę'
+    :'Kolumna C→D→E→F→G→A→H, cała kolumna ta sama nuta';
 }
 function calReset(){
   // restore default frequencies
@@ -358,7 +395,13 @@ function calReset(){
 function calSkip(){
   calIdx++;
   if(calIdx>=CAL_ORDER.length){calDone();return;}
-  calStable=0; calLastFreq=-1; calFreqBuf=[];
+  calStable=0; calLastFreq=-1; calFreqBuf=[]; calWasBelow=true;
+  updateCalUI();
+}
+function calBack(){
+  if(calIdx<=0) return;
+  calIdx--;
+  calStable=0; calLastFreq=-1; calFreqBuf=[]; calWasBelow=true;
   updateCalUI();
 }
  
@@ -371,9 +414,10 @@ function updateCalUI(){
   document.getElementById('cal-detected').textContent='—';
   document.getElementById('cal-tol-fill').style.width='0';
   document.getElementById('cal-mic-wrap').className='';
-  document.getElementById('cal-status').textContent='Zagraj nutę '+cur.label+'...';
+  document.getElementById('cal-status').textContent='Zagraj nutę '+cur.label+' (0/'+CAL_STABLE+')';
   document.getElementById('cal-status').style.color='#445';
-  calStable=0; calFreqBuf=[];
+  document.getElementById('btn-back').style.visibility=calIdx>0?'visible':'hidden';
+  calStable=0; calFreqBuf=[]; calWasBelow=true;
 }
  
 function calDetect(){
@@ -381,14 +425,13 @@ function calDetect(){
   mAn.getFloatTimeDomainData(buf);
   const rms=getRMS();
  
-  // VU in main panel
   document.getElementById('vuf').style.width=Math.min(100,rms*600)+'%';
  
+  // Silence — reset "was below" flag so next sound counts as a new hit
   if(rms<0.006){
     document.getElementById('cal-mic-wrap').className='';
-    document.getElementById('cal-detected').textContent='—';
     document.getElementById('cal-tol-fill').style.width='0';
-    calFreqBuf=[];
+    calWasBelow=true;
     return;
   }
  
@@ -399,60 +442,52 @@ function calDetect(){
   document.getElementById('cal-detected').textContent=Math.round(freq)+' Hz';
  
   const cur=CAL_ORDER[calIdx];
-  // Expected freq for this note (use current calibrated value as reference)
   const expected=cur.freq;
-  // Semitone distance (signed)
-  const ratio=freq/expected;
-  const cents=1200*Math.log2(ratio); // cents deviation
-  const semitones=cents/100;
+  const semitones=1200*Math.log2(freq/expected)/100;
  
-  // Tolerance bar: ±1 semitone = 100%
-  const barPct=Math.min(100,Math.abs(semitones)*100);
   const fill=document.getElementById('cal-tol-fill');
+  const barPct=Math.min(100,Math.abs(semitones)*100);
   fill.style.width=barPct+'%';
   fill.style.background=barPct<100?'#4f4':'#f44';
  
   if(Math.abs(semitones)<=1.0){
-    // Within 1 semitone — accumulate stable readings
-    calFreqBuf.push(freq);
-    calStable++;
-    document.getElementById('cal-status').textContent=
-      'Trzymaj... '+Math.round(calStable/CAL_STABLE*100)+'%';
-    document.getElementById('cal-status').style.color='#4f4';
-  } else {
-    calFreqBuf=[];
-    calStable=0;
-    document.getElementById('cal-status').textContent=
-      `Za daleko: ${semitones>0?'+':''}${semitones.toFixed(1)} półtonu`;
-    document.getElementById('cal-status').style.color='#f84';
-  }
- 
-  if(calStable>=CAL_STABLE){
-    // Accept — use median of collected readings
-    const sorted=[...calFreqBuf].sort((a,b)=>a-b);
-    const calibrated=sorted[Math.floor(sorted.length/2)];
- 
-    // Update live note frequency
-    const live=ALL_NOTES.find(n=>n.id===cur.id);
-    if(live) live.freq=calibrated;
- 
-    // Visual feedback
-    document.getElementById('cal-mic-wrap').className='ok';
-    document.getElementById('cal-detected').textContent='✓ '+Math.round(calibrated)+' Hz';
-    document.getElementById('cal-status').textContent='✓ Zatwierdzone!';
-    document.getElementById('cal-status').style.color='#ffdd00';
-    fill.style.background='#ffdd00';
- 
-    // Mark panel row
-    updateCalPanelHz();
- 
-    calStable=0; calFreqBuf=[];
-    calIdx++;
-    if(calIdx>=CAL_ORDER.length){
-      setTimeout(calDone,700);
-    } else {
-      setTimeout(()=>{updateCalUI();},800);
+    // Count this as a hit only if microphone just came from silence
+    if(calWasBelow){
+      calWasBelow=false;
+      calFreqBuf.push(freq);
+      calStable++;
+      document.getElementById('cal-status').textContent=
+        'Dobra nuta! ('+calStable+'/'+CAL_STABLE+')';
+      document.getElementById('cal-status').style.color='#4f4';
     }
+    // Accept after CAL_STABLE hits
+    if(calStable>=CAL_STABLE){
+      const sorted=[...calFreqBuf].sort((a,b)=>a-b);
+      const calibrated=sorted[Math.floor(sorted.length/2)];
+ 
+      const live=ALL_NOTES.find(n=>n.id===cur.id);
+      if(live) live.freq=calibrated;
+ 
+      document.getElementById('cal-mic-wrap').className='ok';
+      document.getElementById('cal-detected').textContent='✓ '+Math.round(calibrated)+' Hz';
+      document.getElementById('cal-status').textContent='✓ Zatwierdzone! ('+Math.round(calibrated)+' Hz)';
+      document.getElementById('cal-status').style.color='#ffdd00';
+      fill.style.background='#ffdd00';
+      updateCalPanelHz();
+ 
+      calStable=0; calFreqBuf=[]; calWasBelow=true;
+      calIdx++;
+      if(calIdx>=CAL_ORDER.length){
+        setTimeout(calDone,700);
+      } else {
+        setTimeout(()=>{updateCalUI();},900);
+      }
+    }
+  } else {
+    calWasBelow=false; // still sounding, just wrong pitch — don't count silence
+    document.getElementById('cal-status').textContent=
+      `Za daleko: ${semitones>0?'+':''}${semitones.toFixed(1)} półtonu  (${calStable}/${CAL_STABLE})`;
+    document.getElementById('cal-status').style.color='#f84';
   }
 }
  
