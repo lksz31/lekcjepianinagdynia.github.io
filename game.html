@@ -1,31 +1,74 @@
-Piano invaders · HTML
-Copy
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <title>Piano Invaders</title>
 <style>
-body{margin:0;background:#000;display:flex;overflow:hidden;}
-canvas{display:block;background:#000;}
-#panel{width:160px;background:#050510;border-left:1px solid #111;color:#aaa;font:11px 'Courier New',monospace;padding:8px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#000;display:flex;overflow:hidden;font-family:'Courier New',monospace;}
+canvas{display:block;background:#000;flex-shrink:0;}
+ 
+/* ── PANEL ── */
+#panel{width:160px;background:#050510;border-left:1px solid #111;color:#aaa;font:11px 'Courier New',monospace;padding:8px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;position:relative;}
 .pt{font-size:9px;color:#223;text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;}
 .nr{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #0a0a0a;}
 .nr span:first-child{color:#ffdd00;}
 .nr.move span:first-child{color:#44aaff;}
 .nr.lit{background:rgba(255,220,0,.15);}
-/* mic */
+.nr.cal{opacity:.4;}  /* calibrated = dimmed until set */
+.nr.cal.done{opacity:1;}
 .mdot{width:9px;height:9px;border-radius:50%;background:#111;display:inline-block;margin-right:5px;vertical-align:middle;}
 .mdot.on{background:#0f0;box-shadow:0 0 6px #0f0;}
 #mdet{font-size:18px;color:#ffdd00;font-weight:bold;display:block;min-height:22px;}
 .vu{height:3px;background:#111;margin:3px 0;}
 .vuf{height:100%;width:0;background:linear-gradient(90deg,#0a0,#ff0,#f00);transition:width .04s;}
+ 
+/* gear icon */
+#gear-btn{position:absolute;top:6px;right:6px;background:none;border:none;color:#334;font-size:16px;cursor:pointer;padding:2px;line-height:1;transition:color .15s;}
+#gear-btn:hover{color:#aaa;}
+ 
+/* ── CALIBRATION MODAL ── */
+#cal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:100;align-items:center;justify-content:center;}
+#cal-overlay.open{display:flex;}
+#cal-box{background:#0a0a18;border:1px solid #223;border-radius:8px;padding:28px 32px;width:320px;text-align:center;color:#ccc;font-family:'Courier New',monospace;}
+#cal-box h2{font-size:14px;color:#44aaff;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;}
+#cal-box p{font-size:11px;color:#445;margin-bottom:20px;line-height:1.6;}
+ 
+/* mic icon + note name */
+#cal-mic-wrap{margin:0 auto 16px;width:90px;height:90px;border-radius:50%;border:2px solid #223;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:border-color .2s;}
+#cal-mic-wrap.hearing{border-color:#0f0;box-shadow:0 0 16px rgba(0,255,0,0.25);}
+#cal-mic-wrap.ok{border-color:#ffdd00;box-shadow:0 0 16px rgba(255,221,0,0.35);}
+#cal-mic-icon{font-size:28px;line-height:1;}
+#cal-note-name{font-size:22px;font-weight:bold;color:#ffdd00;line-height:1;}
+#cal-note-sub{font-size:10px;color:#445;margin-top:2px;}
+ 
+/* progress bar */
+#cal-progress-wrap{background:#0d0d1a;border-radius:3px;height:5px;width:100%;margin-bottom:10px;overflow:hidden;}
+#cal-progress-fill{height:100%;width:0;background:#44aaff;border-radius:3px;transition:width .3s;}
+#cal-status{font-size:11px;color:#445;min-height:16px;margin-bottom:16px;}
+#cal-detected{font-size:13px;color:#ffdd00;min-height:18px;font-weight:bold;margin-bottom:4px;}
+ 
+/* tolerance bar — shows how close the detected pitch is */
+#cal-tol-wrap{display:flex;align-items:center;gap:6px;margin-bottom:16px;}
+#cal-tol-bar{flex:1;height:6px;background:#111;border-radius:3px;overflow:hidden;position:relative;}
+#cal-tol-fill{position:absolute;top:0;left:50%;width:0;height:100%;background:#f44;border-radius:3px;transform:translateX(-50%);transition:width .05s,background .1s;}
+#cal-tol-mark{position:absolute;top:-1px;left:50%;width:2px;height:8px;background:#333;transform:translateX(-50%);}
+.cal-tol-lbl{font-size:9px;color:#333;}
+ 
+#cal-skip{background:none;border:1px solid #223;color:#445;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;margin-right:6px;}
+#cal-skip:hover{border-color:#446;color:#778;}
+#cal-close{background:none;border:1px solid #446;color:#778;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;}
+#cal-close:hover{border-color:#aaa;color:#aaa;}
+#cal-reset{background:none;border:1px solid #330000;color:#663333;font:10px 'Courier New';padding:4px 12px;border-radius:3px;cursor:pointer;margin-top:8px;}
+#cal-reset:hover{border-color:#f44;color:#f44;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+ 
+<!-- PANEL -->
 <div id="panel">
+  <button id="gear-btn" title="Kalibracja nut" onclick="openCal()">⚙</button>
   <div>
     <div class="pt">Mikrofon</div>
     <span class="mdot" id="mdot"></span><span id="mst">—</span><br>
@@ -34,13 +77,13 @@ canvas{display:block;background:#000;}
   </div>
   <div>
     <div class="pt">Ruch (mała)</div>
-    <div class="nr move" id="nr-c">  <span>c</span><span>kol 1</span></div>
-    <div class="nr move" id="nr-d">  <span>d</span><span>kol 2</span></div>
-    <div class="nr move" id="nr-e">  <span>e</span><span>kol 3</span></div>
-    <div class="nr move" id="nr-f">  <span>f</span><span>kol 4</span></div>
-    <div class="nr move" id="nr-g">  <span>g</span><span>kol 5</span></div>
-    <div class="nr move" id="nr-a">  <span>a</span><span>kol 6</span></div>
-    <div class="nr move" id="nr-h">  <span>h</span><span>kol 7</span></div>
+    <div class="nr move" id="nr-c"><span>c</span><span>kol 1</span></div>
+    <div class="nr move" id="nr-d"><span>d</span><span>kol 2</span></div>
+    <div class="nr move" id="nr-e"><span>e</span><span>kol 3</span></div>
+    <div class="nr move" id="nr-f"><span>f</span><span>kol 4</span></div>
+    <div class="nr move" id="nr-g"><span>g</span><span>kol 5</span></div>
+    <div class="nr move" id="nr-a"><span>a</span><span>kol 6</span></div>
+    <div class="nr move" id="nr-h"><span>h</span><span>kol 7</span></div>
   </div>
   <div>
     <div class="pt">Strzał (razkreślna)</div>
@@ -53,41 +96,67 @@ canvas{display:block;background:#000;}
     <div class="nr" id="nr-H1"><span>h¹</span><span>strzel H</span></div>
   </div>
 </div>
+ 
+<!-- CALIBRATION MODAL -->
+<div id="cal-overlay">
+  <div id="cal-box">
+    <h2>Kalibracja nut</h2>
+    <p>Zagraj każdą nutę na swoim instrumencie.<br>Mikrofon automatycznie ją zatwierdzi.</p>
+    <div id="cal-mic-wrap">
+      <div id="cal-mic-icon">🎤</div>
+      <div id="cal-note-name">—</div>
+      <div id="cal-note-sub">—</div>
+    </div>
+    <div id="cal-progress-wrap"><div id="cal-progress-fill"></div></div>
+    <div id="cal-detected">—</div>
+    <div id="cal-tol-wrap">
+      <span class="cal-tol-lbl">♭</span>
+      <div id="cal-tol-bar">
+        <div id="cal-tol-mark"></div>
+        <div id="cal-tol-fill"></div>
+      </div>
+      <span class="cal-tol-lbl">♯</span>
+    </div>
+    <div id="cal-status">Zagraj nutę...</div>
+    <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+      <button id="cal-skip" onclick="calSkip()">Pomiń →</button>
+      <button id="cal-close" onclick="closeCal()">Zamknij</button>
+    </div>
+    <div style="margin-top:10px;">
+      <button id="cal-reset" onclick="calReset()">↺ Przywróć domyślne</button>
+    </div>
+  </div>
+</div>
+ 
 <script>
 'use strict';
-const cv=document.getElementById('c'), cx=cv.getContext('2d');
-const PW=window.innerWidth-160, PH=window.innerHeight;
-cv.width=PW; cv.height=PH;
  
-// 7 columns
-const COLS=7;
-const COL_W=PW/COLS;
-// column centers
-const colX=i=>COL_W*i+COL_W/2;
- 
-// Notes — small octave → move (C=130Hz range)
-// C=130.81 D=146.83 E=164.81 F=174.61 G=196.00 A=220.00 H=246.94
-// Notes — one-line octave → shoot (C1=261.63 ... H1=493.88)
+// ══════════════════════════════════════════════
+// NOTE DEFINITIONS — default frequencies
+// ══════════════════════════════════════════════
 const MOVE_NOTES=[
-  {id:'c', freq:130.81, col:0},
-  {id:'d', freq:146.83, col:1},
-  {id:'e', freq:164.81, col:2},
-  {id:'f', freq:174.61, col:3},
-  {id:'g', freq:196.00, col:4},
-  {id:'a', freq:220.00, col:5},
-  {id:'h', freq:246.94, col:6},
+  {id:'c', label:'c',  labelFull:'c (mała)',   freq:130.81, col:0},
+  {id:'d', label:'d',  labelFull:'d (mała)',   freq:146.83, col:1},
+  {id:'e', label:'e',  labelFull:'e (mała)',   freq:164.81, col:2},
+  {id:'f', label:'f',  labelFull:'f (mała)',   freq:174.61, col:3},
+  {id:'g', label:'g',  labelFull:'g (mała)',   freq:196.00, col:4},
+  {id:'a', label:'a',  labelFull:'a (mała)',   freq:220.00, col:5},
+  {id:'h', label:'h',  labelFull:'h (mała)',   freq:246.94, col:6},
 ];
 const SHOOT_NOTES=[
-  {id:'C1', freq:261.63, letter:'C'},
-  {id:'D1', freq:293.66, letter:'D'},
-  {id:'E1', freq:329.63, letter:'E'},
-  {id:'F1', freq:349.23, letter:'F'},
-  {id:'G1', freq:392.00, letter:'G'},
-  {id:'A1', freq:440.00, letter:'A'},
-  {id:'H1', freq:493.88, letter:'H'},
+  {id:'C1', label:'c¹', labelFull:'c¹ (razkreślna)', freq:261.63, letter:'C'},
+  {id:'D1', label:'d¹', labelFull:'d¹ (razkreślna)', freq:293.66, letter:'D'},
+  {id:'E1', label:'e¹', labelFull:'e¹ (razkreślna)', freq:329.63, letter:'E'},
+  {id:'F1', label:'f¹', labelFull:'f¹ (razkreślna)', freq:349.23, letter:'F'},
+  {id:'G1', label:'g¹', labelFull:'g¹ (razkreślna)', freq:392.00, letter:'G'},
+  {id:'A1', label:'a¹', labelFull:'a¹ (razkreślna)', freq:440.00, letter:'A'},
+  {id:'H1', label:'h¹', labelFull:'h¹ (razkreślna)', freq:493.88, letter:'H'},
 ];
+// Working copies (modified by calibration)
 const ALL_NOTES=[...MOVE_NOTES,...SHOOT_NOTES];
-const TOL=0.18; // 18% tolerance
+ 
+// Game tolerance after calibration: ±8% (~1.5 semitone)
+const TOL=0.08;
  
 function closest(freq){
   let best=null,bd=1e9;
@@ -95,119 +164,101 @@ function closest(freq){
   return bd<=TOL?best:null;
 }
  
-// MONSTERS — 3 rows × 7 cols, each col has letter matching col index mod 7
-// monster letter = one of C D E F G A H (shoot note letters)
+// ══════════════════════════════════════════════
+// GAME STATE
+// ══════════════════════════════════════════════
+const cv=document.getElementById('c'), cx=cv.getContext('2d');
+const PW=window.innerWidth-160, PH=window.innerHeight;
+cv.width=PW; cv.height=PH;
+ 
+const COLS=7;
+const COL_W=PW/COLS;
+const colX=i=>COL_W*i+COL_W/2;
+ 
 const SHOOT_LETTERS=['C','D','E','F','G','A','H'];
 const MCOL=['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
 let monsters=[];
 function resetMonsters(){
   monsters=[];
-  const rows=3;
   const my=[80,130,180];
-  for(let r=0;r<rows;r++){
-    for(let col=0;col<COLS;col++){
+  for(let r=0;r<3;r++)
+    for(let col=0;col<COLS;col++)
       monsters.push({
         col, x:colX(col), y:my[r],
         letter:SHOOT_LETTERS[Math.floor(Math.random()*SHOOT_LETTERS.length)],
         alive:true
       });
-    }
-  }
 }
 resetMonsters();
  
-// PLAYER
-let playerCol=3; // start center
-const PLAYER_Y=PH-40;
-const PLAYER_W=40, PLAYER_H=14;
- 
-// BULLETS
+let playerCol=3;
+const PLAYER_Y=PH-40, PLAYER_W=40, PLAYER_H=14;
 let bullets=[];
-const BULLET_SPEED=9;
-const SHOT_CD=300; // ms per letter
+const BULLET_SPEED=9, SHOT_CD=300;
 const lastShot={};
  
 function shoot(letter){
   const now=performance.now();
-  if(now-(lastShot[letter]||0)<SHOT_CD) return;
+  if(now-(lastShot[letter]||0)<SHOT_CD)return;
   lastShot[letter]=now;
-  bullets.push({x:colX(playerCol), y:PLAYER_Y-PLAYER_H, letter});
+  bullets.push({x:colX(playerCol),y:PLAYER_Y-PLAYER_H,letter});
 }
  
-// DRAW
+// ── DRAW ──
 function draw(){
   cx.clearRect(0,0,PW,PH);
- 
-  // column grid (faint)
   cx.strokeStyle='#0a0a0a'; cx.lineWidth=1;
   for(let i=1;i<COLS;i++){cx.beginPath();cx.moveTo(i*COL_W,0);cx.lineTo(i*COL_W,PH);cx.stroke();}
  
-  // monsters
   cx.textAlign='center'; cx.textBaseline='middle'; cx.font='bold 13px Courier New';
   for(const m of monsters){
-    if(!m.alive) continue;
+    if(!m.alive)continue;
     cx.fillStyle=MCOL[m.col];
     cx.fillRect(m.x-18,m.y-12,36,20);
     cx.fillStyle='#000';
     cx.fillText(m.letter,m.x,m.y);
   }
  
-  // bullets
   cx.font='bold 9px Courier New';
   for(const b of bullets){
-    cx.fillStyle='#fff';
-    cx.fillRect(b.x-2,b.y,4,10);
-    cx.fillStyle='#ff8';
-    cx.fillText(b.letter,b.x,b.y-6);
+    cx.fillStyle='#fff'; cx.fillRect(b.x-2,b.y,4,10);
+    cx.fillStyle='#ff8'; cx.fillText(b.letter,b.x,b.y-6);
   }
  
-  // player
   const px=colX(playerCol);
   cx.fillStyle='#0cf';
-  cx.fillRect(px-PLAYER_W/2, PLAYER_Y-PLAYER_H, PLAYER_W, PLAYER_H);
+  cx.fillRect(px-PLAYER_W/2,PLAYER_Y-PLAYER_H,PLAYER_W,PLAYER_H);
  
-  // column labels at bottom
   cx.fillStyle='#222'; cx.font='10px Courier New'; cx.textAlign='center';
-  for(let i=0;i<COLS;i++){
-    cx.fillText(SHOOT_LETTERS[i],colX(i),PH-8);
-  }
+  for(let i=0;i<COLS;i++) cx.fillText(SHOOT_LETTERS[i],colX(i),PH-8);
 }
  
-// UPDATE
+// ── UPDATE ──
 function update(){
-  // move bullets up
   for(const b of bullets) b.y-=BULLET_SPEED;
- 
-  // collision
   for(const b of bullets){
     if(b.y<-20){b.dead=true;continue;}
     for(const m of monsters){
-      if(!m.alive) continue;
-      if(Math.abs(b.x-m.x)<22 && b.y<m.y+14 && b.y>m.y-20){
-        // always remove bullet
+      if(!m.alive)continue;
+      if(Math.abs(b.x-m.x)<22&&b.y<m.y+14&&b.y>m.y-20){
         b.dead=true;
-        // only kill monster if letters match
         if(b.letter===m.letter) m.alive=false;
         break;
       }
     }
   }
   bullets=bullets.filter(b=>!b.dead);
- 
-  // win check
   if(monsters.every(m=>!m.alive)) setTimeout(()=>resetMonsters(),600);
 }
  
-// MAIN LOOP — single RAF, no extra intervals
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
+function loop(){update();draw();requestAnimationFrame(loop);}
 loop();
  
-// ─── MICROPHONE ───────────────────────────────
+// ══════════════════════════════════════════════
+// MICROPHONE
+// ══════════════════════════════════════════════
 let mAC=null, mAn=null, fH=[], dCD=0, mReady=false;
+const buf=new Float32Array(4096);
  
 async function startMic(){
   try{
@@ -227,16 +278,21 @@ async function startMic(){
 }
 startMic();
  
-const buf=new Float32Array(4096);
+function getRMS(){
+  let r=0; for(let i=0;i<buf.length;i++) r+=buf[i]*buf[i]; return Math.sqrt(r/buf.length);
+}
+ 
 function detect(){
   if(!mReady){requestAnimationFrame(detect);return;}
+ 
+  // If calibration is open — hand off to cal detector
+  if(calActive){calDetect();requestAnimationFrame(detect);return;}
+ 
   mAn.getFloatTimeDomainData(buf);
- 
-  // RMS
-  let rms=0; for(let i=0;i<buf.length;i++) rms+=buf[i]*buf[i]; rms=Math.sqrt(rms/buf.length);
+  const rms=getRMS();
   document.getElementById('vuf').style.width=Math.min(100,rms*600)+'%';
- 
   const mdot=document.getElementById('mdot');
+ 
   if(rms<0.006){fH=[];dCD=0;mdot.className='mdot';document.getElementById('mdet').textContent='—';clearLit();requestAnimationFrame(detect);return;}
  
   const freq=acorr(buf,mAC.sampleRate);
@@ -246,44 +302,206 @@ function detect(){
   fH.push(freq); if(fH.length>3) fH.shift();
  
   const note=closest(freq);
-  document.getElementById('mdet').textContent=note?note.id+'  '+Math.round(freq)+'Hz':'~'+Math.round(freq)+'Hz';
+  document.getElementById('mdet').textContent=note?note.label+'  '+Math.round(freq)+'Hz':'~'+Math.round(freq)+'Hz';
  
   if(note){
     litRow(note.id);
-    // stability: 1 of 3
     const ok=fH.filter(f=>{const n=closest(f);return n&&n.id===note.id;}).length;
     if(ok>=1&&dCD===0){
       dCD=7;
-      if(note.col!==undefined) playerCol=note.col;       // move
-      else shoot(note.letter);                            // shoot
+      if(note.col!==undefined) playerCol=note.col;
+      else shoot(note.letter);
     }
   } else clearLit();
   if(dCD>0) dCD--;
   requestAnimationFrame(detect);
 }
  
+// ══════════════════════════════════════════════
+// CALIBRATION SYSTEM
+// ══════════════════════════════════════════════
+// All 14 notes in order
+const CAL_ORDER=[...MOVE_NOTES,...SHOOT_NOTES];
+// 1 semitone = 2^(1/12) ≈ 1.0595 → ratio check ≤ 5.9%
+// We accept if detected is within 1 semitone of the default expected freq
+// AND we hold it stable for ~20 frames before accepting
+const CAL_TOL=0.059; // ±1 semitone for acceptance
+const CAL_STABLE=18;  // frames the pitch must be stable
+ 
+let calActive=false;
+let calIdx=0;
+let calStable=0;
+let calLastFreq=-1;
+let calFreqBuf=[];
+ 
+function openCal(){
+  calIdx=0; calStable=0; calLastFreq=-1; calFreqBuf=[];
+  calActive=true;
+  document.getElementById('cal-overlay').classList.add('open');
+  updateCalUI();
+}
+function closeCal(){
+  calActive=false;
+  document.getElementById('cal-overlay').classList.remove('open');
+}
+function calReset(){
+  // restore default frequencies
+  for(const orig of [...MOVE_NOTES,...SHOOT_NOTES]){
+    const live=ALL_NOTES.find(n=>n.id===orig.id);
+    if(live) live.freq=orig.freq;
+  }
+  // update panel Hz labels
+  updateCalPanelHz();
+  document.getElementById('cal-status').textContent='↺ Przywrócono domyślne częstotliwości';
+  document.getElementById('cal-status').style.color='#446';
+}
+function calSkip(){
+  calIdx++;
+  if(calIdx>=CAL_ORDER.length){calDone();return;}
+  calStable=0; calLastFreq=-1; calFreqBuf=[];
+  updateCalUI();
+}
+ 
+function updateCalUI(){
+  const total=CAL_ORDER.length;
+  const cur=CAL_ORDER[calIdx];
+  document.getElementById('cal-note-name').textContent=cur.label;
+  document.getElementById('cal-note-sub').textContent=cur.labelFull;
+  document.getElementById('cal-progress-fill').style.width=(calIdx/total*100)+'%';
+  document.getElementById('cal-detected').textContent='—';
+  document.getElementById('cal-tol-fill').style.width='0';
+  document.getElementById('cal-mic-wrap').className='';
+  document.getElementById('cal-status').textContent='Zagraj nutę '+cur.label+'...';
+  document.getElementById('cal-status').style.color='#445';
+  calStable=0; calFreqBuf=[];
+}
+ 
+function calDetect(){
+  if(!mAn) return;
+  mAn.getFloatTimeDomainData(buf);
+  const rms=getRMS();
+ 
+  // VU in main panel
+  document.getElementById('vuf').style.width=Math.min(100,rms*600)+'%';
+ 
+  if(rms<0.006){
+    document.getElementById('cal-mic-wrap').className='';
+    document.getElementById('cal-detected').textContent='—';
+    document.getElementById('cal-tol-fill').style.width='0';
+    calFreqBuf=[];
+    return;
+  }
+ 
+  const freq=acorr(buf,mAC.sampleRate);
+  if(freq<0) return;
+ 
+  document.getElementById('cal-mic-wrap').className='hearing';
+  document.getElementById('cal-detected').textContent=Math.round(freq)+' Hz';
+ 
+  const cur=CAL_ORDER[calIdx];
+  // Expected freq for this note (use current calibrated value as reference)
+  const expected=cur.freq;
+  // Semitone distance (signed)
+  const ratio=freq/expected;
+  const cents=1200*Math.log2(ratio); // cents deviation
+  const semitones=cents/100;
+ 
+  // Tolerance bar: ±1 semitone = 100%
+  const barPct=Math.min(100,Math.abs(semitones)*100);
+  const fill=document.getElementById('cal-tol-fill');
+  fill.style.width=barPct+'%';
+  fill.style.background=barPct<100?'#4f4':'#f44';
+ 
+  if(Math.abs(semitones)<=1.0){
+    // Within 1 semitone — accumulate stable readings
+    calFreqBuf.push(freq);
+    calStable++;
+    document.getElementById('cal-status').textContent=
+      'Trzymaj... '+Math.round(calStable/CAL_STABLE*100)+'%';
+    document.getElementById('cal-status').style.color='#4f4';
+  } else {
+    calFreqBuf=[];
+    calStable=0;
+    document.getElementById('cal-status').textContent=
+      `Za daleko: ${semitones>0?'+':''}${semitones.toFixed(1)} półtonu`;
+    document.getElementById('cal-status').style.color='#f84';
+  }
+ 
+  if(calStable>=CAL_STABLE){
+    // Accept — use median of collected readings
+    const sorted=[...calFreqBuf].sort((a,b)=>a-b);
+    const calibrated=sorted[Math.floor(sorted.length/2)];
+ 
+    // Update live note frequency
+    const live=ALL_NOTES.find(n=>n.id===cur.id);
+    if(live) live.freq=calibrated;
+ 
+    // Visual feedback
+    document.getElementById('cal-mic-wrap').className='ok';
+    document.getElementById('cal-detected').textContent='✓ '+Math.round(calibrated)+' Hz';
+    document.getElementById('cal-status').textContent='✓ Zatwierdzone!';
+    document.getElementById('cal-status').style.color='#ffdd00';
+    fill.style.background='#ffdd00';
+ 
+    // Mark panel row
+    updateCalPanelHz();
+ 
+    calStable=0; calFreqBuf=[];
+    calIdx++;
+    if(calIdx>=CAL_ORDER.length){
+      setTimeout(calDone,700);
+    } else {
+      setTimeout(()=>{updateCalUI();},800);
+    }
+  }
+}
+ 
+function calDone(){
+  document.getElementById('cal-progress-fill').style.width='100%';
+  document.getElementById('cal-note-name').textContent='✓';
+  document.getElementById('cal-note-sub').textContent='Gotowe!';
+  document.getElementById('cal-status').textContent='Wszystkie nuty skalibrowane';
+  document.getElementById('cal-status').style.color='#4f4';
+  setTimeout(closeCal,1200);
+}
+ 
+function updateCalPanelHz(){
+  // Update the Hz display in the side panel rows (second span)
+  for(const n of ALL_NOTES){
+    const row=document.getElementById('nr-'+n.id);
+    if(row){
+      const spans=row.querySelectorAll('span');
+      // spans[0]=note label, spans[1]=action — we don't change those
+      // but we can add a tiny calibrated dot
+      row.title=Math.round(n.freq)+' Hz';
+    }
+  }
+}
+ 
+// ══════════════════════════════════════════════
+// AUTOCORRELATION
+// ══════════════════════════════════════════════
 function acorr(buf,sr){
   let rms=0; for(const v of buf) rms+=v*v; rms=Math.sqrt(rms/buf.length);
   if(rms<0.0005) return -1;
-  const N=buf.length, H=N>>1;
-  // find first zero crossing
+  const H=buf.length>>1;
   let r1=0;
   for(let i=0;i<H;i++){if(Math.abs(buf[i])<0.04){r1=i;break;}}
-  const s=buf.subarray(r1,r1+H);
-  const L=s.length;
-  // autocorrelation
+  const s=buf.subarray(r1,r1+H), L=s.length;
   const c=new Float32Array(L);
   for(let i=0;i<L;i++) for(let j=0;j<L-i;j++) c[i]+=s[j]*s[j+i];
   let d=0; while(d<L-1&&c[d]>c[d+1]) d++;
   let mv=-1,mp=-1; for(let i=d;i<L;i++){if(c[i]>mv){mv=c[i];mp=i;}}
   if(mp<1) return -1;
-  // parabolic interpolation
   let T=mp;
   if(mp>0&&mp<L-1){const a=(c[mp-1]+c[mp+1]-2*c[mp])/2,b=(c[mp+1]-c[mp-1])/2;if(a)T-=b/(2*a);}
   const f=sr/T;
-  return (f<80||f>2000)?-1:f;
+  return(f<80||f>2000)?-1:f;
 }
  
+// ══════════════════════════════════════════════
+// PANEL HELPERS
+// ══════════════════════════════════════════════
 function clearLit(){document.querySelectorAll('.nr').forEach(r=>r.classList.remove('lit'));}
 function litRow(id){clearLit();const el=document.getElementById('nr-'+id);if(el)el.classList.add('lit');}
 </script>
