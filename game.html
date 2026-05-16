@@ -215,9 +215,9 @@ async function startMic(){
       {audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     mAC=new AudioContext();
     const src=mAC.createMediaStreamSource(stream);
-    const gain=mAC.createGain(); gain.gain.value=5;
+    const gain=mAC.createGain(); gain.gain.value=2;
     src.connect(gain);
-    mAn=mAC.createAnalyser(); mAn.fftSize=4096; mAn.smoothingTimeConstant=0.15;
+    mAn=mAC.createAnalyser(); mAn.fftSize=4096; mAn.smoothingTimeConstant=0.4;
     gain.connect(mAn);
     mReady=true;
     document.getElementById('mst').textContent='ON';
@@ -237,7 +237,7 @@ function detect(){
   document.getElementById('vuf').style.width=Math.min(100,rms*600)+'%';
  
   const mdot=document.getElementById('mdot');
-  if(rms<0.001){fH=[];dCD=0;mdot.className='mdot';document.getElementById('mdet').textContent='—';clearLit();requestAnimationFrame(detect);return;}
+  if(rms<0.006){fH=[];dCD=0;mdot.className='mdot';document.getElementById('mdet').textContent='—';clearLit();requestAnimationFrame(detect);return;}
  
   const freq=acorr(buf,mAC.sampleRate);
   if(freq<0){requestAnimationFrame(detect);return;}
