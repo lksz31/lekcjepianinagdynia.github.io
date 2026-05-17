@@ -42,6 +42,11 @@ body{background:#0a120a;font-family:'Cinzel',serif;overflow:hidden;height:100vh;
 #mic-hud.show{display:flex;}
 #mic-hud input[type=range]{width:60px;accent-color:#d4af37;cursor:pointer;}
 #mic-hud span{font-size:.58rem;color:#8a7050;}
+@media (max-width:600px){
+  #mic-hud input[type=range]{width:90px;height:28px;cursor:pointer;}
+  #mic-hud span{font-size:.72rem;}
+  #mic-hud{gap:8px;flex-wrap:wrap;}
+}
 
 /* GAME */
 #ga{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
@@ -75,6 +80,8 @@ body{background:#0a120a;font-family:'Cinzel',serif;overflow:hidden;height:100vh;
 #note-bar.show{display:flex;}
 .note-tile{cursor:pointer;border:2px solid #4a3a1a;border-radius:8px;background:rgba(3,8,3,.65);padding:4px 4px 3px;transition:all .12s;user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:2px;}
 .note-tile:hover{border-color:#d4af37;box-shadow:0 0 14px rgba(212,175,55,.5);transform:translateY(-2px);}
+.note-tile.mic-only{cursor:default;opacity:0.7;}
+.note-tile.mic-only:hover{border-color:#4a3a1a;box-shadow:none;transform:none;}
 .note-tile.pressing,.note-tile:active{border-color:#ffd700;box-shadow:0 0 22px rgba(255,215,0,.65);transform:scale(.94);background:rgba(212,175,55,.12);}
 
 /* WIN */
@@ -174,6 +181,9 @@ body{background:#0a120a;font-family:'Cinzel',serif;overflow:hidden;height:100vh;
     <input type="range" id="gainSliderHUD" min="1" max="10" step="0.5" value="3.5" oninput="applyGain(this.value)">
     <span>Margines:</span>
     <input type="range" id="marginSliderHUD" min="2" max="40" step="1" value="8" oninput="applyMargin(this.value)">
+    <span>Strój:</span>
+    <input type="range" id="transposeSliderHUD" min="-12" max="12" step="1" value="0" oninput="applyTranspose(this.value)" title="Transpozycja stroju (półtony)">
+    <span id="transposeVal">±0</span>
     <span class="mode-pill" id="mic-note-hud">—</span>
   </div>
 </div>
@@ -243,6 +253,11 @@ body{background:#0a120a;font-family:'Cinzel',serif;overflow:hidden;height:100vh;
           <label>Margines tolerancji &nbsp;<span class="sval" id="marginV">±8 Hz</span></label>
           <input type="range" id="marginSlider" min="2" max="40" step="1" value="8" oninput="applyMargin(this.value)">
           <div class="hz-grid" id="hz-grid"></div>
+        </div>
+        <div class="srow" id="row-transpose" style="display:none;">
+          <label>Transpozycja stroiu (półtony) &nbsp;<span class="sval" id="transposeValS">±0</span></label>
+          <div class="sinfo">Przesuń bazę częstotliwości w górę (+) lub dół (-) dla wyższego/niższego stroju instrumentu.</div>
+          <input type="range" id="transposeSlider" min="-12" max="12" step="1" value="0" oninput="applyTranspose(this.value)">
         </div>
         <button class="subclose" onclick="menuBack()">← Wróć do menu</button>
       </div>
@@ -435,7 +450,7 @@ const ARR={N:'↑',S:'↓',W:'←',E:'→'};
 let MN=NOTES_G.slice();
 
 /* ══ STATE ══ */
-let controlMode='tiles',micGain=3.5,noteMargin=8,clefMode='G';
+let controlMode='tiles',micGain=3.5,noteMargin=8,clefMode='G',transpose=0;
 let fogEnabled=true,showExitHint=false,hintsEnabled=false,noteLabels=false;
 let mAC=null,mAn=null,mGainNode=null,mReady=false,fH=[],dCD=0;
 const buf=new Float32Array(4096);
@@ -496,6 +511,7 @@ function setMode(m){
   const mic=m==='mic'||m==='both';
   document.getElementById('row-gain').style.display=mic?'':'none';
   document.getElementById('row-margin').style.display=mic?'':'none';
+  document.getElementById('row-transpose').style.display=mic?'':'none';
   document.getElementById('mic-hud').classList.toggle('show',mic);
   if(mic&&!mReady)startMic();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
@@ -519,6 +535,13 @@ function applyMargin(v){
   document.getElementById('marginSliderHUD').value=v;
   refreshHzGrid();
 }
+function applyTranspose(v){
+  transpose=parseInt(v);
+  const label=(v>0?'+':'')+v;
+  ['transposeValS','transposeVal'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=label;});
+  ['transposeSlider','transposeSliderHUD'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=v;});
+  refreshHzGrid();
+}
 function toggleFog(on){fogEnabled=on;initFog();}
 function toggleShowExit(on){showExitHint=on;}
 function toggleHints(on){
@@ -529,7 +552,13 @@ function toggleHints(on){
 function toggleNoteLabels(on){noteLabels=on;buildNoteTiles();}
 function refreshHzGrid(){
   const g=document.getElementById('hz-grid');
-  if(g)g.innerHTML=MN.map(n=>`<div class="hz-row"><b>${n.name} ${ARR[n.dir]}</b> ${(n.freq-noteMargin).toFixed(1)}–${(n.freq+noteMargin).toFixed(1)} Hz</div>`).join('');
+  if(!g)return;
+  const activeNotes=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
+  const notesToShow=activeNotes.length?activeNotes:MN;
+  g.innerHTML=notesToShow.map(n=>{
+    const tf=transposedFreq(n.freq);
+    return '<div class="hz-row"><b>'+n.name+' '+ARR[n.dir]+'</b> '+(tf-noteMargin).toFixed(1)+'–'+(tf+noteMargin).toFixed(1)+' Hz</div>';
+  }).join('');
 }
 
 /* ══ NOTE SVG ══
@@ -563,7 +592,7 @@ function noteSVG(n,W,H,showLabel){
     const bClefY=staffTop+sg; // linia 4
     s+=`<text x="5" y="${bClefY+sg*1.5}" font-size="28" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">𝄢</text>`;
   } else {
-    s+=`<text x="4" y="${staffTop+sg*5+2}" font-size="52" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">𝄞</text>`;
+    s+=`<text x="4" y="${staffTop+sg*4+2}" font-size="52" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">𝄞</text>`;
   }
   // Linie dodane dolne dla c1
   if(!isB && n.staffY>=10){
@@ -616,12 +645,14 @@ function buildNoteTiles(){
     t.addEventListener('mouseup',stopPress);t.addEventListener('mouseleave',stopPress);
     t.addEventListener('touchstart',e=>{e.preventDefault();startPress(dir,t);},{passive:false});
     t.addEventListener('touchend',stopPress);t.addEventListener('touchcancel',stopPress);
+    if(controlMode==='mic')t.classList.add('mic-only');
     bar.appendChild(t);
   });
   bar.className='note-bar show';
 }
 function startPress(dir,tile){
   if(won||!mazeData)return;
+  if(controlMode==='mic')return; // w trybie mikrofonu klikanie nie działa
   stopPress();activeTile=tile;tile.classList.add('pressing');
   advanceHint(dir);
   shuffleTileOrder();
@@ -854,10 +885,19 @@ async function startMic(){
   }catch(e){console.warn('Mic:',e);}
 }
 function getRMS(){let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length);}
+function transposedFreq(baseFreq){return baseFreq*Math.pow(2,transpose/12);}
 function closestNote(freq){
+  // Reaguje TYLKO na aktualnie widoczne nuty w kafelkach
+  const activeNotes=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
   let best=null,bd=1e9;
-  for(const n of MN){const d=Math.abs(freq-n.freq);if(d<bd){bd=d;best=n;}}
-  return(best&&freq>=best.freq-noteMargin&&freq<=best.freq+noteMargin)?best:null;
+  for(const n of activeNotes){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
+  return(best&&bd<=noteMargin)?best:null;
+}
+function closestNoteDisplay(freq){
+  // Do wyświetlania - sprawdza wszystkie nuty
+  let best=null,bd=1e9;
+  for(const n of MN){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
+  return best;
 }
 function micLoop(){
   const useMic=controlMode==='mic'||controlMode==='both';
@@ -870,14 +910,21 @@ function micLoop(){
     else{
       const freq=acorr(buf,mAC.sampleRate);
       if(freq>0){
-        const note=closestNote(freq);
-        const label=note?note.name:'~';
+        const displayNote=closestNoteDisplay(freq);
+        const label=displayNote?displayNote.name:'~';
         document.getElementById('mdet').textContent=label;
         document.getElementById('mic-note-hud').textContent=label;
         mdot.className='mdot on';
         fH.push(freq);if(fH.length>3)fH.shift();
+        // Ruch tylko gdy wykryto nutę aktualnie widoczną w kafelku
+        const note=closestNote(freq);
         if(note&&dCD===0){
-          const ok=fH.filter(f=>{let bn=null,bd=1e9;for(const n of MN){const d=Math.abs(f-n.freq);if(d<bd){bd=d;bn=n;}}return bn&&bn.id===note.id&&f>=bn.freq-noteMargin&&f<=bn.freq+noteMargin;}).length;
+          const ok=fH.filter(f=>{
+            const an=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
+            let bn=null,bd=1e9;
+            for(const n of an){const tf=transposedFreq(n.freq);const d=Math.abs(f-tf);if(d<bd){bd=d;bn=n;}}
+            return bn&&bn.id===note.id&&bd<=noteMargin;
+          }).length;
           if(ok>=1){dCD=9;move(note.dir);advanceHint(note.dir);shuffleTileOrder();buildNoteTiles();refreshSideBar();}
         }
       }
