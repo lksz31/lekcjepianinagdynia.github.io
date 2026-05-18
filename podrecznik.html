@@ -1,6 +1,3 @@
-Podrecznik · HTML
-Copy
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -41,50 +38,54 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .book-author{font-size:0.82rem;color:#94a3b8;font-weight:500;margin-top:4px;}
  
 /* ── TOOLS BAR ── */
-.tools-bar{width:100%;max-width:680px;padding:0 16px 2px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.tools-bar{width:100%;max-width:700px;padding:0 16px 6px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .tools-icons{display:flex;gap:8px;}
-.tool-icon-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;padding:0;font-size:0;}
-.tool-icon-btn i{font-size:15px;color:#64748b;transition:color .2s;}
-.tool-icon-btn:hover{border-color:var(--navy);}
+.tool-icon-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s,box-shadow .2s;padding:0;font-size:0;}
+.tool-icon-btn i{font-size:16px;color:#64748b;transition:color .2s;}
+.tool-icon-btn:hover{border-color:var(--navy);box-shadow:0 4px 14px rgba(30,58,138,0.13);}
 .tool-icon-btn:hover i{color:var(--navy);}
 .tool-icon-btn.active{border-color:var(--navy);background:var(--navy);}
 .tool-icon-btn.active i{color:#fff;}
-.tools-panel{display:none;width:100%;background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.tools-panel{display:none;width:100%;background:#fff;border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 6px 30px rgba(30,58,138,0.10);}
 .tools-panel.open{display:flex;}
-.tools-half{flex:1;padding:16px 18px 14px;min-width:0;}
+.tools-half{flex:1;padding:18px 20px 16px;min-width:0;}
 .tools-half+.tools-half{border-left:1px solid var(--border);}
-.tools-half-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.tools-half-title i{font-size:16px;}
+.tools-half-title{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#94a3b8;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.tools-half-title i{font-size:17px;color:var(--navy);}
  
-/* metronome */
-.metro-row{display:flex;align-items:center;gap:12px;}
-.metro-toggle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;}
+/* ── METRONOM ── */
+.metro-bpm-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.metro-toggle{width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:#fff;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;}
 .metro-toggle.active{border-color:var(--navy);background:var(--navy);color:#fff;}
-.metro-toggle i{font-size:16px;}
-.note-bpm{display:flex;align-items:center;gap:8px;}
-.quarter-note{position:relative;width:14px;height:36px;flex-shrink:0;}
-.qn-head{width:11px;height:8px;border-radius:50%;background:var(--text);position:absolute;bottom:0;left:0;transform:rotate(-15deg);}
-.qn-stem{width:2px;height:26px;background:var(--text);position:absolute;right:0;top:2px;}
-.bpm-scroll{width:60px;height:38px;border:1.5px solid var(--border);border-radius:10px;font-size:20px;font-weight:700;color:var(--navy);background:#f8fafc;text-align:center;cursor:ns-resize;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:none;transition:border-color .15s;font-family:'Poppins',sans-serif;}
+.metro-toggle i{font-size:17px;}
+.note-bpm-group{display:flex;align-items:center;gap:8px;}
+.bpm-scroll{width:62px;height:40px;border:1.5px solid var(--border);border-radius:12px;font-size:21px;font-weight:800;color:var(--navy);background:#f8fafc;text-align:center;cursor:ns-resize;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:none;transition:border-color .15s;font-family:'Poppins',sans-serif;}
 .bpm-scroll:hover{border-color:var(--navy);}
-.metro-btns{display:flex;gap:6px;margin-top:10px;}
-.metro-btn{flex:1;height:28px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-weight:600;}
-.metro-btn:hover{border-color:var(--navy);color:var(--navy);}
-.tempo-label{font-size:10px;color:#94a3b8;text-align:center;margin-top:5px;font-weight:600;min-height:14px;}
-.beat-row{display:flex;gap:5px;margin-top:8px;justify-content:center;}
-.beat-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .05s;}
-.beat-dot.on{background:var(--navy);}
+.metro-adj{display:flex;gap:5px;margin-bottom:6px;}
+.metro-btn{flex:1;height:30px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:'Poppins',sans-serif;}
+.metro-btn:hover{border-color:var(--navy);color:var(--navy);background:#f0f7ff;}
+.tempo-label{font-size:10px;color:#94a3b8;font-weight:700;min-height:14px;margin-bottom:8px;text-align:center;}
+.beat-row{display:flex;gap:5px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
+.beat-dot{width:9px;height:9px;border-radius:50%;background:var(--border);transition:background .05s,transform .05s;}
+.beat-dot.on{background:var(--navy);transform:scale(1.3);}
+.beat-dot.accent{background:var(--gold)!important;transform:scale(1.5)!important;}
+.metro-meter-row{display:flex;align-items:center;gap:8px;background:#f8fafc;border:1.5px solid var(--border);border-radius:12px;padding:8px 12px;}
+.meter-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-right:4px;}
+.meter-select{border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--navy);font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;padding:3px 6px;cursor:pointer;outline:none;transition:border-color .15s;}
+.meter-select:focus{border-color:var(--navy);}
+.meter-slash{font-size:18px;font-weight:800;color:#94a3b8;}
+.note-svg-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:34px;flex-shrink:0;}
  
-/* tuner */
-.meter-outer{position:relative;width:100%;height:80px;}
-.tuner-hz-badge{font-size:9.5px;color:#94a3b8;font-weight:600;margin-bottom:6px;}
-.cent-val{text-align:center;font-size:18px;font-weight:700;color:var(--navy);line-height:1;margin-top:4px;}
-.note-name-t{text-align:center;font-size:11px;color:#94a3b8;margin-top:2px;font-weight:600;min-height:14px;}
-.tuner-status{text-align:center;font-size:10px;margin-top:4px;font-weight:700;min-height:13px;}
-.tuner-btn{width:100%;margin-top:8px;padding:7px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:11.5px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Poppins',sans-serif;}
-.tuner-btn:hover{border-color:var(--navy);color:var(--navy);}
+/* ── TUNER ── */
+.tuner-hz-badge{font-size:9px;color:#94a3b8;font-weight:700;margin-bottom:5px;letter-spacing:.1em;}
+.meter-outer{position:relative;width:100%;height:82px;}
+.cent-val{text-align:center;font-size:19px;font-weight:800;color:var(--navy);line-height:1;margin-top:4px;font-family:'Poppins',sans-serif;}
+.note-name-t{text-align:center;font-size:11px;color:#94a3b8;margin-top:2px;font-weight:700;min-height:14px;letter-spacing:.05em;}
+.tuner-status{text-align:center;font-size:10px;margin-top:5px;font-weight:800;min-height:14px;letter-spacing:.05em;}
+.tuner-btn{width:100%;margin-top:10px;padding:8px;border:1.5px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:11.5px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Poppins',sans-serif;}
+.tuner-btn:hover{border-color:var(--navy);color:var(--navy);background:#f0f7ff;}
 .tuner-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
-.tuner-btn i{font-size:14px;}
+.tuner-btn i{font-size:15px;}
  
 /* ── SCREENS ── */
 .screens-outer{width:100%;overflow:hidden;}
@@ -156,7 +157,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .footer-copy{font-size:11px;color:#c0c0cc;}
 .footer-location{font-size:12px;color:#aaa;}
  
-/* ── Modal ── */
+/* ── MODAL ── */
 .footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
 .footer-modal-overlay.open{opacity:1;pointer-events:all;}
 .footer-modal{background:white;border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
@@ -204,554 +205,102 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
     <p class="book-author">Autorski podręcznik do nauki gry na pianinie</p>
   </div>
  
-  <!-- ══ PASEK NARZĘDZI: METRONOM + TUNER ══ -->
- <!--
-════════════════════════════════════════════════════════
-  PASEK NARZĘDZI — wklej w miejsce starego bloku
-  od: <div class="tools-bar">
-  do: </div><!-- /tools-panel -->
-════════════════════════════════════════════════════════
+  <!-- ══ PASEK NARZĘDZI ══ -->
+  <div class="tools-bar">
+    <div class="tools-icons">
+      <button class="tool-icon-btn" id="btnMetroIcon" onclick="toggleTool('metro')" title="Metronom" aria-label="Metronom">
+        <i class="ti ti-metronome"></i>
+      </button>
+      <button class="tool-icon-btn" id="btnTunerIcon" onclick="toggleTool('tuner')" title="Tuner" aria-label="Tuner">
+        <i class="ti ti-wave-sine"></i>
+      </button>
+    </div>
  
-WYMAGANE — dodaj do <head> jeśli jeszcze nie ma:
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <div class="tools-panel" id="toolsPanel">
  
-WYMAGANE — dodaj do :root w <style>:
-  --gold: #d4af37;
-  --navy: #1e3a8a;
-  --border: #e2e8f0;
-  --text: #334155;
-  --bg: #f8fafc;
-════════════════════════════════════════════════════════
--->
+      <!-- METRONOM -->
+      <div class="tools-half" id="panelMetro" style="display:none;">
+        <div class="tools-half-title"><i class="ti ti-metronome"></i>Metronom</div>
+        <div class="metro-bpm-row">
+          <button class="metro-toggle" id="metroToggle" title="Włącz / wyłącz">
+            <i class="ti ti-player-play" id="metroIcon"></i>
+          </button>
+          <div class="note-bpm-group">
+            <div class="note-svg-wrap" id="noteSvgWrap"></div>
+            <div class="bpm-scroll" id="bpmScroll" title="Przeciągnij góra/dół lub kółko myszy">120</div>
+          </div>
+        </div>
+        <div class="metro-adj">
+          <button class="metro-btn" id="btnMinus">−</button>
+          <button class="metro-btn" id="btnPlus">＋</button>
+        </div>
+        <div class="tempo-label" id="tempoLabel">Allegro</div>
+        <div class="beat-row" id="beatRow"></div>
+        <div class="metro-meter-row">
+          <span class="meter-label">Metrum</span>
+          <select class="meter-select" id="meterTop" onchange="onMeterChange()">
+            <option>1</option><option>2</option><option selected>3</option>
+            <option>4</option><option>5</option><option>6</option>
+            <option>7</option><option>8</option><option>9</option>
+            <option>10</option><option>11</option><option>12</option>
+          </select>
+          <span class="meter-slash">/</span>
+          <select class="meter-select" id="meterBot" onchange="onMeterChange()">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="4" selected>4</option>
+            <option value="8">8</option>
+            <option value="16">16</option>
+          </select>
+        </div>
+      </div>
  
-<!-- ══ STYLE PASKA ══ -->
-<style>
-/* ── Tools bar wrapper ── */
-.tools-bar{width:100%;max-width:700px;padding:0 16px 6px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-.tools-icons{display:flex;gap:8px;}
+      <div id="toolsSep" style="display:none;width:1px;background:var(--border);flex-shrink:0;"></div>
  
-/* ── Icon buttons ── */
-.tool-icon-btn{
-  width:36px;height:36px;border-radius:50%;
-  border:1.5px solid var(--border);background:#fff;
-  cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);
-  display:flex;align-items:center;justify-content:center;
-  transition:border-color .2s,background .2s,box-shadow .2s;
-  padding:0;font-size:0;
-}
-.tool-icon-btn i{font-size:16px;color:#64748b;transition:color .2s;}
-.tool-icon-btn:hover{border-color:var(--navy);box-shadow:0 4px 14px rgba(30,58,138,0.13);}
-.tool-icon-btn:hover i{color:var(--navy);}
-.tool-icon-btn.active{border-color:var(--navy);background:var(--navy);}
-.tool-icon-btn.active i{color:#fff;}
+      <!-- TUNER -->
+      <div class="tools-half" id="panelTuner" style="display:none;">
+        <div class="tools-half-title"><i class="ti ti-wave-sine"></i>Tuner</div>
+        <div class="tuner-hz-badge">A4 = 442 Hz</div>
+        <div class="meter-outer">
+          <svg width="100%" height="82" viewBox="0 0 220 82" preserveAspectRatio="xMidYMax meet">
+            <defs>
+              <linearGradient id="arcGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#dc2626"/>
+                <stop offset="44%"  stop-color="#d4af37"/>
+                <stop offset="50%"  stop-color="#16a34a"/>
+                <stop offset="56%"  stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#dc2626"/>
+              </linearGradient>
+            </defs>
+            <path d="M14,78 A96,96 0 0,1 206,78" fill="none" stroke="url(#arcGrad2)" stroke-width="5" stroke-linecap="round"/>
+            <g stroke="#e2e8f0" stroke-width="1.5">
+              <line x1="110" y1="80" x2="110" y2="70"/>
+              <line x1="63"  y1="73" x2="66"  y2="63"/>
+              <line x1="157" y1="73" x2="154" y2="63"/>
+              <line x1="19"  y1="54" x2="24"  y2="45"/>
+              <line x1="201" y1="54" x2="196" y2="45"/>
+            </g>
+            <text x="110" y="68" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">0</text>
+            <text x="55"  y="61" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-25</text>
+            <text x="165" y="61" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+25</text>
+            <text x="13"  y="43" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-50</text>
+            <text x="207" y="43" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+50</text>
+          </svg>
+          <div id="tunerNeedle" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform .12s ease-out;width:2px;height:68px;pointer-events:none;">
+            <div id="needleBar" style="width:2px;height:60px;background:var(--navy);border-radius:2px 2px 0 0;margin:0 auto;"></div>
+            <div id="needleDot" style="width:9px;height:9px;border-radius:50%;background:var(--navy);position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);"></div>
+          </div>
+        </div>
+        <div class="cent-val" id="centVal">— ¢</div>
+        <div class="note-name-t" id="noteName">—</div>
+        <div class="tuner-status" id="tunerStatus" style="color:#94a3b8;">Mikrofon wyłączony</div>
+        <button class="tuner-btn" id="tunerBtn"><i class="ti ti-microphone"></i> Włącz tuner</button>
+      </div>
  
-/* ── Panel ── */
-.tools-panel{
-  display:none;width:100%;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:20px;
-  overflow:hidden;
-  box-shadow:0 6px 30px rgba(30,58,138,0.10);
-}
-.tools-panel.open{display:flex;}
-.tools-half{flex:1;padding:18px 20px 16px;min-width:0;}
-.tools-half+.tools-half{border-left:1px solid var(--border);}
-.tools-half-title{
-  font-size:10px;font-weight:800;letter-spacing:.18em;
-  text-transform:uppercase;color:#94a3b8;
-  margin-bottom:14px;display:flex;align-items:center;gap:7px;
-}
-.tools-half-title i{font-size:17px;color:var(--navy);}
- 
-/* ══ METRONOM ══ */
-/* BPM row */
-.metro-bpm-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.metro-toggle{
-  width:38px;height:38px;border-radius:50%;
-  border:2px solid var(--border);background:#fff;
-  color:#64748b;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:.2s;flex-shrink:0;
-}
-.metro-toggle.active{border-color:var(--navy);background:var(--navy);color:#fff;}
-.metro-toggle i{font-size:17px;}
- 
-/* Note symbol + BPM scroll */
-.note-bpm-group{display:flex;align-items:center;gap:8px;}
-.bpm-scroll{
-  width:62px;height:40px;
-  border:1.5px solid var(--border);border-radius:12px;
-  font-size:21px;font-weight:800;color:var(--navy);
-  background:#f8fafc;text-align:center;
-  cursor:ns-resize;display:flex;align-items:center;justify-content:center;
-  user-select:none;touch-action:none;
-  transition:border-color .15s;
-  font-family:'Poppins',sans-serif;
-}
-.bpm-scroll:hover{border-color:var(--navy);}
- 
-/* +/- buttons */
-.metro-adj{display:flex;gap:5px;margin-bottom:6px;}
-.metro-btn{
-  flex:1;height:30px;
-  border:1.5px solid var(--border);border-radius:8px;
-  background:#fff;color:var(--text);
-  font-size:17px;font-weight:700;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:.15s;font-family:'Poppins',sans-serif;
-}
-.metro-btn:hover{border-color:var(--navy);color:var(--navy);background:#f0f7ff;}
- 
-/* Tempo label */
-.tempo-label{font-size:10px;color:#94a3b8;font-weight:700;min-height:14px;margin-bottom:8px;text-align:center;}
- 
-/* Beat dots */
-.beat-row{display:flex;gap:5px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
-.beat-dot{
-  width:9px;height:9px;border-radius:50%;
-  background:var(--border);transition:background .05s,transform .05s;
-}
-.beat-dot.on{background:var(--navy);transform:scale(1.3);}
-.beat-dot.accent{background:var(--gold)!important;transform:scale(1.5)!important;}
- 
-/* ── Metrum row ── */
-.metro-meter-row{
-  display:flex;align-items:center;gap:8px;
-  background:#f8fafc;border:1.5px solid var(--border);
-  border-radius:12px;padding:8px 12px;
-}
-.meter-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-right:4px;}
-.meter-select{
-  border:1.5px solid var(--border);border-radius:8px;
-  background:#fff;color:var(--navy);
-  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
-  padding:3px 6px;cursor:pointer;outline:none;
-  transition:border-color .15s;
-}
-.meter-select:focus{border-color:var(--navy);}
-.meter-slash{font-size:18px;font-weight:800;color:#94a3b8;}
- 
-/* Note SVG in metrum */
-.note-svg-wrap{display:flex;align-items:center;justify-content:center;width:28px;height:34px;flex-shrink:0;}
- 
-/* ══ TUNER ══ */
-.tuner-hz-badge{font-size:9px;color:#94a3b8;font-weight:700;margin-bottom:5px;letter-spacing:.1em;}
-.meter-outer{position:relative;width:100%;height:82px;}
-.cent-val{text-align:center;font-size:19px;font-weight:800;color:var(--navy);line-height:1;margin-top:4px;font-family:'Poppins',sans-serif;}
-.note-name-t{text-align:center;font-size:11px;color:#94a3b8;margin-top:2px;font-weight:700;min-height:14px;letter-spacing:.05em;}
-.tuner-status{text-align:center;font-size:10px;margin-top:5px;font-weight:800;min-height:14px;letter-spacing:.05em;}
-.tuner-btn{
-  width:100%;margin-top:10px;padding:8px;
-  border:1.5px solid var(--border);border-radius:10px;
-  background:#fff;color:var(--text);
-  font-size:11.5px;font-weight:700;cursor:pointer;
-  transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px;
-  font-family:'Poppins',sans-serif;
-}
-.tuner-btn:hover{border-color:var(--navy);color:var(--navy);background:#f0f7ff;}
-.tuner-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
-.tuner-btn i{font-size:15px;}
-</style>
- 
-<!-- ══ PASEK NARZĘDZI HTML ══ -->
-<div class="tools-bar">
-  <div class="tools-icons">
-    <button class="tool-icon-btn" id="btnMetroIcon" onclick="toggleTool('metro')" title="Metronom" aria-label="Metronom">
-      <i class="ti ti-metronome"></i>
-    </button>
-    <button class="tool-icon-btn" id="btnTunerIcon" onclick="toggleTool('tuner')" title="Tuner" aria-label="Tuner">
-      <i class="ti ti-wave-sine"></i>
-    </button>
+    </div>
   </div>
  
-  <div class="tools-panel" id="toolsPanel">
- 
-    <!-- ── METRONOM ── -->
-    <div class="tools-half" id="panelMetro" style="display:none;">
-      <div class="tools-half-title"><i class="ti ti-metronome"></i>Metronom</div>
- 
-      <!-- BPM -->
-      <div class="metro-bpm-row">
-        <button class="metro-toggle" id="metroToggle" title="Włącz / wyłącz">
-          <i class="ti ti-player-play" id="metroIcon"></i>
-        </button>
-        <div class="note-bpm-group">
-          <!-- dynamiczna nuta SVG -->
-          <div class="note-svg-wrap" id="noteSvgWrap"></div>
-          <div class="bpm-scroll" id="bpmScroll" title="Przeciągnij góra/dół lub kółko myszy">120</div>
-        </div>
-      </div>
- 
-      <div class="metro-adj">
-        <button class="metro-btn" id="btnMinus">−</button>
-        <button class="metro-btn" id="btnPlus">＋</button>
-      </div>
- 
-      <div class="tempo-label" id="tempoLabel">Allegro</div>
- 
-      <!-- Beat dots -->
-      <div class="beat-row" id="beatRow"></div>
- 
-      <!-- Metrum -->
-      <div class="metro-meter-row">
-        <span class="meter-label">Metrum</span>
-        <select class="meter-select" id="meterTop" onchange="onMeterChange()">
-          <option>1</option><option>2</option><option selected>3</option>
-          <option>4</option><option>5</option><option>6</option>
-          <option>7</option><option>8</option><option>9</option>
-          <option>10</option><option>11</option><option>12</option>
-        </select>
-        <span class="meter-slash">/</span>
-        <select class="meter-select" id="meterBot" onchange="onMeterChange()">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="4" selected>4</option>
-          <option value="8">8</option>
-          <option value="16">16</option>
-        </select>
-      </div>
-    </div>
- 
-    <!-- separator -->
-    <div id="toolsSep" style="display:none;width:1px;background:var(--border);flex-shrink:0;"></div>
- 
-    <!-- ── TUNER ── -->
-    <div class="tools-half" id="panelTuner" style="display:none;">
-      <div class="tools-half-title"><i class="ti ti-wave-sine"></i>Tuner</div>
-      <div class="tuner-hz-badge">A4 = 442 Hz</div>
-      <div class="meter-outer">
-        <svg width="100%" height="82" viewBox="0 0 220 82" preserveAspectRatio="xMidYMax meet">
-          <defs>
-            <linearGradient id="arcGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%"   stop-color="#dc2626"/>
-              <stop offset="44%"  stop-color="#d4af37"/>
-              <stop offset="50%"  stop-color="#16a34a"/>
-              <stop offset="56%"  stop-color="#d4af37"/>
-              <stop offset="100%" stop-color="#dc2626"/>
-            </linearGradient>
-          </defs>
-          <path d="M14,78 A96,96 0 0,1 206,78" fill="none" stroke="url(#arcGrad2)" stroke-width="5" stroke-linecap="round"/>
-          <g stroke="#e2e8f0" stroke-width="1.5">
-            <line x1="110" y1="80" x2="110" y2="70"/>
-            <line x1="63"  y1="73" x2="66"  y2="63"/>
-            <line x1="157" y1="73" x2="154" y2="63"/>
-            <line x1="19"  y1="54" x2="24"  y2="45"/>
-            <line x1="201" y1="54" x2="196" y2="45"/>
-          </g>
-          <text x="110" y="68" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">0</text>
-          <text x="55"  y="61" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-25</text>
-          <text x="165" y="61" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+25</text>
-          <text x="13"  y="43" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-50</text>
-          <text x="207" y="43" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+50</text>
-        </svg>
-        <div id="tunerNeedle" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform .12s ease-out;width:2px;height:68px;pointer-events:none;">
-          <div id="needleBar" style="width:2px;height:60px;background:var(--navy);border-radius:2px 2px 0 0;margin:0 auto;"></div>
-          <div id="needleDot" style="width:9px;height:9px;border-radius:50%;background:var(--navy);position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);"></div>
-        </div>
-      </div>
-      <div class="cent-val"  id="centVal">— ¢</div>
-      <div class="note-name-t" id="noteName">—</div>
-      <div class="tuner-status" id="tunerStatus" style="color:#94a3b8;">Mikrofon wyłączony</div>
-      <button class="tuner-btn" id="tunerBtn"><i class="ti ti-microphone"></i> Włącz tuner</button>
-    </div>
- 
-  </div><!-- /tools-panel -->
-</div>
- 
-<!-- ══ JAVASCRIPT ══ -->
-<script>
-/* ────────────────────────────────────────────
-   TOOLS – toggle
-──────────────────────────────────────────── */
-const toolState={metro:false,tuner:false};
- 
-function toggleTool(tool){
-  toolState[tool]=!toolState[tool];
-  const panelEl=document.getElementById('toolsPanel');
-  const metroEl=document.getElementById('panelMetro');
-  const tunerEl=document.getElementById('panelTuner');
-  const sepEl  =document.getElementById('toolsSep');
-  const btnM   =document.getElementById('btnMetroIcon');
-  const btnT   =document.getElementById('btnTunerIcon');
- 
-  metroEl.style.display=toolState.metro?'block':'none';
-  tunerEl.style.display=toolState.tuner?'block':'none';
-  sepEl.style.display  =(toolState.metro&&toolState.tuner)?'block':'none';
-  panelEl.classList.toggle('open',toolState.metro||toolState.tuner);
-  btnM.classList.toggle('active',toolState.metro);
-  btnT.classList.toggle('active',toolState.tuner);
- 
-  if(!toolState.tuner)stopTuner();
-}
- 
-/* ────────────────────────────────────────────
-   METRONOM
-──────────────────────────────────────────── */
-let bpm=120, running=false, nextTick=0, beat=0;
-let meterTop=3, meterBot=4;
-let metroAC=null;
- 
-const bpmEl   =document.getElementById('bpmScroll');
-const toggleBtn=document.getElementById('metroToggle');
-const metroIcon=document.getElementById('metroIcon');
-const tempoLbl =document.getElementById('tempoLabel');
- 
-/* Tempo labels */
-const TEMPOS=[[20,'Larghissimo'],[40,'Grave'],[60,'Largo'],[66,'Larghetto'],
-  [76,'Andante'],[108,'Moderato'],[120,'Allegro'],[156,'Vivace'],
-  [176,'Presto'],[200,'Prestissimo'],[250,'']];
-function getLabel(b){for(let i=TEMPOS.length-1;i>=0;i--)if(b>=TEMPOS[i][0])return TEMPOS[i][1];return '';}
- 
-function setBpm(v){
-  bpm=Math.max(20,Math.min(300,v));
-  bpmEl.textContent=bpm;
-  tempoLbl.textContent=getLabel(bpm);
-}
- 
-/* Beat dots — rebuild on meter change */
-function buildBeatRow(){
-  const row=document.getElementById('beatRow');
-  row.innerHTML='';
-  for(let i=0;i<meterTop;i++){
-    const d=document.createElement('div');
-    d.className='beat-dot';
-    row.appendChild(d);
-  }
-}
- 
-/* Note SVG — draw based on meterBot */
-function drawNoteSvg(){
-  const wrap=document.getElementById('noteSvgWrap');
-  const d=meterBot;
-  // Whole=1, Half=2, Quarter=4, Eighth=8, Sixteenth=16
-  let svg='';
-  const HEAD_W=11,HEAD_H=8,STEM_H=22,FLAG_X=13,STEM_X=13;
- 
-  if(d===1){
-    // Cała nuta — otwarta głowa, brak ogonka
-    svg=`<svg width="22" height="16" viewBox="0 0 22 16">
-      <ellipse cx="11" cy="11" rx="8" ry="5.5" fill="none" stroke="var(--navy)" stroke-width="2.5"/>
-    </svg>`;
-  } else if(d===2){
-    // Półnuta — otwarta głowa + ogonek
-    svg=`<svg width="22" height="34" viewBox="0 0 22 34">
-      <ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="none" stroke="var(--navy)" stroke-width="2.2" transform="rotate(-15 9 26)"/>
-      <line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>`;
-  } else if(d===4){
-    // Ćwierć — wypełniona głowa + ogonek
-    svg=`<svg width="22" height="34" viewBox="0 0 22 34">
-      <ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/>
-      <line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>`;
-  } else if(d===8){
-    // Ósemka — ćwierć + jedna flaga
-    svg=`<svg width="22" height="34" viewBox="0 0 22 34">
-      <ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/>
-      <line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M${FLAG_X} 4 C${FLAG_X+10} 4 ${FLAG_X+10} 12 ${FLAG_X} 14" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>`;
-  } else {
-    // Szesnastka — ćwierć + dwie flagi
-    svg=`<svg width="22" height="34" viewBox="0 0 22 34">
-      <ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/>
-      <line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M${FLAG_X} 4 C${FLAG_X+10} 4 ${FLAG_X+10} 12 ${FLAG_X} 14" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-      <path d="M${FLAG_X} 10 C${FLAG_X+10} 10 ${FLAG_X+10} 18 ${FLAG_X} 20" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/>
-    </svg>`;
-  }
-  wrap.innerHTML=svg;
-}
- 
-function onMeterChange(){
-  meterTop=parseInt(document.getElementById('meterTop').value)||4;
-  meterBot=parseInt(document.getElementById('meterBot').value)||4;
-  buildBeatRow();
-  drawNoteSvg();
-  beat=0;
-  if(running){stopMetroPlay();startMetro();}
-}
- 
-/* Dźwięk kliknięcia */
-function playClick(isAccent){
-  if(!metroAC)return;
-  const o=metroAC.createOscillator();
-  const g=metroAC.createGain();
-  o.connect(g);g.connect(metroAC.destination);
-  // Akcent (pierwsze uderzenie): wyższy ton + głośniej
-  o.frequency.value=isAccent?1400:900;
-  const vol=isAccent?0.5:0.28;
-  g.gain.setValueAtTime(vol,metroAC.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,metroAC.currentTime+0.07);
-  o.start();o.stop(metroAC.currentTime+0.07);
-}
- 
-function tick(){
-  if(!running)return;
-  const now=metroAC.currentTime;
-  if(now>=nextTick){
-    const isAccent=(beat===0);
-    playClick(isAccent);
-    // Update dots
-    const dots=document.getElementById('beatRow').children;
-    for(let i=0;i<dots.length;i++){dots[i].className='beat-dot'+(i===beat?(isAccent?' accent':' on'):'');}
-    beat=(beat+1)%meterTop;
-    nextTick+=60/bpm;
-  }
-  requestAnimationFrame(tick);
-}
- 
-function startMetro(){
-  if(!metroAC)metroAC=new(window.AudioContext||window.webkitAudioContext)();
-  if(metroAC.state==='suspended')metroAC.resume();
-  running=true;beat=0;nextTick=metroAC.currentTime;
-  toggleBtn.classList.add('active');
-  metroIcon.className='ti ti-player-pause';
-  tick();
-}
-function stopMetroPlay(){
-  running=false;
-  toggleBtn.classList.remove('active');
-  metroIcon.className='ti ti-player-play';
-  const dots=document.getElementById('beatRow').children;
-  for(const d of dots)d.className='beat-dot';
-}
- 
-toggleBtn.onclick=()=>running?stopMetroPlay():startMetro();
-document.getElementById('btnMinus').onclick=()=>setBpm(bpm-5);
-document.getElementById('btnPlus').onclick=()=>setBpm(bpm+5);
- 
-/* BPM drag / scroll */
-let dragY=null,dragBpm=null;
-bpmEl.addEventListener('mousedown',e=>{dragY=e.clientY;dragBpm=bpm;e.preventDefault();});
-bpmEl.addEventListener('touchstart',e=>{dragY=e.touches[0].clientY;dragBpm=bpm;},{passive:true});
-window.addEventListener('mousemove',e=>{if(dragY===null)return;setBpm(dragBpm+Math.round((dragY-e.clientY)/2));});
-window.addEventListener('touchmove',e=>{if(dragY===null)return;setBpm(dragBpm+Math.round((dragY-e.touches[0].clientY)/2));},{passive:true});
-window.addEventListener('mouseup',()=>{dragY=null;});
-window.addEventListener('touchend',()=>{dragY=null;});
-bpmEl.addEventListener('wheel',e=>{e.preventDefault();setBpm(bpm+(e.deltaY<0?1:-1));},{passive:false});
- 
-// Init
-setBpm(120);
-buildBeatRow();
-drawNoteSvg();
-// Ustaw domyślne metrum 3/4 w select
-document.getElementById('meterTop').value='3';
-document.getElementById('meterBot').value='4';
- 
-/* ────────────────────────────────────────────
-   TUNER
-──────────────────────────────────────────── */
-const A4_REF=442;
-const NOTES_T=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
- 
-function freqToInfo(freq){
-  if(!freq||freq<20)return null;
-  const midi=12*Math.log2(freq/A4_REF)+69;
-  const rounded=Math.round(midi);
-  const cents=Math.round((midi-rounded)*100);
-  const oct=Math.floor(rounded/12)-1;
-  const name=NOTES_T[((rounded%12)+12)%12];
-  return{name:name+oct,cents};
-}
-function autoCorrelate(buf,sr){
-  const SIZE=buf.length;
-  let rms=0;for(let i=0;i<SIZE;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/SIZE);
-  if(rms<0.01)return -1;
-  let r1=0,r2=SIZE-1;
-  for(let i=0;i<SIZE/2;i++){if(Math.abs(buf[i])<0.2){r1=i;break;}}
-  for(let i=1;i<SIZE/2;i++){if(Math.abs(buf[SIZE-i])<0.2){r2=SIZE-i;break;}}
-  buf=buf.slice(r1,r2);
-  const c=new Float32Array(buf.length).fill(0);
-  for(let i=0;i<buf.length;i++)for(let j=0;j<buf.length-i;j++)c[i]+=buf[j]*buf[j+i];
-  let d=0;while(c[d]>c[d+1])d++;
-  let maxval=-Infinity,maxpos=-1;
-  for(let i=d;i<buf.length;i++){if(c[i]>maxval){maxval=c[i];maxpos=i;}}
-  let T0=maxpos;
-  const x1=c[T0-1],x2=c[T0],x3=c[T0+1];
-  const a2=(x1+x3-2*x2)/2,b2=(x3-x1)/2;
-  if(a2)T0-=b2/(2*a2);
-  return sr/T0;
-}
- 
-let tunerActive=false,analyser=null,tunerStream=null,tunerCtx=null,animId=null;
-const needleEl  =document.getElementById('tunerNeedle');
-const needleBar =document.getElementById('needleBar');
-const needleDot =document.getElementById('needleDot');
-const centValEl =document.getElementById('centVal');
-const noteNameEl=document.getElementById('noteName');
-const tunerStatusEl=document.getElementById('tunerStatus');
-const tunerBtn  =document.getElementById('tunerBtn');
- 
-function setNeedle(cents){
-  const deg=Math.max(-90,Math.min(90,cents*1.8));
-  needleEl.style.transform=`translateX(-50%) rotate(${deg}deg)`;
-}
-function getColor(c){
-  const a=Math.abs(c);
-  return a<=5?'#16a34a':a<=20?'#d4af37':'#dc2626';
-}
-function analyze(){
-  if(!analyser)return;
-  const buf=new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
-  const freq=autoCorrelate(buf,tunerCtx.sampleRate);
-  if(freq>0){
-    const info=freqToInfo(freq);
-    if(info){
-      setNeedle(info.cents);
-      const col=getColor(info.cents);
-      centValEl.textContent=(info.cents>=0?'+':'')+info.cents+' ¢';
-      centValEl.style.color=col;
-      needleBar.style.background=col;
-      needleDot.style.background=col;
-      noteNameEl.textContent=info.name+' · '+Math.round(freq)+' Hz';
-      tunerStatusEl.textContent=Math.abs(info.cents)<=5?'✓ Nastrojony':'Nastraj...';
-      tunerStatusEl.style.color=col;
-    }
-  } else {
-    tunerStatusEl.textContent='Cisza...';
-    tunerStatusEl.style.color='#94a3b8';
-  }
-  animId=requestAnimationFrame(analyze);
-}
-async function startTuner(){
-  try{
-    tunerStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    tunerCtx=new(window.AudioContext||window.webkitAudioContext)();
-    analyser=tunerCtx.createAnalyser();analyser.fftSize=2048;
-    const src=tunerCtx.createMediaStreamSource(tunerStream);
-    src.connect(analyser);
-    tunerActive=true;
-    tunerBtn.classList.add('active');
-    tunerBtn.innerHTML='<i class="ti ti-microphone-off"></i> Wyłącz tuner';
-    tunerStatusEl.textContent='Nasłuchuję...';
-    analyze();
-  }catch(e){
-    tunerStatusEl.textContent='Brak dostępu do mikrofonu';
-  }
-}
-function stopTuner(){
-  if(animId)cancelAnimationFrame(animId);
-  if(tunerStream)tunerStream.getTracks().forEach(t=>t.stop());
-  if(tunerCtx)tunerCtx.close();
-  analyser=null;tunerCtx=null;tunerStream=null;animId=null;
-  tunerActive=false;
-  tunerBtn.classList.remove('active');
-  tunerBtn.innerHTML='<i class="ti ti-microphone"></i> Włącz tuner';
-  tunerStatusEl.textContent='Mikrofon wyłączony';
-  tunerStatusEl.style.color='#94a3b8';
-  setNeedle(0);
-  centValEl.textContent='— ¢';centValEl.style.color='var(--navy)';
-  noteNameEl.textContent='—';
-  needleBar.style.background='var(--navy)';
-  needleDot.style.background='var(--navy)';
-}
-tunerBtn.onclick=()=>tunerActive?stopTuner():startTuner();
-</script>
-  <!-- ══ KONIEC PASKA NARZĘDZI ══ -->
- 
+  <!-- ══ SCREENS ══ -->
   <div class="screens-outer">
     <div class="screens-track show-toc" id="screensTrack">
  
@@ -860,10 +409,10 @@ tunerBtn.onclick=()=>tunerActive?stopTuner():startTuner();
       </div>
     </div>
     <div class="modal-right">
-      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
-      <input type="tel" id="m-phone" placeholder="Numer telefonu">
+      <input type="text"  id="m-name"  placeholder="Twoje imię i nazwisko">
+      <input type="tel"   id="m-phone" placeholder="Numer telefonu">
       <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
-      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
+      <textarea           id="m-msg"   placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
       <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
       <div id="modal-status"></div>
     </div>
@@ -872,7 +421,7 @@ tunerBtn.onclick=()=>tunerActive?stopTuner():startTuner();
  
 <script>
 /* ══════════════════════════════════════════════
-   PODRĘCZNIK – strony
+   PODRĘCZNIK — strony
 ══════════════════════════════════════════════ */
 function gdrive(id){return 'https://drive.google.com/thumbnail?id='+id+'&sz=w1600';}
  
@@ -895,7 +444,7 @@ const TOC=[
   {label:'Ruszanie ręką po klawiaturze',      pages:[3]},
   {label:'Ćwiczenia – ręka w miejscu',        pages:[4]},
   {label:'Ćwiczenia bez znajomości dźwięków', pages:[5]},
-  {label:'Prawa ręka – ćw. 1–12',            pages:[6,7,8]},
+  {label:'Prawa ręka – ćw. 1–12',             pages:[6,7,8]},
   {label:'Lewa ręka – ćw. 13–20',             pages:[9,10]},
   {label:'Obie ręce – ćw. 21–23',             pages:[11]},
 ];
@@ -912,8 +461,7 @@ function showBook(n){
 function buildToc(){
   const list=document.getElementById('tocList');
   TOC.forEach((sec,si)=>{
-    const card=document.createElement('div');
-    card.className='toc-card';
+    const card=document.createElement('div');card.className='toc-card';
     const pStr=sec.pages.length===1?'str. '+sec.pages[0]:'str. '+sec.pages[0]+'–'+sec.pages[sec.pages.length-1];
     card.innerHTML=`<div class="toc-num">${si+1}</div><div class="toc-info"><div class="toc-label">${sec.label}</div><div class="toc-pages">${pStr}</div></div><div class="toc-arrow">›</div>`;
     card.onclick=()=>showBook(sec.pages[0]);
@@ -925,11 +473,9 @@ function goTo(n){
   n=Math.max(1,Math.min(TOTAL,n));
   const img=document.getElementById('pageImg');
   const spinner=document.getElementById('pageSpinner');
-  img.classList.add('out');
-  spinner.style.display='flex';
+  img.classList.add('out');spinner.style.display='flex';
   setTimeout(()=>{
-    current=n;
-    img.src=PAGES[current-1];
+    current=n;img.src=PAGES[current-1];
     img.onload=()=>{img.classList.remove('out');spinner.style.display='none';};
     img.onerror=()=>{img.classList.remove('out');spinner.textContent='Błąd ładowania — sprawdź czy plik jest publiczny';};
     updateUI();
@@ -951,25 +497,22 @@ document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT')return;
   if(e.key==='ArrowRight'||e.key==='ArrowDown')next();
   if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();
-  if(e.key==='Home')goTo(1);
-  if(e.key==='End')goTo(TOTAL);
+  if(e.key==='Home')goTo(1);if(e.key==='End')goTo(TOTAL);
 });
  
 let tx=0;
 document.getElementById('pageDisplay').addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
 document.getElementById('pageDisplay').addEventListener('touchend',e=>{
   const dx=e.changedTouches[0].clientX-tx;
-  if(dx<-50)next();
-  if(dx>50)prev();
+  if(dx<-50)next();if(dx>50)prev();
 },{passive:true});
  
-buildToc();
-goTo(1);
+buildToc();goTo(1);
  
 /* ══════════════════════════════════════════════
-   PASEK NARZĘDZI – toggle
+   TOOLS — toggle
 ══════════════════════════════════════════════ */
-let toolState={metro:false,tuner:false};
+const toolState={metro:false,tuner:false};
  
 function toggleTool(tool){
   toolState[tool]=!toolState[tool];
@@ -979,28 +522,23 @@ function toggleTool(tool){
   const sepEl  =document.getElementById('toolsSep');
   const btnM   =document.getElementById('btnMetroIcon');
   const btnT   =document.getElementById('btnTunerIcon');
- 
   metroEl.style.display=toolState.metro?'block':'none';
   tunerEl.style.display=toolState.tuner?'block':'none';
   sepEl.style.display  =(toolState.metro&&toolState.tuner)?'block':'none';
- 
-  const anyOpen=toolState.metro||toolState.tuner;
-  panelEl.classList.toggle('open',anyOpen);
- 
+  panelEl.classList.toggle('open',toolState.metro||toolState.tuner);
   btnM.classList.toggle('active',toolState.metro);
   btnT.classList.toggle('active',toolState.tuner);
- 
   if(!toolState.tuner)stopTuner();
 }
  
 /* ══════════════════════════════════════════════
    METRONOM
 ══════════════════════════════════════════════ */
-let bpm=120,running=false,nextTick=0,beat=0,audioCtx=null;
+let bpm=120,metRunning=false,metNextTick=0,metBeat=0,meterTop=3,meterBot=4,metroAC=null;
+ 
 const bpmEl   =document.getElementById('bpmScroll');
 const toggleBtn=document.getElementById('metroToggle');
 const metroIcon=document.getElementById('metroIcon');
-const beatDots =[...document.getElementById('beatRow').children];
 const tempoLbl =document.getElementById('tempoLabel');
  
 const TEMPOS=[[20,'Larghissimo'],[40,'Grave'],[60,'Largo'],[66,'Larghetto'],
@@ -1010,46 +548,79 @@ function getLabel(b){for(let i=TEMPOS.length-1;i>=0;i--)if(b>=TEMPOS[i][0])retur
  
 function setBpm(v){
   bpm=Math.max(20,Math.min(300,v));
-  bpmEl.textContent=bpm;
-  tempoLbl.textContent=getLabel(bpm);
+  bpmEl.textContent=bpm;tempoLbl.textContent=getLabel(bpm);
 }
  
-function tick(){
-  if(!running)return;
-  const now=audioCtx.currentTime;
-  if(now>=nextTick){
-    playClick();
-    beat=(beat+1)%4;
-    beatDots.forEach((d,i)=>d.classList.toggle('on',i===beat));
-    nextTick+=60/bpm;
+function buildBeatRow(){
+  const row=document.getElementById('beatRow');row.innerHTML='';
+  for(let i=0;i<meterTop;i++){const d=document.createElement('div');d.className='beat-dot';row.appendChild(d);}
+}
+ 
+function drawNoteSvg(){
+  const wrap=document.getElementById('noteSvgWrap');
+  const d=meterBot;
+  const FLAG_X=13,STEM_X=13,HEAD_W=11,HEAD_H=8;
+  let svg='';
+  if(d===1){
+    svg=`<svg width="22" height="16" viewBox="0 0 22 16"><ellipse cx="11" cy="11" rx="8" ry="5.5" fill="none" stroke="var(--navy)" stroke-width="2.5"/></svg>`;
+  }else if(d===2){
+    svg=`<svg width="22" height="34" viewBox="0 0 22 34"><ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="none" stroke="var(--navy)" stroke-width="2.2" transform="rotate(-15 9 26)"/><line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  }else if(d===4){
+    svg=`<svg width="22" height="34" viewBox="0 0 22 34"><ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/><line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  }else if(d===8){
+    svg=`<svg width="22" height="34" viewBox="0 0 22 34"><ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/><line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/><path d="M${FLAG_X} 4 C${FLAG_X+10} 4 ${FLAG_X+10} 12 ${FLAG_X} 14" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  }else{
+    svg=`<svg width="22" height="34" viewBox="0 0 22 34"><ellipse cx="9" cy="26" rx="${HEAD_W/2}" ry="${HEAD_H/2}" fill="var(--navy)" transform="rotate(-15 9 26)"/><line x1="${STEM_X}" y1="25" x2="${STEM_X}" y2="4" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/><path d="M${FLAG_X} 4 C${FLAG_X+10} 4 ${FLAG_X+10} 12 ${FLAG_X} 14" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/><path d="M${FLAG_X} 10 C${FLAG_X+10} 10 ${FLAG_X+10} 18 ${FLAG_X} 20" fill="none" stroke="var(--navy)" stroke-width="2.2" stroke-linecap="round"/></svg>`;
   }
-  requestAnimationFrame(tick);
+  wrap.innerHTML=svg;
 }
-function playClick(){
-  const o=audioCtx.createOscillator();
-  const g=audioCtx.createGain();
-  o.connect(g);g.connect(audioCtx.destination);
-  const down=beat===0;
-  o.frequency.value=down?1200:900;
-  g.gain.setValueAtTime(down?0.4:0.25,audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
-  o.start();o.stop(audioCtx.currentTime+0.06);
+ 
+function onMeterChange(){
+  meterTop=parseInt(document.getElementById('meterTop').value)||4;
+  meterBot=parseInt(document.getElementById('meterBot').value)||4;
+  buildBeatRow();drawNoteSvg();metBeat=0;
+  if(metRunning){stopMetroPlay();startMetro();}
 }
+ 
+function playClick(isAccent){
+  if(!metroAC)return;
+  const o=metroAC.createOscillator(),g=metroAC.createGain();
+  o.connect(g);g.connect(metroAC.destination);
+  o.frequency.value=isAccent?1400:900;
+  const vol=isAccent?0.5:0.28;
+  g.gain.setValueAtTime(vol,metroAC.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,metroAC.currentTime+0.07);
+  o.start();o.stop(metroAC.currentTime+0.07);
+}
+ 
+function metTick(){
+  if(!metRunning)return;
+  const now=metroAC.currentTime;
+  if(now>=metNextTick){
+    const isAccent=(metBeat===0);
+    playClick(isAccent);
+    const dots=document.getElementById('beatRow').children;
+    for(let i=0;i<dots.length;i++){dots[i].className='beat-dot'+(i===metBeat?(isAccent?' accent':' on'):'');}
+    metBeat=(metBeat+1)%meterTop;
+    metNextTick+=60/bpm;
+  }
+  requestAnimationFrame(metTick);
+}
+ 
 function startMetro(){
-  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended')audioCtx.resume();
-  running=true;beat=-1;nextTick=audioCtx.currentTime;
-  toggleBtn.classList.add('active');
-  metroIcon.className='ti ti-player-pause';
-  tick();
+  if(!metroAC)metroAC=new(window.AudioContext||window.webkitAudioContext)();
+  if(metroAC.state==='suspended')metroAC.resume();
+  metRunning=true;metBeat=0;metNextTick=metroAC.currentTime;
+  toggleBtn.classList.add('active');metroIcon.className='ti ti-player-pause';
+  metTick();
 }
 function stopMetroPlay(){
-  running=false;
-  toggleBtn.classList.remove('active');
-  metroIcon.className='ti ti-player-play';
-  beatDots.forEach(d=>d.classList.remove('on'));
+  metRunning=false;toggleBtn.classList.remove('active');metroIcon.className='ti ti-player-play';
+  const dots=document.getElementById('beatRow').children;
+  for(const d of dots)d.className='beat-dot';
 }
-toggleBtn.onclick=()=>running?stopMetroPlay():startMetro();
+ 
+toggleBtn.onclick=()=>metRunning?stopMetroPlay():startMetro();
 document.getElementById('btnMinus').onclick=()=>setBpm(bpm-5);
 document.getElementById('btnPlus').onclick=()=>setBpm(bpm+5);
  
@@ -1062,13 +633,13 @@ window.addEventListener('mouseup',()=>{dragY=null;});
 window.addEventListener('touchend',()=>{dragY=null;});
 bpmEl.addEventListener('wheel',e=>{e.preventDefault();setBpm(bpm+(e.deltaY<0?1:-1));},{passive:false});
  
-setBpm(120);
+setBpm(120);buildBeatRow();drawNoteSvg();
  
 /* ══════════════════════════════════════════════
    TUNER
 ══════════════════════════════════════════════ */
 const A4_REF=442;
-const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const NOTES_T=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
  
 function freqToInfo(freq){
   if(!freq||freq<20)return null;
@@ -1076,7 +647,7 @@ function freqToInfo(freq){
   const rounded=Math.round(midi);
   const cents=Math.round((midi-rounded)*100);
   const oct=Math.floor(rounded/12)-1;
-  const name=NOTES[((rounded%12)+12)%12];
+  const name=NOTES_T[((rounded%12)+12)%12];
   return{name:name+oct,cents};
 }
 function autoCorrelate(buf,sr){
@@ -1099,83 +670,65 @@ function autoCorrelate(buf,sr){
   return sr/T0;
 }
  
-let tunerActive=false,analyser=null,tunerStream=null,tunerCtx=null,animId=null;
+let tunerActive=false,tunerAnalyser=null,tunerStream=null,tunerCtx=null,tunerAnimId=null;
 const needleEl  =document.getElementById('tunerNeedle');
 const needleBar =document.getElementById('needleBar');
 const needleDot =document.getElementById('needleDot');
 const centValEl =document.getElementById('centVal');
 const noteNameEl=document.getElementById('noteName');
-const tunerStatus=document.getElementById('tunerStatus');
+const tunerStatusEl=document.getElementById('tunerStatus');
 const tunerBtn  =document.getElementById('tunerBtn');
  
 function setNeedle(cents){
   const deg=Math.max(-90,Math.min(90,cents*1.8));
   needleEl.style.transform=`translateX(-50%) rotate(${deg}deg)`;
 }
-function getColor(c){
-  const a=Math.abs(c);
-  return a<=5?'#16a34a':a<=20?'#d4af37':'#dc2626';
-}
-function analyze(){
-  if(!analyser)return;
-  const buf=new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
+function getTunerColor(c){const a=Math.abs(c);return a<=5?'#16a34a':a<=20?'#d4af37':'#dc2626';}
+function analyzeAudio(){
+  if(!tunerAnalyser)return;
+  const buf=new Float32Array(tunerAnalyser.fftSize);
+  tunerAnalyser.getFloatTimeDomainData(buf);
   const freq=autoCorrelate(buf,tunerCtx.sampleRate);
   if(freq>0){
     const info=freqToInfo(freq);
     if(info){
       setNeedle(info.cents);
-      const col=getColor(info.cents);
+      const col=getTunerColor(info.cents);
       centValEl.textContent=(info.cents>=0?'+':'')+info.cents+' ¢';
-      centValEl.style.color=col;
-      needleBar.style.background=col;
-      needleDot.style.background=col;
+      centValEl.style.color=col;needleBar.style.background=col;needleDot.style.background=col;
       noteNameEl.textContent=info.name+' · '+Math.round(freq)+' Hz';
-      tunerStatus.textContent=Math.abs(info.cents)<=5?'✓ Nastrojony':'Nastraj...';
-      tunerStatus.style.color=col;
+      tunerStatusEl.textContent=Math.abs(info.cents)<=5?'✓ Nastrojony':'Nastraj...';
+      tunerStatusEl.style.color=col;
     }
-  } else {
-    tunerStatus.textContent='Cisza...';
-    tunerStatus.style.color='#94a3b8';
-  }
-  animId=requestAnimationFrame(analyze);
+  }else{tunerStatusEl.textContent='Cisza...';tunerStatusEl.style.color='#94a3b8';}
+  tunerAnimId=requestAnimationFrame(analyzeAudio);
 }
 async function startTuner(){
   try{
     tunerStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
     tunerCtx=new(window.AudioContext||window.webkitAudioContext)();
-    analyser=tunerCtx.createAnalyser();analyser.fftSize=2048;
-    const src=tunerCtx.createMediaStreamSource(tunerStream);
-    src.connect(analyser);
-    tunerActive=true;
-    tunerBtn.classList.add('active');
+    tunerAnalyser=tunerCtx.createAnalyser();tunerAnalyser.fftSize=2048;
+    tunerCtx.createMediaStreamSource(tunerStream).connect(tunerAnalyser);
+    tunerActive=true;tunerBtn.classList.add('active');
     tunerBtn.innerHTML='<i class="ti ti-microphone-off"></i> Wyłącz tuner';
-    tunerStatus.textContent='Nasłuchuję...';
-    analyze();
-  }catch(e){
-    tunerStatus.textContent='Brak dostępu do mikrofonu';
-  }
+    tunerStatusEl.textContent='Nasłuchuję...';analyzeAudio();
+  }catch(e){tunerStatusEl.textContent='Brak dostępu do mikrofonu';}
 }
 function stopTuner(){
-  if(animId)cancelAnimationFrame(animId);
+  if(tunerAnimId)cancelAnimationFrame(tunerAnimId);
   if(tunerStream)tunerStream.getTracks().forEach(t=>t.stop());
   if(tunerCtx)tunerCtx.close();
-  analyser=null;tunerCtx=null;tunerStream=null;animId=null;
-  tunerActive=false;
+  tunerAnalyser=null;tunerCtx=null;tunerStream=null;tunerAnimId=null;tunerActive=false;
   tunerBtn.classList.remove('active');
   tunerBtn.innerHTML='<i class="ti ti-microphone"></i> Włącz tuner';
-  tunerStatus.textContent='Mikrofon wyłączony';
-  tunerStatus.style.color='#94a3b8';
-  setNeedle(0);
-  centValEl.textContent='— ¢';centValEl.style.color='var(--navy)';
-  noteNameEl.textContent='—';
-  needleBar.style.background='var(--navy)';
-  needleDot.style.background='var(--navy)';
+  tunerStatusEl.textContent='Mikrofon wyłączony';tunerStatusEl.style.color='#94a3b8';
+  setNeedle(0);centValEl.textContent='— ¢';centValEl.style.color='var(--navy)';
+  noteNameEl.textContent='—';needleBar.style.background='var(--navy)';needleDot.style.background='var(--navy)';
 }
 tunerBtn.onclick=()=>tunerActive?stopTuner():startTuner();
  
 /* ══════════════════════════════════════════════
-   MODAL – lekcja próbna
+   MODAL — lekcja próbna
 ══════════════════════════════════════════════ */
 function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
 function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
@@ -1193,42 +746,30 @@ function mSetPiano(v){
   document.getElementById('m-p-n').classList.toggle('selected',!v);
   mUpdatePrice();
 }
-function mUpdatePrice(){
-  document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h';
-}
+function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
 async function wyslijModal(){
-  const s=document.getElementById('modal-status');
-  const submitBtn=document.querySelector('.modal-submit-btn');
+  const s=document.getElementById('modal-status');const submitBtn=document.querySelector('.modal-submit-btn');
   const name=document.getElementById('m-name').value.trim();
   const phone=document.getElementById('m-phone').value.trim();
   const email=document.getElementById('m-email').value.trim();
-  if(name.length<2||phone.length<9||!email.includes('@')){
-    s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;
-  }
-  submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
-  const location=mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd';
-  const piano=mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu');
-  const price=(mLoc==='u'&&!mPiano?119:99)+' zł/h';
+  if(name.length<2||phone.length<9||!email.includes('@')){s.textContent='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
+  submitBtn.disabled=true;submitBtn.textContent='Wysyłanie...';s.textContent='';
   const payload={
     typ:'lekcja-probna-podrecznik',
     imie_nazwisko:name,telefon:phone,email:email,
     tresc:document.getElementById('m-msg').value.trim(),
-    miejsce:location,pianino:piano,cena:price,
+    miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',
+    pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),
+    cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',
     data:new Date().toLocaleString('pl-PL')
   };
   try{
-    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    s.innerText='✅ Wysłano! Sprawdź email.';s.style.color='#22c55e';
-    submitBtn.innerText='WYŚLIJ PROŚBĘ';
-    setTimeout(()=>{
-      closeBookingModal();s.innerText='';
-      ['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');
-      submitBtn.disabled=false;
-    },3000);
+    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    s.textContent='✅ Wysłano! Sprawdź email.';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
+    setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
   }catch(e){
-    s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';
-    submitBtn.innerText='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;
+    s.textContent='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';
+    submitBtn.textContent='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;
   }
 }
 </script>
