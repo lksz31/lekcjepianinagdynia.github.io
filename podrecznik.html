@@ -1,3 +1,6 @@
+Podrecznik · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -7,10 +10,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 <style>
 :root{--gold:#d4af37;--navy:#1e3a8a;--green:#16a34a;--border:#e2e8f0;--text:#334155;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+ 
+/* ── NAV ── */
 .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
 .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
 .site-nav a:hover{color:var(--gold);}
@@ -25,12 +31,62 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
 .mobile-nav a.mn-cta:hover{background:var(--gold);}
 @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+ 
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:80px 0 0;gap:0;}
-.book-header{text-align:center;padding:22px 20px 16px;}
+.book-header{text-align:center;padding:22px 20px 12px;}
 .book-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold);margin-bottom:6px;}
 .book-title{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,3.5vw,2.1rem);color:var(--navy);line-height:1.2;}
 .book-title em{color:var(--gold);font-style:italic;}
 .book-author{font-size:0.82rem;color:#94a3b8;font-weight:500;margin-top:4px;}
+ 
+/* ── TOOLS BAR ── */
+.tools-bar{width:100%;max-width:680px;padding:0 16px 2px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.tools-icons{display:flex;gap:8px;}
+.tool-icon-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;padding:0;font-size:0;}
+.tool-icon-btn i{font-size:15px;color:#64748b;transition:color .2s;}
+.tool-icon-btn:hover{border-color:var(--navy);}
+.tool-icon-btn:hover i{color:var(--navy);}
+.tool-icon-btn.active{border-color:var(--navy);background:var(--navy);}
+.tool-icon-btn.active i{color:#fff;}
+.tools-panel{display:none;width:100%;background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);}
+.tools-panel.open{display:flex;}
+.tools-half{flex:1;padding:16px 18px 14px;min-width:0;}
+.tools-half+.tools-half{border-left:1px solid var(--border);}
+.tools-half-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.tools-half-title i{font-size:16px;}
+ 
+/* metronome */
+.metro-row{display:flex;align-items:center;gap:12px;}
+.metro-toggle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:#fff;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;}
+.metro-toggle.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+.metro-toggle i{font-size:16px;}
+.note-bpm{display:flex;align-items:center;gap:8px;}
+.quarter-note{position:relative;width:14px;height:36px;flex-shrink:0;}
+.qn-head{width:11px;height:8px;border-radius:50%;background:var(--text);position:absolute;bottom:0;left:0;transform:rotate(-15deg);}
+.qn-stem{width:2px;height:26px;background:var(--text);position:absolute;right:0;top:2px;}
+.bpm-scroll{width:60px;height:38px;border:1.5px solid var(--border);border-radius:10px;font-size:20px;font-weight:700;color:var(--navy);background:#f8fafc;text-align:center;cursor:ns-resize;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:none;transition:border-color .15s;font-family:'Poppins',sans-serif;}
+.bpm-scroll:hover{border-color:var(--navy);}
+.metro-btns{display:flex;gap:6px;margin-top:10px;}
+.metro-btn{flex:1;height:28px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-weight:600;}
+.metro-btn:hover{border-color:var(--navy);color:var(--navy);}
+.tempo-label{font-size:10px;color:#94a3b8;text-align:center;margin-top:5px;font-weight:600;min-height:14px;}
+.beat-row{display:flex;gap:5px;margin-top:8px;justify-content:center;}
+.beat-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .05s;}
+.beat-dot.on{background:var(--navy);}
+ 
+/* tuner */
+.meter-outer{position:relative;width:100%;height:80px;}
+.tuner-hz-badge{font-size:9.5px;color:#94a3b8;font-weight:600;margin-bottom:6px;}
+.cent-val{text-align:center;font-size:18px;font-weight:700;color:var(--navy);line-height:1;margin-top:4px;}
+.note-name-t{text-align:center;font-size:11px;color:#94a3b8;margin-top:2px;font-weight:600;min-height:14px;}
+.tuner-status{text-align:center;font-size:10px;margin-top:4px;font-weight:700;min-height:13px;}
+.tuner-btn{width:100%;margin-top:8px;padding:7px;border:1.5px solid var(--border);border-radius:8px;background:#fff;color:var(--text);font-size:11.5px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'Poppins',sans-serif;}
+.tuner-btn:hover{border-color:var(--navy);color:var(--navy);}
+.tuner-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tuner-btn i{font-size:14px;}
+ 
+/* ── SCREENS ── */
 .screens-outer{width:100%;overflow:hidden;}
 .screens-track{display:flex;transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);will-change:transform;}
 .screens-track.show-toc{transform:translateX(0);}
@@ -73,6 +129,8 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .page-jump:focus{border-color:var(--gold);}
 @media(max-width:500px){.page-input-wrap{display:none;}}
 .shortcuts{font-size:0.68rem;color:#cbd5e1;text-align:center;padding:8px 0 4px;}
+ 
+/* ── FOOTER ── */
 .site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;}
 .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
 @media(max-width:900px){.footer-main{grid-template-columns:1fr 1fr;gap:2rem;}.footer-cta-col{grid-column:span 2;}}
@@ -98,7 +156,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .footer-copy{font-size:11px;color:#c0c0cc;}
 .footer-location{font-size:12px;color:#aaa;}
  
-/* ── Modal lekcja próbna ── */
+/* ── Modal ── */
 .footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
 .footer-modal-overlay.open{opacity:1;pointer-events:all;}
 .footer-modal{background:white;border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
@@ -145,6 +203,94 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
     <h1 class="book-title">Szkoła Gry na <em>Fortepianie</em></h1>
     <p class="book-author">Autorski podręcznik do nauki gry na pianinie</p>
   </div>
+ 
+  <!-- ══ PASEK NARZĘDZI: METRONOM + TUNER ══ -->
+  <div class="tools-bar">
+    <div class="tools-icons">
+      <button class="tool-icon-btn" id="btnMetroIcon" onclick="toggleTool('metro')" title="Metronom" aria-label="Metronom">
+        <i class="ti ti-metronome"></i>
+      </button>
+      <button class="tool-icon-btn" id="btnTunerIcon" onclick="toggleTool('tuner')" title="Tuner" aria-label="Tuner">
+        <i class="ti ti-wave-sine"></i>
+      </button>
+    </div>
+    <div class="tools-panel" id="toolsPanel">
+ 
+      <!-- METRONOM -->
+      <div class="tools-half" id="panelMetro" style="display:none;">
+        <div class="tools-half-title"><i class="ti ti-metronome"></i>Metronom</div>
+        <div class="metro-row">
+          <button class="metro-toggle" id="metroToggle" title="Włącz / wyłącz">
+            <i class="ti ti-player-play" id="metroIcon"></i>
+          </button>
+          <div class="note-bpm">
+            <div class="quarter-note" aria-hidden="true">
+              <div class="qn-head"></div>
+              <div class="qn-stem"></div>
+            </div>
+            <div class="bpm-scroll" id="bpmScroll" title="Przeciągnij góra/dół lub kółko myszy">120</div>
+          </div>
+        </div>
+        <div class="metro-btns">
+          <button class="metro-btn" id="btnMinus">−</button>
+          <button class="metro-btn" id="btnPlus">＋</button>
+        </div>
+        <div class="tempo-label" id="tempoLabel">Allegro</div>
+        <div class="beat-row" id="beatRow">
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+          <div class="beat-dot"></div>
+        </div>
+      </div>
+ 
+      <!-- SEPARATOR (widoczny gdy oba otwarte) -->
+      <div id="toolsSep" style="display:none;width:1px;background:var(--border);flex-shrink:0;"></div>
+ 
+      <!-- TUNER -->
+      <div class="tools-half" id="panelTuner" style="display:none;">
+        <div class="tools-half-title"><i class="ti ti-wave-sine"></i>Tuner</div>
+        <div class="tuner-hz-badge">A4 = 442 Hz</div>
+        <div class="meter-outer">
+          <svg width="100%" height="80" viewBox="0 0 220 80" preserveAspectRatio="xMidYMax meet">
+            <defs>
+              <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#dc2626"/>
+                <stop offset="44%" stop-color="#d4af37"/>
+                <stop offset="50%" stop-color="#16a34a"/>
+                <stop offset="56%" stop-color="#d4af37"/>
+                <stop offset="100%" stop-color="#dc2626"/>
+              </linearGradient>
+            </defs>
+            <path d="M14,76 A96,96 0 0,1 206,76" fill="none" stroke="url(#arcGrad)" stroke-width="5" stroke-linecap="round"/>
+            <g stroke="#e2e8f0" stroke-width="1.5">
+              <line x1="110" y1="78" x2="110" y2="68"/>
+              <line x1="63"  y1="71" x2="66"  y2="61"/>
+              <line x1="157" y1="71" x2="154" y2="61"/>
+              <line x1="19"  y1="52" x2="24"  y2="43"/>
+              <line x1="201" y1="52" x2="196" y2="43"/>
+            </g>
+            <text x="110" y="66" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">0</text>
+            <text x="55"  y="59" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-25</text>
+            <text x="165" y="59" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+25</text>
+            <text x="13"  y="41" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">-50</text>
+            <text x="207" y="41" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Poppins,sans-serif">+50</text>
+          </svg>
+          <!-- igła: pivot na dole środka -->
+          <div id="tunerNeedle" style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%) rotate(0deg);transform-origin:bottom center;transition:transform .12s ease-out;width:2px;height:68px;pointer-events:none;">
+            <div id="needleBar" style="width:2px;height:60px;background:var(--navy);border-radius:2px 2px 0 0;margin:0 auto;"></div>
+            <div id="needleDot" style="width:9px;height:9px;border-radius:50%;background:var(--navy);position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);"></div>
+          </div>
+        </div>
+        <div class="cent-val" id="centVal">— ¢</div>
+        <div class="note-name-t" id="noteName">—</div>
+        <div class="tuner-status" id="tunerStatus" style="color:#94a3b8;">Mikrofon wyłączony</div>
+        <button class="tuner-btn" id="tunerBtn"><i class="ti ti-microphone"></i> Włącz tuner</button>
+      </div>
+ 
+    </div><!-- /tools-panel -->
+  </div>
+  <!-- ══ KONIEC PASKA NARZĘDZI ══ -->
  
   <div class="screens-outer">
     <div class="screens-track show-toc" id="screensTrack">
@@ -235,34 +381,63 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
   </div>
 </footer>
  
+<!-- Modal lekcja próbna -->
+<div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
+  <div class="footer-modal">
+    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+    <div class="modal-left">
+      <h3>Lekcja próbna</h3>
+      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
+      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+      <div id="m-piano-box">
+        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
+          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
+      <input type="tel" id="m-phone" placeholder="Numer telefonu">
+      <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
+      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
+      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
+      <div id="modal-status"></div>
+    </div>
+  </div>
+</div>
+ 
 <script>
-function gdrive(id){
-  // thumbnail endpoint daje wysoką rozdzielczość i działa publicznie
-  return 'https://drive.google.com/thumbnail?id='+id+'&sz=w1600';
-}
+/* ══════════════════════════════════════════════
+   PODRĘCZNIK – strony
+══════════════════════════════════════════════ */
+function gdrive(id){return 'https://drive.google.com/thumbnail?id='+id+'&sz=w1600';}
  
 const PAGES=[
-  gdrive('1HhGRasqAkIWE0MAm4vrlKWMXfKII9r0r'), // 1
-  gdrive('1H6a3cEOJz7P3XQwp4wIuF2ro4psx3bLl'), // 2
-  gdrive('1cl8pcVp0VhWxw043kJWz8dHRsatOXba6'), // 3
-  gdrive('1zOVnTOLIxxZtqzACnHRgDbACkECGijV1'), // 4
-  gdrive('1QPkC-ybUuBbRgIier8s5aKMF62hmCOdR'), // 5
-  gdrive('1xkqIdBstRv-c-wjIJCSIM3_OI6cyQNSZ'), // 6
-  gdrive('1b2za16bDssbhAGKs2eKd8IvtA1wdigxu'), // 7
-  gdrive('10lKpDNMiZ87Cmfdq5nrnGbquZirmbVO2'), // 8
-  gdrive('1t1gW8I35vJnWeyVUwF_2t0B4wVe2g9RI'), // 9
-  gdrive('147TpHeF8prycfAoRelx3LeqEs4VcswpJ'), // 10
-  gdrive('1RN74tdcS_GK7gjD8RIzAdsXFhQBKHl_D'), // 11
+  gdrive('1HhGRasqAkIWE0MAm4vrlKWMXfKII9r0r'),
+  gdrive('1H6a3cEOJz7P3XQwp4wIuF2ro4psx3bLl'),
+  gdrive('1cl8pcVp0VhWxw043kJWz8dHRsatOXba6'),
+  gdrive('1zOVnTOLIxxZtqzACnHRgDbACkECGijV1'),
+  gdrive('1QPkC-ybUuBbRgIier8s5aKMF62hmCOdR'),
+  gdrive('1xkqIdBstRv-c-wjIJCSIM3_OI6cyQNSZ'),
+  gdrive('1b2za16bDssbhAGKs2eKd8IvtA1wdigxu'),
+  gdrive('10lKpDNMiZ87Cmfdq5nrnGbquZirmbVO2'),
+  gdrive('1t1gW8I35vJnWeyVUwF_2t0B4wVe2g9RI'),
+  gdrive('147TpHeF8prycfAoRelx3LeqEs4VcswpJ'),
+  gdrive('1RN74tdcS_GK7gjD8RIzAdsXFhQBKHl_D'),
 ];
  
 const TOC=[
-  {label:'Postawa i podstawy gry',            pages:[1,2]},
-  {label:'Ruszanie ręką po klawiaturze',       pages:[3]},
-  {label:'Ćwiczenia – ręka w miejscu',         pages:[4]},
-  {label:'Ćwiczenia bez znajomości dźwięków',  pages:[5]},
-  {label:'Prawa ręka – ćw. 1–12',             pages:[6,7,8]},
-  {label:'Lewa ręka – ćw. 13–20',              pages:[9,10]},
-  {label:'Obie ręce – ćw. 21–23',              pages:[11]},
+  {label:'Postawa i podstawy gry',           pages:[1,2]},
+  {label:'Ruszanie ręką po klawiaturze',      pages:[3]},
+  {label:'Ćwiczenia – ręka w miejscu',        pages:[4]},
+  {label:'Ćwiczenia bez znajomości dźwięków', pages:[5]},
+  {label:'Prawa ręka – ćw. 1–12',            pages:[6,7,8]},
+  {label:'Lewa ręka – ćw. 13–20',             pages:[9,10]},
+  {label:'Obie ręce – ćw. 21–23',             pages:[11]},
 ];
  
 const TOTAL=PAGES.length;
@@ -279,9 +454,7 @@ function buildToc(){
   TOC.forEach((sec,si)=>{
     const card=document.createElement('div');
     card.className='toc-card';
-    const pStr=sec.pages.length===1
-      ?'str. '+sec.pages[0]
-      :'str. '+sec.pages[0]+'–'+sec.pages[sec.pages.length-1];
+    const pStr=sec.pages.length===1?'str. '+sec.pages[0]:'str. '+sec.pages[0]+'–'+sec.pages[sec.pages.length-1];
     card.innerHTML=`<div class="toc-num">${si+1}</div><div class="toc-info"><div class="toc-label">${sec.label}</div><div class="toc-pages">${pStr}</div></div><div class="toc-arrow">›</div>`;
     card.onclick=()=>showBook(sec.pages[0]);
     list.appendChild(card);
@@ -305,7 +478,6 @@ function goTo(n){
 function prev(){goTo(current-1);}
 function next(){goTo(current+1);}
 function jumpTo(){const v=parseInt(document.getElementById('pageJump').value);if(!isNaN(v))goTo(v);}
- 
 function updateUI(){
   document.getElementById('pageCounter').textContent=current+' / '+TOTAL;
   document.getElementById('pageJump').value=current;
@@ -334,7 +506,217 @@ document.getElementById('pageDisplay').addEventListener('touchend',e=>{
 buildToc();
 goTo(1);
  
-// ── Modal lekcja próbna ────────────────────────────────────────────────────
+/* ══════════════════════════════════════════════
+   PASEK NARZĘDZI – toggle
+══════════════════════════════════════════════ */
+let toolState={metro:false,tuner:false};
+ 
+function toggleTool(tool){
+  toolState[tool]=!toolState[tool];
+  const panelEl=document.getElementById('toolsPanel');
+  const metroEl=document.getElementById('panelMetro');
+  const tunerEl=document.getElementById('panelTuner');
+  const sepEl  =document.getElementById('toolsSep');
+  const btnM   =document.getElementById('btnMetroIcon');
+  const btnT   =document.getElementById('btnTunerIcon');
+ 
+  metroEl.style.display=toolState.metro?'block':'none';
+  tunerEl.style.display=toolState.tuner?'block':'none';
+  sepEl.style.display  =(toolState.metro&&toolState.tuner)?'block':'none';
+ 
+  const anyOpen=toolState.metro||toolState.tuner;
+  panelEl.classList.toggle('open',anyOpen);
+ 
+  btnM.classList.toggle('active',toolState.metro);
+  btnT.classList.toggle('active',toolState.tuner);
+ 
+  if(!toolState.tuner)stopTuner();
+}
+ 
+/* ══════════════════════════════════════════════
+   METRONOM
+══════════════════════════════════════════════ */
+let bpm=120,running=false,nextTick=0,beat=0,audioCtx=null;
+const bpmEl   =document.getElementById('bpmScroll');
+const toggleBtn=document.getElementById('metroToggle');
+const metroIcon=document.getElementById('metroIcon');
+const beatDots =[...document.getElementById('beatRow').children];
+const tempoLbl =document.getElementById('tempoLabel');
+ 
+const TEMPOS=[[20,'Larghissimo'],[40,'Grave'],[60,'Largo'],[66,'Larghetto'],
+  [76,'Andante'],[108,'Moderato'],[120,'Allegro'],[156,'Vivace'],
+  [176,'Presto'],[200,'Prestissimo'],[250,'']];
+function getLabel(b){for(let i=TEMPOS.length-1;i>=0;i--)if(b>=TEMPOS[i][0])return TEMPOS[i][1];return '';}
+ 
+function setBpm(v){
+  bpm=Math.max(20,Math.min(300,v));
+  bpmEl.textContent=bpm;
+  tempoLbl.textContent=getLabel(bpm);
+}
+ 
+function tick(){
+  if(!running)return;
+  const now=audioCtx.currentTime;
+  if(now>=nextTick){
+    playClick();
+    beat=(beat+1)%4;
+    beatDots.forEach((d,i)=>d.classList.toggle('on',i===beat));
+    nextTick+=60/bpm;
+  }
+  requestAnimationFrame(tick);
+}
+function playClick(){
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  const down=beat===0;
+  o.frequency.value=down?1200:900;
+  g.gain.setValueAtTime(down?0.4:0.25,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
+  o.start();o.stop(audioCtx.currentTime+0.06);
+}
+function startMetro(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  running=true;beat=-1;nextTick=audioCtx.currentTime;
+  toggleBtn.classList.add('active');
+  metroIcon.className='ti ti-player-pause';
+  tick();
+}
+function stopMetroPlay(){
+  running=false;
+  toggleBtn.classList.remove('active');
+  metroIcon.className='ti ti-player-play';
+  beatDots.forEach(d=>d.classList.remove('on'));
+}
+toggleBtn.onclick=()=>running?stopMetroPlay():startMetro();
+document.getElementById('btnMinus').onclick=()=>setBpm(bpm-5);
+document.getElementById('btnPlus').onclick=()=>setBpm(bpm+5);
+ 
+let dragY=null,dragBpm=null;
+bpmEl.addEventListener('mousedown',e=>{dragY=e.clientY;dragBpm=bpm;e.preventDefault();});
+bpmEl.addEventListener('touchstart',e=>{dragY=e.touches[0].clientY;dragBpm=bpm;},{passive:true});
+window.addEventListener('mousemove',e=>{if(dragY===null)return;setBpm(dragBpm+Math.round((dragY-e.clientY)/2));});
+window.addEventListener('touchmove',e=>{if(dragY===null)return;setBpm(dragBpm+Math.round((dragY-e.touches[0].clientY)/2));},{passive:true});
+window.addEventListener('mouseup',()=>{dragY=null;});
+window.addEventListener('touchend',()=>{dragY=null;});
+bpmEl.addEventListener('wheel',e=>{e.preventDefault();setBpm(bpm+(e.deltaY<0?1:-1));},{passive:false});
+ 
+setBpm(120);
+ 
+/* ══════════════════════════════════════════════
+   TUNER
+══════════════════════════════════════════════ */
+const A4_REF=442;
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+ 
+function freqToInfo(freq){
+  if(!freq||freq<20)return null;
+  const midi=12*Math.log2(freq/A4_REF)+69;
+  const rounded=Math.round(midi);
+  const cents=Math.round((midi-rounded)*100);
+  const oct=Math.floor(rounded/12)-1;
+  const name=NOTES[((rounded%12)+12)%12];
+  return{name:name+oct,cents};
+}
+function autoCorrelate(buf,sr){
+  const SIZE=buf.length;
+  let rms=0;for(let i=0;i<SIZE;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/SIZE);
+  if(rms<0.01)return -1;
+  let r1=0,r2=SIZE-1;
+  for(let i=0;i<SIZE/2;i++){if(Math.abs(buf[i])<0.2){r1=i;break;}}
+  for(let i=1;i<SIZE/2;i++){if(Math.abs(buf[SIZE-i])<0.2){r2=SIZE-i;break;}}
+  buf=buf.slice(r1,r2);
+  const c=new Float32Array(buf.length).fill(0);
+  for(let i=0;i<buf.length;i++)for(let j=0;j<buf.length-i;j++)c[i]+=buf[j]*buf[j+i];
+  let d=0;while(c[d]>c[d+1])d++;
+  let maxval=-Infinity,maxpos=-1;
+  for(let i=d;i<buf.length;i++){if(c[i]>maxval){maxval=c[i];maxpos=i;}}
+  let T0=maxpos;
+  const x1=c[T0-1],x2=c[T0],x3=c[T0+1];
+  const a2=(x1+x3-2*x2)/2,b2=(x3-x1)/2;
+  if(a2)T0-=b2/(2*a2);
+  return sr/T0;
+}
+ 
+let tunerActive=false,analyser=null,tunerStream=null,tunerCtx=null,animId=null;
+const needleEl  =document.getElementById('tunerNeedle');
+const needleBar =document.getElementById('needleBar');
+const needleDot =document.getElementById('needleDot');
+const centValEl =document.getElementById('centVal');
+const noteNameEl=document.getElementById('noteName');
+const tunerStatus=document.getElementById('tunerStatus');
+const tunerBtn  =document.getElementById('tunerBtn');
+ 
+function setNeedle(cents){
+  const deg=Math.max(-90,Math.min(90,cents*1.8));
+  needleEl.style.transform=`translateX(-50%) rotate(${deg}deg)`;
+}
+function getColor(c){
+  const a=Math.abs(c);
+  return a<=5?'#16a34a':a<=20?'#d4af37':'#dc2626';
+}
+function analyze(){
+  if(!analyser)return;
+  const buf=new Float32Array(analyser.fftSize);
+  analyser.getFloatTimeDomainData(buf);
+  const freq=autoCorrelate(buf,tunerCtx.sampleRate);
+  if(freq>0){
+    const info=freqToInfo(freq);
+    if(info){
+      setNeedle(info.cents);
+      const col=getColor(info.cents);
+      centValEl.textContent=(info.cents>=0?'+':'')+info.cents+' ¢';
+      centValEl.style.color=col;
+      needleBar.style.background=col;
+      needleDot.style.background=col;
+      noteNameEl.textContent=info.name+' · '+Math.round(freq)+' Hz';
+      tunerStatus.textContent=Math.abs(info.cents)<=5?'✓ Nastrojony':'Nastraj...';
+      tunerStatus.style.color=col;
+    }
+  } else {
+    tunerStatus.textContent='Cisza...';
+    tunerStatus.style.color='#94a3b8';
+  }
+  animId=requestAnimationFrame(analyze);
+}
+async function startTuner(){
+  try{
+    tunerStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    tunerCtx=new(window.AudioContext||window.webkitAudioContext)();
+    analyser=tunerCtx.createAnalyser();analyser.fftSize=2048;
+    const src=tunerCtx.createMediaStreamSource(tunerStream);
+    src.connect(analyser);
+    tunerActive=true;
+    tunerBtn.classList.add('active');
+    tunerBtn.innerHTML='<i class="ti ti-microphone-off"></i> Wyłącz tuner';
+    tunerStatus.textContent='Nasłuchuję...';
+    analyze();
+  }catch(e){
+    tunerStatus.textContent='Brak dostępu do mikrofonu';
+  }
+}
+function stopTuner(){
+  if(animId)cancelAnimationFrame(animId);
+  if(tunerStream)tunerStream.getTracks().forEach(t=>t.stop());
+  if(tunerCtx)tunerCtx.close();
+  analyser=null;tunerCtx=null;tunerStream=null;animId=null;
+  tunerActive=false;
+  tunerBtn.classList.remove('active');
+  tunerBtn.innerHTML='<i class="ti ti-microphone"></i> Włącz tuner';
+  tunerStatus.textContent='Mikrofon wyłączony';
+  tunerStatus.style.color='#94a3b8';
+  setNeedle(0);
+  centValEl.textContent='— ¢';centValEl.style.color='var(--navy)';
+  noteNameEl.textContent='—';
+  needleBar.style.background='var(--navy)';
+  needleDot.style.background='var(--navy)';
+}
+tunerBtn.onclick=()=>tunerActive?stopTuner():startTuner();
+ 
+/* ══════════════════════════════════════════════
+   MODAL – lekcja próbna
+══════════════════════════════════════════════ */
 function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
 function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
 let mLoc='s',mPiano=true;
@@ -390,35 +772,5 @@ async function wyslijModal(){
   }
 }
 </script>
- 
-<!-- Modal lekcja próbna -->
-<div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
-  <div class="footer-modal">
-    <button class="modal-close" onclick="closeBookingModal()">✕</button>
-    <div class="modal-left">
-      <h3>Lekcja próbna</h3>
-      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
-      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
-      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-      <div id="m-piano-box">
-        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
-          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-right">
-      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
-      <input type="tel" id="m-phone" placeholder="Numer telefonu">
-      <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
-      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
-      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
-      <div id="modal-status"></div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
- 
