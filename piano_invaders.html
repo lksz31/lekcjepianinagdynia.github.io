@@ -449,7 +449,6 @@ canvas{display:block;position:fixed;top:44px;left:0;width:100vw;height:calc(100v
 </div>
  
 <script>
-'use strict';
  
 // ══ IMAGES ══
 const PIANO_IMG = new Image();
@@ -845,10 +844,12 @@ function startGame(){
  
 // ══ DEMO ANIMATION (slajd 2 — animowany strzał) ══
 let demoAnim=null,demoT=0;
-const demoCanvas=document.getElementById('demo-canvas');
-const demoCtx=demoCanvas.getContext('2d');
+let demoCanvas=null;
+let demoCtx=null;
  
 function startDemoAnimation(){
+  if(!demoCanvas){demoCanvas=document.getElementById("demo-canvas");if(demoCanvas)demoCtx=demoCanvas.getContext("2d");}
+  if(!demoCanvas)return;
   if(demoAnim)return;
   demoT=0;
   animateDemo();
@@ -938,8 +939,11 @@ function animateDemo(){
 }
  
 // ══ INIT TUTORIAL ══
-buildTutorialUI();
-updateTutorial();
+window.addEventListener("DOMContentLoaded", function(){
+  buildTutorialUI();
+  updateTutorial();
+});
 </script>
 </body>
+</html>
 </html>
