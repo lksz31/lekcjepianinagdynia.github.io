@@ -1,3 +1,6 @@
+Fiszki · HTML
+Copy
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -11,6 +14,8 @@
 :root{--gold:#d4af37;--navy:#1e3a8a;--green:#16a34a;--border:#e2e8f0;--text:#334155;--bg:#f8fafc;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+ 
+/* ── NAV ── */
 .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
 .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
 .site-nav a:hover{color:var(--gold);}
@@ -25,9 +30,13 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
 .mobile-nav a.mn-cta:hover{background:var(--gold);}
 @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+ 
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:100px 16px 40px;gap:12px;}
 .page-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--navy);text-align:center;}
 .page-title em{color:var(--gold);font-style:italic;}
+ 
+/* ── PANEL USTAWIEŃ ── */
 .ctrl-outer{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;max-width:1060px;overflow:hidden;}
 .ctrl-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
 .ctrl-topbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
@@ -38,7 +47,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .mb:hover:not(.active){background:#f0f7ff;}
 .ctrl-collapse-btn{padding:4px 10px;border-radius:50px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:0.7rem;color:#94a3b8;font-family:'Poppins',sans-serif;font-weight:600;flex-shrink:0;transition:0.2s;}
 .ctrl-collapse-btn:hover{border-color:var(--navy);color:var(--navy);}
-.ctrl-body{padding:12px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border);}
+.ctrl-body{padding:12px 16px;display:flex;flex-direction:column;gap:10px;}
 .ctrl-body.collapsed{display:none;}
 .ctrl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .ctrl-lbl{font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;white-space:nowrap;min-width:80px;}
@@ -49,15 +58,20 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .cb:disabled{opacity:0.35;cursor:not-allowed;border-color:#ccc;color:#ccc;}
 .slider-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:160px;position:relative;}
 .slider-wrap input[type=range]{flex:1;accent-color:var(--navy);cursor:pointer;height:6px;position:relative;z-index:1;}
-.slider-shimmer{position:absolute;top:50%;left:0;right:0;height:6px;transform:translateY(-50%);pointer-events:none;overflow:hidden;border-radius:3px;z-index:2;}
-.slider-shimmer::after{content:'';position:absolute;top:-100%;left:-60%;width:40%;height:300%;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.55) 50%,transparent 70%);animation:shimmerSlide 5.5s ease-in-out infinite;}
-@keyframes shimmerSlide{0%{left:-60%;}70%{left:120%;}100%{left:120%;}}
 .sl-lbl{font-size:0.69rem;color:#94a3b8;font-weight:700;}
 .sl-val{font-size:1.05rem;font-weight:800;color:var(--navy);min-width:26px;text-align:center;font-family:'Playfair Display',serif;}
 .sl-sfx{font-size:0.63rem;color:#94a3b8;font-weight:600;white-space:nowrap;}
 .ctrl-div{height:1px;background:var(--border);}
+.toggle-row{display:flex;align-items:center;gap:10px;}
+.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:20px;transition:0.3s;}
+.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+.toggle-switch input:checked+.toggle-slider{background:var(--navy);}
+.toggle-switch input:checked+.toggle-slider:before{transform:translateX(16px);}
+.toggle-lbl{font-size:0.72rem;font-weight:700;color:var(--text);}
  
-/* ── Mikrofon – osobny panel ustawień ── */
+/* ── PANEL MIKROFONU ── */
 .mic-settings-outer{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;max-width:1060px;overflow:hidden;}
 .mic-settings-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;gap:10px;cursor:pointer;user-select:none;}
 .mic-settings-topbar:hover{background:#f8fafc;}
@@ -66,8 +80,8 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .mic-settings-body{padding:12px 16px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border);}
 .mic-settings-body.collapsed{display:none;}
  
-/* ── Karta główna ── */
-.card{background:white;border-radius:28px;padding:18px 16px 18px 16px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:1060px;animation:fadeIn 0.35s ease;position:relative;}
+/* ── KARTA FISZKI ── */
+.card{background:white;border-radius:28px;padding:18px 16px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:1060px;animation:fadeIn 0.35s ease;position:relative;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .timer-disp{font-size:1.9rem;font-weight:800;color:var(--navy);font-family:'Playfair Display',serif;display:none;}
 .timer-disp.active{display:block;}
@@ -75,54 +89,26 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 .ok-msg{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--green);background:#dcfce7;padding:7px 22px;border-radius:50px;border:2px solid #86efac;display:none;text-align:center;}
 .ok-msg.show{display:block;}
  
-/* ── Pięciolinia + przyciski ── */
+/* ── PIĘCIOLINIA ── */
 .staff-row{display:flex;align-items:center;gap:0;width:100%;}
 .staff-wrap{flex:1;min-width:0;}
 canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
  
-/* ── Kolumna akcji: Dobrze / Losuj / Źle ── */
+/* ── KOLUMNA PRZYCISKÓW ── */
 .draw-col{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:6px;width:80px;flex-shrink:0;margin-left:8px;}
-@media(max-width:500px){
-  .draw-col{width:64px;margin-left:4px;}
-}
- 
-.draw-btn{
-  background:var(--navy);color:white;
-  padding:10px 6px;
-  border-radius:14px;
-  font-family:'Poppins',sans-serif;font-weight:800;font-size:0.78rem;
-  border:none;cursor:pointer;
-  transition:all 0.25s;
-  box-shadow:0 4px 18px rgba(30,58,138,0.28);
-  animation:pulse 2s infinite;
-  text-align:center;line-height:1.3;width:100%;
-}
+@media(max-width:500px){.draw-col{width:64px;margin-left:4px;}}
+.draw-btn{background:var(--navy);color:white;padding:10px 6px;border-radius:14px;font-family:'Poppins',sans-serif;font-weight:800;font-size:0.78rem;border:none;cursor:pointer;transition:all 0.25s;box-shadow:0 4px 18px rgba(30,58,138,0.28);animation:pulsebtn 2s infinite;text-align:center;line-height:1.3;width:100%;}
 .draw-btn:hover{background:var(--gold);transform:translateY(-2px);box-shadow:0 5px 18px rgba(212,175,55,0.35);}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);}70%{box-shadow:0 0 0 10px rgba(30,58,138,0);}100%{box-shadow:0 0 0 0 rgba(30,58,138,0);}}
- 
-.sc-btn{
-  display:none;
-  padding:0 4px;
-  border-radius:12px;
-  font-family:'Poppins',sans-serif;font-weight:800;
-  font-size:clamp(1.1rem,3.5vw,1.55rem);
-  border:2px solid;cursor:pointer;
-  transition:all 0.22s;width:100%;text-align:center;
-  flex-shrink:0;
-  height:52px;line-height:52px;
-}
-@media(max-width:500px){
-  .sc-btn{height:44px;line-height:44px;font-size:1.2rem;}
-  .draw-btn{font-size:0.7rem;padding:8px 4px;}
-}
+@keyframes pulsebtn{0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);}70%{box-shadow:0 0 0 10px rgba(30,58,138,0);}100%{box-shadow:0 0 0 0 rgba(30,58,138,0);}}
+.sc-btn{display:none;padding:0 4px;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(1.1rem,3.5vw,1.55rem);border:2px solid;cursor:pointer;transition:all 0.22s;width:100%;text-align:center;flex-shrink:0;height:52px;line-height:52px;}
+@media(max-width:500px){.sc-btn{height:44px;line-height:44px;font-size:1.2rem;}.draw-btn{font-size:0.7rem;padding:8px 4px;}}
 .sc-btn.visible{display:block;}
 .sc-btn.good{border-color:#22c55e;background:#f0fdf4;color:#15803d;}
 .sc-btn.good:hover{background:#22c55e;color:white;transform:translateY(-2px);box-shadow:0 4px 14px rgba(34,197,94,0.35);}
-.sc-btn.good:active{transform:scale(0.97);}
 .sc-btn.bad{border-color:#f87171;background:#fff5f5;color:#dc2626;}
 .sc-btn.bad:hover{background:#ef4444;color:white;transform:translateY(-2px);box-shadow:0 4px 14px rgba(239,68,68,0.35);border-color:#ef4444;}
-.sc-btn.bad:active{transform:scale(0.97);}
  
+/* ── REVEAL ── */
 .reveal-sec{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;}
 .names-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:38px;align-items:center;}
 .nb{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);font-weight:700;transition:all 0.25s;background:#f0f4ff;padding:2px 11px;border-radius:10px;border:1px solid #dbeafe;cursor:default;}
@@ -140,7 +126,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .mic-btn-inline{padding:5px 12px;border-radius:50px;border:2px solid var(--navy);background:white;color:var(--navy);font-weight:700;cursor:pointer;transition:0.2s;font-size:0.72rem;font-family:'Poppins',sans-serif;}
 .mic-btn-inline.on{background:var(--gold);border-color:var(--gold);color:white;}
  
-/* Panel live mikrofonu (wynik) */
+/* ── MIC LIVE ── */
 .mic-live-panel{width:100%;padding:7px 12px;border-radius:12px;background:#f8fafc;border:1px solid var(--border);display:none;flex-direction:column;gap:4px;}
 .mic-live-panel.on{display:flex;}
 .mic-lbl{font-size:0.63rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;}
@@ -150,11 +136,10 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .mic-res.ok{background:#dcfce7;color:var(--green);}
 .mic-res.bad{background:#fee2e2;color:#dc2626;}
 .mic-res.wait{background:#f1f5f9;color:#94a3b8;}
-.mic-res.spin{animation:spinText 0.4s ease-in-out;}
-@keyframes spinText{0%{transform:rotateX(0deg);opacity:1;}50%{transform:rotateX(90deg);opacity:0;}100%{transform:rotateX(0deg);opacity:1;}}
 .pitch-wrap{width:100%;height:4px;background:#e2e8f0;border-radius:3px;overflow:hidden;}
 .pitch-bar{height:100%;width:0;background:var(--navy);border-radius:3px;transition:width 0.1s,background 0.2s;}
  
+/* ── CHOICE ── */
 .choice-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%;max-width:720px;}
 .ch-btn{padding:18px 12px;border-radius:16px;border:2px solid var(--border);background:#f8fafc;font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--navy);cursor:pointer;transition:0.25s;text-align:center;}
 .ch-btn:hover{border-color:var(--navy);background:#f0f7ff;}
@@ -166,46 +151,52 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .score-bar strong{color:var(--navy);}
 .score-pct{font-size:0.68rem;color:#94a3b8;font-weight:500;}
  
-/* ── Sekcja "Umów termin" ── */
-.booking-section{width:100%;max-width:1060px;background:white;border-radius:28px;border:1px solid var(--border);box-shadow:0 8px 40px rgba(0,0,0,0.08);overflow:hidden;margin-top:8px;}
-.booking-header{background:linear-gradient(135deg,var(--navy) 0%,#2d56c7 100%);padding:32px 36px 28px;color:white;position:relative;overflow:hidden;}
-.booking-header::before{content:'𝄞';position:absolute;right:30px;top:10px;font-size:5rem;opacity:0.1;font-family:'Playfair Display',serif;pointer-events:none;}
-.booking-header h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:6px;}
-.booking-header p{font-size:0.85rem;opacity:0.8;font-weight:400;}
-.booking-body{display:grid;grid-template-columns:1fr 1.1fr;gap:0;}
-@media(max-width:680px){.booking-body{grid-template-columns:1fr;}}
-.booking-info{padding:28px 28px;border-right:1px solid var(--border);}
-@media(max-width:680px){.booking-info{border-right:none;border-bottom:1px solid var(--border);padding:20px;}}
-.booking-info-title{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:14px;}
-.booking-tile{background:#f8fafc;border:1px solid var(--border);border-radius:14px;padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:all 0.25s;font-size:0.85rem;color:var(--navy);}
-.booking-tile b{display:block;font-weight:700;margin-bottom:2px;}
-.booking-tile small{color:#64748b;font-size:0.78rem;}
-.booking-tile.selected{border-color:var(--navy);background:#f0f4ff;}
-.booking-tile:hover:not(.selected){border-color:#93c5fd;background:#f8faff;}
-.booking-price-box{background:#fffbeb;border:2px dashed var(--gold);border-radius:12px;padding:10px 14px;text-align:center;margin-top:14px;}
-.booking-price-box .price-val{font-weight:800;font-size:1.4rem;color:var(--navy);display:block;}
-.booking-price-box small{font-size:0.72rem;color:#92400e;}
-.booking-piano-box{display:none;margin-top:12px;}
-.booking-piano-box .bpb-title{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:8px;}
-.piano-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.piano-opt{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;text-align:center;font-size:0.8rem;font-weight:700;color:var(--navy);transition:0.2s;}
-.piano-opt.selected{border-color:var(--navy);background:#f0f4ff;}
-.piano-opt:hover:not(.selected){border-color:#93c5fd;}
+/* ── ANIMACJE ── */
+.note-fly{position:fixed;pointer-events:none;z-index:3000;font-size:1.6rem;will-change:transform,opacity;}
+.emoji-float{position:fixed;pointer-events:none;z-index:3001;font-size:1.2rem;will-change:transform,opacity;}
  
-.booking-form{padding:28px 28px;display:flex;flex-direction:column;gap:10px;}
-@media(max-width:680px){.booking-form{padding:20px;}}
-.booking-form-title{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:2px;}
-.bf-input{width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid var(--border);font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text);transition:0.2s;outline:none;}
-.bf-input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,138,0.08);}
-.bf-textarea{width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid var(--border);font-family:'Poppins',sans-serif;font-size:0.85rem;color:var(--text);resize:none;height:80px;transition:0.2s;outline:none;}
-.bf-textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,138,0.08);}
-.bf-submit{background:var(--navy);color:white;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;font-size:0.9rem;transition:0.3s;text-transform:uppercase;letter-spacing:0.05em;}
-.bf-submit:hover{background:var(--gold);}
-.bf-submit:disabled{opacity:0.5;cursor:not-allowed;}
-.bf-status{font-size:0.82rem;font-weight:600;text-align:center;min-height:18px;}
+/* ══════════════════════════════════════════
+   SEKCJA TERMINY — identyczna z index.html
+══════════════════════════════════════════ */
+.terminy-section{padding:80px 16px 0;width:100%;display:flex;justify-content:center;}
+.apple-card{
+  width:100%;max-width:1060px;
+  background:var(--navy);
+  border-radius:40px;
+  padding:40px 28px;
+  position:relative;overflow:hidden;
+  box-shadow:0 20px 50px rgba(0,0,0,0.15);
+}
+.apple-card-title{font-family:'Playfair Display',serif;text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);color:var(--gold);margin-bottom:25px;}
+.info-card{background:rgba(255,255,255,0.05);border-radius:28px;padding:18px;}
+.info-card iframe{width:100%;height:350px;border-radius:16px;border:none;filter:invert(92%) hue-rotate(190deg);display:block;}
+@media(max-width:500px){.info-card iframe{height:260px;}}
  
-/* ── Stopka ── */
-.site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:40px;}
+@keyframes pulse-gold{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.7);}70%{box-shadow:0 0 0 15px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
+.btn-open-form{display:block;width:fit-content;margin:22px auto 0;background:var(--gold);color:var(--navy);padding:15px 40px;border-radius:50px;font-weight:800;border:none;cursor:pointer;text-decoration:none;font-family:'Poppins',sans-serif;font-size:0.9rem;animation:pulse-gold 2s infinite;transition:transform 0.3s;}
+.btn-open-form:hover{transform:scale(1.05);}
+ 
+.form-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:white;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;box-sizing:border-box;clip-path:circle(0% at 50% 90%);transition:clip-path 0.8s cubic-bezier(0.7,0,0.3,1);overflow-y:auto;border-radius:40px;}
+.form-overlay.open{clip-path:circle(150% at 50% 90%);}
+.close-btn{position:absolute;top:16px;right:20px;font-size:1.5rem;color:var(--navy);cursor:pointer;font-weight:bold;background:none;border:none;font-family:'Poppins',sans-serif;}
+.form-content{width:100%;max-width:500px;text-align:center;color:var(--navy);}
+.form-content h3{font-family:'Playfair Display',serif;margin:0 0 12px;color:var(--navy);}
+.price-tag{background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:10px;margin-bottom:15px;}
+.bento-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
+.form-tile{background:#fff;border:1px solid #eee;border-radius:16px;padding:12px;text-align:left;cursor:pointer;transition:0.3s;font-size:0.85rem;color:var(--navy);}
+.form-tile.selected{border-color:var(--navy);background:#f0f4ff;}
+.form-tile:hover:not(.selected){border-color:#93c5fd;background:#f8faff;}
+#piano-options{display:none;margin-bottom:15px;animation:fadeInUp 0.4s;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.contact-box{background:var(--navy);border-radius:20px;padding:18px;}
+.contact-box input,.contact-box textarea{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.85rem;}
+.contact-box textarea{height:70px;resize:none;}
+.btn-submit{width:100%;background:#ccc;color:#666;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:not-allowed;transition:0.3s;font-family:'Poppins',sans-serif;font-size:0.9rem;}
+.btn-submit.active{background:var(--gold);color:white;cursor:pointer;animation:pulse-gold 2s infinite;}
+#res-status{margin-top:12px;font-weight:600;font-size:0.85rem;min-height:18px;text-align:center;}
+ 
+/* ── STOPKA ── */
+.site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:60px;}
 .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
 @media(max-width:900px){.footer-main{grid-template-columns:1fr 1fr;gap:2rem;}.footer-cta-col{grid-column:span 2;}}
 @media(max-width:560px){.footer-main{grid-template-columns:1fr;padding:2rem 0;}.footer-cta-col{grid-column:span 1;}}
@@ -230,7 +221,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .footer-copy{font-size:11px;color:#c0c0cc;}
 .footer-location{font-size:12px;color:#aaa;}
  
-/* Modal lekcja próbna */
+/* ── MODAL ── */
 .footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
 .footer-modal-overlay.open{opacity:1;pointer-events:all;}
 .footer-modal{background:white;border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
@@ -249,23 +240,10 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 .modal-submit-btn{background:var(--gold);color:white;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;font-size:0.9rem;transition:0.3s;text-transform:uppercase;}
 .modal-submit-btn:hover{opacity:0.9;}
 #modal-status{color:#22c55e;font-size:0.85rem;font-weight:600;text-align:center;min-height:20px;}
- 
-/* Animacje nutek */
-.note-fly{position:fixed;pointer-events:none;z-index:3000;font-size:1.6rem;will-change:transform,opacity;}
-.emoji-float{position:fixed;pointer-events:none;z-index:3001;font-size:1.2rem;will-change:transform,opacity;}
- 
-/* Toggle switch */
-.toggle-row{display:flex;align-items:center;gap:10px;}
-.toggle-switch{position:relative;width:36px;height:20px;flex-shrink:0;}
-.toggle-switch input{opacity:0;width:0;height:0;}
-.toggle-slider{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:20px;transition:0.3s;}
-.toggle-slider:before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
-.toggle-switch input:checked+.toggle-slider{background:var(--navy);}
-.toggle-switch input:checked+.toggle-slider:before{transform:translateX(16px);}
-.toggle-lbl{font-size:0.72rem;font-weight:700;color:var(--text);}
 </style>
 </head>
 <body>
+ 
 <nav class="site-nav">
   <a href="index.html">Strona główna</a>
   <a href="fiszki.html">Fiszki</a>
@@ -278,8 +256,8 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
     <a href="index.html"><span class="mn-icon">🏠</span>Główna</a>
     <a href="index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
     <a href="#" class="mn-cta" onclick="openBookingModal();return false;">🎹 Umów</a>
-    <a href="fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
-    <a href="podrecznik.html" class="active"><span class="mn-icon">📖</span>Podręcznik</a>
+    <a href="fiszki.html" class="active"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
  
@@ -325,7 +303,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       <span class="ctrl-lbl">Nut naraz</span>
       <div class="slider-wrap">
         <span class="sl-lbl">1</span>
-        <input type="range" id="slider" min="1" max="10" value="1" oninput="setN(+this.value)"><div class="slider-shimmer"></div>
+        <input type="range" id="slider" min="1" max="10" value="1" oninput="setN(+this.value)">
         <span class="sl-lbl">10</span>
       </div>
     </div>
@@ -339,7 +317,6 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       </div>
     </div>
     <div class="ctrl-div"></div>
-    <!-- Ustawienia wyświetlania -->
     <div class="ctrl-row">
       <span class="ctrl-lbl">Widok</span>
       <div class="toggle-row">
@@ -363,48 +340,41 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
   </div>
 </div>
  
-<!-- ── Panel ustawień mikrofonu ── -->
+<!-- ── Panel mikrofonu ── -->
 <div class="mic-settings-outer">
   <div class="mic-settings-topbar" onclick="toggleMicPanel()">
     <div class="mic-settings-title">🎤 <span>Ustawienia mikrofonu</span></div>
     <button class="ctrl-collapse-btn" id="micPanelBtn" style="pointer-events:none;">▼ Rozwiń</button>
   </div>
   <div class="mic-settings-body collapsed" id="micSettingsBody">
-    <!-- Włącz mikrofon -->
     <div class="ctrl-row">
       <span class="ctrl-lbl">Mikrofon</span>
       <button class="mic-btn-inline" id="micBtn" onclick="toggleMic()">🎤 Włącz mikrofon</button>
     </div>
     <div class="ctrl-div"></div>
-    <!-- Tolerancja Hz -->
     <div class="ctrl-row">
       <span class="ctrl-lbl">Tolerancja</span>
       <div class="slider-wrap">
         <span class="sl-lbl">0.5%</span>
         <input type="range" id="sliderTol" min="5" max="50" value="15" oninput="updateTolLabel(this.value)">
-        <div class="slider-shimmer"></div>
         <span class="sl-lbl">5%</span>
       </div>
       <span class="sl-sfx" id="tolVal">1.5%</span>
     </div>
-    <!-- Czułość mikrofonu -->
     <div class="ctrl-row">
       <span class="ctrl-lbl">Czułość</span>
       <div class="slider-wrap">
         <span class="sl-lbl">1×</span>
         <input type="range" id="sliderGain" min="10" max="50" value="20" oninput="updateGainLabel(this.value)">
-        <div class="slider-shimmer"></div>
         <span class="sl-lbl">5×</span>
       </div>
       <span class="sl-sfx" id="gainVal">2.0×</span>
     </div>
-    <!-- Strojenie -->
     <div class="ctrl-row">
       <span class="ctrl-lbl">Strój</span>
       <div class="slider-wrap">
         <span class="sl-lbl">-12</span>
         <input type="range" id="sliderTune" min="-12" max="12" value="0" oninput="updateTuneLabel(this.value)">
-        <div class="slider-shimmer"></div>
         <span class="sl-lbl">+12</span>
       </div>
       <span class="sl-sfx" id="tuneVal">0 st.</span>
@@ -416,20 +386,16 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
 <div class="card" id="card">
   <div class="timer-disp" id="timerDisp">0:10</div>
   <div class="ok-msg" id="okMsg">✓ Brawo!</div>
- 
   <div class="staff-row">
     <div class="staff-wrap">
       <canvas id="C" width="900" height="440"></canvas>
     </div>
-    <!-- Kolumna: Dobrze / Losuj / Źle -->
     <div class="draw-col">
       <button class="sc-btn good" id="scGood" onclick="handleSelfCheck(true)">🎉</button>
       <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
       <button class="sc-btn bad" id="scBad" onclick="handleSelfCheck(false)">😬</button>
     </div>
   </div>
- 
-  <!-- Reveal mode -->
   <div class="reveal-sec" id="revealSec">
     <div class="names-row" id="namesRow"></div>
     <div class="reveal-bar">
@@ -446,8 +412,6 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       <div class="pitch-wrap"><div class="pitch-bar" id="pitchBar"></div></div>
     </div>
   </div>
- 
-  <!-- Choice mode -->
   <div id="choiceSec" style="display:none;">
     <div class="names-row" id="namesRowC" style="margin-bottom:8px;"></div>
     <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:8px;flex-wrap:wrap;">
@@ -464,48 +428,58 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
   <span class="score-pct" id="sPct"></span>
 </div>
  
-<!-- ── Sekcja: Umów termin ── -->
-<div class="booking-section" id="terminy">
-  <div class="booking-header">
-    <h2>🎹 Umów termin</h2>
-    <p>Lekcja próbna bez zobowiązań – sprawdź, czy to dla Ciebie!</p>
-  </div>
-  <div class="booking-body">
-    <div class="booking-info">
-      <div class="booking-info-title">Miejsce zajęć</div>
-      <div class="booking-tile selected" id="bt-s" onclick="bSetLoc('s')">
-        <b>🏠 W studio</b>
-        <small>Gdynia Mały Kack</small>
-      </div>
-      <div class="booking-tile" id="bt-u" onclick="bSetLoc('u')">
-        <b>🚗 U ucznia</b>
-        <small>Dojazd do Ciebie</small>
-      </div>
-      <div class="booking-piano-box" id="bPianoBox">
-        <div class="bpb-title">Czy masz pianino?</div>
-        <div class="piano-opts">
-          <div class="piano-opt selected" id="bp-y" onclick="bSetPiano(true)">✅ Mam</div>
-          <div class="piano-opt" id="bp-n" onclick="bSetPiano(false)">❌ Nie mam<br><small style="font-size:0.7rem;font-weight:400;">(+20 zł)</small></div>
-        </div>
-      </div>
-      <div class="booking-price-box">
-        <span class="price-val" id="bPrice">99 zł / h</span>
-        <small>Lekcja próbna · płatność po zajęciach</small>
-      </div>
+</main>
+ 
+<!-- ══ SEKCJA TERMINY — jak w index.html ══ -->
+<div class="terminy-section">
+  <div class="apple-card" id="appleCard">
+    <h2 class="apple-card-title">Wolne Terminy</h2>
+    <div class="info-card">
+      <iframe
+        src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com"
+        title="Kalendarz terminów">
+      </iframe>
+      <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
     </div>
-    <div class="booking-form">
-      <div class="booking-form-title">Twoje dane</div>
-      <input class="bf-input" id="bf-name" type="text" placeholder="Imię i nazwisko">
-      <input class="bf-input" id="bf-phone" type="tel" placeholder="Numer telefonu">
-      <input class="bf-input" id="bf-email" type="email" placeholder="Adres email">
-      <textarea class="bf-textarea" id="bf-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
-      <button class="bf-submit" id="bfSubmitBtn" onclick="wyslijBooking()">WYŚLIJ PROŚBĘ O LEKCJĘ</button>
-      <div class="bf-status" id="bfStatus"></div>
+ 
+    <!-- Formularz — clip-path wjazd z dołu -->
+    <div class="form-overlay" id="formOverlay">
+      <button class="close-btn" onclick="toggleForm(false)">✕</button>
+      <div class="form-content">
+        <h3>Szczegóły rezerwacji</h3>
+        <div class="price-tag">
+          <span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span>
+        </div>
+        <div class="bento-grid">
+          <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')">
+            <b>W studio</b><br><small>Gdynia Mały Kack</small>
+          </div>
+          <div class="form-tile" id="loc-uczen" onclick="setLoc('uczen')">
+            <b>U ucznia</b><br><small>Dojazd do Ciebie</small>
+          </div>
+        </div>
+        <div id="piano-options">
+          <div class="bento-grid">
+            <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)">
+              <b>Mam pianino</b><br><small>Standard</small>
+            </div>
+            <div class="form-tile" id="piano-no" onclick="setPiano(false)">
+              <b>Nie mam</b><br><small>Dowóz instrumentu (+20 zł)</small>
+            </div>
+          </div>
+        </div>
+        <div class="contact-box">
+          <input type="text"  id="res-name"  placeholder="Twoje imię i nazwisko" oninput="val()">
+          <input type="tel"   id="res-phone" placeholder="Numer telefonu"         oninput="val()">
+          <input type="email" id="res-email" placeholder="Adres email"            oninput="val()">
+          <textarea           id="res-msg"   placeholder="Dodatkowe informacje (wiek, doświadczenie, preferowane godziny...)"></textarea>
+          <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
+        </div>
+        <div id="res-status"></div>
+      </div>
     </div>
   </div>
 </div>
- 
-</main>
  
 <footer class="site-footer">
   <div class="footer-main">
@@ -540,7 +514,7 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       </ul>
     </div>
     <div class="footer-cta-col">
-      <a href="#terminy" class="footer-cta-btn">🎹 Umów lekcję próbną</a>
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
     </div>
   </div>
   <div style="max-width:1100px;margin:0 auto;">
@@ -570,10 +544,10 @@ canvas#C{width:100%;height:auto;display:block;border-radius:10px;}
       </div>
     </div>
     <div class="modal-right">
-      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
-      <input type="tel" id="m-phone" placeholder="Numer telefonu">
+      <input type="text"  id="m-name"  placeholder="Twoje imię i nazwisko">
+      <input type="tel"   id="m-phone" placeholder="Numer telefonu">
       <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
-      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
+      <textarea           id="m-msg"   placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
       <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
       <div id="modal-status"></div>
     </div>
@@ -639,49 +613,29 @@ let panelOpen=true,micSettingsOpen=false;
 let lastDrawnNote=null;
 let selfCheckActive=false;
 let feedbackTimeout=null;
- 
-// Ustawienia mikrofonu
-let micTolerance=0.015; // 1.5%
-let micGain=2.0;
-let micTuneSteps=0; // semitony
- 
-// Pozycje nutek na canvasie (do animacji)
+let micTolerance=0.015,micGain=2.0,micTuneSteps=0;
 let noteCanvasPositions=[];
  
 // ══════════════════════════════════════════════════════════
-// PANEL USTAWIEŃ
+// PANEL
 // ══════════════════════════════════════════════════════════
 function togglePanel(){
   panelOpen=!panelOpen;
   document.getElementById('ctrlBody').classList.toggle('collapsed',!panelOpen);
   document.getElementById('collapseBtn').textContent=panelOpen?'▲ Zwiń':'▼ Rozwiń';
 }
- 
 function toggleMicPanel(){
   micSettingsOpen=!micSettingsOpen;
   document.getElementById('micSettingsBody').classList.toggle('collapsed',!micSettingsOpen);
   document.getElementById('micPanelBtn').textContent=micSettingsOpen?'▲ Zwiń':'▼ Rozwiń';
 }
- 
-function updateTolLabel(v){
-  micTolerance=v/1000;
-  document.getElementById('tolVal').textContent=(v/10).toFixed(1)+'%';
-}
-function updateGainLabel(v){
-  micGain=v/10;
-  document.getElementById('gainVal').textContent=(v/10).toFixed(1)+'×';
-}
-function updateTuneLabel(v){
-  micTuneSteps=+v;
-  document.getElementById('tuneVal').textContent=(v>=0?'+':'')+v+' st.';
-}
- 
+function updateTolLabel(v){micTolerance=v/1000;document.getElementById('tolVal').textContent=(v/10).toFixed(1)+'%';}
+function updateGainLabel(v){micGain=v/10;document.getElementById('gainVal').textContent=(v/10).toFixed(1)+'×';}
+function updateTuneLabel(v){micTuneSteps=+v;document.getElementById('tuneVal').textContent=(v>=0?'+':'')+v+' st.';}
 function updatePlayBtnVisibility(){
   const show=document.getElementById('togglePlayBtn').checked;
-  const el=document.getElementById('playBtnEl');
-  const elC=document.getElementById('playBtnChoiceEl');
-  if(el)el.style.display=show?'':'none';
-  if(elC)elC.style.display=show?'':'none';
+  document.getElementById('playBtnEl').style.display=show?'':'none';
+  document.getElementById('playBtnChoiceEl').style.display=show?'':'none';
 }
  
 // ══════════════════════════════════════════════════════════
@@ -690,13 +644,11 @@ function updatePlayBtnVisibility(){
 const STEP=20,LX=95,RE=28;
 const cv=document.getElementById('C');
 const ctx2d=cv.getContext('2d');
- 
 function ny(st,p){return st+4*STEP-p*(STEP/2);}
  
 const cfont=new FontFace('NotoMusic',"url('https://fonts.gstatic.com/s/notomusic/v20/pe0rMImSLYT1-7EeGl95MqrFJA.woff2')");
 cfont.load().then(f=>{document.fonts.add(f);render([]);}).catch(()=>{});
  
-// Zapisuje pozycje nutek na canvasie do animacji
 function computeNotePositions(items,tops,clefs,ns,nw){
   noteCanvasPositions=[];
   const dual=(clef==='both');
@@ -705,18 +657,12 @@ function computeNotePositions(items,tops,clefs,ns,nw){
     items.forEach((it,i)=>{
       const si=clefs.indexOf(it.ct);
       if(si<0){noteCanvasPositions.push(null);return;}
-      const nx=ns+sp*(i+1);
-      const st=tops[si];
-      const nyv=ny(st,it.n.p);
-      noteCanvasPositions.push({nx,ny:nyv});
+      noteCanvasPositions.push({nx:ns+sp*(i+1),ny:ny(tops[si],it.n.p)});
     });
   }else{
     const sp=nw/(items.length+1);
     items.forEach((it,i)=>{
-      const nx=ns+sp*(i+1);
-      const st=tops[0];
-      const nyv=ny(st,it.n.p);
-      noteCanvasPositions.push({nx,ny:nyv});
+      noteCanvasPositions.push({nx:ns+sp*(i+1),ny:ny(tops[0],it.n.p)});
     });
   }
 }
@@ -727,10 +673,8 @@ function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
   cv.width=BASE_W*dpr;cv.height=BASE_H*dpr;
   ctx2d.setTransform(dpr,0,0,dpr,0,0);
   const W=BASE_W,H=BASE_H;
- 
   ctx2d.clearRect(0,0,W,H);
   ctx2d.fillStyle='#fff';ctx2d.beginPath();ctx2d.roundRect(0,0,W,H,12);ctx2d.fill();
- 
   const dual=(clef==='both');
   let tops,clefs2;
   if(dual){
@@ -739,7 +683,6 @@ function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
   }else{
     tops=[Math.round(H/2-2*STEP)];clefs2=[clef];
   }
- 
   if(dual){
     const ty=tops[0],by=tops[1]+4*STEP,mid=(ty+by)/2,aw=15;
     ctx2d.save();ctx2d.strokeStyle='#1e3a8a';ctx2d.fillStyle='#1e3a8a';ctx2d.lineCap='round';
@@ -751,7 +694,6 @@ function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
     ctx2d.beginPath();ctx2d.moveTo(LX-3,by);ctx2d.lineTo(LX-9,by-11);ctx2d.lineTo(LX-1,by-6);ctx2d.closePath();ctx2d.fill();
     ctx2d.restore();
   }
- 
   tops.forEach((st,si)=>{
     ctx2d.strokeStyle='#1e3a8a';ctx2d.lineWidth=1.5;
     for(let i=0;i<5;i++){const y=st+i*STEP;ctx2d.beginPath();ctx2d.moveTo(LX,y);ctx2d.lineTo(W-RE,y);ctx2d.stroke();}
@@ -760,25 +702,19 @@ function render(items,highlightIdx=-1,highlightColor='#1e3a8a'){
   });
   ctx2d.strokeStyle='#1e3a8a';ctx2d.lineWidth=2.5;
   ctx2d.beginPath();ctx2d.moveTo(W-RE,tops[0]);ctx2d.lineTo(W-RE,tops[tops.length-1]+4*STEP);ctx2d.stroke();
- 
   if(!items||!items.length)return;
- 
   const ns=LX+90,ne=W-RE-15,nw=ne-ns;
   computeNotePositions(items,tops,clefs2,ns,nw);
- 
   if(dual){
     const sp=nw/(items.length+1);
     items.forEach((it,i)=>{
-      const si=clefs2.indexOf(it.ct);
-      if(si<0)return;
-      const col=i===highlightIdx?highlightColor:'#1e3a8a';
-      drawNote(tops[si],it.n,ns+sp*(i+1),it.n.p<=4,col,it.n.a,it.ct==='bass');
+      const si=clefs2.indexOf(it.ct);if(si<0)return;
+      drawNote(tops[si],it.n,ns+sp*(i+1),it.n.p<=4,i===highlightIdx?highlightColor:'#1e3a8a',it.n.a,it.ct==='bass');
     });
   }else{
     const sp=nw/(items.length+1);
     items.forEach((it,i)=>{
-      const col=i===highlightIdx?highlightColor:'#1e3a8a';
-      drawNote(tops[0],it.n,ns+sp*(i+1),it.n.p<=4,col,it.n.a,clef==='bass');
+      drawNote(tops[0],it.n,ns+sp*(i+1),it.n.p<=4,i===highlightIdx?highlightColor:'#1e3a8a',it.n.a,clef==='bass');
     });
   }
 }
@@ -799,16 +735,16 @@ function drawNote(st,n,nx,stemUp,col,accSign,isBasClef){
 }
  
 function drawTreble(st){
-  const topY=st-STEP*0.15,H2=4*STEP+STEP*1.5;
   ctx2d.save();ctx2d.fillStyle='#1e3a8a';
+  const H2=4*STEP+STEP*1.5;
   ctx2d.font=(H2*0.92)+'px NotoMusic,Times New Roman,serif';
-  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D11E}',LX+3,topY-H2*0.04);ctx2d.restore();
+  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D11E}',LX+3,st-H2*0.04-STEP*0.15);ctx2d.restore();
 }
 function drawBass(st){
-  const topY=st-STEP*0.45,H2=STEP*4.2;
   ctx2d.save();ctx2d.fillStyle='#1e3a8a';
+  const H2=STEP*4.2;
   ctx2d.font=(H2*1.1)+'px NotoMusic,Times New Roman,serif';
-  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D122}',LX+2,topY-STEP*0.05);ctx2d.restore();
+  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D122}',LX+2,st-STEP*0.45-STEP*0.05);ctx2d.restore();
 }
  
 // ══════════════════════════════════════════════════════════
@@ -819,11 +755,8 @@ function pool(ct){
   const alts=ct==='bass'?B_ALT:T_ALT;
   let arr;
   if(clef==='both'){
-    if(range==='small'){
-      arr=ct==='bass'?base.filter(n=>n.p>=3&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=4);
-    }else{
-      arr=ct==='bass'?base.filter(n=>n.p>=-6&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=14);
-    }
+    if(range==='small'){arr=ct==='bass'?base.filter(n=>n.p>=3&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=4);}
+    else{arr=ct==='bass'?base.filter(n=>n.p>=-6&&n.p<=10):base.filter(n=>n.p>=-2&&n.p<=14);}
   }else if(ct==='bass'){
     arr=range==='small'?base.filter(n=>n.p>=3&&n.p<=13):base.filter(n=>n.p>=-7);
   }else{
@@ -852,12 +785,10 @@ function go(){
   document.getElementById('choiceGrid').innerHTML='';
   document.getElementById('revBtn').textContent='Pokaż nuty';
   document.getElementById('okMsg').classList.remove('show');
-  buildNotes();
-  render(notes);
+  buildNotes();render(notes);
   if(mode==='reveal'){
     if(micOn){cnt++;document.getElementById('sCnt').textContent=cnt;updScore();}
-    selfCheckActive=true;
-    updateSelfCheckVisibility();
+    selfCheckActive=true;updateSelfCheckVisibility();
     document.getElementById('revealSec').style.display='flex';
     document.getElementById('choiceSec').style.display='none';
     notes.forEach(()=>{
@@ -866,8 +797,7 @@ function go(){
     });
     resetMicUI();
   }else{
-    selfCheckActive=false;
-    updateSelfCheckVisibility();
+    selfCheckActive=false;updateSelfCheckVisibility();
     cnt++;document.getElementById('sCnt').textContent=cnt;
     document.getElementById('revealSec').style.display='none';
     document.getElementById('choiceSec').style.display='block';
@@ -881,25 +811,23 @@ function buildNotes(){
   if(clef==='both'){
     for(let i=0;i<noteCount;i++){
       const ct=Math.random()<0.5?'treble':'bass';
-      const p=pool(ct);
-      notes.push({n:p[rnd(p.length)],ct});
+      const p=pool(ct);notes.push({n:p[rnd(p.length)],ct});
     }
   }else{
-    const p=pool(clef);
-    const usedNotes=new Set();
+    const p=pool(clef);const usedNotes=new Set();
     for(let i=0;i<noteCount;i++){
       let note,attempts=0;
       do{
         note=p[rnd(p.length)];
         const noteKey=note.l+'_'+note.p;
-        if(noteCount===1&&lastDrawnNote&&note.l===lastDrawnNote.l&&note.p===lastDrawnNote.p){note=null;}
-        if(note&&usedNotes.has(noteKey)){note=null;}
+        if(noteCount===1&&lastDrawnNote&&note.l===lastDrawnNote.l&&note.p===lastDrawnNote.p)note=null;
+        if(note&&usedNotes.has(noteKey))note=null;
         attempts++;
       }while(!note&&attempts<100);
       if(note){notes.push({n:note,ct:clef});usedNotes.add(note.l+'_'+note.p);}
     }
   }
-  if(noteCount===1&&notes.length>0){lastDrawnNote=notes[0].n;}
+  if(noteCount===1&&notes.length>0)lastDrawnNote=notes[0].n;
 }
  
 function updateSelfCheckVisibility(){
@@ -908,8 +836,19 @@ function updateSelfCheckVisibility(){
   document.getElementById('scBad').classList.toggle('visible',show);
 }
  
+function toggleReveal(){
+  revealState=!revealState;
+  document.getElementById('revBtn').textContent=revealState?'Ukryj nuty':'Pokaż nuty';
+  const children=document.getElementById('namesRow').children;
+  notes.forEach((it,i)=>{
+    const b=children[i];if(!b)return;
+    if(revealState){b.classList.remove('hidden');b.textContent=it.n.l;if(it.n.kontra)b.classList.add('kontra');}
+    else{b.classList.add('hidden');b.textContent='?';b.className='nb hidden';}
+  });
+}
+ 
 // ══════════════════════════════════════════════════════════
-// SAMOOCENA (Dobrze/Źle)
+// SAMOOCENA
 // ══════════════════════════════════════════════════════════
 const EMOJIS_GOOD=['🎉','🥳','🌟','👏','🎯','💪','🏆','✨','🔥','😄'];
 const EMOJIS_BAD=['😬','😅','🙈','💀','😵','🤦','🫠','😤','😭','🤷'];
@@ -920,75 +859,37 @@ function nextEmojiBad(){emojiBadIdx=(emojiBadIdx+1)%EMOJIS_BAD.length;return EMO
 function handleSelfCheck(correct){
   if(mode==='reveal'&&!selfCheckActive)return;
   cnt++;document.getElementById('sCnt').textContent=cnt;
-  if(correct){
-    ok++;
-    playPyk(true);
-    // Animacja: tyle nutek ile wylosowanych, każda ze swojej pozycji na canvasie
-    flyNotesFromCanvas(EMOJIS_GOOD[emojiGoodIdx]);
-    document.getElementById('scGood').textContent=nextEmojiGood();
-  }else{
-    playPyk(false);
-    flyNotesFromCanvas(EMOJIS_BAD[emojiBadIdx]);
-    document.getElementById('scBad').textContent=nextEmojiBad();
-  }
-  updScore();
-  go();
+  if(correct){ok++;playPyk(true);flyNotesFromCanvas(EMOJIS_GOOD[emojiGoodIdx]);document.getElementById('scGood').textContent=nextEmojiGood();}
+  else{playPyk(false);flyNotesFromCanvas(EMOJIS_BAD[emojiBadIdx]);document.getElementById('scBad').textContent=nextEmojiBad();}
+  updScore();go();
 }
  
-// ══════════════════════════════════════════════════════════
-// ANIMACJE NUTEK – KAŻDA OD SWOJEJ NUTY
-// ══════════════════════════════════════════════════════════
 function getCanvasNoteScreenPos(idx){
-  // Przelicz pozycję nuty z canvas-coords na screen-coords
   const rect=cv.getBoundingClientRect();
-  const pos=noteCanvasPositions[idx];
-  if(!pos)return null;
-  const scaleX=rect.width/900;
-  const scaleY=rect.height/440;
-  return{
-    x:rect.left+pos.nx*scaleX,
-    y:rect.top+pos.ny*scaleY
-  };
+  const pos=noteCanvasPositions[idx];if(!pos)return null;
+  return{x:rect.left+pos.nx*(rect.width/900),y:rect.top+pos.ny*(rect.height/440)};
 }
  
 function flyNotesFromCanvas(sharedEmoji){
-  const targets=[
-    document.getElementById('scGood'),
-    document.getElementById('scBad'),
-    document.getElementById('draw-btn')
-  ];
-  // Cel: środek kolumny przycisków (draw-col)
   const drawCol=document.querySelector('.draw-col');
   const dcRect=drawCol?drawCol.getBoundingClientRect():null;
   const toX=dcRect?(dcRect.left+dcRect.width/2):window.innerWidth/2;
   const toY=dcRect?(dcRect.top+dcRect.height/2):window.innerHeight/2;
- 
   notes.forEach((_,i)=>{
-    const from=getCanvasNoteScreenPos(i);
-    if(!from)return;
-    const delay=i*80;
-    setTimeout(()=>{
-      flyOneNote(from.x,from.y,toX,toY,sharedEmoji);
-    },delay);
+    const from=getCanvasNoteScreenPos(i);if(!from)return;
+    setTimeout(()=>flyOneNote(from.x,from.y,toX,toY,sharedEmoji),i*80);
   });
 }
  
 function flyOneNote(fromX,fromY,toX,toY,emoji){
-  // Dźwięk pop
-  if(document.getElementById('togglePopSound').checked){
-    playPop();
-  }
- 
+  if(document.getElementById('togglePopSound').checked)playPop();
   const note=document.createElement('div');
-  note.className='note-fly';
-  note.textContent='♩';
+  note.className='note-fly';note.textContent='♩';
   note.style.cssText=`left:${fromX}px;top:${fromY}px;color:#1e3a8a;`;
   document.body.appendChild(note);
- 
   const midX=(fromX+toX)/2+(Math.random()-0.5)*120;
   const midY=Math.min(fromY,toY)-80-Math.random()*60;
   const dur=700;const startT=performance.now();
- 
   (function step(now){
     const t=Math.min((now-startT)/dur,1);
     const e2=t<0.5?2*t*t:(1-Math.pow(-2*t+2,2)/2);
@@ -999,16 +900,13 @@ function flyOneNote(fromX,fromY,toX,toY,emoji){
     note.style.left=x+'px';note.style.top=y+'px';
     note.style.transform=`translate(-50%,-50%) scale(${sc})`;
     note.style.opacity=op;
-    if(t<1){requestAnimationFrame(step);}
-    else{note.remove();spawnSpecificEmoji(toX,toY,emoji);}
+    if(t<1){requestAnimationFrame(step);}else{note.remove();spawnSpecificEmoji(toX,toY,emoji);}
   })(startT);
 }
  
 function spawnSpecificEmoji(x,y,emoji){
-  const el=document.createElement('div');
-  el.className='emoji-float';el.textContent=emoji;
-  el.style.cssText=`left:${x}px;top:${y}px;`;
-  document.body.appendChild(el);
+  const el=document.createElement('div');el.className='emoji-float';el.textContent=emoji;
+  el.style.cssText=`left:${x}px;top:${y}px;`;document.body.appendChild(el);
   const dur=1300;const startT=performance.now();
   const ampX=25+Math.random()*25;const freq=2.5+Math.random()*2;
   (function step(now){
@@ -1024,10 +922,8 @@ function spawnSpecificEmoji(x,y,emoji){
   })(startT);
 }
  
-// Stara animacja (tryb choice) – jedna nutka do przycisku
 function flyNoteAnimation(fromEl,toEl){
-  const from=fromEl.getBoundingClientRect();
-  const to=toEl.getBoundingClientRect();
+  const from=fromEl.getBoundingClientRect();const to=toEl.getBoundingClientRect();
   flyOneNote(from.left+from.width/2,from.top+from.height/2,to.left+to.width/2,to.top+to.height/2,'🎵');
 }
  
@@ -1035,22 +931,16 @@ function flyNoteAnimation(fromEl,toEl){
 // TRYB CHOICE
 // ══════════════════════════════════════════════════════════
 function buildChoiceUI(){
-  const namesRowC=document.getElementById('namesRowC');
-  namesRowC.innerHTML='';
+  const namesRowC=document.getElementById('namesRowC');namesRowC.innerHTML='';
   notes.forEach((it,i)=>{
-    const b=document.createElement('div');
-    b.className='nb'+(i===0?' guess-cur':'');
-    b.id='nc-'+i;b.textContent='?';
-    namesRowC.appendChild(b);
+    const b=document.createElement('div');b.className='nb'+(i===0?' guess-cur':'');
+    b.id='nc-'+i;b.textContent='?';namesRowC.appendChild(b);
   });
-  guessIdx=0;
-  render(notes,0,'#d4af37');
-  buildChoiceButtons();
+  guessIdx=0;render(notes,0,'#d4af37');buildChoiceButtons();
 }
  
 function buildChoiceButtons(){
-  const grid=document.getElementById('choiceGrid');
-  grid.innerHTML='';
+  const grid=document.getElementById('choiceGrid');grid.innerHTML='';
   const it=notes[guessIdx];if(!it)return;
   const p=pool(it.ct).filter(n=>n.l!==it.n.l);
   const wrong=[];const used=new Set([it.n.l]);
@@ -1060,10 +950,8 @@ function buildChoiceButtons(){
   const opts=shuffle([it.n,...wrong]);
   opts.forEach(n=>{
     const btn=document.createElement('button');
-    btn.className='ch-btn'+(n.kontra?' kontra':'');
-    btn.textContent=n.l;
-    btn.onclick=()=>handleChoice(n,it.n);
-    grid.appendChild(btn);
+    btn.className='ch-btn'+(n.kontra?' kontra':'');btn.textContent=n.l;
+    btn.onclick=()=>handleChoice(n,it.n);grid.appendChild(btn);
   });
 }
  
@@ -1074,15 +962,12 @@ function handleChoice(chosen,correct){
   if(chosen.l===correct.l){
     allBtns.forEach(b=>{if(b.textContent.startsWith(correct.l))b.classList.add('ok');});
     if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=correct.l;if(correct.kontra)nb.classList.add('kontra');}
-    render(notes,guessIdx,'#16a34a');
-    playPyk(true);
-    const clickedBtn=Array.from(allBtns).find(b=>b.textContent===chosen.l)||allBtns[0];
-    flyNoteAnimation(document.getElementById('C'),clickedBtn);
+    render(notes,guessIdx,'#16a34a');playPyk(true);
+    flyNoteAnimation(document.getElementById('C'),allBtns[0]);
     guessIdx++;
     if(guessIdx>=notes.length){ok++;updScore();cooldown=true;resetTimer();setTimeout(go,600);}
     else{
-      const nextNb=document.getElementById('nc-'+guessIdx);
-      if(nextNb)nextNb.classList.add('guess-cur');
+      const nextNb=document.getElementById('nc-'+guessIdx);if(nextNb)nextNb.classList.add('guess-cur');
       setTimeout(()=>{render(notes,guessIdx,'#d4af37');buildChoiceButtons();},600);
     }
   }else{
@@ -1095,8 +980,7 @@ function handleChoice(chosen,correct){
       guessIdx++;
       if(guessIdx>=notes.length){setTimeout(go,1000);}
       else{
-        const nextNb=document.getElementById('nc-'+guessIdx);
-        if(nextNb)nextNb.classList.add('guess-cur');
+        const nextNb=document.getElementById('nc-'+guessIdx);if(nextNb)nextNb.classList.add('guess-cur');
         setTimeout(()=>{render(notes,guessIdx,'#d4af37');buildChoiceButtons();},600);
       }
     },1200);
@@ -1113,135 +997,67 @@ function getACtx(){
   return audioCtxPlay;
 }
 function playFreq(freq,start,dur){
-  const ac=getACtx();
-  const tuned=freq*Math.pow(2,micTuneSteps/12);
+  const ac=getACtx();const tuned=freq*Math.pow(2,micTuneSteps/12);
   const osc=ac.createOscillator(),gain=ac.createGain();
   osc.type='triangle';osc.frequency.value=tuned;
-  gain.gain.setValueAtTime(0,start);
-  gain.gain.linearRampToValueAtTime(0.35,start+0.02);
-  gain.gain.setValueAtTime(0.35,start+dur-0.05);
-  gain.gain.linearRampToValueAtTime(0,start+dur);
-  osc.connect(gain);gain.connect(ac.destination);
-  osc.start(start);osc.stop(start+dur);
+  gain.gain.setValueAtTime(0,start);gain.gain.linearRampToValueAtTime(0.35,start+0.02);
+  gain.gain.setValueAtTime(0.35,start+dur-0.05);gain.gain.linearRampToValueAtTime(0,start+dur);
+  osc.connect(gain);gain.connect(ac.destination);osc.start(start);osc.stop(start+dur);
 }
-function playNotes(){
-  if(!notes.length)return;
-  const ac=getACtx();const now=ac.currentTime;
-  notes.forEach((it,i)=>playFreq(it.n.f,now+i*0.6,0.55));
-}
-function playCurrentGuess(){
-  if(guessIdx>=notes.length)return;
-  const it=notes[guessIdx];if(it)playFreq(it.n.f,getACtx().currentTime,1.0);
-}
+function playNotes(){if(!notes.length)return;const ac=getACtx();const now=ac.currentTime;notes.forEach((it,i)=>playFreq(it.n.f,now+i*0.6,0.55));}
+function playCurrentGuess(){if(guessIdx>=notes.length)return;const it=notes[guessIdx];if(it)playFreq(it.n.f,getACtx().currentTime,1.0);}
 function playPyk(correct){
   try{
     const ac=getACtx();const now=ac.currentTime;
     const osc=ac.createOscillator();const gain=ac.createGain();
     osc.connect(gain);gain.connect(ac.destination);
-    if(correct){
-      osc.type='sine';osc.frequency.setValueAtTime(523,now);
-      osc.frequency.exponentialRampToValueAtTime(784,now+0.10);
-      gain.gain.setValueAtTime(0.22,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.32);
-      osc.start(now);osc.stop(now+0.32);
-    }else{
-      osc.type='sine';osc.frequency.setValueAtTime(220,now);
-      osc.frequency.exponentialRampToValueAtTime(140,now+0.18);
-      gain.gain.setValueAtTime(0.18,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.28);
-      osc.start(now);osc.stop(now+0.28);
-    }
+    if(correct){osc.type='sine';osc.frequency.setValueAtTime(523,now);osc.frequency.exponentialRampToValueAtTime(784,now+0.10);gain.gain.setValueAtTime(0.22,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.32);osc.start(now);osc.stop(now+0.32);}
+    else{osc.type='sine';osc.frequency.setValueAtTime(220,now);osc.frequency.exponentialRampToValueAtTime(140,now+0.18);gain.gain.setValueAtTime(0.18,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.28);osc.start(now);osc.stop(now+0.28);}
   }catch(e){}
 }
 function playPop(){
   try{
     const ac=getACtx();const now=ac.currentTime;
     const osc=ac.createOscillator();const gain=ac.createGain();
-    osc.type='sine';
-    osc.frequency.setValueAtTime(800,now);
-    osc.frequency.exponentialRampToValueAtTime(400,now+0.06);
-    gain.gain.setValueAtTime(0.18,now);
-    gain.gain.exponentialRampToValueAtTime(0.001,now+0.09);
-    osc.connect(gain);gain.connect(ac.destination);
-    osc.start(now);osc.stop(now+0.09);
+    osc.type='sine';osc.frequency.setValueAtTime(800,now);osc.frequency.exponentialRampToValueAtTime(400,now+0.06);
+    gain.gain.setValueAtTime(0.18,now);gain.gain.exponentialRampToValueAtTime(0.001,now+0.09);
+    osc.connect(gain);gain.connect(ac.destination);osc.start(now);osc.stop(now+0.09);
   }catch(e){}
 }
  
 // ══════════════════════════════════════════════════════════
-// USTAWIENIA FISZEK
+// USTAWIENIA
 // ══════════════════════════════════════════════════════════
 function setClef(c){
-  clef=c;
-  ['treble','bass','both'].forEach(id=>document.getElementById('cb-'+id).classList.toggle('active',id===c));
-  notes=[];document.getElementById('namesRow').innerHTML='';
-  document.getElementById('namesRowC').innerHTML='';
-  document.getElementById('choiceGrid').innerHTML='';
-  render([]);
+  clef=c;['treble','bass','both'].forEach(id=>document.getElementById('cb-'+id).classList.toggle('active',id===c));
+  notes=[];document.getElementById('namesRow').innerHTML='';document.getElementById('namesRowC').innerHTML='';
+  document.getElementById('choiceGrid').innerHTML='';render([]);
 }
-function setRange(r){
-  range=r;
-  document.getElementById('cb-small').classList.toggle('active',r==='small');
-  document.getElementById('cb-full').classList.toggle('active',r==='full');
-}
-function setAcc(){
-  acc=!acc;
-  const btn=document.getElementById('cb-acc');
-  btn.classList.toggle('active',acc);
-  btn.textContent=acc?'Chromatyczne':'Diatoniczne';
-}
-function setN(n){
-  noteCount=n;
-  const sl=document.getElementById('slider');
-  if(sl){
-    sl.value=n;
-    const t=(n-1)/9;
-    const r=Math.round(30+t*(220-30)),g2=Math.round(58+t*(38-58)),b=Math.round(138+t*(38-138));
-    sl.style.accentColor='#'+[r,g2,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-  }
-}
+function setRange(r){range=r;document.getElementById('cb-small').classList.toggle('active',r==='small');document.getElementById('cb-full').classList.toggle('active',r==='full');}
+function setAcc(){acc=!acc;const btn=document.getElementById('cb-acc');btn.classList.toggle('active',acc);btn.textContent=acc?'Chromatyczne':'Diatoniczne';}
+function setN(n){noteCount=n;}
 function setMode(m){
   mode=m;cnt=0;ok=0;selfCheckActive=false;
-  document.getElementById('sCnt').textContent='0';
-  document.getElementById('cCnt').textContent='0';
-  document.getElementById('sPct').textContent='';
+  document.getElementById('sCnt').textContent='0';document.getElementById('cCnt').textContent='0';document.getElementById('sPct').textContent='';
   ['reveal','choice'].forEach(id=>document.getElementById('mb-'+id).classList.toggle('active',id===m));
-  notes=[];
-  document.getElementById('namesRow').innerHTML='';
-  document.getElementById('namesRowC').innerHTML='';
-  document.getElementById('choiceGrid').innerHTML='';
-  document.getElementById('revBtn').textContent='Pokaż nuty';
-  document.getElementById('okMsg').classList.remove('show');
-  render([]);
-  if(m!=='reveal'&&micOn)stopMic();
-  updateSelfCheckVisibility();
-  go();
+  notes=[];document.getElementById('namesRow').innerHTML='';document.getElementById('namesRowC').innerHTML='';
+  document.getElementById('choiceGrid').innerHTML='';document.getElementById('revBtn').textContent='Pokaż nuty';
+  document.getElementById('okMsg').classList.remove('show');render([]);
+  if(m!=='reveal'&&micOn)stopMic();updateSelfCheckVisibility();go();
 }
  
 // ══════════════════════════════════════════════════════════
 // TIMER
 // ══════════════════════════════════════════════════════════
 function setTimer(s){
-  timerSec=s;stopTimer();
-  [0,5,10,30].forEach(t=>document.getElementById('cb-t'+t).classList.toggle('active',t===s));
-  const d=document.getElementById('timerDisp');
-  d.classList.toggle('active',s>0);if(s>0)d.textContent=fmt(s);
+  timerSec=s;stopTimer();[0,5,10,30].forEach(t=>document.getElementById('cb-t'+t).classList.toggle('active',t===s));
+  const d=document.getElementById('timerDisp');d.classList.toggle('active',s>0);if(s>0)d.textContent=fmt(s);
 }
 function fmt(s){return Math.floor(s/60)+':'+(s%60).toString().padStart(2,'0');}
-function startTimer(){
-  stopTimer();if(!timerSec)return;
-  timerLeft=timerSec;const d=document.getElementById('timerDisp');
-  d.textContent=fmt(timerLeft);d.classList.remove('warn');
-  timerInt=setInterval(()=>{timerLeft--;d.textContent=fmt(timerLeft);if(timerLeft<=3)d.classList.add('warn');if(timerLeft<=0){stopTimer();go();}},1000);
-}
+function startTimer(){stopTimer();if(!timerSec)return;timerLeft=timerSec;const d=document.getElementById('timerDisp');d.textContent=fmt(timerLeft);d.classList.remove('warn');timerInt=setInterval(()=>{timerLeft--;d.textContent=fmt(timerLeft);if(timerLeft<=3)d.classList.add('warn');if(timerLeft<=0){stopTimer();go();}},1000);}
 function stopTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;}}
-function resetTimer(){
-  stopTimer();if(!timerSec)return;
-  const d=document.getElementById('timerDisp');d.classList.remove('warn');timerLeft=timerSec;d.textContent=fmt(timerLeft);
-  timerInt=setInterval(()=>{timerLeft--;d.textContent=fmt(timerLeft);if(timerLeft<=3)d.classList.add('warn');if(timerLeft<=0){stopTimer();go();}},1000);
-}
-function updScore(){
-  document.getElementById('cCnt').textContent=ok;
-  const pct=cnt>0?'('+Math.round(ok/cnt*100)+'% poprawnych)':'';
-  document.getElementById('sPct').textContent=pct;
-}
+function resetTimer(){stopTimer();if(!timerSec)return;const d=document.getElementById('timerDisp');d.classList.remove('warn');timerLeft=timerSec;d.textContent=fmt(timerLeft);timerInt=setInterval(()=>{timerLeft--;d.textContent=fmt(timerLeft);if(timerLeft<=3)d.classList.add('warn');if(timerLeft<=0){stopTimer();go();}},1000);}
+function updScore(){document.getElementById('cCnt').textContent=ok;document.getElementById('sPct').textContent=cnt>0?'('+Math.round(ok/cnt*100)+'% poprawnych)':'';}
  
 // ══════════════════════════════════════════════════════════
 // MIKROFON
@@ -1255,13 +1071,9 @@ async function toggleMic(){
     const gain=aCtx.createGain();gain.gain.value=micGain;src.connect(gain);
     analyser=aCtx.createAnalyser();analyser.fftSize=8192;analyser.smoothingTimeConstant=0.6;gain.connect(analyser);
     micOn=true;
-    ['micBtn','micBtnCard'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el){el.classList.add('on');el.textContent='🎤 Wyłącz';}
-    });
+    ['micBtn','micBtnCard'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.add('on');el.textContent='🎤 Wyłącz';}});
     document.getElementById('micPanel').classList.add('on');
-    pitchInt=setInterval(detectPitch,100);
-    updateSelfCheckVisibility();updScore();
+    pitchInt=setInterval(detectPitch,100);updateSelfCheckVisibility();updScore();
   }catch(e){alert('Brak dostępu do mikrofonu.');}
 }
 function stopMic(){
@@ -1269,62 +1081,32 @@ function stopMic(){
   if(micSt){micSt.getTracks().forEach(t=>t.stop());micSt=null;}
   if(aCtx){aCtx.close();aCtx=null;}
   micOn=false;
-  ['micBtn','micBtnCard'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){el.classList.remove('on');el.textContent='🎤 Mikrofon';}
-  });
+  ['micBtn','micBtnCard'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('on');el.textContent='🎤 Mikrofon';}});
   document.getElementById('micPanel').classList.remove('on');
 }
-function resetMicUI(){
-  document.getElementById('micDet').textContent='—';
-  document.getElementById('micRes').className='mic-res wait';
-  document.getElementById('micRes').textContent='Graj nutę...';
-  document.getElementById('pitchBar').style.width='0';
-}
-function updateFeedback(text,className){
-  const res=document.getElementById('micRes');
-  res.classList.add('spin');
-  setTimeout(()=>{res.textContent=text;res.className='mic-res '+className+' spin';},200);
-}
+function resetMicUI(){document.getElementById('micDet').textContent='—';document.getElementById('micRes').className='mic-res wait';document.getElementById('micRes').textContent='Graj nutę...';document.getElementById('pitchBar').style.width='0';}
+function updateFeedback(text,className){const res=document.getElementById('micRes');res.classList.add('spin');setTimeout(()=>{res.textContent=text;res.className='mic-res '+className;},200);}
 function detectPitch(){
   if(!analyser||!notes.length||cooldown)return;
-  // Aktualizuj wzmocnienie na bieżąco
-  if(analyser.gain!==undefined){}// brak bezpośredniego dostępu, OK
-  const buf=new Float32Array(analyser.fftSize);
-  analyser.getFloatTimeDomainData(buf);
+  const buf=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(buf);
   const vol=getVol(buf);
   document.getElementById('pitchBar').style.width=Math.min(100,vol*400)+'%';
   if(vol<0.006){freqHist=[];document.getElementById('pitchBar').style.background='var(--navy)';return;}
-  const freq=autoCorr(buf,aCtx.sampleRate);
-  if(freq<0){freqHist=[];return;}
-  // Korekcja stroju
+  const freq=autoCorr(buf,aCtx.sampleRate);if(freq<0){freqHist=[];return;}
   const corrFreq=freq/Math.pow(2,micTuneSteps/12);
-  freqHist.push(corrFreq);
-  if(freqHist.length>4)freqHist.shift();
+  freqHist.push(corrFreq);if(freqHist.length>4)freqHist.shift();
   document.getElementById('micDet').textContent=f2name(corrFreq)+' ('+Math.round(corrFreq)+' Hz)';
-  const target=seqIdx<notes.length?[notes[seqIdx]]:[];
-  const bar=document.getElementById('pitchBar');
+  const target=seqIdx<notes.length?[notes[seqIdx]]:[];const bar=document.getElementById('pitchBar');
   if(target.length===0)return;
   const targetFreq=target[0].n.f;
   const matchC=freqHist.filter(f=>Math.abs(f-targetFreq)/targetFreq<micTolerance).length;
   if(matchC>=3){
-    updateFeedback('Dobrze','ok');
-    bar.style.background='#16a34a';
-    freqHist=[];
+    updateFeedback('Dobrze','ok');bar.style.background='#16a34a';freqHist=[];
     const b=document.getElementById('namesRow').children[seqIdx];
-    if(b){
-      b.classList.remove('hidden','guess-cur');b.classList.add('guess-ok');
-      b.textContent=notes[seqIdx].n.l;
-      if(notes[seqIdx].n.kontra)b.classList.add('kontra');
-    }
+    if(b){b.classList.remove('hidden','guess-cur');b.classList.add('guess-ok');b.textContent=notes[seqIdx].n.l;if(notes[seqIdx].n.kontra)b.classList.add('kontra');}
     seqIdx++;
     if(seqIdx>=notes.length){allGood();}
-    else{
-      const nb=document.getElementById('namesRow').children[seqIdx];
-      if(nb)nb.classList.add('guess-cur');
-      if(feedbackTimeout)clearTimeout(feedbackTimeout);
-      feedbackTimeout=setTimeout(()=>{updateFeedback('Następny','wait');},800);
-    }
+    else{const nb=document.getElementById('namesRow').children[seqIdx];if(nb)nb.classList.add('guess-cur');if(feedbackTimeout)clearTimeout(feedbackTimeout);feedbackTimeout=setTimeout(()=>{updateFeedback('Następny','wait');},800);}
   }else if(vol>0.015){
     const semitones=Math.abs(Math.round(12*Math.log2(corrFreq/targetFreq)));
     if(semitones===1){updateFeedback('Obok','bad');bar.style.background='#f59e0b';}
@@ -1332,17 +1114,12 @@ function detectPitch(){
   }
 }
 function allGood(){
-  ok++;cnt++;
-  document.getElementById('sCnt').textContent=cnt;
-  updScore();cooldown=true;
-  document.getElementById('okMsg').textContent='✓ Brawo! Zagrano poprawnie!';
-  document.getElementById('okMsg').classList.add('show');
-  resetTimer();
-  setTimeout(()=>{document.getElementById('okMsg').classList.remove('show');go();},1500);
+  ok++;cnt++;document.getElementById('sCnt').textContent=cnt;updScore();cooldown=true;
+  document.getElementById('okMsg').textContent='✓ Brawo! Zagrano poprawnie!';document.getElementById('okMsg').classList.add('show');
+  resetTimer();setTimeout(()=>{document.getElementById('okMsg').classList.remove('show');go();},1500);
 }
 function autoCorr(buf,sr){
-  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
-  if(rms<0.005)return-1;
+  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);if(rms<0.005)return-1;
   let r1=0,r2=buf.length-1;
   for(let i=0;i<buf.length/2;i++){if(Math.abs(buf[i])<0.12){r1=i;break;}}
   for(let i=1;i<buf.length/2;i++){if(Math.abs(buf[buf.length-i])<0.12){r2=buf.length-i;break;}}
@@ -1363,71 +1140,65 @@ function f2name(f){
   return pl[idx]+(sfx[oct]||oct);
 }
  
-function anim(){
-  const c=document.getElementById('card');
-  c.style.animation='none';c.offsetHeight;c.style.animation='fadeIn 0.35s ease';
-}
+function anim(){const c=document.getElementById('card');c.style.animation='none';c.offsetHeight;c.style.animation='fadeIn 0.35s ease';}
 function rnd(n){return Math.floor(Math.random()*n);}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
  
 render([]);
  
 // ══════════════════════════════════════════════════════════
-// SEKCJA BOOKING (inline)
+// FORMULARZ TERMINY
 // ══════════════════════════════════════════════════════════
-let bLoc='s',bPiano=true;
-function bSetLoc(t){
-  bLoc=t;
-  document.getElementById('bt-s').classList.toggle('selected',t==='s');
-  document.getElementById('bt-u').classList.toggle('selected',t==='u');
-  document.getElementById('bPianoBox').style.display=t==='u'?'block':'none';
-  bUpdatePrice();
+const FORM_WEBHOOK='https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6';
+let isStudio=true,hasPiano=true;
+ 
+function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);}
+function setLoc(loc){
+  isStudio=loc==='studio';
+  document.getElementById('loc-studio').classList.toggle('selected',isStudio);
+  document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);
+  document.getElementById('piano-options').style.display=isStudio?'none':'block';
+  updatePrice();
 }
-function bSetPiano(v){
-  bPiano=v;
-  document.getElementById('bp-y').classList.toggle('selected',v);
-  document.getElementById('bp-n').classList.toggle('selected',!v);
-  bUpdatePrice();
+function setPiano(v){
+  hasPiano=v;
+  document.getElementById('piano-yes').classList.toggle('selected',v);
+  document.getElementById('piano-no').classList.toggle('selected',!v);
+  updatePrice();
 }
-function bUpdatePrice(){
-  document.getElementById('bPrice').textContent=(bLoc==='u'&&!bPiano?119:99)+' zł / h';
+function updatePrice(){document.getElementById('price-val').textContent=(!isStudio&&!hasPiano?119:99)+' zł / h';val();}
+function val(){
+  const n=document.getElementById('res-name').value;
+  const p=document.getElementById('res-phone').value;
+  const e=document.getElementById('res-email').value;
+  const ok2=n.length>2&&p.length>=9&&e.includes('@');
+  const btn=document.getElementById('subBtn');
+  btn.classList.toggle('active',ok2);btn.style.cursor=ok2?'pointer':'not-allowed';
 }
-async function wyslijBooking(){
-  const s=document.getElementById('bfStatus');
-  const btn=document.getElementById('bfSubmitBtn');
-  const name=document.getElementById('bf-name').value.trim();
-  const phone=document.getElementById('bf-phone').value.trim();
-  const email=document.getElementById('bf-email').value.trim();
-  if(name.length<2||phone.length<9||!email.includes('@')){
-    s.textContent='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;
-  }
-  btn.disabled=true;btn.textContent='Wysyłanie...';s.textContent='';
-  const location=bLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd';
-  const piano=bLoc==='s'?'—':(bPiano?'Tak':'Nie — dowóz instrumentu');
-  const price=(bLoc==='u'&&!bPiano?119:99)+' zł/h';
+async function wyslij(){
+  if(!document.getElementById('subBtn').classList.contains('active'))return;
+  const s=document.getElementById('res-status');const btn=document.getElementById('subBtn');
+  s.textContent='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
   const payload={
-    typ:'lekcja-probna-fiszki-inline',
-    imie_nazwisko:name,telefon:phone,email:email,
-    tresc:document.getElementById('bf-msg').value.trim(),
-    miejsce:location,pianino:piano,cena:price,
+    typ:'rezerwacja-fiszki',
+    imie_nazwisko:document.getElementById('res-name').value.trim(),
+    telefon:document.getElementById('res-phone').value.trim(),
+    email:document.getElementById('res-email').value.trim(),
+    tresc:document.getElementById('res-msg').value.trim(),
+    miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',
+    pianino:isStudio?'—':(hasPiano?'Tak':'Nie — dowóz instrumentu'),
+    cena:(!isStudio&&!hasPiano?119:99)+' zł/h',
     data:new Date().toLocaleString('pl-PL')
   };
   try{
-    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    s.textContent='✅ Wysłano! Odezwiemy się wkrótce.';s.style.color='#16a34a';
-    btn.textContent='WYŚLIJ PROŚBĘ O LEKCJĘ';
-    setTimeout(()=>{
-      s.textContent='';
-      document.getElementById('bf-name').value='';
-      document.getElementById('bf-phone').value='';
-      document.getElementById('bf-email').value='';
-      document.getElementById('bf-msg').value='';
-      btn.disabled=false;
-    },4000);
+    const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
+    s.textContent='✅ Dziękujemy! Odezwiemy się wkrótce.';s.style.color='#16a34a';btn.textContent='WYŚLIJ ZGŁOSZENIE';
+    setTimeout(()=>{toggleForm(false);s.textContent='';['res-name','res-phone','res-email','res-msg'].forEach(id=>document.getElementById(id).value='');btn.disabled=false;},3000);
   }catch(e){
-    s.textContent='❌ Błąd. Zadzwoń: 514 338 875';s.style.color='#ef4444';
-    btn.textContent='WYŚLIJ PROŚBĘ O LEKCJĘ';btn.disabled=false;
+    s.textContent='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';
+    btn.textContent='WYŚLIJ ZGŁOSZENIE';btn.disabled=false;btn.classList.add('active');
   }
 }
  
@@ -1437,38 +1208,20 @@ async function wyslijBooking(){
 function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
 function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
 let mLoc='s',mPiano=true;
-function mSetLoc(t){
-  mLoc=t;
-  document.getElementById('m-l-s').classList.toggle('selected',t==='s');
-  document.getElementById('m-l-u').classList.toggle('selected',t==='u');
-  document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';
-  mUpdatePrice();
-}
-function mSetPiano(v){
-  mPiano=v;
-  document.getElementById('m-p-y').classList.toggle('selected',v);
-  document.getElementById('m-p-n').classList.toggle('selected',!v);
-  mUpdatePrice();
-}
-function mUpdatePrice(){document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
+function mSetLoc(t){mLoc=t;document.getElementById('m-l-s').classList.toggle('selected',t==='s');document.getElementById('m-l-u').classList.toggle('selected',t==='u');document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';mUpdatePrice();}
+function mSetPiano(v){mPiano=v;document.getElementById('m-p-y').classList.toggle('selected',v);document.getElementById('m-p-n').classList.toggle('selected',!v);mUpdatePrice();}
+function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
 async function wyslijModal(){
-  const s=document.getElementById('modal-status');
-  const submitBtn=document.querySelector('.modal-submit-btn');
-  const name=document.getElementById('m-name').value.trim();
-  const phone=document.getElementById('m-phone').value.trim();
-  const email=document.getElementById('m-email').value.trim();
-  if(name.length<2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
-  submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
-  const location=mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd';
-  const piano=mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu');
-  const price=(mLoc==='u'&&!mPiano?119:99)+' zł/h';
-  const payload={typ:'lekcja-probna-fiszki',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('m-msg').value.trim(),miejsce:location,pianino:piano,cena:price,data:new Date().toLocaleString('pl-PL')};
+  const s=document.getElementById('modal-status');const submitBtn=document.querySelector('.modal-submit-btn');
+  const name=document.getElementById('m-name').value.trim();const phone=document.getElementById('m-phone').value.trim();const email=document.getElementById('m-email').value.trim();
+  if(name.length<2||phone.length<9||!email.includes('@')){s.textContent='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
+  submitBtn.disabled=true;submitBtn.textContent='Wysyłanie...';s.textContent='';
+  const payload={typ:'lekcja-probna-fiszki',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL')};
   try{
-    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    s.innerText='✅ Wysłano! Sprawdź email.';s.style.color='#22c55e';
-    submitBtn.innerText='WYŚLIJ PROŚBĘ';
-    setTimeout(()=>{closeBookingModal();s.innerText='';document.getElementById('m-name').value='';document.getElementById('m-phone').value='';document.getElementById('m-email').value='';document.getElementById('m-msg').value='';submitBtn.disabled=false;},3000);
-  }catch(e){s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.innerText='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
+    await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    s.textContent='✅ Wysłano!';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
+    setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
+  }catch(e){s.textContent='❌ Błąd. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.textContent='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
 }
 </script>
 </body>
