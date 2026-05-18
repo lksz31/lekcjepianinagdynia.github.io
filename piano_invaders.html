@@ -234,13 +234,6 @@ function closest(freq){
 
 // ══ CANVAS ══
 const cv=document.getElementById('c'), cx=cv.getContext('2d');
-function resize(){
-  cv.width=window.innerWidth;
-  cv.height=window.innerHeight-44;
-  updateLayout();
-}
-resize();
-window.addEventListener('resize',resize);
 
 const COLS=7;
 let COL_W, colX, PW=window.innerWidth, PH=window.innerHeight-44;
@@ -249,8 +242,14 @@ function updateLayout(){
   COL_W=PW/COLS;
   colX=i=>COL_W*i+COL_W/2;
 }
-updateLayout();
-resetMap();
+
+function resize(){
+  cv.width=window.innerWidth;
+  cv.height=window.innerHeight-44;
+  updateLayout();
+}
+resize();
+window.addEventListener('resize',resize);
 
 // ══ PLAYER (Piano) ══
 let playerCol=3;
