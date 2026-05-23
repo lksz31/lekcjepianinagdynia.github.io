@@ -969,15 +969,14 @@ function drawMaze(){
   }
   if(fogEnabled){
     updateFog();
-    fogBlurPhase += 0.003;
-    // Głębokość gradientu oddycha ±3% TILE
-    const R = TILE * (0.333 + 0.03 * Math.sin(fogBlurPhase));
+    fogBlurPhase += 0.008; // szybszy oddech
+    // Głębokość gradientu — oddycha mocniej: ±12% TILE
+    const R = TILE * (0.333 + 0.12 * Math.sin(fogBlurPhase));
 
     const fogOff = document.createElement('canvas');
     fogOff.width = canvas.width; fogOff.height = canvas.height;
     const fc = fogOff.getContext('2d');
 
-    // 1. Wypełnij całą mgłę teksturą
     if(FOGIMG.complete && FOGIMG.naturalWidth > 0){
       const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
       const scale=Math.max(canvas.width/fw, canvas.height/fh);
@@ -988,7 +987,6 @@ function drawMaze(){
       fc.fillRect(0,0,canvas.width,canvas.height);
     }
 
-    // 2. destination-out: wycinamy mgłę tam gdzie mapa odkryta
     fc.globalCompositeOperation = 'destination-out';
 
     for(let r = 0; r < ROWS; r++){
@@ -997,66 +995,65 @@ function drawMaze(){
         const x0 = c2*TILE, y0 = r*TILE;
 
         if(fogA < 0.02){
-          // Całkowicie odkryty — wytnij mgłę w 100% na całym kaflu
           fc.globalAlpha = 1;
           fc.fillStyle = 'black';
           fc.fillRect(x0, y0, TILE, TILE);
           continue;
         }
 
-        // Kafelek zakryty — sprawdź każdą stronę
-        // Jeśli sąsiad odkryty: gradient liniowy prostopadły do granicy
-        // na CAŁEJ długości krawędzi, głębokość R w głąb tego kafla
-        // przy granicy (dist=0): wycięcie 100% → mgła przezroczysta
-        // po R (dist=R):         wycięcie 0%   → mgła pełna
+        // Pomocnicza funkcja: czy sąsiad jest odkryty
+        function isOpen(dr, dc){
+          const nr=r+dr, nc=c2+dc;
+          if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return false;
+          return fogAlpha[nr][nc] < 0.3;
+        }
 
-        // Góra: granica y=y0, gradient idzie w dół (w głąb kafla) na R
-        {
-          const nr=r-1, nc=c2;
-          const nbFog = (nr>=0&&nr<ROWS) ? fogAlpha[nr][nc] : 1;
-          if(nbFog < 0.3){
-            const g = fc.createLinearGradient(0, y0, 0, y0+R);
-            g.addColorStop(0, 'rgba(0,0,0,1)');
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            fc.fillStyle = g;
-            fc.fillRect(x0, y0, TILE, R);
-          }
+        const oN = isOpen(-1, 0);
+        const oS = isOpen( 1, 0);
+        const oW = isOpen( 0,-1);
+        const oE = isOpen( 0, 1);
+
+        // ── Krawędzie proste (gradient liniowy na pełnej długości krawędzi) ──
+        if(oN){
+          const g = fc.createLinearGradient(0, y0, 0, y0+R);
+          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+          fc.fillStyle=g; fc.fillRect(x0, y0, TILE, R);
         }
-        // Dół: granica y=y0+TILE, gradient idzie w górę
-        {
-          const nr=r+1, nc=c2;
-          const nbFog = (nr>=0&&nr<ROWS) ? fogAlpha[nr][nc] : 1;
-          if(nbFog < 0.3){
-            const g = fc.createLinearGradient(0, y0+TILE, 0, y0+TILE-R);
-            g.addColorStop(0, 'rgba(0,0,0,1)');
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            fc.fillStyle = g;
-            fc.fillRect(x0, y0+TILE-R, TILE, R);
-          }
+        if(oS){
+          const g = fc.createLinearGradient(0, y0+TILE, 0, y0+TILE-R);
+          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+          fc.fillStyle=g; fc.fillRect(x0, y0+TILE-R, TILE, R);
         }
-        // Lewo: granica x=x0, gradient idzie w prawo
-        {
-          const nr=r, nc=c2-1;
-          const nbFog = (nc>=0&&nc<COLS) ? fogAlpha[nr][nc] : 1;
-          if(nbFog < 0.3){
-            const g = fc.createLinearGradient(x0, 0, x0+R, 0);
-            g.addColorStop(0, 'rgba(0,0,0,1)');
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            fc.fillStyle = g;
-            fc.fillRect(x0, y0, R, TILE);
-          }
+        if(oW){
+          const g = fc.createLinearGradient(x0, 0, x0+R, 0);
+          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+          fc.fillStyle=g; fc.fillRect(x0, y0, R, TILE);
         }
-        // Prawo: granica x=x0+TILE, gradient idzie w lewo
-        {
-          const nr=r, nc=c2+1;
-          const nbFog = (nc>=0&&nc<COLS) ? fogAlpha[nr][nc] : 1;
-          if(nbFog < 0.3){
-            const g = fc.createLinearGradient(x0+TILE, 0, x0+TILE-R, 0);
-            g.addColorStop(0, 'rgba(0,0,0,1)');
-            g.addColorStop(1, 'rgba(0,0,0,0)');
-            fc.fillStyle = g;
-            fc.fillRect(x0+TILE-R, y0, R, TILE);
-          }
+        if(oE){
+          const g = fc.createLinearGradient(x0+TILE, 0, x0+TILE-R, 0);
+          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+          fc.fillStyle=g; fc.fillRect(x0+TILE-R, y0, R, TILE);
+        }
+
+        // ── Rogi po przekątnej: gradient radialny z narożnika ──
+        // Narożnik liczy się gdy oba sąsiedzi prostopadle LUB ukośnie są odkryci
+        const corners = [
+          { dr:-1,dc:-1, cx:x0,        cy:y0,       oA:oN||oW, oB:isOpen(-1,-1) },
+          { dr:-1,dc: 1, cx:x0+TILE,   cy:y0,       oA:oN||oE, oB:isOpen(-1, 1) },
+          { dr: 1,dc:-1, cx:x0,        cy:y0+TILE,  oA:oS||oW, oB:isOpen( 1,-1) },
+          { dr: 1,dc: 1, cx:x0+TILE,   cy:y0+TILE,  oA:oS||oE, oB:isOpen( 1, 1) },
+        ];
+
+        for(const corner of corners){
+          if(!corner.oA && !corner.oB) continue; // żaden sąsiad nie odkryty
+          const g = fc.createRadialGradient(corner.cx, corner.cy, 0, corner.cx, corner.cy, R);
+          g.addColorStop(0,'rgba(0,0,0,1)');
+          g.addColorStop(1,'rgba(0,0,0,0)');
+          fc.fillStyle=g;
+          // Ogranicz do ćwiartki kafla przy danym rogu
+          const rx = corner.dc < 0 ? x0     : x0+TILE-R;
+          const ry = corner.dr < 0 ? y0     : y0+TILE-R;
+          fc.fillRect(rx, ry, R, R);
         }
       }
     }
@@ -1372,22 +1369,53 @@ function updateCreaturePositions() {
     c.imgEl.style.opacity = fogEnabled ? (fa < 0.7 ? '1' : '0') : '1';
   });
 
-  // ── Wężyk: każde zwierzątko śledzi historyczną pozycję gracza ──
   const n = creaturesFollowing.length;
   if (n === 0) return;
 
-  const spacing = computeSpacing(n);
   const histLen = creaturePositions.length;
+  const cSz = parseInt(creaturesFollowing[0].imgEl.dataset.cSz || Math.round(TILE*0.40));
 
-  // Zbierz docelowe pozycje i sprawdź nakładanie
+  // Pozycja gracza w pikselach
+  const plX = ox + playerC * TILE + TILE / 2;
+  const plY = ox + playerR * TILE + TILE / 2; // ox tu użyte celowo — zaraz poprawione
+  const playerPx = { x: ox + playerC * TILE + TILE / 2, y: oy + playerR * TILE + TILE / 2 };
+
+  // ── Pierwsze 6: ustawione wokół gracza (obok i przed) ──
+  // Siatka pozycji wokół gracza — przed i po bokach, nie za
+  // Offset w pikselach: 1 slot = cSz * 1.05
+  const slot = cSz * 1.05;
+  // Pozycje względem gracza (dx, dy) — przed = w górę ekranu (-y), boki = ±x
+  // Rząd 1 (przed graczem): 3 miejsca
+  // Rząd 2 (obok gracza):   3 miejsca
+  const aroundOffsets = [
+    // Rząd przed graczem (y = -slot)
+    { dx: -slot, dy: -slot },
+    { dx:  0,    dy: -slot },
+    { dx:  slot, dy: -slot },
+    // Obok gracza (y = 0)
+    { dx: -slot, dy: 0 },
+    { dx:  slot, dy: 0 },
+    // Tuż przed (bliżej)
+    { dx:  0,    dy: -slot * 0.5 },
+  ];
+
+  const AROUND_MAX = 6; // pierwsze 6 wokół gracza
   const targetPositions = [];
+
   creaturesFollowing.forEach((c, idx) => {
-    // Dodatkowy offset = 1 TILE żeby pierwsze zwierzątko nie nachodziło na postać
-    const tileOffset = Math.round(TILE * 1.2); // px = ~1.2 kafla za graczem
-    const delay = tileOffset + (idx + 1) * spacing;
-    const histIdx = Math.max(0, histLen - 1 - delay);
-    const pos     = creaturePositions[histIdx];
-    targetPositions.push({ x: pos.x, y: pos.y });
+    if (idx < AROUND_MAX) {
+      // Ustaw wokół gracza
+      const off = aroundOffsets[idx];
+      targetPositions.push({ x: playerPx.x + off.dx, y: playerPx.y + off.dy });
+    } else {
+      // Reszta: idzie po historii pozycji gracza (wężyk za graczem)
+      const tailIdx = idx - AROUND_MAX; // indeks w ogonie
+      const spacing = computeSpacing(n - AROUND_MAX);
+      const delay   = Math.round(TILE * 1.5) + (tailIdx + 1) * spacing;
+      const histIdx = Math.max(0, histLen - 1 - delay);
+      const pos     = creaturePositions[histIdx];
+      targetPositions.push({ x: pos.x, y: pos.y });
+    }
   });
 
   // Rozsuń nakładające się zwierzątka
