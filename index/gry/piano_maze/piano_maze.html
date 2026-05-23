@@ -25,7 +25,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 #loading-tip{font-family:'Crimson Text',serif;font-size:.75rem;color:#4a5a3a;letter-spacing:.06em;text-align:center;font-style:italic;min-height:1.2em;transition:opacity .4s;}
  
 #char-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow-y:auto;}
-#char-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.2;pointer-events:none;}
+#char-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.35;pointer-events:none;transition:opacity 0.8s;}
 #char-screen h1{position:relative;font-size:clamp(1rem,3.5vw,2rem);font-weight:900;color:#d4af37;letter-spacing:.2em;text-shadow:0 0 20px rgba(212,175,55,.6);text-align:center;}
 .subtitle{position:relative;font-family:'Crimson Text',serif;font-size:.85rem;color:#6a7a4a;letter-spacing:.12em;}
 .char-grid{position:relative;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
@@ -442,7 +442,7 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + '../loading_screen/loading screen maze.png';
+  const bgSrc = BASE + 'loading_screen/loading screen maze.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
   const bgImg = new Image();
   bgImg.onload = () => {
@@ -527,8 +527,16 @@ const CHARS = [
   document.getElementById('char-img-'+i).src=src;
   document.getElementById('mchar-img-'+i).src=src;
 });
+// Preloaduj concept art przez Image() żeby był w cache gdy char-screen się pojawi
 const rBg=(IMGS.bgs||[])[Math.floor(Math.random()*(IMGS.bgs||['']).length)]||'';
-if(rBg) document.getElementById('char-bg').style.backgroundImage=`url(${rBg})`;
+if(rBg){
+  const charBgImg = new Image();
+  charBgImg.onload = () => {
+    const el = document.getElementById('char-bg');
+    el.style.backgroundImage = 'url(' + rBg + ')';
+  };
+  charBgImg.src = rBg;
+}
  
 /* ══ TILES ══ */
 const TILES_BY_PATH = {
@@ -888,6 +896,54 @@ function assignCellTile(r,c,op,isGoal){
   }
   return cellTiles2[k];
 }
+ 
+/* ══ FOG BLUR ══ */
+// Rysuje miękki, lekko animowany blur na granicy mgły
+// Działa jako radialny gradient nakładany na każdy odkryty kafelek
+let fogBlurPhase = 0;
+function drawFogBlur(ctx) {
+  if (!mazeData) return;
+  fogBlurPhase += 0.008;
+  // Pulsowanie: ±2px promienia
+  const pulse = Math.sin(fogBlurPhase) * 2;
+  const halfT = TILE / 2;
+  const blurR = halfT * 1.55 + pulse; // promień aureoli — delikatnie większy niż pół kafla
+ 
+  ctx.save();
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const alpha = fogAlpha[r][c];
+      // Rysuj tylko na granicy: kafelek częściowo odkryty LUB sąsiad jest w mgle
+      if (alpha >= 1) continue; // w pełni zakryty — pomijaj
+      // Sprawdź czy ma sąsiada w mgle
+      let hasFogNeighbour = false;
+      const nbs = [{r:r-1,c},{r:r+1,c},{r,c:c-1},{r,c:c+1}];
+      for (const nb of nbs) {
+        if (nb.r < 0 || nb.r >= ROWS || nb.c < 0 || nb.c >= COLS) { hasFogNeighbour = true; break; }
+        if (fogAlpha[nb.r][nb.c] > 0.3) { hasFogNeighbour = true; break; }
+      }
+      if (!hasFogNeighbour && alpha < 0.05) continue; // w pełni odkryty bez mgły w pobliżu
+ 
+      const cx2 = c * TILE + halfT;
+      const cy2 = r * TILE + halfT;
+ 
+      // Radialny gradient: przezroczysty w środku → ciemna zieleń na krawędzi
+      const grad = ctx.createRadialGradient(cx2, cy2, halfT * 0.3, cx2, cy2, blurR);
+      const fogOpacity = Math.max(0, Math.min(1, alpha + 0.45));
+      grad.addColorStop(0,   'rgba(8,20,8,0)');
+      grad.addColorStop(0.55,'rgba(8,20,8,0)');
+      grad.addColorStop(0.78,'rgba(8,20,8,' + (fogOpacity * 0.35).toFixed(2) + ')');
+      grad.addColorStop(1,   'rgba(8,20,8,' + (fogOpacity * 0.72).toFixed(2) + ')');
+ 
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(cx2, cy2, blurR * 1.1, blurR * 0.95, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+ 
 function drawMaze(){
   if(!mazeData)return;
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -948,6 +1004,9 @@ function drawMaze(){
     for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){const alpha=fogAlpha[r][c];if(alpha>=1)continue;fc.globalAlpha=1-alpha;fc.fillStyle='black';fc.fillRect(c*TILE,r*TILE,TILE,TILE);}}
     fc.globalCompositeOperation='source-over';fc.globalAlpha=1;
     ctx.drawImage(fogOff,0,0);
+ 
+    // ── Blur na granicy mgły — miękka, animowana aureola ──
+    drawFogBlur(ctx);
     if(showExitHint){
       const{goalR,goalC}=mazeData;const alpha=fogAlpha[goalR][goalC];
       if(alpha>0&&POLOWINADRZWIIMG.complete&&POLOWINADRZWIIMG.naturalWidth>0){
