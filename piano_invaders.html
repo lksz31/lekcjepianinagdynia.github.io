@@ -89,11 +89,11 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 .ctrl-item span:last-child{color:#445;}
 
 /* ══ TUTORIAL ══ */
-#tut{position:fixed;inset:0;z-index:500;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.tut-logo{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:bold;letter-spacing:6px;color:#44aaff;text-transform:uppercase;text-shadow:0 0 30px rgba(68,170,255,0.5);margin-bottom:4px;}
-.tut-sub{font-size:11px;color:#334;letter-spacing:3px;text-transform:uppercase;margin-bottom:18px;}
-.tut-box{width:100%;max-width:760px;padding:0 20px;}
-.tut-slides{background:rgba(6,6,22,0.98);border:1px solid #1e1e40;border-radius:14px;min-height:280px;overflow:hidden;}
+#tut{position:fixed;inset:0;z-index:500;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:20px 0 16px;}
+.tut-logo{font-size:clamp(1.2rem,4vw,2.2rem);font-weight:bold;letter-spacing:6px;color:#44aaff;text-transform:uppercase;text-shadow:0 0 30px rgba(68,170,255,0.5);margin-bottom:2px;flex-shrink:0;}
+.tut-sub{font-size:11px;color:#334;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;flex-shrink:0;}
+.tut-box{width:100%;max-width:760px;padding:0 16px;flex:1;display:flex;flex-direction:column;}
+.tut-slides{background:rgba(6,6,22,0.98);border:1px solid #1e1e40;border-radius:14px;overflow:hidden;flex:1;}
 .tut-slide{display:none;padding:20px 24px;flex-direction:column;gap:12px;}
 .tut-slide.active{display:flex;}
 .stitle{font-size:13px;color:#44aaff;letter-spacing:3px;text-transform:uppercase;text-align:center;padding-bottom:10px;border-bottom:1px solid #1a1a3a;font-weight:bold;}
@@ -125,7 +125,7 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 .demo-wrap{background:rgba(0,0,0,0.35);border:1px solid #1a1a3a;border-radius:7px;overflow:hidden;height:68px;position:relative;}
 .demo-wrap canvas{position:absolute;inset:0;width:100%;height:100%;}
 .tut-note{font-size:11px;color:#556;text-align:center;line-height:1.8;} .tut-note b{color:#aab;}
-.tut-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+.tut-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:0 2px;flex-shrink:0;position:sticky;bottom:0;}
 .tut-dots{display:flex;gap:6px;flex:1;justify-content:center;}
 .tut-dot{width:7px;height:7px;border-radius:50%;background:#1a1a3a;transition:.2s;} .tut-dot.on{background:#44aaff;}
 .tbtn{background:none;border:1px solid #2a2a4a;color:#99b;font:bold 12px 'Courier New';padding:9px 20px;border-radius:5px;cursor:pointer;letter-spacing:1px;transition:.15s;min-width:80px;}
@@ -310,6 +310,20 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
         <button class="seg-btn" id="card-letters" onclick="setCardDisplay('letters')">Litery</button>
         <button class="seg-btn active" id="card-staff" onclick="setCardDisplay('staff')">Pięciolinia</button>
         <button class="seg-btn" id="card-both" onclick="setCardDisplay('both')">Oba</button>
+      </div>
+    </div>
+    <div class="s-row">
+      <span class="s-label">Wyświetlanie przeciwników</span>
+      <div class="seg-row">
+        <button class="seg-btn active" id="mdisp-letters" onclick="setMonsterDisplay('letters')">Litery</button>
+        <button class="seg-btn" id="mdisp-staff" onclick="setMonsterDisplay('staff')">Pięciolinia</button>
+      </div>
+    </div>
+    <div class="s-row" id="settings-octave-scope" style="display:none;">
+      <span class="s-label">Oktawa przeciwników</span>
+      <div class="seg-row">
+        <button class="seg-btn active" id="scope-razkreslna" onclick="setOctaveScope('razkreslna')">Tylko razkreślna</button>
+        <button class="seg-btn" id="scope-both" onclick="setOctaveScope('both')">Mała + razkreślna</button>
       </div>
     </div>
     <div class="s-row">
@@ -538,17 +552,33 @@ function setDifficulty(d){
 
 // ══ MONSTERS ══
 var monsters=[], monsterMode='random', score=0;
-// Monster colors are fixed per column assignment at build time
 var MONSTER_COLORS = ['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
 function buildMonsters(){
   monsters=[];
   var ROWS=3, yStep=PH*0.09;
+  // Determine available letters based on octaveScope
+  // 'razkreslna' = C D E F G A H (shoot notes, razkreślna)
+  // 'both' = also includes c d e f g a h (move notes, mała)
+  var availLetters = SHOOT_LETTERS.slice(); // always include razkreślna
+  if(monsterDisplayMode==='staff' && octaveScope==='both'){
+    // Also include small octave — use lowercase letters as monster letters
+    availLetters = availLetters.concat(['c','d','e','f','g','a','h']);
+  }
   for(var r=0;r<ROWS;r++) for(var col=0;col<COLS;col++){
-    var letter=monsterMode==='ordered'?SHOOT_LETTERS[col]:SHOOT_LETTERS[Math.floor(Math.random()*SHOOT_LETTERS.length)];
-    // Assign a fixed color per monster based on its letter, not column, so it never changes
-    var colorIdx = SHOOT_LETTERS.indexOf(letter);
+    var letter, noteId;
+    if(monsterMode==='ordered'){
+      letter = SHOOT_LETTERS[col];
+      noteId = letter+'1'; // e.g. C1, D1 etc.
+    } else {
+      var idx = Math.floor(Math.random()*availLetters.length);
+      letter = availLetters[idx];
+      // If it's a lowercase letter from mała, noteId is just the letter
+      var isSmall = (letter === letter.toLowerCase() && letter !== letter.toUpperCase());
+      noteId = isSmall ? letter : letter+'1';
+    }
+    var colorIdx = SHOOT_LETTERS.indexOf(letter.toUpperCase());
     var color = MONSTER_COLORS[colorIdx >= 0 ? colorIdx : col];
-    monsters.push({col:col,x:colX(col),y:(r*yStep)+60,letter:letter,alive:true,bob:Math.random()*Math.PI*2,color:color});
+    monsters.push({col:col,x:colX(col),y:(r*yStep)+60,letter:letter,noteId:noteId,alive:true,bob:Math.random()*Math.PI*2,color:color});
   }
 }
 
@@ -557,6 +587,73 @@ var bullets=[], BULLET_SPEED=10, SHOT_CD=300, lastShot={};
 function shoot(letter){
   var now=performance.now(); if(now-(lastShot[letter]||0)<SHOT_CD) return;
   lastShot[letter]=now; bullets.push({x:colX(playerCol),y:playerY,letter:letter});
+}
+
+// ══ DRAW STAFF DIRECTLY ON CANVAS ══
+function drawStaffOnCanvas(ctx, noteId, x, y, w, h, noteColor){
+  var data = STAFF_DATA[noteId];
+  if(!data) return;
+  ctx.save();
+  // Geometry
+  var clefW = Math.round(w * 0.30);
+  var sx = x + clefW + 2, sw = w - clefW - 5;
+  var ls = h / 8;
+  var st = y + h * 0.14;
+  var sb = st + 4 * ls;
+  var midY = (st + sb) / 2;
+
+  // 5 staff lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+  ctx.lineWidth = 0.9;
+  for(var i=0;i<5;i++){
+    var ly = st + i*ls;
+    ctx.beginPath(); ctx.moveTo(sx, ly); ctx.lineTo(sx+sw, ly); ctx.stroke();
+  }
+
+  // Clef text
+  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+  if(data.clef === 'treble'){
+    ctx.font = (h*0.88)+'px serif';
+    ctx.fillText('𝄞', x + clefW*0.5, midY + ls*0.3);
+  } else {
+    ctx.font = (ls*2.8)+'px serif';
+    ctx.fillText('𝄢', x + clefW*0.5, st + ls*1.2);
+  }
+
+  // Note position
+  var noteY = sb - data.step * ls * 0.5;
+  var nr = ls * 0.62;
+  var nx = sx + sw * 0.5;
+
+  // Ledger lines
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+  ctx.lineWidth = 1.1;
+  if(data.step <= -2){
+    var lly = sb + ls;
+    ctx.beginPath(); ctx.moveTo(nx-nr*1.7,lly); ctx.lineTo(nx+nr*1.7,lly); ctx.stroke();
+  }
+  // No ledger for h (step 9) — just above top line
+
+  // Stem
+  ctx.strokeStyle = noteColor;
+  ctx.lineWidth = 1.2;
+  if(noteY >= midY){
+    ctx.beginPath(); ctx.moveTo(nx+nr*1.0,noteY); ctx.lineTo(nx+nr*1.0,noteY-ls*2.8); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.moveTo(nx-nr*1.0,noteY); ctx.lineTo(nx-nr*1.0,noteY+ls*2.8); ctx.stroke();
+  }
+
+  // Note head
+  ctx.fillStyle = noteColor;
+  ctx.shadowColor = noteColor; ctx.shadowBlur = 4;
+  ctx.beginPath();
+  ctx.ellipse(nx, noteY, nr*1.15, nr*0.75, -0.3, 0, Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+
+  ctx.restore();
 }
 
 // ══ DRAW PIANO ══
@@ -604,7 +701,11 @@ function draw(){
     cx.shadowColor=m.color; cx.shadowBlur=18;
     cx.fillStyle=m.color; cx.beginPath(); cx.roundRect(mx-mw/2,my-mh/2,mw,mh,5); cx.fill(); cx.shadowBlur=0;
     cx.strokeStyle='rgba(255,255,255,0.35)'; cx.lineWidth=1.5; cx.beginPath(); cx.roundRect(mx-mw/2,my-mh/2,mw,mh,5); cx.stroke();
-    cx.fillStyle='rgba(0,0,0,0.82)'; cx.font='bold '+Math.round(mh*0.6)+'px Courier New'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(m.letter,mx,my);
+    if(monsterDisplayMode==='staff' && m.noteId && STAFF_DATA[m.noteId]){
+      drawStaffOnCanvas(cx, m.noteId, mx-mw/2+2, my-mh/2+2, mw-4, mh-4, 'rgba(0,0,0,0.9)');
+    } else {
+      cx.fillStyle='rgba(0,0,0,0.82)'; cx.font='bold '+Math.round(mh*0.6)+'px Courier New'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(m.letter,mx,my);
+    }
   });
   bullets.forEach(function(b){
     cx.shadowColor='#fff'; cx.shadowBlur=8; cx.fillStyle='#fff'; cx.fillRect(b.x-2,b.y,4,12);
@@ -625,15 +726,40 @@ function draw(){
 
 // ══ UPDATE ══
 function update(){
-  // Monster movement toward player (difficulty-based)
   var spd = DIFF_SPEED[difficulty] || 0;
   if(spd > 0){
     monsters.forEach(function(m){
       if(!m.alive) return;
       m.y += spd;
-      // If monster reaches piano, reset it to top (don't destroy player, just restart from top)
       if(m.y > playerY - 10) m.y = 40 + Math.random()*20;
     });
+    // Prevent monsters from overlapping each other
+    var mw = COL_W*0.62, mh = mw*0.55;
+    var minDist = mh + 4;
+    for(var pass=0; pass<3; pass++){
+      for(var i=0;i<monsters.length;i++){
+        if(!monsters[i].alive) continue;
+        for(var j=i+1;j<monsters.length;j++){
+          if(!monsters[j].alive) continue;
+          // Only check same column for y-overlap (different cols use x spacing)
+          var dx = Math.abs(monsters[i].x - monsters[j].x);
+          var dy = Math.abs(monsters[i].y - monsters[j].y);
+          if(dx < mw*0.8 && dy < minDist){
+            var push = (minDist - dy) * 0.5 + 1;
+            if(monsters[i].y < monsters[j].y){
+              monsters[i].y -= push;
+              monsters[j].y += push;
+            } else {
+              monsters[i].y += push;
+              monsters[j].y -= push;
+            }
+            // Clamp to valid range
+            if(monsters[i].y < 20) monsters[i].y = 20;
+            if(monsters[j].y < 20) monsters[j].y = 20;
+          }
+        }
+      }
+    }
   }
   bullets.forEach(function(b){ b.y-=BULLET_SPEED; });
   bullets.forEach(function(b){
@@ -883,7 +1009,7 @@ function detect(){
   fH.push(freq); if(fH.length>3) fH.shift();
   var note=closest(freq);
   document.getElementById('hud-note').textContent=note?note.label+' '+Math.round(freq)+'Hz':'~'+Math.round(freq)+'Hz';
-  if(note&&gameRunning){
+  if(note&&gameRunning&&inputMode!=='tiles'){
     var ok=fH.filter(function(f){ var n=closest(f); return n&&n.id===note.id; }).length;
     if(ok>=1&&dCD===0){
       dCD=7;
@@ -916,7 +1042,26 @@ function showHelp(){ closeOverlays(); document.getElementById('ov-help').classLi
 function showSettings(){ closeOverlays(); document.getElementById('ov-settings').classList.add('open'); }
 function showTutorial(){ closeOverlays(); tutSlide=0; renderTut(); document.getElementById('tut').style.display='flex'; }
 function doResetMap(){ buildMonsters(); closeOverlays(); }
-function exitGame(){ window.location.href='index.html'; }
+function exitGame(){
+  if(confirm('Na pewno chcesz wyjść z gry?')) window.location.href='index.html';
+}
+
+// ══ MONSTER DISPLAY MODE ══
+var monsterDisplayMode = 'letters'; // 'letters' | 'staff'
+var octaveScope = 'razkreslna'; // 'razkreslna' | 'both'
+function setMonsterDisplay(mode){
+  monsterDisplayMode = mode;
+  document.getElementById('mdisp-letters').classList.toggle('active', mode==='letters');
+  document.getElementById('mdisp-staff').classList.toggle('active', mode==='staff');
+  document.getElementById('settings-octave-scope').style.display = mode==='staff' ? '' : 'none';
+  buildMonsters();
+}
+function setOctaveScope(scope){
+  octaveScope = scope;
+  document.getElementById('scope-razkreslna').classList.toggle('active', scope==='razkreslna');
+  document.getElementById('scope-both').classList.toggle('active', scope==='both');
+  buildMonsters();
+}
 
 // ══ TUTORIAL ══
 var tutSlide=0,TOTAL_SLIDES=3,gameRunning=false;
