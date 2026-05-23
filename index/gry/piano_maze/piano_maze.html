@@ -363,7 +363,7 @@ const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.githu
 // URL dla obrazków wyświetlanych w HTML (ta sama domena co strona = brak CORS)
 const SITE_BASE = '/index/gry/piano_maze/';
 // Tło podczas tutorialu i gry
-const BG_GAME_SRC = SITE_BASE + 'loading_screen/tło maze i tutorial maze.png';
+const BG_GAME_SRC = SITE_BASE + 'loading_screen/loading screen maze.png';
 
 /* ══ TILE SOURCES ══ */
 const TILE_SRCS = {
@@ -446,7 +446,7 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + 'loading_screen/loading screen maze.png';
+  const bgSrc = BASE + 'loading_screen/tło maze i tutorial maze.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
   // Użyj <img> zamiast background-image żeby ominąć CORS
   const bgImgEl = document.createElement('img');
@@ -462,6 +462,7 @@ const CREATURE_IMGS = {
   IMGS.bgs.forEach(u => allUrls.push(u));
   Object.values(CREATURE_IMGS).forEach(u => allUrls.push(u));
   allUrls.push(SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png');
+  allUrls.push(SITE_BASE + 'loading_screen/loading screen maze.png');
 
   const total = allUrls.length;
   let loaded = 0;
@@ -965,107 +966,91 @@ function drawMaze(){
   }
   if(fogEnabled){
     updateFog();
-    fogBlurPhase += 0.005;
+    fogBlurPhase += 0.004;
 
-    // ══ KROK 1: Narysuj mgłę na offscreen canvas ══
+    // Mapa rysowana jest zawsze w pełni nieprzezroczysta (już narysowana powyżej).
+    // Teraz nakładamy mgłę:
+    // - Na kafelku ODKRYTYM: mgła = 0 (przezroczysta, mapa widoczna)
+    // - Na styku odkrytego z zakrytym: mgła = 0 (mapa przebija)
+    // - W głąb zakrytego: mgła rośnie gradientowo do 1
+    // Fala: amplituda ±4% szerokości kafla, okres ~12s
+
+    const wave = Math.sin(fogBlurPhase) * 0.04 * TILE; // ±4% TILE w pikselach
+
+    // Offscreen canvas na mgłę
     const fogOff = document.createElement('canvas');
-    fogOff.width = canvas.width; fogOff.height = canvas.height;
+    fogOff.width = canvas.width;
+    fogOff.height = canvas.height;
     const fc = fogOff.getContext('2d');
 
-    // Tło mgły
+    // Narysuj teksturę mgły na całym canvasie
     if(FOGIMG.complete && FOGIMG.naturalWidth > 0){
-      const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
-      const scale=Math.max(canvas.width/fw, canvas.height/fh);
-      const sw=Math.ceil(fw*scale), sh=Math.ceil(fh*scale);
+      const fw = FOGIMG.naturalWidth, fh = FOGIMG.naturalHeight;
+      const scale = Math.max(canvas.width/fw, canvas.height/fh);
+      const sw = Math.ceil(fw*scale), sh = Math.ceil(fh*scale);
       fc.drawImage(FOGIMG, (canvas.width-sw)/2, (canvas.height-sh)/2, sw, sh);
     } else {
-      fc.fillStyle='rgba(10,20,10,0.97)';
-      fc.fillRect(0,0,canvas.width,canvas.height);
+      fc.fillStyle = 'rgba(180,190,200,0.97)';
+      fc.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // ══ KROK 2: Wytnij odkryte kafle z mgły — z miękką krawędzią ══
-    // Używamy destination-out: gdzie rysujemy = gdzie mgła znika
+    // Wytnij mgłę (destination-out):
+    // Dla każdego zakrytego kafla który sąsiaduje z odkrytym:
+    //   - przy granicy z odkrytym: wytnij w 100% (alpha odkrytego)
+    //   - w głąb kafla: stopniowo mniej wycinaj (gradient do 0)
+    // Dla odkrytych kafli: wytnij całkowicie (mgła = 0)
     fc.globalCompositeOperation = 'destination-out';
 
-    const blurZone = TILE * (0.55 + 0.04 * Math.sin(fogBlurPhase));
+    const gradW = TILE * 1.0 + wave; // szerokość strefy gradientu = 1 kafelek + fala
 
     for(let r = 0; r < ROWS; r++){
       for(let c2 = 0; c2 < COLS; c2++){
-        const a = fogAlpha[r][c2];
-        if(a >= 1) continue; // w pełni zakryty — nic nie wytnij
+        const alpha = fogAlpha[r][c2]; // 0 = odkryty, 1 = zakryty
+        const x0 = c2 * TILE, y0 = r * TILE;
 
-        const x0 = c2*TILE, y0 = r*TILE;
-        const reveal = 1 - a; // 1 = całkowicie odkryty, 0 = zakryty
-
-        // ── Twardy środek kafla ──
-        // Centrum odkrytego kafla — wytniej mgłę w pełni
-        fc.globalAlpha = reveal;
-        fc.fillStyle = 'black';
-        // Bezpieczny prostokąt wewnątrz kafla (bez krawędzi)
-        const inner = TILE * 0.25;
-        fc.fillRect(x0 + inner, y0 + inner, TILE - 2*inner, TILE - 2*inner);
-
-        // ── Miękka krawędź: gradient per strona kafla ──
-        // Dla każdej strony sprawdź sąsiada i narysuj gradient
-        // od pełnego reveal (przy granicy) do 0 (przy krawędzi blurZone)
-
-        const sides = [
-          // [dx_rect, dy_rect, dw, dh, gx1,gy1, gx2,gy2, sąsiad dr,dc]
-          // Góra
-          [x0, y0, TILE, blurZone,
-           0, y0+blurZone, 0, y0,
-           -1, 0],
-          // Dół
-          [x0, y0+TILE-blurZone, TILE, blurZone,
-           0, y0+TILE-blurZone, 0, y0+TILE,
-           1, 0],
-          // Lewo
-          [x0, y0, blurZone, TILE,
-           x0+blurZone, 0, x0, 0,
-           0, -1],
-          // Prawo
-          [x0+TILE-blurZone, y0, blurZone, TILE,
-           x0+TILE-blurZone, 0, x0+TILE, 0,
-           0, 1],
-        ];
-
-        for(const [rx,ry,rw,rh,gx1,gy1,gx2,gy2,dr,dc] of sides){
-          const nr2 = r+dr, nc2b = c2+dc;
-          // Siła reveal po stronie sąsiada
-          let neighbourReveal;
-          if(nr2<0||nr2>=ROWS||nc2b<0||nc2b>=COLS){
-            neighbourReveal = 0; // krawędź mapy = zakryta
-          } else {
-            neighbourReveal = 1 - fogAlpha[nr2][nc2b];
-          }
-          // Gradient reveal: od centrum kafla (reveal) do granicy z sąsiadem (neighbourReveal)
-          const g = fc.createLinearGradient(gx1, gy1, gx2, gy2);
-          g.addColorStop(0, 'rgba(0,0,0,' + reveal.toFixed(3) + ')');
-          g.addColorStop(1, 'rgba(0,0,0,' + neighbourReveal.toFixed(3) + ')');
-          fc.fillStyle = g;
-          fc.fillRect(rx, ry, rw, rh);
+        if(alpha < 0.02){
+          // Całkowicie odkryty — wytnij mgłę w 100%
+          fc.globalAlpha = 1;
+          fc.fillStyle = 'black';
+          fc.fillRect(x0, y0, TILE, TILE);
+          continue;
         }
 
-        // ── Rogi (interpolacja po przekątnej) ──
-        const corners = [
-          [x0,         y0,         -1,-1],
-          [x0+TILE-blurZone, y0,         -1, 1],
-          [x0,         y0+TILE-blurZone,  1,-1],
-          [x0+TILE-blurZone, y0+TILE-blurZone,  1, 1],
+        // Kafelek częściowo lub całkowicie zakryty
+        // Sprawdź każdą stronę — czy sąsiad jest odkryty
+        const nbAlpha = {
+          N: r > 0 ? fogAlpha[r-1][c2] : 1,
+          S: r < ROWS-1 ? fogAlpha[r+1][c2] : 1,
+          W: c2 > 0 ? fogAlpha[r][c2-1] : 1,
+          E: c2 < COLS-1 ? fogAlpha[r][c2+1] : 1,
+        };
+
+        // Dla każdej strony z odkrytym sąsiadem: gradient od granicy (100% wycięcie) w głąb (0% wycięcie)
+        const sides = [
+          { open: nbAlpha.N < 0.5, gx1:x0, gy1:y0,        gx2:x0, gy2:y0+gradW,      rx:x0, ry:y0,        rw:TILE, rh:Math.min(gradW,TILE) },
+          { open: nbAlpha.S < 0.5, gx1:x0, gy1:y0+TILE,   gx2:x0, gy2:y0+TILE-gradW, rx:x0, ry:Math.max(y0+TILE-gradW,y0), rw:TILE, rh:Math.min(gradW,TILE) },
+          { open: nbAlpha.W < 0.5, gx1:x0,      gy1:y0,   gx2:x0+gradW,      gy2:y0, rx:x0, ry:y0, rw:Math.min(gradW,TILE), rh:TILE },
+          { open: nbAlpha.E < 0.5, gx1:x0+TILE, gy1:y0,   gx2:x0+TILE-gradW, gy2:y0, rx:Math.max(x0+TILE-gradW,x0), ry:y0, rw:Math.min(gradW,TILE), rh:TILE },
         ];
-        for(const [cx3,cy3,dr,dc] of corners){
-          const nr2=r+dr, nc2b=c2+dc;
-          let nRev = 0;
-          if(nr2>=0&&nr2<ROWS&&nc2b>=0&&nc2b<COLS) nRev=1-fogAlpha[nr2][nc2b];
-          const avgRev = (reveal + nRev) / 2;
-          const rg = fc.createRadialGradient(
-            cx3+(dc>0?0:blurZone), cy3+(dr>0?0:blurZone), 0,
-            cx3+(dc>0?0:blurZone), cy3+(dr>0?0:blurZone), blurZone*1.2
-          );
-          rg.addColorStop(0, 'rgba(0,0,0,' + avgRev.toFixed(3) + ')');
-          rg.addColorStop(1, 'rgba(0,0,0,0)');
-          fc.fillStyle = rg;
-          fc.fillRect(cx3, cy3, blurZone, blurZone);
+
+        let anyOpen = false;
+        for(const s of sides){
+          if(!s.open) continue;
+          anyOpen = true;
+          // Gradient: od granicy (pełne wycięcie = mgła przezroczysta) w głąb (0 wycięcia = mgła pełna)
+          const g = fc.createLinearGradient(s.gx1, s.gy1, s.gx2, s.gy2);
+          g.addColorStop(0, 'rgba(0,0,0,1)');   // przy granicy: wytnij mgłę całkowicie
+          g.addColorStop(1, 'rgba(0,0,0,0)');   // w głąb kafla: nie wycinaj (pełna mgła)
+          fc.fillStyle = g;
+          fc.globalAlpha = 1 - alpha * 0.3;     // im bardziej zakryty, tym słabszy gradient
+          fc.fillRect(s.rx, s.ry, s.rw, s.rh);
+        }
+
+        // Jeśli kafelek w pełni odkryty (fogAlpha~0) ale nie zero — też wytnij środek
+        if(alpha < 0.3){
+          fc.globalAlpha = (0.3 - alpha) / 0.3;
+          fc.fillStyle = 'black';
+          fc.fillRect(x0, y0, TILE, TILE);
         }
       }
     }
@@ -1073,10 +1058,10 @@ function drawMaze(){
     fc.globalCompositeOperation = 'source-over';
     fc.globalAlpha = 1;
 
-    // ══ KROK 3: Nałóż mgłę na główny canvas ══
+    // Nałóż mgłę na canvas
     ctx.drawImage(fogOff, 0, 0);
 
-    // ══ KROK 4: Podgląd wyjścia przez mgłę ══
+    // Podgląd wyjścia przez mgłę
     if(showExitHint){
       const{goalR,goalC}=mazeData;
       const alpha=fogAlpha[goalR][goalC];
@@ -1225,7 +1210,7 @@ function showTutorial(){
   if(!ov.querySelector('img.bg-img')){
     const bg=document.createElement('img');
     bg.className='bg-img';
-    bg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0.22;pointer-events:none;';
+    bg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0.55;pointer-events:none;';
     bg.src=BG_GAME_SRC;
     ov.insertBefore(bg,ov.firstChild);
   }
@@ -1245,7 +1230,7 @@ function startGame(){
   if(!cw.querySelector('img.bg-img')){
     const cwBg=document.createElement('img');
     cwBg.className='bg-img';
-    cwBg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0.18;pointer-events:none;';
+    cwBg.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;opacity:0.92;pointer-events:none;';
     cwBg.src=BG_GAME_SRC;
     cw.insertBefore(cwBg,cw.firstChild);
   }
