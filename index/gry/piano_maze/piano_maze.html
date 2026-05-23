@@ -13,8 +13,8 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 /* ══ LOADING SCREEN ══ */
 #loading-screen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10vh;background:#060e0a;transition:opacity 0.8s ease;}
 #loading-screen.fade-out{opacity:0;pointer-events:none;}
-#loading-bg{position:absolute;inset:0;background-size:cover;background-position:center top;image-rendering:pixelated;opacity:0;transition:opacity 0.4s ease;}
-#loading-bg.loaded{opacity:1;}
+#loading-bg{position:absolute;inset:0;overflow:hidden;}
+
 #loading-content{position:relative;width:min(480px,88vw);display:flex;flex-direction:column;align-items:center;gap:14px;}
 #loading-title{font-family:'Cinzel',serif;font-size:clamp(1rem,3.5vw,1.6rem);font-weight:900;color:#d4af37;letter-spacing:.22em;text-shadow:0 0 30px rgba(212,175,55,.7),0 2px 8px rgba(0,0,0,.9);text-align:center;}
 #loading-sub{font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;letter-spacing:.12em;text-align:center;}
@@ -416,10 +416,10 @@ const IMGS = {
   'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
   'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
   'bgs': [
-    SITE_BASE + 'concept_art/bagno 4.png',
-    SITE_BASE + 'concept_art/las 3.png',
-    SITE_BASE + 'concept_art/malowidla 2.png',
-    SITE_BASE + 'concept_art/wykopaliska 1.png',
+    BASE + 'concept_art/bagno 4.png',
+    BASE + 'concept_art/las 3.png',
+    BASE + 'concept_art/malowidla 2.png',
+    BASE + 'concept_art/wykopaliska 1.png',
   ],
 };
 
@@ -444,18 +444,14 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = SITE_BASE + 'loading_screen/loading screen maze.png';
+  const bgSrc = BASE + 'loading_screen/loading screen maze.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
-  const bgImg = new Image();
-  bgImg.onload = () => {
-    bgEl.style.backgroundImage = 'url(' + bgSrc + ')';
-    // Krótkie opóźnienie żeby przeglądarka zdążyła zastosować background-image
-    setTimeout(() => bgEl.classList.add('loaded'), 20);
-  };
-  bgImg.onerror = () => {
-    // Fallback: ciemne tło już jest w CSS
-  };
-  bgImg.src = bgSrc;
+  // Użyj <img> zamiast background-image żeby ominąć CORS
+  const bgImgEl = document.createElement('img');
+  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;image-rendering:pixelated;opacity:0;transition:opacity 0.4s;';
+  bgImgEl.onload = () => { bgImgEl.style.opacity = '1'; };
+  bgImgEl.src = bgSrc;
+  bgEl.appendChild(bgImgEl);
 
   const allUrls = [];
   Object.values(TILE_SRCS).forEach(u => allUrls.push(u));
@@ -529,15 +525,15 @@ const CHARS = [
   document.getElementById('char-img-'+i).src=src;
   document.getElementById('mchar-img-'+i).src=src;
 });
-// Preloaduj concept art przez Image() żeby był w cache gdy char-screen się pojawi
+// Concept art jako <img> zamiast background-image (omija CORS)
 const rBg=(IMGS.bgs||[])[Math.floor(Math.random()*(IMGS.bgs||['']).length)]||'';
 if(rBg){
-  const charBgImg = new Image();
-  charBgImg.onload = () => {
-    const el = document.getElementById('char-bg');
-    el.style.backgroundImage = 'url(' + rBg + ')';
-  };
+  const charBgEl = document.getElementById('char-bg');
+  const charBgImg = document.createElement('img');
+  charBgImg.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.8s;';
+  charBgImg.onload = () => { charBgImg.style.opacity = '0.35'; };
   charBgImg.src = rBg;
+  charBgEl.appendChild(charBgImg);
 }
 
 /* ══ TILES ══ */
@@ -883,7 +879,7 @@ function fitCanvas(){
   canvas.width=TILE*COLS;canvas.height=TILE*ROWS;
 }
 // Prawdopodobieństwo pojawienia się kafelka filler w pustej komórce (0..1)
-const FILLER_CHANCE = 0.30;
+const FILLER_CHANCE = 0.55;
 
 function assignCellTile(r,c,op,isGoal){
   const k=`${r},${c}`;
@@ -935,8 +931,8 @@ function drawMaze(){
           ctx.fillStyle='#d4af37';
           ctx.fillRect(x,y,TILE,TILE);
           ctx.restore();
-          const dw=Math.round(TILE*0.72),dh=Math.round(TILE*0.88);
-          ctx.drawImage(DRZWIIMG,x+(TILE-dw)/2,y+(TILE-dh)/2,dw,dh);
+          const dw=Math.round(TILE*0.68),dh=Math.round(TILE*0.82);
+          ctx.drawImage(DRZWIIMG,x+(TILE-dw)/2,y+(TILE-dh)/2 - Math.round(TILE*0.1),dw,dh);
         }
       }
     }
@@ -1312,13 +1308,43 @@ function updateCreaturePositions() {
   const spacing = computeSpacing(n);
   const histLen = creaturePositions.length;
 
+  // Zbierz docelowe pozycje i sprawdź nakładanie
+  const targetPositions = [];
   creaturesFollowing.forEach((c, idx) => {
-    // Indeks 0 = najbliższe gracza, każde następne jest SPACING klatek dalej w historii
     const delay   = (idx + 1) * spacing;
     const histIdx = Math.max(0, histLen - 1 - delay);
     const pos     = creaturePositions[histIdx];
-    c.imgEl.style.left    = pos.x + 'px';
-    c.imgEl.style.top     = pos.y + 'px';
+    targetPositions.push({ x: pos.x, y: pos.y });
+  });
+
+  // Rozsuń nakładające się zwierzątka
+  const minDist = CREATURE_SIZE * 1.1;
+  for (let pass = 0; pass < 3; pass++) {
+    for (let i = 0; i < targetPositions.length; i++) {
+      for (let j = i + 1; j < targetPositions.length; j++) {
+        const dx = targetPositions[j].x - targetPositions[i].x;
+        const dy = targetPositions[j].y - targetPositions[i].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < minDist && dist > 0.01) {
+          const push = (minDist - dist) / 2 + 1;
+          const nx = dx / dist, ny = dy / dist;
+          targetPositions[i].x -= nx * push;
+          targetPositions[i].y -= ny * push;
+          targetPositions[j].x += nx * push;
+          targetPositions[j].y += ny * push;
+        } else if (dist <= 0.01) {
+          // Identyczne pozycje — rozsuń w kółko
+          const angle = (j / targetPositions.length) * Math.PI * 2;
+          targetPositions[j].x += Math.cos(angle) * minDist;
+          targetPositions[j].y += Math.sin(angle) * minDist;
+        }
+      }
+    }
+  }
+
+  creaturesFollowing.forEach((c, idx) => {
+    c.imgEl.style.left    = targetPositions[idx].x + 'px';
+    c.imgEl.style.top     = targetPositions[idx].y + 'px';
     c.imgEl.style.opacity = '1';
   });
 }
