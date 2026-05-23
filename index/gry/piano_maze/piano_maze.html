@@ -1,3 +1,6 @@
+
+raw
+Piano maze · HTML
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -13,7 +16,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 /* ══ LOADING SCREEN ══ */
 #loading-screen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10vh;background:#060e0a;transition:opacity 0.8s ease;}
 #loading-screen.fade-out{opacity:0;pointer-events:none;}
-#loading-bg{position:absolute;inset:0;background-size:cover;background-position:center top;image-rendering:pixelated;opacity:0;transition:opacity 1.2s ease;}
+#loading-bg{position:absolute;inset:0;background-size:cover;background-position:center top;image-rendering:pixelated;opacity:0;transition:opacity 0.4s ease;}
 #loading-bg.loaded{opacity:1;}
 #loading-content{position:relative;width:min(480px,88vw);display:flex;flex-direction:column;align-items:center;gap:14px;}
 #loading-title{font-family:'Cinzel',serif;font-size:clamp(1rem,3.5vw,1.6rem);font-weight:900;color:#d4af37;letter-spacing:.22em;text-shadow:0 0 30px rgba(212,175,55,.7),0 2px 8px rgba(0,0,0,.9);text-align:center;}
@@ -156,7 +159,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 </div>
  
 <!-- CHAR SCREEN -->
-<div id="char-screen">
+<div id="char-screen" style="display:none;">
   <div id="char-bg"></div>
   <div class="ornament">⚔ ✦ ⚔</div>
   <h1>Muzyczny Labirynt</h1>
@@ -443,9 +446,16 @@ const CREATURE_IMGS = {
 (function(){
   const bgEl = document.getElementById('loading-bg');
   const bgSrc = BASE + '../loading_screen/loading screen maze.png';
-  bgEl.style.backgroundImage = 'url(' + bgSrc + ')';
+  // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
   const bgImg = new Image();
-  bgImg.onload = () => bgEl.classList.add('loaded');
+  bgImg.onload = () => {
+    bgEl.style.backgroundImage = 'url(' + bgSrc + ')';
+    // Krótkie opóźnienie żeby przeglądarka zdążyła zastosować background-image
+    setTimeout(() => bgEl.classList.add('loaded'), 20);
+  };
+  bgImg.onerror = () => {
+    // Fallback: ciemne tło już jest w CSS
+  };
   bgImg.src = bgSrc;
  
   const allUrls = [];
@@ -491,7 +501,11 @@ const CREATURE_IMGS = {
     setTimeout(() => {
       const ls = document.getElementById('loading-screen');
       ls.classList.add('fade-out');
-      setTimeout(() => { if(ls.parentNode) ls.parentNode.removeChild(ls); }, 850);
+      setTimeout(() => {
+        if(ls.parentNode) ls.parentNode.removeChild(ls);
+        // Pokaż ekran wyboru postaci dopiero po zniknięciu loading screena
+        document.getElementById('char-screen').style.display = 'flex';
+      }, 850);
     }, 500);
   }
  
@@ -517,7 +531,7 @@ const CHARS = [
   document.getElementById('mchar-img-'+i).src=src;
 });
 const rBg=(IMGS.bgs||[])[Math.floor(Math.random()*(IMGS.bgs||['']).length)]||'';
-document.getElementById('char-bg').style.backgroundImage=`url(${rBg})`;
+if(rBg) document.getElementById('char-bg').style.backgroundImage=`url(${rBg})`;
  
 /* ══ TILES ══ */
 const TILES_BY_PATH = {
@@ -531,7 +545,7 @@ const TILES_BY_PATH = {
 };
 function openKey(s){return[...s].sort().join('');}
 function pickTileName(openSet,isGoal){
-  if(isGoal)return'exit_1';
+  // Cel dostaje normalny kafelek drogi — drzwi będą narysowane jako token na wierzchu
   const k=openKey(openSet);
   if(TILES_BY_PATH[k]){const a=TILES_BY_PATH[k];return a[Math.floor(Math.random()*a.length)];}
   return TILES_BY_PATH['WALL'][Math.floor(Math.random()*5)];
@@ -811,7 +825,7 @@ function generateMaze(){
   function dfs(r,c,lastDir){
     vis[r][c]=true;
     let ds=[...DIRS].sort(()=>Math.random()-.5);
-    if(lastDir){const same=ds.find(d=>d[0]===lastDir);if(same&&Math.random()<0.6){ds=ds.filter(d=>d[0]!==lastDir);ds.unshift(same);}}
+    // brak preferencji prostej drogi — więcej ślepych zaułków
     for(const[d,dr,dc,rd]of ds){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!vis[nr][nc]){conn[r][c].add(d);conn[nr][nc].add(rd);dfs(nr,nc,d);}}
   }
   const sc=1+Math.floor(Math.random()*(COLS-2));
@@ -860,9 +874,21 @@ function fitCanvas(){
   TILE=Math.max(16,Math.floor(Math.min(W/COLS,H/ROWS)));
   canvas.width=TILE*COLS;canvas.height=TILE*ROWS;
 }
+// Prawdopodobieństwo pojawienia się kafelka filler w pustej komórce (0..1)
+const FILLER_CHANCE = 0.30;
+ 
 function assignCellTile(r,c,op,isGoal){
   const k=`${r},${c}`;
-  if(!cellTiles2[k])cellTiles2[k]=pickTileName(op,isGoal);
+  if(!cellTiles2[k]){
+    if(op.size===0){
+      // Puste miejsce (ściana): z FILLER_CHANCE losuj kafelek filler, inaczej czarna dziura
+      cellTiles2[k] = Math.random()<FILLER_CHANCE
+        ? TILES_BY_PATH['WALL'][Math.floor(Math.random()*TILES_BY_PATH['WALL'].length)]
+        : '__empty__';
+    } else {
+      cellTiles2[k] = pickTileName(op,false);
+    }
+  }
   return cellTiles2[k];
 }
 function drawMaze(){
@@ -873,13 +899,35 @@ function drawMaze(){
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
       const x=c*TILE,y=r*TILE,op=conn[r][c],isGoal=(r===goalR&&c===goalC);
-      const im=IMG[assignCellTile(r,c,op,isGoal)];
-      if(im&&im.complete&&im.naturalWidth>0){ctx.drawImage(im,x,y,TILE,TILE);}
-      else{ctx.fillStyle=isGoal?'#2a4a1a':(op.size===0?'#111a11':'#1e3a1e');ctx.fillRect(x,y,TILE,TILE);ctx.strokeStyle='#2a3a2a';ctx.strokeRect(x+.5,y+.5,TILE-1,TILE-1);}
+      // Kafelek drogi lub dekoracji — cel dostaje normalny kafelek drogi
+      const tileName=assignCellTile(r,c,op,false);
+      if(tileName==='__empty__'){
+        // Puste miejsce — tylko ciemne tło, nie rysuj nic
+        ctx.fillStyle='#0d150d';
+        ctx.fillRect(x,y,TILE,TILE);
+      } else {
+        const im=IMG[tileName];
+        if(im&&im.complete&&im.naturalWidth>0){
+          ctx.drawImage(im,x,y,TILE,TILE);
+        } else {
+          ctx.fillStyle=op.size===0?'#111a11':'#1e3a1e';
+          ctx.fillRect(x,y,TILE,TILE);
+          ctx.strokeStyle='#2a3a2a';
+          ctx.strokeRect(x+.5,y+.5,TILE-1,TILE-1);
+        }
+      }
+      // Token drzwi nałożony na kafelek celu
       if(isGoal){
-        ctx.save();ctx.globalAlpha=0.18+0.08*Math.sin(Date.now()*.004);ctx.fillStyle='#d4af37';ctx.fillRect(x,y,TILE,TILE);ctx.globalAlpha=1;ctx.restore();
         const fa=fogEnabled?fogAlpha[r][c]:0;
-        if(fa<0.3&&DRZWIIMG.complete&&DRZWIIMG.naturalWidth>0){const dw=Math.round(TILE*.5),dh=Math.round(TILE*.65);ctx.drawImage(DRZWIIMG,x+(TILE-dw)/2,y+TILE-dh,dw,dh);}
+        if(fa<0.5&&DRZWIIMG.complete&&DRZWIIMG.naturalWidth>0){
+          ctx.save();
+          ctx.globalAlpha=(0.12+0.06*Math.sin(Date.now()*.004))*Math.max(0,1-fa*2);
+          ctx.fillStyle='#d4af37';
+          ctx.fillRect(x,y,TILE,TILE);
+          ctx.restore();
+          const dw=Math.round(TILE*0.72),dh=Math.round(TILE*0.88);
+          ctx.drawImage(DRZWIIMG,x+(TILE-dw)/2,y+(TILE-dh)/2,dw,dh);
+        }
       }
     }
   }
@@ -888,8 +936,17 @@ function drawMaze(){
     const fogOff=document.createElement('canvas');
     fogOff.width=canvas.width;fogOff.height=canvas.height;
     const fc=fogOff.getContext('2d');
-    if(FOGIMG.complete&&FOGIMG.naturalWidth>0){fc.drawImage(FOGIMG,0,0,canvas.width,canvas.height);}
-    else{fc.fillStyle='rgba(10,20,10,0.95)';fc.fillRect(0,0,canvas.width,canvas.height);}
+    if(FOGIMG.complete&&FOGIMG.naturalWidth>0){
+      // Skaluj mgłę cover-fit: wypełnij cały canvas, utnij co wychodzi poza
+      const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
+      const cw=canvas.width, ch=canvas.height;
+      const scale=Math.max(cw/fw, ch/fh);
+      const sw=Math.ceil(fw*scale), sh=Math.ceil(fh*scale);
+      const sx=(cw-sw)/2, sy=(ch-sh)/2;
+      fc.drawImage(FOGIMG,sx,sy,sw,sh);
+    } else {
+      fc.fillStyle='rgba(10,20,10,0.95)';fc.fillRect(0,0,canvas.width,canvas.height);
+    }
     fc.globalCompositeOperation='destination-out';
     for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){const alpha=fogAlpha[r][c];if(alpha>=1)continue;fc.globalAlpha=1-alpha;fc.fillStyle='black';fc.fillRect(c*TILE,r*TILE,TILE,TILE);}}
     fc.globalCompositeOperation='source-over';fc.globalAlpha=1;
@@ -1040,7 +1097,7 @@ function startGame(){
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
 }
  
-/* ══ CREATURES — WĘŻYK ══ */
+/* ══ CREATURES — PŁYNNY WĘŻYK ══ */
  
 const CREATURE_DEFS = [
   { id: 'sowa',      name: 'Sowa',                img: CREATURE_IMGS.sowa },
@@ -1061,13 +1118,13 @@ const CREATURE_DEFS = [
  
 let creaturesOnMap     = [];
 let creaturesFollowing = [];
-let creaturePositions  = []; // historia pikselowych pozycji gracza (każda klatka)
+let creaturePositions  = []; // historia pikselowych pozycji gracza
  
-const CREATURE_SIZE    = 18;
-const CREATURE_SPACING = 24; // bazowy odstęp między zwierzątkami w historii
-const HIST_KEEP        = 800;
+const CREATURE_SIZE = 16;    // px — rozmiar ikonki
+const BASE_SPACING  = 20;    // px — bazowy odstęp między zwierzątkami
+const HIST_FRAMES   = 900;   // max długość historii
  
-// Aktualna pikselowa pozycja gracza (środek jego kafla)
+// Pikselowa pozycja środka kafla gracza
 function playerPixelPos() {
   if (!mazeData) return { x: 0, y: 0 };
   const cr = canvas.getBoundingClientRect();
@@ -1112,6 +1169,7 @@ function spawnCreatures() {
     const pos   = available[i];
     const imgEl = document.createElement('img');
     imgEl.src   = def.img;
+    // CSS transition na left/top dla płynnego ruchu
     imgEl.style.cssText =
       'position:absolute;' +
       'width:'  + CREATURE_SIZE + 'px;' +
@@ -1120,7 +1178,7 @@ function spawnCreatures() {
       'pointer-events:none;' +
       'z-index:9;' +
       'transform:translate(-50%,-50%);' +
-      'transition:opacity .3s;' +
+      'transition:left 0.18s linear, top 0.18s linear, opacity 0.3s;' +
       'will-change:left,top;';
     wrap.appendChild(imgEl);
     creaturesOnMap.push({ ...def, r: pos.r, c: pos.c, imgEl });
@@ -1128,21 +1186,26 @@ function spawnCreatures() {
  
   // Wypełnij historię bieżącą pozycją gracza
   const pp = playerPixelPos();
-  for (let i = 0; i < HIST_KEEP; i++) creaturePositions.push({ ...pp });
+  for (let i = 0; i < HIST_FRAMES; i++) creaturePositions.push({ ...pp });
  
   updateCreatureHUD();
   updateCreaturePositions();
 }
  
-// Zapisz bieżącą pozycję gracza do historii — wywoływana co klatkę w loop()
+// Dodaj bieżącą pozycję gracza do historii — wywoływana co klatkę w loop()
 function recordPlayerPos() {
   if (!mazeData) return;
   creaturePositions.push(playerPixelPos());
-  // Ogranicz historię: tyle ile potrzebujemy dla ostatniego zwierzątka + zapas
-  const n       = creaturesFollowing.length;
-  const spacing = n > 8 ? Math.max(12, CREATURE_SPACING - Math.floor(n / 4) * 2) : CREATURE_SPACING;
-  const needed  = HIST_KEEP + n * spacing * 2 + 100;
+  // Ogranicz historię
+  const n = creaturesFollowing.length;
+  const spacing = computeSpacing(n);
+  const needed  = HIST_FRAMES + n * spacing + 60;
   while (creaturePositions.length > needed) creaturePositions.shift();
+}
+ 
+function computeSpacing(n) {
+  // Im więcej zwierząt, tym mniejszy odstęp — min 10px
+  return Math.max(10, BASE_SPACING - Math.floor(n / 5) * 3);
 }
  
 // Ustaw pozycje DOM — wywoływana co klatkę w loop()
@@ -1163,20 +1226,15 @@ function updateCreaturePositions() {
     c.imgEl.style.opacity = fogEnabled ? (fa < 0.7 ? '1' : '0') : '1';
   });
  
-  // ── Wężyk ──
+  // ── Wężyk: każde zwierzątko śledzi historyczną pozycję gracza ──
   const n = creaturesFollowing.length;
   if (n === 0) return;
  
-  // Im więcej zwierząt, tym mniejszy odstęp (zagęszczanie)
-  // przy 1–4: 24px, przy 5–8: 20px, przy 9–14: 14px
-  const spacing = n <= 4 ? CREATURE_SPACING
-                : n <= 8 ? Math.max(18, CREATURE_SPACING - 4)
-                : Math.max(12, CREATURE_SPACING - 10);
- 
+  const spacing = computeSpacing(n);
   const histLen = creaturePositions.length;
  
   creaturesFollowing.forEach((c, idx) => {
-    // Każde kolejne zwierzątko sięga głębiej w historię pozycji gracza
+    // Indeks 0 = najbliższe gracza, każde następne jest SPACING klatek dalej w historii
     const delay   = (idx + 1) * spacing;
     const histIdx = Math.max(0, histLen - 1 - delay);
     const pos     = creaturePositions[histIdx];
@@ -1201,7 +1259,6 @@ function updateCreatureHUD() {
   const total = creaturesOnMap.length + creaturesFollowing.length;
   el.textContent = '\uD83D\uDC3E ' + creaturesFollowing.length + '/' + total;
 }
- 
  
 </script>
 </body>
