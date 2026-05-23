@@ -1,3 +1,6 @@
+
+raw
+Podrecznik · HTML
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -181,19 +184,19 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
 <body>
  
 <nav class="site-nav">
-  <a href="index.html">Strona główna</a>
-  <a href="fiszki.html">Fiszki</a>
-  <a href="index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="../index.html">Strona główna</a>
+  <a href="../fiszki.html">Fiszki</a>
+  <a href="../index.html#terminy" class="nav-highlight">🎹 Umów</a>
   <a href="podrecznik.html">Podręcznik</a>
-  <a href="index.html#briefy">Materiały</a>
+  <a href="../index.html#briefy">Materiały</a>
 </nav>
  
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
-    <a href="index.html"><span class="mn-icon">🏠</span>Główna</a>
-    <a href="index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
-    <a href="index.html#terminy" class="mn-cta">🎹 Umów</a>
-    <a href="fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="../index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="../index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="../index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="../fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
     <a href="podrecznik.html" class="active"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
@@ -349,7 +352,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
   <div class="footer-main">
     <div>
       <div class="footer-brand-row">
-        <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo">
+        <img src="../grafiki_index/logo bez numeru tel.png" alt="Logo" class="footer-logo">
         <div><div class="footer-name">Łukasz Ganczarek</div><div class="footer-tagline">Nauka gry na pianinie</div></div>
       </div>
       <div class="footer-rule"></div>
@@ -363,11 +366,11 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
     <div>
       <div class="footer-col-title">Nawigacja</div>
       <ul class="footer-links">
-        <li><a href="index.html">Strona główna</a></li>
-        <li><a href="index.html#o-mnie">O mnie</a></li>
-        <li><a href="index.html#pianino">Pianino</a></li>
-        <li><a href="index.html#terminy">Wolne terminy</a></li>
-        <li><a href="fiszki.html">Fiszki nutowe</a></li>
+        <li><a href="../index.html">Strona główna</a></li>
+        <li><a href="../index.html#o-mnie">O mnie</a></li>
+        <li><a href="../index.html#pianino">Pianino</a></li>
+        <li><a href="../index.html#terminy">Wolne terminy</a></li>
+        <li><a href="../fiszki.html">Fiszki nutowe</a></li>
         <li><a href="podrecznik.html">Podręcznik</a></li>
       </ul>
     </div>
@@ -421,22 +424,20 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
  
 <script>
 /* ══════════════════════════════════════════════
-   PODRĘCZNIK — strony
+   PODRĘCZNIK — strony lokalne (PDF w folderze strony/)
 ══════════════════════════════════════════════ */
-function gdrive(id){return 'https://drive.google.com/thumbnail?id='+id+'&sz=w1600';}
- 
-const PAGES=[
-  gdrive('1HhGRasqAkIWE0MAm4vrlKWMXfKII9r0r'),
-  gdrive('1H6a3cEOJz7P3XQwp4wIuF2ro4psx3bLl'),
-  gdrive('1cl8pcVp0VhWxw043kJWz8dHRsatOXba6'),
-  gdrive('1zOVnTOLIxxZtqzACnHRgDbACkECGijV1'),
-  gdrive('1QPkC-ybUuBbRgIier8s5aKMF62hmCOdR'),
-  gdrive('1xkqIdBstRv-c-wjIJCSIM3_OI6cyQNSZ'),
-  gdrive('1b2za16bDssbhAGKs2eKd8IvtA1wdigxu'),
-  gdrive('10lKpDNMiZ87Cmfdq5nrnGbquZirmbVO2'),
-  gdrive('1t1gW8I35vJnWeyVUwF_2t0B4wVe2g9RI'),
-  gdrive('147TpHeF8prycfAoRelx3LeqEs4VcswpJ'),
-  gdrive('1RN74tdcS_GK7gjD8RIzAdsXFhQBKHl_D'),
+const PAGES = [
+  'strony/1.pdf',
+  'strony/2.pdf',
+  'strony/3.pdf',
+  'strony/4.pdf',
+  'strony/5.pdf',
+  'strony/6.pdf',
+  'strony/7.pdf',
+  'strony/8.pdf',
+  'strony/9.pdf',
+  'strony/10.pdf',
+  'strony/11.pdf',
 ];
  
 const TOC=[
@@ -475,9 +476,29 @@ function goTo(n){
   const spinner=document.getElementById('pageSpinner');
   img.classList.add('out');spinner.style.display='flex';
   setTimeout(()=>{
-    current=n;img.src=PAGES[current-1];
-    img.onload=()=>{img.classList.remove('out');spinner.style.display='none';};
-    img.onerror=()=>{img.classList.remove('out');spinner.textContent='Błąd ładowania — sprawdź czy plik jest publiczny';};
+    current=n;
+    // Dla PDF używamy obiektu embed zamiast img
+    const src = PAGES[current-1];
+    if(src.endsWith('.pdf')){
+      img.style.display='none';
+      let embed = document.getElementById('pageEmbed');
+      if(!embed){
+        embed=document.createElement('embed');
+        embed.id='pageEmbed';
+        embed.style.cssText='width:100%;height:100%;border:none;background:white;';
+        document.getElementById('pageDisplay').appendChild(embed);
+      }
+      embed.src=src;
+      embed.style.display='block';
+      spinner.style.display='none';
+    } else {
+      let embed=document.getElementById('pageEmbed');
+      if(embed)embed.style.display='none';
+      img.style.display='block';
+      img.src=src;
+      img.onload=()=>{img.classList.remove('out');spinner.style.display='none';};
+      img.onerror=()=>{img.classList.remove('out');spinner.textContent='Błąd ładowania strony';};
+    }
     updateUI();
   },180);
 }
