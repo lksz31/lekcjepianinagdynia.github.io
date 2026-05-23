@@ -238,7 +238,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   <div id="game-row">
     <div id="canvas-wrap">
       <canvas id="mc"></canvas>
-      <div id="pl"><img id="pl-img" src="" alt="" style="width:36px;height:auto;"></div>
+      <div id="pl"><img id="pl-img" src="" alt="" style="height:auto;"></div>
       <div id="wo">
         <h2>🏆 Dotarłeś<br>do celu!</h2>
         <button class="wb" onclick="newMaze()">🎲 Nowy labirynt</button>
@@ -931,7 +931,7 @@ function drawMaze(){
           ctx.fillStyle='#d4af37';
           ctx.fillRect(x,y,TILE,TILE);
           ctx.restore();
-          const dw=Math.round(TILE*0.68),dh=Math.round(TILE*0.82);
+          const dw=Math.round(TILE*0.75),dh=Math.round(TILE*0.90);
           ctx.drawImage(DRZWIIMG,x+(TILE-dw)/2,y+(TILE-dh)/2 - Math.round(TILE*0.1),dw,dh);
         }
       }
@@ -968,62 +968,57 @@ function drawMaze(){
     fc.globalCompositeOperation='source-over';fc.globalAlpha=1;
     ctx.drawImage(fogOff,0,0);
 
-    // ── Warstwa 2: miękkie przejście na granicy mgły ──
-    // Jeden subcanvas z gradientami per kafelek graniczny
+    // ── Warstwa 2: blur na zakrytych kafelkach graniczących z odkrytymi ──
+    // Logika: na ZAKRYTYCH kafelkach które mają sąsiada ODKRYTEGO
+    // rysujemy gradient który przechodzi od pełnej mgły (dalej od granicy)
+    // do częściowej przezroczystości (blisko granicy) — mapa prześwituje przez mgłę
     const blurOff=document.createElement('canvas');
     blurOff.width=canvas.width;blurOff.height=canvas.height;
     const bc=blurOff.getContext('2d');
 
-    // Najpierw narysuj mgłę na blurOff (tak samo jak fogOff)
-    if(FOGIMG.complete&&FOGIMG.naturalWidth>0){
-      const fw=FOGIMG.naturalWidth,fh=FOGIMG.naturalHeight,cw=canvas.width,ch=canvas.height;
-      const scale=Math.max(cw/fw,ch/fh);
-      const sw=Math.ceil(fw*scale),sh=Math.ceil(fh*scale);
-      bc.drawImage(FOGIMG,(cw-sw)/2,(ch-sh)/2,sw,sh);
-    } else {
-      bc.fillStyle='rgba(10,20,10,0.97)';bc.fillRect(0,0,canvas.width,canvas.height);
-    }
+    // blurOff zawiera TYLKO gradient przejścia — nakładamy go na już narysowaną mgłę
+    // używamy composite 'source-over' na głównym ctx z globalAlpha
 
-    // Na blurOff wytnij "miękką strefę" wokół każdego kafla granicznego
-    // Strefa graniczny = kafelek odkryty (alpha<1) który ma sąsiada w mgle (alpha>0.5)
-    bc.globalCompositeOperation='destination-out';
-    const blurPad = TILE * (1.1 + 0.08 * Math.sin(fogBlurPhase)); // pulsowanie ±8% kafla
+    const blurPad = TILE * (1.05 + 0.06 * Math.sin(fogBlurPhase));
+
     for(let r=0;r<ROWS;r++){
-      for(let c=0;c<COLS;c++){
-        const alpha=fogAlpha[r][c];
-        if(alpha>=1) continue; // w pełni zakryty — pomijaj
+      for(let c2=0;c2<COLS;c2++){
+        const alpha=fogAlpha[r][c2];
+        // Interesują nas ZAKRYTE lub częściowo zakryte kafelki (alpha > 0.1)
+        if(alpha < 0.1) continue;
 
-        // Sprawdź czy to kafelek graniczny (ma sąsiada w mgle)
-        let isBorder=false;
+        // Sprawdź czy ma sąsiada ODKRYTEGO (alpha < 0.5)
+        let hasOpenNeighbour=false;
         const nbs=[{dr:-1,dc:0},{dr:1,dc:0},{dr:0,dc:-1},{dr:0,dc:1}];
         for(const nb of nbs){
-          const nr2=r+nb.dr,nc2=c+nb.dc;
-          if(nr2<0||nr2>=ROWS||nc2<0||nc2>=COLS){isBorder=true;break;}
-          if(fogAlpha[nr2][nc2]>0.4){isBorder=true;break;}
+          const nr2=r+nb.dr,nc2b=c2+nb.dc;
+          if(nr2<0||nr2>=ROWS||nc2b<0||nc2b>=COLS){
+            // Granica mapy — traktuj jak odkryty (mgła się urywa)
+            hasOpenNeighbour=true;break;
+          }
+          if(fogAlpha[nr2][nc2b]<0.5){hasOpenNeighbour=true;break;}
         }
-        if(!isBorder) continue;
+        if(!hasOpenNeighbour) continue;
 
-        const cx2=c*TILE+TILE/2;
+        const cx2=c2*TILE+TILE/2;
         const cy2=r*TILE+TILE/2;
 
-        // Radialny gradient: w centrum kafla pełne wycięcie → na krawędzi blurPad brak wycięcia
-        // To tworzy miękką przejściową strefę zamiast twardej krawędzi
-        const innerR = TILE * 0.3; // w centrum zawsze odkryty
-        const outerR = blurPad;    // zasięg miękkiego przejścia
-
-        const grad=bc.createRadialGradient(cx2,cy2,innerR,cx2,cy2,outerR);
-        const revealStrength = 1 - alpha; // jak bardzo kafelek jest odkryty
-        grad.addColorStop(0,   'rgba(0,0,0,' + revealStrength.toFixed(2) + ')');
-        grad.addColorStop(0.5, 'rgba(0,0,0,' + (revealStrength*0.65).toFixed(2) + ')');
-        grad.addColorStop(1,   'rgba(0,0,0,0)');
+        // Gradient: centrum = przezroczysty (mapa widoczna przez mgłę)
+        // krawędź blurPad = pełna mgła
+        // Efekt: przy granicy odkrytego kafla mgła jest półprzezroczysta
+        const grad=bc.createRadialGradient(cx2,cy2,0,cx2,cy2,blurPad);
+        grad.addColorStop(0,   'rgba(8,20,8,0)');          // środek — bez mgły (mapa widoczna)
+        grad.addColorStop(0.35,'rgba(8,20,8,' + (alpha*0.25).toFixed(2) + ')');
+        grad.addColorStop(0.65,'rgba(8,20,8,' + (alpha*0.55).toFixed(2) + ')');
+        grad.addColorStop(1,   'rgba(8,20,8,' + (alpha*0.85).toFixed(2) + ')');
 
         bc.fillStyle=grad;
         bc.beginPath();
-        bc.ellipse(cx2,cy2,outerR,outerR*0.92,0,0,Math.PI*2);
+        bc.ellipse(cx2,cy2,blurPad*1.05,blurPad*0.95,0,0,Math.PI*2);
         bc.fill();
       }
     }
-    bc.globalCompositeOperation='source-over';bc.globalAlpha=1;
+    // Nakładamy blurOff na główny canvas
     ctx.drawImage(blurOff,0,0);
 
     if(showExitHint){
@@ -1042,7 +1037,13 @@ function posEl(el,r,c){
   el.style.left=(cr.left-ar.left+c*TILE+TILE/2)+'px';
   el.style.top=(cr.top-ar.top+r*TILE+TILE/2)+'px';
 }
-function updatePlayer(){posEl(document.getElementById('pl'),playerR,playerC);}
+function updatePlayer(){
+  const plImg=document.getElementById('pl-img');
+  // Postać = 1.4 × TILE, żeby była proporcjonalna do kafli
+  const plSize=Math.round(TILE*1.4);
+  plImg.style.width=plSize+'px';
+  posEl(document.getElementById('pl'),playerR,playerC);
+}
 function move(dir){
   if(won||!mazeData)return;
   const op=mazeData.conn[playerR][playerC];if(!op.has(dir))return;
@@ -1061,6 +1062,7 @@ function newMaze(){
   mazeData=generateMaze();playerR=mazeData.startR;playerC=mazeData.startC;
   initFog();fitCanvas();updatePlayer();
   spawnCreatures();
+  refreshCreatureSizes();
 }
 function loop(){drawMaze();updatePlayer();recordPlayerPos();updateCreaturePositions();requestAnimationFrame(loop);}
 
@@ -1195,7 +1197,7 @@ let creaturesOnMap     = [];
 let creaturesFollowing = [];
 let creaturePositions  = []; // historia pikselowych pozycji gracza
 
-const CREATURE_SIZE = 16;    // px — rozmiar ikonki
+// CREATURE_SIZE jest obliczany dynamicznie z TILE w updateCreaturePositions
 const BASE_SPACING  = 20;    // px — bazowy odstęp między zwierzątkami
 const HIST_FRAMES   = 900;   // max długość historii
 
@@ -1245,16 +1247,18 @@ function spawnCreatures() {
     const imgEl = document.createElement('img');
     imgEl.src   = def.img;
     // CSS transition na left/top dla płynnego ruchu
+    const cSz = Math.round(TILE * 0.75); // zwierzątko = 75% kafla
     imgEl.style.cssText =
       'position:absolute;' +
-      'width:'  + CREATURE_SIZE + 'px;' +
-      'height:' + CREATURE_SIZE + 'px;' +
+      'width:'  + cSz + 'px;' +
+      'height:' + cSz + 'px;' +
       'image-rendering:pixelated;' +
       'pointer-events:none;' +
       'z-index:9;' +
       'transform:translate(-50%,-50%);' +
       'transition:left 0.18s linear, top 0.18s linear, opacity 0.3s;' +
       'will-change:left,top;';
+    imgEl.dataset.cSz = cSz;
     wrap.appendChild(imgEl);
     creaturesOnMap.push({ ...def, r: pos.r, c: pos.c, imgEl });
   }
@@ -1311,14 +1315,19 @@ function updateCreaturePositions() {
   // Zbierz docelowe pozycje i sprawdź nakładanie
   const targetPositions = [];
   creaturesFollowing.forEach((c, idx) => {
-    const delay   = (idx + 1) * spacing;
+    // idx=0 startuje od 2*spacing (nie od 1*spacing) — pierwsze zwierzątko jest dalej od gracza
+    const delay   = (idx + 2) * spacing;
     const histIdx = Math.max(0, histLen - 1 - delay);
     const pos     = creaturePositions[histIdx];
     targetPositions.push({ x: pos.x, y: pos.y });
   });
 
   // Rozsuń nakładające się zwierzątka
-  const minDist = CREATURE_SIZE * 1.1;
+  // Rozmiar zwierzątka z dataset (zapisany przy spawn)
+  const cSzNow = creaturesFollowing.length > 0
+    ? parseInt(creaturesFollowing[0].imgEl.dataset.cSz || Math.round(TILE*0.75))
+    : Math.round(TILE*0.75);
+  const minDist = cSzNow * 1.05;
   for (let pass = 0; pass < 3; pass++) {
     for (let i = 0; i < targetPositions.length; i++) {
       for (let j = i + 1; j < targetPositions.length; j++) {
@@ -1346,6 +1355,17 @@ function updateCreaturePositions() {
     c.imgEl.style.left    = targetPositions[idx].x + 'px';
     c.imgEl.style.top     = targetPositions[idx].y + 'px';
     c.imgEl.style.opacity = '1';
+  });
+}
+
+function refreshCreatureSizes() {
+  // Aktualizuj rozmiar zwierzątek gdy TILE się zmienił (nowa plansza)
+  const cSz = Math.round(TILE * 0.75);
+  const allC = [...creaturesOnMap, ...creaturesFollowing];
+  allC.forEach(c => {
+    c.imgEl.style.width  = cSz + 'px';
+    c.imgEl.style.height = cSz + 'px';
+    c.imgEl.dataset.cSz  = cSz;
   });
 }
 
