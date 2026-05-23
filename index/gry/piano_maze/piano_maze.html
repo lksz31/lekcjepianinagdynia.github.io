@@ -418,10 +418,8 @@ const IMGS = {
   'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
   'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
   'bgs': [
-    BASE + 'concept_art/bagno 4.png',
-    BASE + 'concept_art/las 3.png',
-    BASE + 'concept_art/malowidla 2.png',
-    BASE + 'concept_art/wykopaliska 1.png',
+    SITE_BASE + 'loading_screen/tło maze i tutorial maze.png',
+    SITE_BASE + 'loading_screen/loading screen maze.png',
   ],
 };
 
@@ -446,11 +444,11 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + 'loading_screen/tło maze i tutorial maze.png';
+  const bgSrc = BASE + 'loading_screen/tło Music maze okładka.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
   // Użyj <img> zamiast background-image żeby ominąć CORS
   const bgImgEl = document.createElement('img');
-  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;opacity:0;transition:opacity 0.4s;';
+  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.4s;';
   bgImgEl.onload = () => { bgImgEl.style.opacity = '1'; };
   bgImgEl.src = bgSrc;
   bgEl.appendChild(bgImgEl);
@@ -533,8 +531,8 @@ const rBg=(IMGS.bgs||[])[Math.floor(Math.random()*(IMGS.bgs||['']).length)]||'';
 if(rBg){
   const charBgEl = document.getElementById('char-bg');
   const charBgImg = document.createElement('img');
-  charBgImg.style.cssText = 'width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.8s;';
-  charBgImg.onload = () => { charBgImg.style.opacity = '0.35'; };
+  charBgImg.style.cssText = 'width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transition:opacity 0.8s;';
+  charBgImg.onload = () => { charBgImg.style.opacity = '0.6'; };
   charBgImg.src = rBg;
   charBgEl.appendChild(charBgImg);
 }
@@ -972,7 +970,7 @@ function drawMaze(){
   if(fogEnabled){
     updateFog();
     fogBlurPhase += 0.003;
-    // Promień gradientu oddycha ±3% TILE
+    // Głębokość gradientu oddycha ±3% TILE
     const R = TILE * (0.333 + 0.03 * Math.sin(fogBlurPhase));
 
     const fogOff = document.createElement('canvas');
@@ -990,12 +988,7 @@ function drawMaze(){
       fc.fillRect(0,0,canvas.width,canvas.height);
     }
 
-    // 2. Wytnij mgłę (destination-out):
-    //    - Odkryte kafle: wytnij w 100% (mgła znika całkowicie)
-    //    - Przy granicy styku: gradient radialny z punktu styku,
-    //      promień R w głąb zakrytego kafla:
-    //      r=0 (styk) → wycięcie 100% (mgła przezroczysta)
-    //      r=R        → wycięcie 0%   (mgła pełna)
+    // 2. destination-out: wycinamy mgłę tam gdzie mapa odkryta
     fc.globalCompositeOperation = 'destination-out';
 
     for(let r = 0; r < ROWS; r++){
@@ -1004,38 +997,66 @@ function drawMaze(){
         const x0 = c2*TILE, y0 = r*TILE;
 
         if(fogA < 0.02){
-          // Całkowicie odkryty — wytnij mgłę w 100%
+          // Całkowicie odkryty — wytnij mgłę w 100% na całym kaflu
           fc.globalAlpha = 1;
           fc.fillStyle = 'black';
           fc.fillRect(x0, y0, TILE, TILE);
           continue;
         }
 
-        // Kafelek zakryty (fogA >= 0.02)
-        // Sprawdź każdy z 4 sąsiadów — czy jest odkryty
-        const sides = [
-          {dr:-1,dc:0, px:x0+TILE/2, py:y0      }, // góra — punkt styku = środek górnej krawędzi
-          {dr: 1,dc:0, px:x0+TILE/2, py:y0+TILE  }, // dół
-          {dr:0,dc:-1, px:x0,        py:y0+TILE/2 }, // lewo
-          {dr:0,dc: 1, px:x0+TILE,   py:y0+TILE/2 }, // prawo
-        ];
+        // Kafelek zakryty — sprawdź każdą stronę
+        // Jeśli sąsiad odkryty: gradient liniowy prostopadły do granicy
+        // na CAŁEJ długości krawędzi, głębokość R w głąb tego kafla
+        // przy granicy (dist=0): wycięcie 100% → mgła przezroczysta
+        // po R (dist=R):         wycięcie 0%   → mgła pełna
 
-        for(const s of sides){
-          const nr=r+s.dr, nc=c2+s.dc;
-          const nbFog = (nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) ? fogAlpha[nr][nc] : 1;
-
-          if(nbFog >= 0.3) continue; // sąsiad zakryty — brak styku
-
-          // Punkt styku: środek wspólnej krawędzi
-          // Gradient radialny: od punktu styku (r=0, wycięcie=1) do r=R (wycięcie=0)
-          const grad = fc.createRadialGradient(s.px, s.py, 0, s.px, s.py, R);
-          grad.addColorStop(0,   'rgba(0,0,0,1)'); // przy styku: mgła całkowicie przezroczysta
-          grad.addColorStop(1,   'rgba(0,0,0,0)'); // po 1/3 kafla: mgła pełna
-
-          fc.fillStyle = grad;
-          fc.globalAlpha = 1;
-          // Ogranicz rysowanie do prostokąta kafla (+ R margines żeby gradient nie uciekał)
-          fc.fillRect(x0-R, y0-R, TILE+2*R, TILE+2*R);
+        // Góra: granica y=y0, gradient idzie w dół (w głąb kafla) na R
+        {
+          const nr=r-1, nc=c2;
+          const nbFog = (nr>=0&&nr<ROWS) ? fogAlpha[nr][nc] : 1;
+          if(nbFog < 0.3){
+            const g = fc.createLinearGradient(0, y0, 0, y0+R);
+            g.addColorStop(0, 'rgba(0,0,0,1)');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            fc.fillStyle = g;
+            fc.fillRect(x0, y0, TILE, R);
+          }
+        }
+        // Dół: granica y=y0+TILE, gradient idzie w górę
+        {
+          const nr=r+1, nc=c2;
+          const nbFog = (nr>=0&&nr<ROWS) ? fogAlpha[nr][nc] : 1;
+          if(nbFog < 0.3){
+            const g = fc.createLinearGradient(0, y0+TILE, 0, y0+TILE-R);
+            g.addColorStop(0, 'rgba(0,0,0,1)');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            fc.fillStyle = g;
+            fc.fillRect(x0, y0+TILE-R, TILE, R);
+          }
+        }
+        // Lewo: granica x=x0, gradient idzie w prawo
+        {
+          const nr=r, nc=c2-1;
+          const nbFog = (nc>=0&&nc<COLS) ? fogAlpha[nr][nc] : 1;
+          if(nbFog < 0.3){
+            const g = fc.createLinearGradient(x0, 0, x0+R, 0);
+            g.addColorStop(0, 'rgba(0,0,0,1)');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            fc.fillStyle = g;
+            fc.fillRect(x0, y0, R, TILE);
+          }
+        }
+        // Prawo: granica x=x0+TILE, gradient idzie w lewo
+        {
+          const nr=r, nc=c2+1;
+          const nbFog = (nc>=0&&nc<COLS) ? fogAlpha[nr][nc] : 1;
+          if(nbFog < 0.3){
+            const g = fc.createLinearGradient(x0+TILE, 0, x0+TILE-R, 0);
+            g.addColorStop(0, 'rgba(0,0,0,1)');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            fc.fillStyle = g;
+            fc.fillRect(x0+TILE-R, y0, R, TILE);
+          }
         }
       }
     }
