@@ -966,102 +966,91 @@ function drawMaze(){
   }
   if(fogEnabled){
     updateFog();
-    fogBlurPhase += 0.004;
+    fogBlurPhase += 0.003;
+    const waveAmp = 0.02 * Math.sin(fogBlurPhase); // ±2% TILE — powolna fala
 
-    // Mapa rysowana jest zawsze w pełni nieprzezroczysta (już narysowana powyżej).
-    // Teraz nakładamy mgłę:
-    // - Na kafelku ODKRYTYM: mgła = 0 (przezroczysta, mapa widoczna)
-    // - Na styku odkrytego z zakrytym: mgła = 0 (mapa przebija)
-    // - W głąb zakrytego: mgła rośnie gradientowo do 1
-    // Fala: amplituda ±4% szerokości kafla, okres ~12s
-
-    const wave = Math.sin(fogBlurPhase) * 0.04 * TILE; // ±4% TILE w pikselach
-
-    // Offscreen canvas na mgłę
     const fogOff = document.createElement('canvas');
-    fogOff.width = canvas.width;
-    fogOff.height = canvas.height;
+    fogOff.width = canvas.width; fogOff.height = canvas.height;
     const fc = fogOff.getContext('2d');
 
     // Narysuj teksturę mgły na całym canvasie
     if(FOGIMG.complete && FOGIMG.naturalWidth > 0){
-      const fw = FOGIMG.naturalWidth, fh = FOGIMG.naturalHeight;
-      const scale = Math.max(canvas.width/fw, canvas.height/fh);
-      const sw = Math.ceil(fw*scale), sh = Math.ceil(fh*scale);
+      const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
+      const scale=Math.max(canvas.width/fw, canvas.height/fh);
+      const sw=Math.ceil(fw*scale), sh=Math.ceil(fh*scale);
       fc.drawImage(FOGIMG, (canvas.width-sw)/2, (canvas.height-sh)/2, sw, sh);
     } else {
-      fc.fillStyle = 'rgba(160,175,190,1.0)';
-      fc.fillRect(0, 0, canvas.width, canvas.height);
+      fc.fillStyle='rgba(160,175,190,1)';
+      fc.fillRect(0,0,canvas.width,canvas.height);
     }
 
-    // Wytnij mgłę (destination-out):
-    // Dla każdego zakrytego kafla który sąsiaduje z odkrytym:
-    //   - przy granicy z odkrytym: wytnij w 100% (alpha odkrytego)
-    //   - w głąb kafla: stopniowo mniej wycinaj (gradient do 0)
-    // Dla odkrytych kafli: wytnij całkowicie (mgła = 0)
+    // destination-out: gdzie rysujemy = gdzie mgła znika
     fc.globalCompositeOperation = 'destination-out';
 
-    const gradW = TILE * 1.0 + wave; // szerokość strefy gradientu = 1 kafelek + fala
+    // Gradient promienisty z każdego punktu styku granicy.
+    // Promień = 1/3 TILE + fala
+    const R = TILE * (0.333 + waveAmp);
+
+    // Dla każdego zakrytego kafla (alpha > 0):
+    // Znajdź wszystkie punkty styku z odkrytymi sąsiadami.
+    // Punkt styku = środek krawędzi między tym kaflem a odkrytym sąsiadem.
+    // Z każdego takiego punktu rysuj gradient radialny:
+    //   - r=0: alpha=1 (pełne wycięcie mgły, mapa widoczna)
+    //   - r=R: alpha=0 (mgła pełna)
 
     for(let r = 0; r < ROWS; r++){
       for(let c2 = 0; c2 < COLS; c2++){
-        const alpha = fogAlpha[r][c2]; // 0 = odkryty, 1 = zakryty
+        const fogA = fogAlpha[r][c2];
+        if(fogA < 0.02) continue; // odkryty — pomijaj (mgły już nie ma)
+
         const x0 = c2 * TILE, y0 = r * TILE;
+        const cx = x0 + TILE/2, cy = y0 + TILE/2;
 
-        if(alpha < 0.02){
-          // Całkowicie odkryty — wytnij mgłę w 100%
-          fc.globalAlpha = 1;
-          fc.fillStyle = 'black';
-          fc.fillRect(x0, y0, TILE, TILE);
-          continue;
-        }
+        // Zbierz punkty styku (środki krawędzi z odkrytymi sąsiadami)
+        const touchPoints = [];
 
-        // Kafelek częściowo lub całkowicie zakryty
-        // Sprawdź każdą stronę — czy sąsiad jest odkryty
-        const nbAlpha = {
-          N: r > 0 ? fogAlpha[r-1][c2] : 1,
-          S: r < ROWS-1 ? fogAlpha[r+1][c2] : 1,
-          W: c2 > 0 ? fogAlpha[r][c2-1] : 1,
-          E: c2 < COLS-1 ? fogAlpha[r][c2+1] : 1,
-        };
-
-        // Dla każdej strony z odkrytym sąsiadem: gradient od granicy (100% wycięcie) w głąb (0% wycięcie)
-        const sides = [
-          { open: nbAlpha.N < 0.5, gx1:x0, gy1:y0,        gx2:x0, gy2:y0+gradW,      rx:x0, ry:y0,        rw:TILE, rh:Math.min(gradW,TILE) },
-          { open: nbAlpha.S < 0.5, gx1:x0, gy1:y0+TILE,   gx2:x0, gy2:y0+TILE-gradW, rx:x0, ry:Math.max(y0+TILE-gradW,y0), rw:TILE, rh:Math.min(gradW,TILE) },
-          { open: nbAlpha.W < 0.5, gx1:x0,      gy1:y0,   gx2:x0+gradW,      gy2:y0, rx:x0, ry:y0, rw:Math.min(gradW,TILE), rh:TILE },
-          { open: nbAlpha.E < 0.5, gx1:x0+TILE, gy1:y0,   gx2:x0+TILE-gradW, gy2:y0, rx:Math.max(x0+TILE-gradW,x0), ry:y0, rw:Math.min(gradW,TILE), rh:TILE },
+        // Sprawdź 4 sąsiadów
+        const neighbors = [
+          {dr:-1,dc:0, px:cx,        py:y0       }, // góra — krawędź górna, środek
+          {dr: 1,dc:0, px:cx,        py:y0+TILE  }, // dół
+          {dr:0,dc:-1, px:x0,        py:cy       }, // lewo
+          {dr:0,dc: 1, px:x0+TILE,   py:cy       }, // prawo
         ];
 
-        let anyOpen = false;
-        for(const s of sides){
-          if(!s.open) continue;
-          anyOpen = true;
-          // Gradient: od granicy (pełne wycięcie = mgła przezroczysta) w głąb (0 wycięcia = mgła pełna)
-          const g = fc.createLinearGradient(s.gx1, s.gy1, s.gx2, s.gy2);
-          g.addColorStop(0, 'rgba(0,0,0,1)');   // przy granicy: wytnij mgłę całkowicie
-          g.addColorStop(1, 'rgba(0,0,0,0)');   // w głąb kafla: nie wycinaj (pełna mgła)
-          fc.fillStyle = g;
-          fc.globalAlpha = 1 - alpha * 0.3;     // im bardziej zakryty, tym słabszy gradient
-          fc.fillRect(s.rx, s.ry, s.rw, s.rh);
+        for(const nb of neighbors){
+          const nr=r+nb.dr, nc=c2+nb.dc;
+          let nbFog = 1;
+          if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS) nbFog = fogAlpha[nr][nc];
+          else nbFog = 1; // krawędź mapy = zakryta
+
+          if(nbFog < 0.3){
+            // Sąsiad odkryty — punkt styku to środek wspólnej krawędzi
+            // Siła reveal = 1 - średnia fog obu kafli
+            const strength = 1 - (fogA + nbFog) / 2;
+            touchPoints.push({x: nb.px, y: nb.py, strength: Math.max(0.1, strength)});
+          }
         }
 
-        // Jeśli kafelek w pełni odkryty (fogAlpha~0) ale nie zero — też wytnij środek
-        if(alpha < 0.3){
-          fc.globalAlpha = (0.3 - alpha) / 0.3;
-          fc.fillStyle = 'black';
-          fc.fillRect(x0, y0, TILE, TILE);
+        if(touchPoints.length === 0) continue;
+
+        // Dla każdego punktu styku: gradient radialny promień R
+        for(const tp of touchPoints){
+          const grad = fc.createRadialGradient(tp.x, tp.y, 0, tp.x, tp.y, R);
+          grad.addColorStop(0,   'rgba(0,0,0,' + tp.strength.toFixed(3) + ')'); // przy styku: wycięcie
+          grad.addColorStop(1,   'rgba(0,0,0,0)');  // na R: zero wycięcia (pełna mgła)
+
+          fc.fillStyle = grad;
+          fc.globalAlpha = 1;
+          // Ogranicz rysowanie do obszaru tego kafla + R w każdą stronę
+          fc.fillRect(x0 - R, y0 - R, TILE + 2*R, TILE + 2*R);
         }
       }
     }
 
     fc.globalCompositeOperation = 'source-over';
     fc.globalAlpha = 1;
-
-    // Nałóż mgłę na canvas
     ctx.drawImage(fogOff, 0, 0);
 
-    // Podgląd wyjścia przez mgłę
     if(showExitHint){
       const{goalR,goalC}=mazeData;
       const alpha=fogAlpha[goalR][goalC];
