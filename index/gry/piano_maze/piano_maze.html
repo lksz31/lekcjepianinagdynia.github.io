@@ -9,7 +9,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;width:100%;overflow:hidden;}
 body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:column;height:100dvh;}
- 
+
 /* ══ LOADING SCREEN ══ */
 #loading-screen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:10vh;background:#060e0a;transition:opacity 0.8s ease;}
 #loading-screen.fade-out{opacity:0;pointer-events:none;}
@@ -23,7 +23,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 @keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
 #loading-count{font-family:'Cinzel',serif;font-size:.6rem;color:#5a6a3a;letter-spacing:.1em;}
 #loading-tip{font-family:'Crimson Text',serif;font-size:.75rem;color:#4a5a3a;letter-spacing:.06em;text-align:center;font-style:italic;min-height:1.2em;transition:opacity .4s;}
- 
+
 #char-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow-y:auto;}
 #char-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.35;pointer-events:none;transition:opacity 0.8s;}
 #char-screen h1{position:relative;font-size:clamp(1rem,3.5vw,2rem);font-weight:900;color:#d4af37;letter-spacing:.2em;text-shadow:0 0 20px rgba(212,175,55,.6);text-align:center;}
@@ -140,7 +140,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 </style>
 </head>
 <body>
- 
+
 <!-- ══ EKRAN ŁADOWANIA ══ -->
 <div id="loading-screen">
   <div id="loading-bg"></div>
@@ -154,7 +154,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     <div id="loading-tip">Znajdź wyjście śpiewając właściwą nutę…</div>
   </div>
 </div>
- 
+
 <!-- CHAR SCREEN -->
 <div id="char-screen" style="display:none;">
   <div id="char-bg"></div>
@@ -170,7 +170,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   <button class="start-btn" id="start-btn" onclick="showTutorial()">Rozpocznij przygodę</button>
   <div class="ornament">✦ ✦ ✦</div>
 </div>
- 
+
 <!-- TUTORIAL OVERLAY -->
 <div id="tut-ov" class="ov">
   <div class="tut-panel">
@@ -202,7 +202,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     <button class="tut-start-btn" onclick="startGame()">▶ Zaczynamy!</button>
   </div>
 </div>
- 
+
 <!-- HUD -->
 <div id="hdr">
   <div id="hdr-left">
@@ -232,7 +232,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     </div>
   </div>
 </div>
- 
+
 <!-- GAME -->
 <div id="ga">
   <div id="game-row">
@@ -252,7 +252,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   </div>
   <div id="note-bar"></div>
 </div>
- 
+
 <!-- MENU OVERLAY -->
 <div id="menu-ov" class="ov">
   <div class="menu-wrap">
@@ -354,13 +354,15 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     <button class="menu-back-btn" id="menu-close-btn" onclick="closeMenu()">Powrót do gry</button>
   </div>
 </div>
- 
+
 <script>
 'use strict';
- 
+
 /* ══ BASE URL ══ */
 const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano_maze/';
- 
+// URL dla obrazków wyświetlanych w HTML (ta sama domena co strona = brak CORS)
+const SITE_BASE = '/index/gry/piano_maze/';
+
 /* ══ TILE SOURCES ══ */
 const TILE_SRCS = {
   'NESW_1': BASE + 'objekty/mapa/NESW 1.png',
@@ -402,47 +404,47 @@ const TILE_SRCS = {
   'filler_3': BASE + 'objekty/mapa/filler 3.png',
   'filler_4': BASE + 'objekty/mapa/filler 4.png',
   'filler_5': BASE + 'objekty/mapa/filler 5.png',
-  'exit_1':   BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
+  'exit_1':   SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
 };
- 
+
 /* ══ IMAGES ══ */
 const IMGS = {
-  'poszukiwaczka': BASE + 'objekty/postacie/gracz/poszukiwaczka przyg\u00f3d.png',
-  'odkrywca':      BASE + 'objekty/postacie/gracz/odkrywca.png',
-  'pies':          BASE + 'objekty/postacie/gracz/pies poszukiwacz.png',
-  'kot':           BASE + 'objekty/postacie/gracz/kot poszukiwacz.png',
-  'drzwi':         BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
-  'polowaDrzwi':   BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
+  'poszukiwaczka': SITE_BASE + 'objekty/postacie/gracz/poszukiwaczka przyg\u00f3d.png',
+  'odkrywca':      SITE_BASE + 'objekty/postacie/gracz/odkrywca.png',
+  'pies':          SITE_BASE + 'objekty/postacie/gracz/pies poszukiwacz.png',
+  'kot':           SITE_BASE + 'objekty/postacie/gracz/kot poszukiwacz.png',
+  'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
+  'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
   'bgs': [
-    BASE + 'concept_art/bagno 4.png',
-    BASE + 'concept_art/las 3.png',
-    BASE + 'concept_art/malowidla 2.png',
-    BASE + 'concept_art/wykopaliska 1.png',
+    SITE_BASE + 'concept_art/bagno 4.png',
+    SITE_BASE + 'concept_art/las 3.png',
+    SITE_BASE + 'concept_art/malowidla 2.png',
+    SITE_BASE + 'concept_art/wykopaliska 1.png',
   ],
 };
- 
+
 /* ══ CREATURE IMAGES ══ */
 const CREATURE_IMGS = {
-  'biedronka':  BASE + 'objekty/postacie/zwierzeta/biedronka maze.png',
-  'chomik':     BASE + 'objekty/postacie/zwierzeta/chomik maze.png',
-  'dzdz':       BASE + 'objekty/postacie/zwierzeta/d\u017cd\u017cownica maze.png',
-  'jaszczurka': BASE + 'objekty/postacie/zwierzeta/jaszczurka maze.png',
-  'jez':        BASE + 'objekty/postacie/zwierzeta/je\u017c maze.png',
-  'kameleon':   BASE + 'objekty/postacie/zwierzeta/kameleon maze.png',
-  'sowa':       BASE + 'objekty/postacie/zwierzeta/sowa maze.png',
-  'swinka':     BASE + 'objekty/postacie/zwierzeta/swinka m maze.png',
-  'szynszyla':  BASE + 'objekty/postacie/zwierzeta/szynszyla maze.png',
-  'wiewiorka':  BASE + 'objekty/postacie/zwierzeta/wiewi\u00f3rka maze.png',
-  'winniczek':  BASE + 'objekty/postacie/zwierzeta/winniczek maze.png',
-  'wrobel':     BASE + 'objekty/postacie/zwierzeta/wr\u00f3bel maze.png',
-  'zabka':      BASE + 'objekty/postacie/zwierzeta/\u017cabka maze.png',
-  'zolw':       BASE + 'objekty/postacie/zwierzeta/\u017c\u00f3\u0142w maze.png',
+  'biedronka':  SITE_BASE + 'objekty/postacie/zwierzeta/biedronka maze.png',
+  'chomik':     SITE_BASE + 'objekty/postacie/zwierzeta/chomik maze.png',
+  'dzdz':       SITE_BASE + 'objekty/postacie/zwierzeta/d\u017cd\u017cownica maze.png',
+  'jaszczurka': SITE_BASE + 'objekty/postacie/zwierzeta/jaszczurka maze.png',
+  'jez':        SITE_BASE + 'objekty/postacie/zwierzeta/je\u017c maze.png',
+  'kameleon':   SITE_BASE + 'objekty/postacie/zwierzeta/kameleon maze.png',
+  'sowa':       SITE_BASE + 'objekty/postacie/zwierzeta/sowa maze.png',
+  'swinka':     SITE_BASE + 'objekty/postacie/zwierzeta/swinka m maze.png',
+  'szynszyla':  SITE_BASE + 'objekty/postacie/zwierzeta/szynszyla maze.png',
+  'wiewiorka':  SITE_BASE + 'objekty/postacie/zwierzeta/wiewi\u00f3rka maze.png',
+  'winniczek':  SITE_BASE + 'objekty/postacie/zwierzeta/winniczek maze.png',
+  'wrobel':     SITE_BASE + 'objekty/postacie/zwierzeta/wr\u00f3bel maze.png',
+  'zabka':      SITE_BASE + 'objekty/postacie/zwierzeta/\u017cabka maze.png',
+  'zolw':       SITE_BASE + 'objekty/postacie/zwierzeta/\u017c\u00f3\u0142w maze.png',
 };
- 
+
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + 'loading_screen/loading screen maze.png';
+  const bgSrc = SITE_BASE + 'loading_screen/loading screen maze.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
   const bgImg = new Image();
   bgImg.onload = () => {
@@ -454,18 +456,18 @@ const CREATURE_IMGS = {
     // Fallback: ciemne tło już jest w CSS
   };
   bgImg.src = bgSrc;
- 
+
   const allUrls = [];
   Object.values(TILE_SRCS).forEach(u => allUrls.push(u));
   allUrls.push(IMGS.poszukiwaczka, IMGS.odkrywca, IMGS.pies, IMGS.kot);
   allUrls.push(IMGS.drzwi, IMGS.polowaDrzwi);
   IMGS.bgs.forEach(u => allUrls.push(u));
   Object.values(CREATURE_IMGS).forEach(u => allUrls.push(u));
-  allUrls.push(BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png');
- 
+  allUrls.push(SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png');
+
   const total = allUrls.length;
   let loaded = 0;
- 
+
   const tips = [
     'Znajdź wyjście śpiewając właściwą nutę…',
     'Mgła ustępuje przed odważnymi…',
@@ -483,7 +485,7 @@ const CREATURE_IMGS = {
       tipEl.style.opacity = '1';
     }, 400);
   }, 2800);
- 
+
   function onLoad() {
     loaded++;
     const pct = Math.round(loaded / total * 100);
@@ -491,7 +493,7 @@ const CREATURE_IMGS = {
     document.getElementById('loading-count').textContent = loaded + ' / ' + total;
     if (loaded >= total) finish();
   }
- 
+
   function finish() {
     clearInterval(tipInterval);
     document.getElementById('loading-sub').textContent = 'Gotowe!';
@@ -505,16 +507,16 @@ const CREATURE_IMGS = {
       }, 850);
     }, 500);
   }
- 
+
   allUrls.forEach(url => {
     const img = new Image();
     img.onload = img.onerror = onLoad;
     img.src = url;
   });
- 
+
   if (total === 0) finish();
 })();
- 
+
 /* ══ CHARS ══ */
 const CHARS = [
   {id:1,img:'poszukiwaczka',name:'Poszukiwaczka'},
@@ -537,7 +539,7 @@ if(rBg){
   };
   charBgImg.src = rBg;
 }
- 
+
 /* ══ TILES ══ */
 const TILES_BY_PATH = {
   'ENSW':['NESW_1','NESW_2','NESW_3','NESW_4','NESW_5'],
@@ -564,7 +566,7 @@ function preloadAll(cb){
     const im=new Image();im.onload=im.onerror=()=>{imgsLoaded++;if(imgsLoaded>=imgsTotal)cb();};im.src=src;IMG[name]=im;
   });
 }
- 
+
 /* ══ NOTES ══ */
 const NOTE_COLOR_DEFAULT='#c8b87a';
 const NOTES_G=[
@@ -589,13 +591,13 @@ const ARR={N:'\u2191',S:'\u2193',W:'\u2190',E:'\u2192'};
 let MN=NOTES_G.slice();
 let coloredNotes=false;
 function noteColor(n){return coloredNotes?n.colorFull:NOTE_COLOR_DEFAULT;}
- 
+
 /* ══ BOARD SIZE STATE ══ */
 let boardShape='square';
 let squareSize=12;
 let rectCols=16,rectRows=10;
 let ROWS=12,COLS=12;
- 
+
 function setBoardShape(shape){
   boardShape=shape;
   document.getElementById('shapeSquare').classList.toggle('on',shape==='square');
@@ -621,7 +623,7 @@ function applyBoardSize(){
   else{ROWS=rectRows;COLS=rectCols;}
   if(mazeData){newMaze();}
 }
- 
+
 /* ══ STATE ══ */
 let controlMode='tiles',micGain=3.5,noteMargin=8,clefMode='G',transpose=0;
 let fogEnabled=true,showExitHint=false,hintsEnabled=false,noteLabels=false;
@@ -633,16 +635,17 @@ let activeTile=null,pressTimer=null,animRunning=false;
 let cellTiles2={};
 let fogState=[],fogAlpha=[],fogTimers={};
 let tileOrder=['N','E','S','W'];
+let fogBlurPhase=0;
 let hintIdx={N:0,S:0,E:0,W:0};
- 
+
 /* ══ FOG IMAGE — z GitHuba ══ */
 const FOGIMG=new Image();
-FOGIMG.src = BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png';
+FOGIMG.src = SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png';
 const DRZWIIMG=new Image();
 const POLOWINADRZWIIMG=new Image();
 if(IMGS.drzwi)DRZWIIMG.src=IMGS.drzwi;
 if(IMGS.polowaDrzwi)POLOWINADRZWIIMG.src=IMGS.polowaDrzwi;
- 
+
 /* ══ MENU ══ */
 let currentSub=null;
 function menuGoTo(sub){
@@ -676,7 +679,7 @@ function menuSelectChar(id){
   document.getElementById('pl-img').src=src;
   setTimeout(()=>closeMenu(),300);
 }
- 
+
 /* ══ SETTINGS ══ */
 function setMode(m){
   controlMode=m;
@@ -736,7 +739,7 @@ function refreshHzGrid(){
     return '<div class="hz-row"><b>'+n.name+' '+ARR[n.dir]+'</b> '+(tf-noteMargin).toFixed(1)+'\u2013'+(tf+noteMargin).toFixed(1)+' Hz</div>';
   }).join('');
 }
- 
+
 /* ══ NOTE SVG ══ */
 function noteSVG(n,W,H,showLabel){
   W=W||80;H=H||92;
@@ -757,13 +760,13 @@ function noteSVG(n,W,H,showLabel){
   if(showLabel){s+=`<text x="${W/2}" y="${H-4}" font-size="9" fill="${c}" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${n.name} ${ARR[n.dir]}</text>`;}
   s+='</svg>';return s;
 }
- 
+
 /* ══ NOTE TILES ══ */
 function shuffleTileOrder(){for(let i=tileOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tileOrder[i],tileOrder[j]]=[tileOrder[j],tileOrder[i]];}}
 function notesForDir(dir){return MN.filter(n=>n.dir===dir);}
 function currentHintNote(dir){const a=notesForDir(dir);return a.length?a[hintIdx[dir]%a.length]:null;}
 function advanceHint(dir){const a=notesForDir(dir);if(a.length)hintIdx[dir]=(hintIdx[dir]+1)%a.length;}
- 
+
 function buildNoteTiles(){
   const bar=document.getElementById('note-bar');
   const show=controlMode==='tiles'||controlMode==='both';
@@ -795,7 +798,7 @@ function startPress(dir,tile){
   pressTimer=setInterval(()=>{if(!won&&mazeData)move(dir);else stopPress();},200);
 }
 function stopPress(){clearInterval(pressTimer);pressTimer=null;if(activeTile){activeTile.classList.remove('pressing');activeTile=null;}}
- 
+
 /* ══ SIDE BAR ══ */
 function buildCtrlTable(container){
   if(!container)return;
@@ -821,7 +824,7 @@ function buildCtrlTable(container){
   container.innerHTML=h;
 }
 function refreshSideBar(){const sb=document.getElementById('side-content');if(!sb)return;buildCtrlTable(sb);}
- 
+
 /* ══ MAZE GENERATION ══ */
 function generateMaze(){
   const conn=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>new Set()));
@@ -839,7 +842,7 @@ function generateMaze(){
   for(let r=Math.floor(ROWS/2);r<ROWS;r++){for(let c=0;c<COLS;c++){const dist=Math.abs(r)+Math.abs(c-sc);if(dist>best&&conn[r][c].size>0){best=dist;gr=r;gc=c;}}}
   return{conn,startR:0,startC:sc,goalR:gr,goalC:gc};
 }
- 
+
 /* ══ FOG ══ */
 function initFog(){
   fogState=Array.from({length:ROWS},()=>Array(COLS).fill(0));
@@ -869,7 +872,7 @@ function updateFog(){
     if(prog>=1){fogState[r][c]=1;fogAlpha[r][c]=0;delete fogTimers[key];}
   }
 }
- 
+
 /* ══ CANVAS ══ */
 const canvas=document.getElementById('mc');
 const ctx=canvas.getContext('2d');
@@ -881,7 +884,7 @@ function fitCanvas(){
 }
 // Prawdopodobieństwo pojawienia się kafelka filler w pustej komórce (0..1)
 const FILLER_CHANCE = 0.30;
- 
+
 function assignCellTile(r,c,op,isGoal){
   const k=`${r},${c}`;
   if(!cellTiles2[k]){
@@ -896,54 +899,8 @@ function assignCellTile(r,c,op,isGoal){
   }
   return cellTiles2[k];
 }
- 
-/* ══ FOG BLUR ══ */
-// Rysuje miękki, lekko animowany blur na granicy mgły
-// Działa jako radialny gradient nakładany na każdy odkryty kafelek
-let fogBlurPhase = 0;
-function drawFogBlur(ctx) {
-  if (!mazeData) return;
-  fogBlurPhase += 0.008;
-  // Pulsowanie: ±2px promienia
-  const pulse = Math.sin(fogBlurPhase) * 2;
-  const halfT = TILE / 2;
-  const blurR = halfT * 1.55 + pulse; // promień aureoli — delikatnie większy niż pół kafla
- 
-  ctx.save();
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const alpha = fogAlpha[r][c];
-      // Rysuj tylko na granicy: kafelek częściowo odkryty LUB sąsiad jest w mgle
-      if (alpha >= 1) continue; // w pełni zakryty — pomijaj
-      // Sprawdź czy ma sąsiada w mgle
-      let hasFogNeighbour = false;
-      const nbs = [{r:r-1,c},{r:r+1,c},{r,c:c-1},{r,c:c+1}];
-      for (const nb of nbs) {
-        if (nb.r < 0 || nb.r >= ROWS || nb.c < 0 || nb.c >= COLS) { hasFogNeighbour = true; break; }
-        if (fogAlpha[nb.r][nb.c] > 0.3) { hasFogNeighbour = true; break; }
-      }
-      if (!hasFogNeighbour && alpha < 0.05) continue; // w pełni odkryty bez mgły w pobliżu
- 
-      const cx2 = c * TILE + halfT;
-      const cy2 = r * TILE + halfT;
- 
-      // Radialny gradient: przezroczysty w środku → ciemna zieleń na krawędzi
-      const grad = ctx.createRadialGradient(cx2, cy2, halfT * 0.3, cx2, cy2, blurR);
-      const fogOpacity = Math.max(0, Math.min(1, alpha + 0.45));
-      grad.addColorStop(0,   'rgba(8,20,8,0)');
-      grad.addColorStop(0.55,'rgba(8,20,8,0)');
-      grad.addColorStop(0.78,'rgba(8,20,8,' + (fogOpacity * 0.35).toFixed(2) + ')');
-      grad.addColorStop(1,   'rgba(8,20,8,' + (fogOpacity * 0.72).toFixed(2) + ')');
- 
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.ellipse(cx2, cy2, blurR * 1.1, blurR * 0.95, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-  ctx.restore();
-}
- 
+
+
 function drawMaze(){
   if(!mazeData)return;
   ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -986,27 +943,93 @@ function drawMaze(){
   }
   if(fogEnabled){
     updateFog();
+    fogBlurPhase += 0.006;
+
+    // ── Warstwa 1: twarda mgła (pełne kafelki) ──
     const fogOff=document.createElement('canvas');
     fogOff.width=canvas.width;fogOff.height=canvas.height;
     const fc=fogOff.getContext('2d');
     if(FOGIMG.complete&&FOGIMG.naturalWidth>0){
-      // Skaluj mgłę cover-fit: wypełnij cały canvas, utnij co wychodzi poza
-      const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
-      const cw=canvas.width, ch=canvas.height;
-      const scale=Math.max(cw/fw, ch/fh);
-      const sw=Math.ceil(fw*scale), sh=Math.ceil(fh*scale);
-      const sx=(cw-sw)/2, sy=(ch-sh)/2;
-      fc.drawImage(FOGIMG,sx,sy,sw,sh);
+      const fw=FOGIMG.naturalWidth,fh=FOGIMG.naturalHeight,cw=canvas.width,ch=canvas.height;
+      const scale=Math.max(cw/fw,ch/fh);
+      const sw=Math.ceil(fw*scale),sh=Math.ceil(fh*scale);
+      fc.drawImage(FOGIMG,(cw-sw)/2,(ch-sh)/2,sw,sh);
     } else {
-      fc.fillStyle='rgba(10,20,10,0.95)';fc.fillRect(0,0,canvas.width,canvas.height);
+      fc.fillStyle='rgba(10,20,10,0.97)';fc.fillRect(0,0,canvas.width,canvas.height);
     }
+    // Wytnij odkryte kafelki (twarda maska — pełna przezroczystość tylko w centrum)
     fc.globalCompositeOperation='destination-out';
-    for(let r=0;r<ROWS;r++){for(let c=0;c<COLS;c++){const alpha=fogAlpha[r][c];if(alpha>=1)continue;fc.globalAlpha=1-alpha;fc.fillStyle='black';fc.fillRect(c*TILE,r*TILE,TILE,TILE);}}
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const alpha=fogAlpha[r][c];
+        if(alpha>=1) continue;
+        // Odkryty kafelek — wytnij z mgły z pełną siłą
+        fc.globalAlpha=1-alpha;
+        fc.fillStyle='black';
+        fc.fillRect(c*TILE,r*TILE,TILE,TILE);
+      }
+    }
     fc.globalCompositeOperation='source-over';fc.globalAlpha=1;
     ctx.drawImage(fogOff,0,0);
- 
-    // ── Blur na granicy mgły — miękka, animowana aureola ──
-    drawFogBlur(ctx);
+
+    // ── Warstwa 2: miękkie przejście na granicy mgły ──
+    // Jeden subcanvas z gradientami per kafelek graniczny
+    const blurOff=document.createElement('canvas');
+    blurOff.width=canvas.width;blurOff.height=canvas.height;
+    const bc=blurOff.getContext('2d');
+
+    // Najpierw narysuj mgłę na blurOff (tak samo jak fogOff)
+    if(FOGIMG.complete&&FOGIMG.naturalWidth>0){
+      const fw=FOGIMG.naturalWidth,fh=FOGIMG.naturalHeight,cw=canvas.width,ch=canvas.height;
+      const scale=Math.max(cw/fw,ch/fh);
+      const sw=Math.ceil(fw*scale),sh=Math.ceil(fh*scale);
+      bc.drawImage(FOGIMG,(cw-sw)/2,(ch-sh)/2,sw,sh);
+    } else {
+      bc.fillStyle='rgba(10,20,10,0.97)';bc.fillRect(0,0,canvas.width,canvas.height);
+    }
+
+    // Na blurOff wytnij "miękką strefę" wokół każdego kafla granicznego
+    // Strefa graniczny = kafelek odkryty (alpha<1) który ma sąsiada w mgle (alpha>0.5)
+    bc.globalCompositeOperation='destination-out';
+    const blurPad = TILE * (1.1 + 0.08 * Math.sin(fogBlurPhase)); // pulsowanie ±8% kafla
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const alpha=fogAlpha[r][c];
+        if(alpha>=1) continue; // w pełni zakryty — pomijaj
+
+        // Sprawdź czy to kafelek graniczny (ma sąsiada w mgle)
+        let isBorder=false;
+        const nbs=[{dr:-1,dc:0},{dr:1,dc:0},{dr:0,dc:-1},{dr:0,dc:1}];
+        for(const nb of nbs){
+          const nr2=r+nb.dr,nc2=c+nb.dc;
+          if(nr2<0||nr2>=ROWS||nc2<0||nc2>=COLS){isBorder=true;break;}
+          if(fogAlpha[nr2][nc2]>0.4){isBorder=true;break;}
+        }
+        if(!isBorder) continue;
+
+        const cx2=c*TILE+TILE/2;
+        const cy2=r*TILE+TILE/2;
+
+        // Radialny gradient: w centrum kafla pełne wycięcie → na krawędzi blurPad brak wycięcia
+        // To tworzy miękką przejściową strefę zamiast twardej krawędzi
+        const innerR = TILE * 0.3; // w centrum zawsze odkryty
+        const outerR = blurPad;    // zasięg miękkiego przejścia
+
+        const grad=bc.createRadialGradient(cx2,cy2,innerR,cx2,cy2,outerR);
+        const revealStrength = 1 - alpha; // jak bardzo kafelek jest odkryty
+        grad.addColorStop(0,   'rgba(0,0,0,' + revealStrength.toFixed(2) + ')');
+        grad.addColorStop(0.5, 'rgba(0,0,0,' + (revealStrength*0.65).toFixed(2) + ')');
+        grad.addColorStop(1,   'rgba(0,0,0,0)');
+
+        bc.fillStyle=grad;
+        bc.beginPath();
+        bc.ellipse(cx2,cy2,outerR,outerR*0.92,0,0,Math.PI*2);
+        bc.fill();
+      }
+    }
+    bc.globalCompositeOperation='source-over';bc.globalAlpha=1;
+    ctx.drawImage(blurOff,0,0);
+
     if(showExitHint){
       const{goalR,goalC}=mazeData;const alpha=fogAlpha[goalR][goalC];
       if(alpha>0&&POLOWINADRZWIIMG.complete&&POLOWINADRZWIIMG.naturalWidth>0){
@@ -1044,7 +1067,7 @@ function newMaze(){
   spawnCreatures();
 }
 function loop(){drawMaze();updatePlayer();recordPlayerPos();updateCreaturePositions();requestAnimationFrame(loop);}
- 
+
 /* ══ MICROPHONE ══ */
 async function startMic(){
   if(mReady)return;
@@ -1119,7 +1142,7 @@ function acorr(buf,sr){
   if(mp>0&&mp<L-1){const a=(c2[mp-1]+c2[mp+1]-2*c2[mp])/2,b=(c2[mp+1]-c2[mp-1])/2;if(a)T-=b/(2*a);}
   const f=sr/T;return(f<80||f>600)?-1:f;
 }
- 
+
 /* ══ KEYBOARD ══ */
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeMenu();return;}
@@ -1131,7 +1154,7 @@ document.addEventListener('keydown',e=>{
   else if(['ArrowRight','d','D'].includes(e.key)){move('E');advanceHint('E');shuffleTileOrder();buildNoteTiles();refreshSideBar();}
 });
 window.addEventListener('resize',()=>{if(mazeData){fitCanvas();updatePlayer();}buildNoteTiles();});
- 
+
 /* ══ GAME FLOW ══ */
 function selectChar(id){
   selectedChar=id;
@@ -1152,9 +1175,9 @@ function startGame(){
   buildNoteTiles();refreshHzGrid();refreshSideBar();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
 }
- 
+
 /* ══ CREATURES — PŁYNNY WĘŻYK ══ */
- 
+
 const CREATURE_DEFS = [
   { id: 'sowa',      name: 'Sowa',                img: CREATURE_IMGS.sowa },
   { id: 'swinka',    name: '\u015awinka',          img: CREATURE_IMGS.swinka },
@@ -1171,15 +1194,15 @@ const CREATURE_DEFS = [
   { id: 'jez',       name: 'Je\u017c',             img: CREATURE_IMGS.jez },
   { id: 'kameleon',  name: 'Kameleon',             img: CREATURE_IMGS.kameleon },
 ];
- 
+
 let creaturesOnMap     = [];
 let creaturesFollowing = [];
 let creaturePositions  = []; // historia pikselowych pozycji gracza
- 
+
 const CREATURE_SIZE = 16;    // px — rozmiar ikonki
 const BASE_SPACING  = 20;    // px — bazowy odstęp między zwierzątkami
 const HIST_FRAMES   = 900;   // max długość historii
- 
+
 // Pikselowa pozycja środka kafla gracza
 function playerPixelPos() {
   if (!mazeData) return { x: 0, y: 0 };
@@ -1190,7 +1213,7 @@ function playerPixelPos() {
     y: cr.top  - ar.top  + playerR * TILE + TILE / 2,
   };
 }
- 
+
 function spawnCreatures() {
   [...creaturesOnMap, ...creaturesFollowing].forEach(c => {
     if (c.imgEl && c.imgEl.parentNode) c.imgEl.parentNode.removeChild(c.imgEl);
@@ -1198,9 +1221,9 @@ function spawnCreatures() {
   creaturesOnMap     = [];
   creaturesFollowing = [];
   creaturePositions  = [];
- 
+
   if (!mazeData) return;
- 
+
   const { conn, startR, startC, goalR, goalC } = mazeData;
   const available = [];
   for (let r = 0; r < ROWS; r++) {
@@ -1216,10 +1239,10 @@ function spawnCreatures() {
     const j = Math.floor(Math.random() * (i + 1));
     [available[i], available[j]] = [available[j], available[i]];
   }
- 
+
   const wrap  = document.getElementById('canvas-wrap');
   const count = Math.min(CREATURE_DEFS.length, available.length);
- 
+
   for (let i = 0; i < count; i++) {
     const def   = CREATURE_DEFS[i];
     const pos   = available[i];
@@ -1239,15 +1262,15 @@ function spawnCreatures() {
     wrap.appendChild(imgEl);
     creaturesOnMap.push({ ...def, r: pos.r, c: pos.c, imgEl });
   }
- 
+
   // Wypełnij historię bieżącą pozycją gracza
   const pp = playerPixelPos();
   for (let i = 0; i < HIST_FRAMES; i++) creaturePositions.push({ ...pp });
- 
+
   updateCreatureHUD();
   updateCreaturePositions();
 }
- 
+
 // Dodaj bieżącą pozycję gracza do historii — wywoływana co klatkę w loop()
 function recordPlayerPos() {
   if (!mazeData) return;
@@ -1258,12 +1281,12 @@ function recordPlayerPos() {
   const needed  = HIST_FRAMES + n * spacing + 60;
   while (creaturePositions.length > needed) creaturePositions.shift();
 }
- 
+
 function computeSpacing(n) {
   // Im więcej zwierząt, tym mniejszy odstęp — min 10px
   return Math.max(10, BASE_SPACING - Math.floor(n / 5) * 3);
 }
- 
+
 // Ustaw pozycje DOM — wywoływana co klatkę w loop()
 function updateCreaturePositions() {
   if (!mazeData) return;
@@ -1271,7 +1294,7 @@ function updateCreaturePositions() {
   const ar = document.getElementById('canvas-wrap').getBoundingClientRect();
   const ox = cr.left - ar.left;
   const oy = cr.top  - ar.top;
- 
+
   // ── Zwierzątka na mapie (czekające) ──
   creaturesOnMap.forEach(c => {
     const px = ox + c.c * TILE + TILE / 2;
@@ -1281,14 +1304,14 @@ function updateCreaturePositions() {
     const fa = fogEnabled ? (fogAlpha[c.r] ? fogAlpha[c.r][c.c] : 1) : 0;
     c.imgEl.style.opacity = fogEnabled ? (fa < 0.7 ? '1' : '0') : '1';
   });
- 
+
   // ── Wężyk: każde zwierzątko śledzi historyczną pozycję gracza ──
   const n = creaturesFollowing.length;
   if (n === 0) return;
- 
+
   const spacing = computeSpacing(n);
   const histLen = creaturePositions.length;
- 
+
   creaturesFollowing.forEach((c, idx) => {
     // Indeks 0 = najbliższe gracza, każde następne jest SPACING klatek dalej w historii
     const delay   = (idx + 1) * spacing;
@@ -1299,7 +1322,7 @@ function updateCreaturePositions() {
     c.imgEl.style.opacity = '1';
   });
 }
- 
+
 function checkCreaturePickup() {
   const idx = creaturesOnMap.findIndex(c => c.r === playerR && c.c === playerC);
   if (idx !== -1) {
@@ -1308,14 +1331,14 @@ function checkCreaturePickup() {
     updateCreatureHUD();
   }
 }
- 
+
 function updateCreatureHUD() {
   const el = document.getElementById('hud-creatures');
   if (!el) return;
   const total = creaturesOnMap.length + creaturesFollowing.length;
   el.textContent = '\uD83D\uDC3E ' + creaturesFollowing.length + '/' + total;
 }
- 
+
 </script>
 </body>
 </html>
