@@ -446,10 +446,18 @@ const CREATURE_IMGS = {
   const bgEl = document.getElementById('loading-bg');
   const bgSrc = BASE + 'loading_screen/tło Music maze okładka.png';
   // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
-  // Użyj <img> zamiast background-image żeby ominąć CORS
   const bgImgEl = document.createElement('img');
-  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.4s;';
+  bgImgEl.crossOrigin = 'anonymous';
+  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.6s;';
   bgImgEl.onload = () => { bgImgEl.style.opacity = '1'; };
+  bgImgEl.onerror = () => {
+    // fallback: spróbuj bez crossOrigin
+    const bgFallback = document.createElement('img');
+    bgFallback.style.cssText = bgImgEl.style.cssText;
+    bgFallback.onload = () => { bgFallback.style.opacity = '1'; };
+    bgFallback.src = bgSrc + '?v=' + Date.now();
+    bgEl.appendChild(bgFallback);
+  };
   bgImgEl.src = bgSrc;
   bgEl.appendChild(bgImgEl);
 
@@ -825,50 +833,52 @@ function refreshSideBar(){const sb=document.getElementById('side-content');if(!s
 /* ══ MAZE GENERATION ══ */
 function generateMaze(){
   const conn=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>new Set()));
-  const vis=Array.from({length:ROWS},()=>Array(COLS).fill(false));
   const DIRS=[['N',-1,0,'S'],['S',1,0,'N'],['E',0,1,'W'],['W',0,-1,'E']];
 
-  // DFS z ograniczeniem: każde wywołanie ma 20% szans na zatrzymanie (ślepa uliczka)
-  // + preferuje kierunki prostopadłe (więcej zakrętów)
-  function dfs(r,c,fromDir,depth){
+  // KROK 1: Zaznacz ~70% kafli jako "droga", reszta będzie filler
+  const sc=1+Math.floor(Math.random()*(COLS-2));
+  const isRoad=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      isRoad[r][c]=Math.random()<0.70;
+    }
+  }
+  // Start, kolumna startowa i obszar wokół startu — zawsze droga
+  for(let r=0;r<ROWS;r++) isRoad[r][sc]=true;
+  isRoad[0][sc]=true;
+
+  // KROK 2: DFS wyłącznie po polach isRoad
+  const vis=Array.from({length:ROWS},()=>Array(COLS).fill(false));
+  function dfs(r,c,fromDir){
     vis[r][c]=true;
     let ds=[...DIRS].sort(()=>Math.random()-.5);
-    // Preferuj prostopadłe kierunki — więcej zakrętów i ślepych zaułków
     if(fromDir){
       const opp={N:'S',S:'N',E:'W',W:'E'};
       const perp=ds.filter(d=>d[0]!==fromDir&&d[0]!==opp[fromDir]);
       const rest=ds.filter(d=>!perp.includes(d));
-      // 60% szans: idź prostopadle
-      ds=Math.random()<0.6?[...perp,...rest]:[...ds];
+      ds=Math.random()<0.55?[...perp,...rest]:ds;
     }
     for(const[d,dr,dc,rd]of ds){
       const nr=r+dr,nc=c+dc;
-      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!vis[nr][nc]){
-        // 18% szans: pomiń ten kafelek (pozostanie jako filler/ściana)
-        // Nie pomijaj jeśli to jedyna droga do nieodwiedzonej części (sprawdzamy połączalność)
-        if(Math.random()<0.18 && depth>2) continue;
+      if(nr>=0&&nr<ROWS&&nc>=0&&nc<COLS&&!vis[nr][nc]&&isRoad[nr][nc]){
         conn[r][c].add(d);conn[nr][nc].add(rd);
-        dfs(nr,nc,d,depth+1);
+        dfs(nr,nc,d);
       }
     }
   }
+  dfs(0,sc,null);
 
-  const sc=1+Math.floor(Math.random()*(COLS-2));
-  dfs(0,sc,null,0);
-
-  // Upewnij się że cel jest osiągalny — cel = najdalej osiągalny odwiedzony kafelek
+  // KROK 3: Cel = najdalej osiągalny kafelek
   let best=0,gr=ROWS-1,gc=sc;
   for(let r=Math.floor(ROWS/2);r<ROWS;r++){
     for(let c=0;c<COLS;c++){
       if(conn[r][c].size>0){
-        const dist=Math.abs(r-0)+Math.abs(c-sc);
+        const dist=Math.abs(r)+Math.abs(c-sc);
         if(dist>best){best=dist;gr=r;gc=c;}
       }
     }
   }
-  // Jeśli cel jest nieosiągalny z powodu pominiętych kafli — połącz go ze startową siatką
   if(best===0){gr=ROWS-1;gc=sc;}
-
   return{conn,startR:0,startC:sc,goalR:gr,goalC:gc};
 }
 
@@ -1083,7 +1093,7 @@ function updatePlayer(){
   const plImg=document.getElementById('pl-img');
   // Postać = 1.4 × TILE, żeby była proporcjonalna do kafli
   // Postać: min 28px, max 72px, ~85% TILE
-  const plSize=Math.max(28,Math.min(72,Math.round(TILE*0.85)));
+  const plSize=Math.max(20,Math.min(56,Math.round(TILE*0.65)));
   plImg.style.width=plSize+'px';
   posEl(document.getElementById('pl'),playerR,playerC);
 }
@@ -1096,7 +1106,7 @@ function move(dir){
   if(nr<0||nr>=ROWS||nc<0||nc>=COLS||!mazeData.conn[nr][nc].has(rd))return;
   playerR=nr;playerC=nc;updatePlayer();
   recordPlayerPos();checkCreaturePickup();
-  if(fogEnabled){revealCell(playerR,playerC,false);revealNeighbours(playerR,playerC,false);}
+  if(fogEnabled){revealCell(playerR,playerC,true);revealNeighbours(playerR,playerC,true);}
   if(nr===mazeData.goalR&&nc===mazeData.goalC){won=true;setTimeout(()=>document.getElementById('wo').classList.add('show'),500);}
 }
 function newMaze(){
@@ -1373,49 +1383,17 @@ function updateCreaturePositions() {
   if (n === 0) return;
 
   const histLen = creaturePositions.length;
-  const cSz = parseInt(creaturesFollowing[0].imgEl.dataset.cSz || Math.round(TILE*0.40));
+  const spacing = computeSpacing(n);
 
-  // Pozycja gracza w pikselach
-  const plX = ox + playerC * TILE + TILE / 2;
-  const plY = ox + playerR * TILE + TILE / 2; // ox tu użyte celowo — zaraz poprawione
-  const playerPx = { x: ox + playerC * TILE + TILE / 2, y: oy + playerR * TILE + TILE / 2 };
-
-  // ── Pierwsze 6: ustawione wokół gracza (obok i przed) ──
-  // Siatka pozycji wokół gracza — przed i po bokach, nie za
-  // Offset w pikselach: 1 slot = cSz * 1.05
-  const slot = cSz * 1.05;
-  // Pozycje względem gracza (dx, dy) — przed = w górę ekranu (-y), boki = ±x
-  // Rząd 1 (przed graczem): 3 miejsca
-  // Rząd 2 (obok gracza):   3 miejsca
-  const aroundOffsets = [
-    // Rząd przed graczem (y = -slot)
-    { dx: -slot, dy: -slot },
-    { dx:  0,    dy: -slot },
-    { dx:  slot, dy: -slot },
-    // Obok gracza (y = 0)
-    { dx: -slot, dy: 0 },
-    { dx:  slot, dy: 0 },
-    // Tuż przed (bliżej)
-    { dx:  0,    dy: -slot * 0.5 },
-  ];
-
-  const AROUND_MAX = 6; // pierwsze 6 wokół gracza
+  // Wszystkie zwierzątka idą wężykiem po historii pozycji gracza.
+  // Pierwsze zwierzątko startuje od pozycji poprzedniego kafla gracza
+  // (= 1 krok wstecz w historii = TILE px).
   const targetPositions = [];
-
   creaturesFollowing.forEach((c, idx) => {
-    if (idx < AROUND_MAX) {
-      // Ustaw wokół gracza
-      const off = aroundOffsets[idx];
-      targetPositions.push({ x: playerPx.x + off.dx, y: playerPx.y + off.dy });
-    } else {
-      // Reszta: idzie po historii pozycji gracza (wężyk za graczem)
-      const tailIdx = idx - AROUND_MAX; // indeks w ogonie
-      const spacing = computeSpacing(n - AROUND_MAX);
-      const delay   = Math.round(TILE * 1.5) + (tailIdx + 1) * spacing;
-      const histIdx = Math.max(0, histLen - 1 - delay);
-      const pos     = creaturePositions[histIdx];
-      targetPositions.push({ x: pos.x, y: pos.y });
-    }
+    const delay   = Math.round(TILE) + (idx + 1) * spacing;
+    const histIdx = Math.max(0, histLen - 1 - delay);
+    const pos     = creaturePositions[histIdx];
+    targetPositions.push({ x: pos.x, y: pos.y });
   });
 
   // Rozsuń nakładające się zwierzątka
