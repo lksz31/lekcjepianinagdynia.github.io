@@ -8,23 +8,21 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:'Cinzel',serif;}
- 
-#hud{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(10,16,6,0.97);border-bottom:2px solid #3a5a1a;display:flex;align-items:center;gap:14px;padding:0 14px;z-index:100;}
+#hud{position:fixed;top:0;left:0;right:0;height:52px;background:rgba(10,16,6,0.97);border-bottom:2px solid #3a5a1a;display:flex;align-items:center;gap:12px;padding:0 14px;z-index:100;}
 .res{display:flex;align-items:center;gap:5px;font-size:11px;color:#c8b87a;letter-spacing:.05em;white-space:nowrap;}
-.res-val{font-weight:700;color:#f0d060;min-width:28px;}
+.res-icon{height:26px;width:auto;image-rendering:pixelated;}
+.res-val{font-weight:700;color:#f0d060;min-width:24px;}
 #hud-sep{flex:1;}
 #sell-btn{padding:4px 12px;background:transparent;border:1px solid #4a6a1a;color:#7ab04a;font-family:'Cinzel',serif;font-size:9px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.07em;}
 #sell-btn:hover{border-color:#f0d060;color:#f0d060;}
-#hud-title{font-size:13px;color:#d4af37;letter-spacing:.2em;font-weight:700;}
- 
-#game-wrap{position:fixed;inset:52px 210px 0 0;overflow:hidden;background:#1a2a0e;cursor:default;}
+#hud-title{font-size:12px;color:#d4af37;letter-spacing:.18em;font-weight:700;white-space:nowrap;}
+#game-wrap{position:fixed;inset:52px 210px 0 0;overflow:hidden;background:#1a2a0e;}
 #map-canvas{display:block;}
- 
 #sidebar{position:fixed;right:0;top:52px;bottom:0;width:210px;background:rgba(6,10,4,0.97);border-left:2px solid #2a4a0a;padding:10px 9px;overflow-y:auto;z-index:50;display:flex;flex-direction:column;gap:7px;}
 #sidebar h3{font-size:8px;color:#3a4a1a;letter-spacing:.15em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid #1a2a0a;}
 .hex-info{font-family:'Crimson Text',serif;font-size:11.5px;color:#7a8a5a;line-height:1.6;}
 .hex-info b{color:#b8a86a;font-family:'Cinzel',serif;font-size:9px;}
-.action-btn{width:100%;padding:6px 8px;background:transparent;border:1px solid #3a5a1a;color:#7a9a5a;font-family:'Cinzel',serif;font-size:8.5px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.05em;margin-top:3px;text-align:left;}
+.action-btn{width:100%;padding:6px 8px;background:transparent;border:1px solid #3a5a1a;color:#7a9a5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.04em;margin-top:3px;text-align:left;}
 .action-btn:hover:not(:disabled){border-color:#f0d060;color:#f0d060;}
 .action-btn:disabled{opacity:0.28;cursor:not-allowed;}
 .action-btn.danger{border-color:#5a2a0a;color:#9a5a2a;}
@@ -32,15 +30,12 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
 .progress-wrap{margin-top:4px;height:3px;background:#1a2a0a;border-radius:2px;overflow:hidden;}
 .progress-bar{height:100%;background:linear-gradient(90deg,#2a7a10,#f0d060);border-radius:2px;}
 .prog-label{font-family:'Crimson Text',serif;font-size:9px;color:#4a5a2a;margin-top:2px;}
- 
-/* MUSIC MODAL */
 #music-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.82);}
 #music-modal.show{display:flex;}
 .music-panel{background:#020a02;border:2px solid #3a5a1a;border-radius:12px;padding:20px 22px;width:340px;max-width:96vw;display:flex;flex-direction:column;gap:10px;color:#c8b87a;}
 .music-panel h2{font-size:.82rem;color:#d4af37;letter-spacing:.16em;text-align:center;}
 .music-task{font-family:'Crimson Text',serif;font-size:1rem;text-align:center;color:#8a9a6a;}
 .music-task b{font-size:1.5rem;color:#f0d060;font-family:'Cinzel',serif;}
-.staff-wrap{margin:4px auto;}
 .note-arrow-row{display:flex;justify-content:center;gap:14px;}
 .note-arr-btn{width:38px;height:38px;background:transparent;border:1px solid #3a5a1a;color:#d4af37;font-size:20px;cursor:pointer;border-radius:4px;transition:.15s;display:flex;align-items:center;justify-content:center;}
 .note-arr-btn:hover{background:rgba(212,175,55,.12);border-color:#d4af37;}
@@ -52,20 +47,18 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
 .music-result{text-align:center;font-family:'Crimson Text',serif;font-size:.88rem;min-height:20px;}
 .music-result.ok{color:#60e870;}
 .music-result.fail{color:#e05050;}
- 
-#tooltip{position:fixed;pointer-events:none;background:rgba(2,8,2,0.95);border:1px solid #3a5a1a;border-radius:6px;padding:5px 9px;font-family:'Crimson Text',serif;font-size:11.5px;color:#c8b87a;z-index:200;display:none;max-width:170px;line-height:1.5;}
- 
+#tooltip{position:fixed;pointer-events:none;background:rgba(2,8,2,0.95);border:1px solid #3a5a1a;border-radius:6px;padding:5px 9px;font-family:'Crimson Text',serif;font-size:11.5px;color:#c8b87a;z-index:200;display:none;max-width:175px;line-height:1.5;}
 #win-screen{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);flex-direction:column;gap:16px;}
 #win-screen.show{display:flex;}
 #win-screen h1{font-size:2rem;color:#f0d060;letter-spacing:.15em;text-shadow:0 0 30px rgba(240,208,60,.6);}
 .win-btn{padding:10px 26px;background:transparent;border:2px solid #f0d060;color:#f0d060;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
 .win-btn:hover{background:#f0d060;color:#040c04;}
- 
-#sell-panel{position:fixed;right:220px;top:52px;background:#020a02;border:1px solid #3a5a1a;border-radius:8px;padding:12px 14px;z-index:150;display:none;min-width:155px;}
+#sell-panel{position:fixed;right:220px;top:52px;background:#020a02;border:1px solid #3a5a1a;border-radius:8px;padding:12px 14px;z-index:150;display:none;min-width:165px;}
 #sell-panel.show{display:block;}
 #sell-panel h4{font-size:.58rem;color:#5a6a2a;letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase;}
 .sell-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;}
-.sell-row label{font-family:'Crimson Text',serif;font-size:.78rem;color:#8a9a6a;}
+.sell-row label{font-family:'Crimson Text',serif;font-size:.78rem;color:#8a9a6a;display:flex;align-items:center;gap:4px;}
+.sell-icon{height:18px;width:auto;image-rendering:pixelated;}
 .sell-row button{padding:3px 8px;background:transparent;border:1px solid #3a5a1a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;}
 .sell-row button:hover{border-color:#f0d060;color:#f0d060;}
 .close-small{margin-top:5px;padding:3px 8px;background:transparent;border:1px solid #2a2a0a;color:#4a4a1a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;width:100%;}
@@ -73,46 +66,50 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
 </style>
 </head>
 <body>
- 
+
 <div id="hud">
   <span id="hud-title">⚔ AGE OF THE MUSIC</span>
-  <div style="width:1px;height:24px;background:#2a3a0a;"></div>
-  <div class="res">💰<span>Złoto:</span><span class="res-val" id="hud-gold">50</span></div>
-  <div class="res">🪵<span>Drewno:</span><span class="res-val" id="hud-wood">10</span></div>
-  <div class="res">🪨<span>Kamień:</span><span class="res-val" id="hud-stone">5</span></div>
+  <div style="width:1px;height:24px;background:#2a3a0a;flex-shrink:0;"></div>
+  <div class="res"><img id="icon-gold"  class="res-icon" src=""><span>Złoto:</span><span class="res-val" id="hud-gold">50</span></div>
+  <div class="res"><img id="icon-wood"  class="res-icon" src=""><span>Drewno:</span><span class="res-val" id="hud-wood">10</span></div>
+  <div class="res"><img id="icon-stone" class="res-icon" src=""><span>Kamień:</span><span class="res-val" id="hud-stone">5</span></div>
   <div id="hud-sep"></div>
   <button id="sell-btn" onclick="toggleSellPanel()">💱 Sprzedaj</button>
 </div>
- 
+
 <div id="sell-panel">
   <h4>Sprzedaż surowców</h4>
-  <div class="sell-row"><label>10 🪵 → 1 💰</label><button onclick="sellRes('wood')">Sprzedaj</button></div>
-  <div class="sell-row"><label>10 🪨 → 3 💰</label><button onclick="sellRes('stone')">Sprzedaj</button></div>
+  <div class="sell-row">
+    <label><img class="sell-icon" id="sicon-wood" src=""> 10 → <img class="sell-icon" id="sicon-gold" src=""> 1</label>
+    <button onclick="sellRes('wood')">Sprzedaj</button>
+  </div>
+  <div class="sell-row">
+    <label><img class="sell-icon" id="sicon-stone" src=""> 10 → <img class="sell-icon" id="sicon-gold2" src=""> 3</label>
+    <button onclick="sellRes('stone')">Sprzedaj</button>
+  </div>
   <button class="close-small" onclick="toggleSellPanel()">Zamknij</button>
 </div>
- 
-<div id="game-wrap">
-  <canvas id="map-canvas"></canvas>
-</div>
- 
+
+<div id="game-wrap"><canvas id="map-canvas"></canvas></div>
+
 <div id="sidebar">
   <h3>Zaznaczone pole</h3>
   <div id="hex-info-box" class="hex-info"><span style="color:#2a3a0a;font-style:italic;">Kliknij hex…</span></div>
   <div id="action-box"></div>
 </div>
- 
+
 <div id="tooltip"></div>
- 
+
 <div id="music-modal">
   <div class="music-panel">
     <h2>🎵 Wydobycie Surowca</h2>
     <div class="music-task">Zagraj nutę: <b id="music-target-note">c</b></div>
-    <div class="staff-wrap">
+    <div style="margin:4px auto;">
       <svg id="staff-svg" width="296" height="120" viewBox="0 0 296 120" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     <div class="note-arrow-row">
-      <button class="note-arr-btn" onclick="moveNote(1)" title="Wyżej">▲</button>
-      <button class="note-arr-btn" onclick="moveNote(-1)" title="Niżej">▼</button>
+      <button class="note-arr-btn" onclick="moveNote(1)">▲</button>
+      <button class="note-arr-btn" onclick="moveNote(-1)">▼</button>
     </div>
     <div class="music-controls">
       <button class="mus-btn" onclick="closeMusicModal()">Anuluj</button>
@@ -121,19 +118,84 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
     <div id="music-result" class="music-result"></div>
   </div>
 </div>
- 
+
 <div id="win-screen">
   <h1>🏆 Zwycięstwo!</h1>
-  <p style="font-family:'Crimson Text',serif;font-size:1rem;color:#8a9a6a;">Przejąłeś rynek wroga!</p>
+  <p style="font-family:'Crimson Text',serif;font-size:1rem;color:#8a9a6a;">Przejąłeś ratusz wroga!</p>
   <button class="win-btn" onclick="location.reload()">🎲 Nowa gra</button>
 </div>
- 
+
 <script>
 'use strict';
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
+   ŚCIEŻKA BAZOWA
+═══════════════════════════════════════ */
+const BASE = '/index/gry/Age_of_Music/ilustracje/tales/';
+
+/* ═══════════════════════════════════════
+   WSZYSTKIE OBRAZKI
+═══════════════════════════════════════ */
+const SRC = {
+  // Teren leśny (zielony) — losowany per hex
+  drewno: [1,2,3,4,5].map(i => BASE+'drewno_'+i+'.png'),
+  // Teren kamienny (szary) — losowany per hex
+  kamien: [1,2,3,4,5].map(i => BASE+'kamień_'+i+'.png'),
+  // Tartaki — losowany per hex przy budowie
+  tartak: [1,2,3,4,5,6].map(i => BASE+'tartak_'+i+'.png'),
+  // Kamieniołomy — losowany per hex przy budowie
+  kamieniolom: [1,2,3,4,5,6,7].map(i => BASE+'kamieniołom_'+i+'.png'),
+  // Ratusz gracza i wroga
+  ratusz_player: BASE+'ratusz_1.png',
+  ratusz_enemy:  BASE+'ratusz_2.png',
+  // Rynek (jeśli będzie potrzebny w przyszłości)
+  rynek: [1,2,3,4,5,6].map(i => BASE+'rynek_'+i+'.png'),
+  // Tokeny w HUD
+  token_drewno: BASE+'drewno_token_1.png',
+  token_kamien: BASE+'kamien_token_1.png',
+  token_moneta: BASE+'moneta_1.png',
+};
+
+// Cache załadowanych obrazków
+const IMGS = {};
+function loadImg(src){
+  if(!src) return null;
+  if(IMGS[src]) return IMGS[src];
+  const im = new Image();
+  im.src = src;
+  IMGS[src] = im;
+  return im;
+}
+// Preload wszystkiego
+[...SRC.drewno,...SRC.kamien,...SRC.tartak,...SRC.kamieniolom,...SRC.rynek,
+ SRC.ratusz_player,SRC.ratusz_enemy,
+ SRC.token_drewno,SRC.token_kamien,SRC.token_moneta
+].forEach(s=>loadImg(s));
+
+// Ustaw tokeny w HUD po załadowaniu
+window.addEventListener('load',()=>{
+  ['icon-gold','sicon-gold','sicon-gold2'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.src=SRC.token_moneta;
+  });
+  ['icon-wood','sicon-wood'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.src=SRC.token_drewno;
+  });
+  ['icon-stone','sicon-stone'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.src=SRC.token_kamien;
+  });
+});
+// Ustaw od razu (nie czekając na load)
+setTimeout(()=>{
+  ['icon-gold','sicon-gold','sicon-gold2'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_moneta;});
+  ['icon-wood','sicon-wood'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_drewno;});
+  ['icon-stone','sicon-stone'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_kamien;});
+},100);
+
+function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ═══════════════════════════════════════
    CONFIG
-══════════════════════════ */
+═══════════════════════════════════════ */
 const CFG = {
   startGold:50, startWood:10, startStone:5,
   claimTime:4000, buildTime:4000,
@@ -145,124 +207,62 @@ const CFG = {
   sellStoneRate:10, sellStoneGold:3,
   adjBonus:0.25,
 };
- 
-/* ══════════════════════════
-   IMAGES (PNG placeholders)
-   Zmień src na ścieżkę do swojego PNG.
-   Każdy obrazek to widok izometryczny kafelka.
-══════════════════════════ */
-const IMG_SRCS = {
-  // kafelki terenu (tło hexa)
-  green:   null,  // np. 'tiles/green.png'
-  gray:    null,  // np. 'tiles/gray.png'
-  // budynki (nakładane na teren)
-  sawmill: null,  // np. 'buildings/sawmill.png'
-  quarry:  null,  // np. 'buildings/quarry.png'
-  market_player: null, // np. 'buildings/market_player.png'
-  market_enemy:  null, // np. 'buildings/market_enemy.png'
-};
-const IMGS = {};
-Object.entries(IMG_SRCS).forEach(([k,src])=>{
-  if(src){ const im=new Image(); im.src=src; IMGS[k]=im; }
-});
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    ISO HEX MATH
-   Rysujemy heksa z góry-z-boku (izometria).
-   Hex ma płaski wierzch (flat-top), rzutowany izometrycznie.
-   Używamy axial coords (q,r).
-══════════════════════════ */
-const HS   = 44;   // rozmiar hexa (circumradius płaskiego)
-const DEPTH= 14;   // grubość ziemi widoczna z boku
-const SQRT3= Math.sqrt(3);
- 
-// Płaski hex: 6 rogów (flat-top, w 2D)
-function flatHexCorners2D(cx, cy, size){
-  const pts=[];
-  for(let i=0;i<6;i++){
-    const a=Math.PI/180*(60*i);
-    pts.push({x:cx+size*Math.cos(a), y:cy+size*Math.sin(a)});
-  }
-  return pts;
+═══════════════════════════════════════ */
+const HS    = 44;   // circumradius hexa
+const DEPTH = 14;   // grubość boku
+const SQRT3 = Math.sqrt(3);
+
+function isoProject(x,y){
+  return { x:(x-y)*Math.cos(Math.PI/6), y:(x+y)*Math.sin(Math.PI/6) };
 }
- 
-// Projekcja izometryczna (2:1 dimetria)
-function isoProject(x, y){
-  return {
-    x: (x - y) * Math.cos(Math.PI/6),
-    y: (x + y) * Math.sin(Math.PI/6),
-  };
+function axialToScreen(q,r,ox,oy){
+  const wx=HS*1.5*q, wy=HS*SQRT3*(r+q/2);
+  const p=isoProject(wx,wy);
+  return {sx:p.x+ox, sy:p.y+oy};
 }
- 
-// Axial -> flat world position
-function axialToWorld(q, r){
-  return {
-    wx: HS * 1.5 * q,
-    wy: HS * SQRT3 * (r + q/2),
-  };
-}
- 
-// Axial -> screen center of hex (izometrycznie)
-function axialToScreen(q, r, ox, oy){
-  const {wx,wy} = axialToWorld(q,r);
-  const p = isoProject(wx, wy);
-  return {sx: p.x+ox, sy: p.y+oy};
-}
- 
-// Wylicz narożniki górnej powierzchni hexa (iso)
-function isoHexTop(sx, sy){
-  // Generujemy 6 rogów hexa w 2D, rzutujemy każdy
-  // Flat-top hex o środku (0,0), radius HS
-  const corners2d=flatHexCorners2D(0,0,HS);
-  return corners2d.map(p=>{
-    const ip=isoProject(p.x,p.y);
-    return {x:sx+ip.x, y:sy+ip.y};
-  });
-}
- 
-// Odwrotna projekcja - piksel -> axial (przybliżona)
-function screenToAxial(px, py, ox, oy){
-  // Odwróć isoProject: x=p.x/cos(30), y=p.y/sin(30)-x
-  const ix = px-ox, iy = py-oy;
+function screenToAxial(px,py,ox,oy){
+  const ix=px-ox, iy=py-oy;
   const cos30=Math.cos(Math.PI/6), sin30=Math.sin(Math.PI/6);
-  // wx-wy = ix/cos30 => wx-wy=A
-  // wx+wy = iy/sin30 => wx+wy=B
-  const A = ix/cos30, B = iy/sin30;
+  const A=ix/cos30, B=iy/sin30;
   const wx=(A+B)/2, wy=(B-A)/2;
-  // wx=HS*1.5*q => q=wx/(HS*1.5)
-  // wy=HS*sqrt3*(r+q/2) => r=wy/(HS*sqrt3)-q/2
-  const q = wx/(HS*1.5);
-  const r = wy/(HS*SQRT3) - q/2;
+  const q=wx/(HS*1.5);
+  const r=wy/(HS*SQRT3)-q/2;
   return hexRound(q,r);
 }
- 
 function hexRound(q,r){
   const s=-q-r;
   let rq=Math.round(q),rr=Math.round(r),rs=Math.round(s);
   const dq=Math.abs(rq-q),dr=Math.abs(rr-r),ds=Math.abs(rs-s);
-  if(dq>dr&&dq>ds) rq=-rr-rs;
-  else if(dr>ds) rr=-rq-rs;
+  if(dq>dr&&dq>ds) rq=-rr-rs; else if(dr>ds) rr=-rq-rs;
   return {q:rq,r:rr};
 }
- 
+function isoHexTop(sx,sy){
+  const pts=[];
+  for(let i=0;i<6;i++){
+    const a=Math.PI/3*i;
+    const lx=HS*Math.cos(a), ly=HS*Math.sin(a);
+    const p=isoProject(lx,ly);
+    pts.push({x:sx+p.x, y:sy+p.y});
+  }
+  return pts;
+}
 const HEX_DIRS=[{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
 function hexKey(q,r){return q+','+r;}
 function getNeighbors(q,r){return HEX_DIRS.map(d=>({q:q+d.q,r:r+d.r}));}
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    STATE
-══════════════════════════ */
+═══════════════════════════════════════ */
 let gold=CFG.startGold, wood=CFG.startWood, stone=CFG.startStone;
-let hexes={};
-let selected=null;
+let hexes={}, drawOrder=[], selected=null;
 let originX=0, originY=0;
- 
-// Sortowanie hexów do rysowania (painter's algorithm: tylne pierwsze)
-let drawOrder=[];
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    INIT
-══════════════════════════ */
+═══════════════════════════════════════ */
 function initGame(){
   hexes={};
   const COLS=10, ROWS=10;
@@ -270,208 +270,210 @@ function initGame(){
     for(let col=0;col<COLS;col++){
       const q=col-Math.floor(row/2), r=row;
       const key=hexKey(q,r);
-      hexes[key]={q,r,
-        terrain:Math.random()<0.55?'green':'gray',
-        owner:null,building:null,
+      const terrain=Math.random()<0.55?'green':'gray';
+      hexes[key]={
+        q,r,terrain,owner:null,building:null,
+        // Losuj PNG terenu raz na zawsze dla tego hexa
+        terrainSrc: terrain==='green'
+          ? randFrom(SRC.drewno)
+          : randFrom(SRC.kamien),
+        buildingSrc: null, // losowane przy budowie
         claimProg:null,claimStart:null,
         buildProg:null,buildStart:null,buildType:null
       };
     }
   }
- 
-  // Posortuj klucze wg (r+q) do painter's algorithm
+
+  // Painter's sort
   drawOrder=Object.keys(hexes).sort((a,b)=>{
     const ha=hexes[a],hb=hexes[b];
     return (ha.r+ha.q)-(hb.r+hb.q);
   });
- 
-  // Gracz — top-left
-  const playerKeys=[...drawOrder];
-  let sawKey=playerKeys[0], quarryKey=null, marketKey=null;
-  hexes[sawKey].terrain='green';
+
+  // ── Gracz (top-left) ──
+  const pKeys=[...drawOrder];
+  let sawKey=pKeys[0], quarryKey=null, townKey=null;
   for(const nb of getNeighbors(hexes[sawKey].q,hexes[sawKey].r)){
     const k=hexKey(nb.q,nb.r);
     if(!hexes[k]) continue;
     if(!quarryKey){quarryKey=k;continue;}
-    if(!marketKey){marketKey=k;break;}
+    if(!townKey){townKey=k;break;}
   }
-  if(!quarryKey) quarryKey=playerKeys[1]||sawKey;
-  if(!marketKey) marketKey=playerKeys[2]||sawKey;
-  hexes[sawKey].terrain='green'; hexes[sawKey].owner='player'; hexes[sawKey].building='sawmill';
-  hexes[quarryKey].terrain='gray'; hexes[quarryKey].owner='player'; hexes[quarryKey].building='quarry';
-  hexes[marketKey].owner='player'; hexes[marketKey].building='market';
- 
-  // Wróg — bottom-right
-  const enemyKeys=[...drawOrder].reverse();
-  let eMk=null,eS=null,eQ=null;
-  for(const k of enemyKeys){
-    if(k===sawKey||k===quarryKey||k===marketKey) continue;
-    if(!eMk){eMk=k;continue;} break;
+  quarryKey=quarryKey||pKeys[1]||sawKey;
+  townKey  =townKey  ||pKeys[2]||sawKey;
+
+  hexes[sawKey].terrain='green';
+  hexes[sawKey].terrainSrc=randFrom(SRC.drewno);
+  hexes[sawKey].owner='player';
+  hexes[sawKey].building='sawmill';
+  hexes[sawKey].buildingSrc=randFrom(SRC.tartak);
+
+  hexes[quarryKey].terrain='gray';
+  hexes[quarryKey].terrainSrc=randFrom(SRC.kamien);
+  hexes[quarryKey].owner='player';
+  hexes[quarryKey].building='quarry';
+  hexes[quarryKey].buildingSrc=randFrom(SRC.kamieniolom);
+
+  hexes[townKey].owner='player';
+  hexes[townKey].building='townhall';
+  hexes[townKey].buildingSrc=SRC.ratusz_player;
+
+  // ── Wróg (bottom-right) ──
+  const eKeys=[...drawOrder].reverse();
+  let eTown=null,eS=null,eQ=null;
+  for(const k of eKeys){
+    if(k===sawKey||k===quarryKey||k===townKey) continue;
+    if(!eTown){eTown=k;continue;}
+    break;
   }
-  if(eMk){
-    hexes[eMk].owner='enemy'; hexes[eMk].building='market';
-    for(const nb of getNeighbors(hexes[eMk].q,hexes[eMk].r)){
+  if(eTown){
+    hexes[eTown].owner='enemy';
+    hexes[eTown].building='townhall';
+    hexes[eTown].buildingSrc=SRC.ratusz_enemy;
+
+    for(const nb of getNeighbors(hexes[eTown].q,hexes[eTown].r)){
       const k=hexKey(nb.q,nb.r);
-      if(!hexes[k]||k===sawKey||k===quarryKey||k===marketKey) continue;
-      if(!eS){eS=k;continue;} if(!eQ){eQ=k;break;}
+      if(!hexes[k]||k===sawKey||k===quarryKey||k===townKey) continue;
+      if(!eS){eS=k;continue;}
+      if(!eQ){eQ=k;break;}
     }
-    if(!eS) eS=enemyKeys.find(k=>k!==eMk&&k!==sawKey&&k!==quarryKey&&k!==marketKey)||eMk;
-    if(!eQ) eQ=enemyKeys.find(k=>k!==eMk&&k!==eS&&k!==sawKey&&k!==quarryKey&&k!==marketKey)||eMk;
-    hexes[eS].owner='enemy'; hexes[eS].terrain='green'; hexes[eS].building='sawmill';
-    hexes[eQ].owner='enemy'; hexes[eQ].terrain='gray';  hexes[eQ].building='quarry';
+    eS=eS||eKeys.find(k=>k!==eTown&&k!==sawKey&&k!==quarryKey&&k!==townKey)||eTown;
+    eQ=eQ||eKeys.find(k=>k!==eTown&&k!==eS&&k!==sawKey&&k!==quarryKey&&k!==townKey)||eTown;
+
+    hexes[eS].owner='enemy'; hexes[eS].terrain='green';
+    hexes[eS].terrainSrc=randFrom(SRC.drewno);
+    hexes[eS].building='sawmill';
+    hexes[eS].buildingSrc=randFrom(SRC.tartak);
+
+    hexes[eQ].owner='enemy'; hexes[eQ].terrain='gray';
+    hexes[eQ].terrainSrc=randFrom(SRC.kamien);
+    hexes[eQ].building='quarry';
+    hexes[eQ].buildingSrc=randFrom(SRC.kamieniolom);
   }
- 
-  fitCanvas();
-  updateHUD();
+
+  fitCanvas(); updateHUD();
   requestAnimationFrame(gameLoop);
 }
- 
-/* ══════════════════════════
-   CANVAS & FIT
-══════════════════════════ */
+
+/* ═══════════════════════════════════════
+   CANVAS
+═══════════════════════════════════════ */
 const canvas=document.getElementById('map-canvas');
 const ctx=canvas.getContext('2d');
- 
+
 function fitCanvas(){
   const wrap=document.getElementById('game-wrap');
-  canvas.width=wrap.clientWidth;
-  canvas.height=wrap.clientHeight;
-  // Oblicz origin żeby wyśrodkować mapę
+  canvas.width=wrap.clientWidth; canvas.height=wrap.clientHeight;
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(const k of Object.keys(hexes)){
-    const h=hexes[k];
-    const {sx,sy}=axialToScreen(h.q,h.r,0,0);
-    minX=Math.min(minX,sx); maxX=Math.max(maxX,sx);
-    minY=Math.min(minY,sy); maxY=Math.max(maxY,sy);
+    const h=hexes[k],{sx,sy}=axialToScreen(h.q,h.r,0,0);
+    minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);
+    minY=Math.min(minY,sy);maxY=Math.max(maxY,sy);
   }
   originX=canvas.width/2-(minX+maxX)/2;
   originY=canvas.height/2-(minY+maxY)/2+DEPTH/2;
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    DRAW LOOP
-══════════════════════════ */
-function gameLoop(){
-  updateTimers();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
- 
+═══════════════════════════════════════ */
+function gameLoop(){ updateTimers(); draw(); requestAnimationFrame(gameLoop); }
+
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  // Tło — gradient nieba
   const sky=ctx.createLinearGradient(0,0,0,canvas.height);
-  sky.addColorStop(0,'#2a4a18');
-  sky.addColorStop(1,'#0e1e08');
-  ctx.fillStyle=sky;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
- 
-  // Rysuj hexy od tyłu (painter's algorithm)
+  sky.addColorStop(0,'#2a4a18'); sky.addColorStop(1,'#0e1e08');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,canvas.width,canvas.height);
   for(const k of drawOrder) drawIsoHex(k);
 }
- 
-/* ══════════════════════════
-   DRAW ISO HEX
-══════════════════════════ */
+
+/* ═══════════════════════════════════════
+   DRAW HEX
+═══════════════════════════════════════ */
+function imgReady(im){ return im&&im.complete&&im.naturalWidth>0; }
+
 function drawIsoHex(key){
   const h=hexes[key];
   const {sx,sy}=axialToScreen(h.q,h.r,originX,originY);
   const top=isoHexTop(sx,sy);
   const isSel=selected===key;
- 
-  // ── Boki hexa (grubość ziemi) ──
-  // Widoczne boki to dolna połowa: narożniki 2,3,4,5 (indeks 0=prawy, idąc CCW dla flat-top)
-  // W izometrii widzimy boki south-east i south-west
-  // Narożniki: 0=prawy, 1=prawy-dolny, 2=lewy-dolny, 3=lewy, 4=lewy-górny, 5=prawy-górny
-  const sideColor = h.owner==='player'?'#1a3a10':
-                    h.owner==='enemy' ?'#3a1010':'#1a1a10';
-  const sideColorDark = darken(sideColor,0.6);
- 
-  // Prawy bok (narożniki 0→1 + przesunięcie w dół o DEPTH)
-  const rightSide=[top[0],top[1],{x:top[1].x,y:top[1].y+DEPTH},{x:top[0].x,y:top[0].y+DEPTH}];
-  ctx.beginPath();
-  rightSide.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=darken(sideColor,0.5);
-  ctx.fill();
-  if(isSel){ctx.strokeStyle='rgba(240,208,60,0.5)';ctx.lineWidth=1;ctx.stroke();}
- 
-  // Lewy-prawy bok (narożniki 1→2)
-  const rightBot=[top[1],top[2],{x:top[2].x,y:top[2].y+DEPTH},{x:top[1].x,y:top[1].y+DEPTH}];
-  ctx.beginPath();
-  rightBot.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=darken(sideColor,0.35);
-  ctx.fill();
-  if(isSel){ctx.strokeStyle='rgba(240,208,60,0.5)';ctx.lineWidth=1;ctx.stroke();}
- 
-  // Lewy bok (2→3)
-  const leftSide=[top[2],top[3],{x:top[3].x,y:top[3].y+DEPTH},{x:top[2].x,y:top[2].y+DEPTH}];
-  ctx.beginPath();
-  leftSide.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=darken(sideColor,0.45);
-  ctx.fill();
-  if(isSel){ctx.strokeStyle='rgba(240,208,60,0.5)';ctx.lineWidth=1;ctx.stroke();}
- 
-  // ── Górna powierzchnia hexa ──
+
+  // ── Boki (grubość) ──
+  const sideBase = h.owner==='player'?'#1a3a10':h.owner==='enemy'?'#3a1010':'#1a1a10';
+  drawSide(top[0],top[1],darken(sideBase,0.50),isSel);
+  drawSide(top[1],top[2],darken(sideBase,0.35),isSel);
+  drawSide(top[2],top[3],darken(sideBase,0.45),isSel);
+
+  // ── Górna powierzchnia ──
   ctx.beginPath();
   top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
   ctx.closePath();
- 
-  // Kolor górny = terrain + owner
-  let topFill;
-  if(h.terrain==='green'){
-    topFill=h.owner==='player'?'#2a6a20':h.owner==='enemy'?'#5a2510':'#1e4a14';
-  } else {
-    topFill=h.owner==='player'?'#3a3a6a':h.owner==='enemy'?'#4a1a3a':'#222230';
-  }
-  if(isSel) topFill=blendHex(topFill,'#f0d060',0.22);
- 
-  // Jeśli mamy PNG terenu, narysuj go wewnątrz clipu
-  const terrainImg=IMGS[h.terrain];
-  if(terrainImg&&terrainImg.complete&&terrainImg.naturalWidth>0){
+
+  const terrainImg=loadImg(h.terrainSrc);
+  if(imgReady(terrainImg)){
+    // Clipujemy PNG terenu w kształcie hexa
     ctx.save();
     ctx.clip();
-    // Bounding box górnej powierzchni
-    const xs=top.map(p=>p.x), ys=top.map(p=>p.y);
+    const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
     const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
     ctx.drawImage(terrainImg,bx,by,bw,bh);
+    // Przyciemnienie jeśli należy do wroga lub bez właściciela
+    if(h.owner==='enemy'){
+      ctx.fillStyle='rgba(80,0,0,0.28)';ctx.fillRect(bx,by,bw,bh);
+    } else if(!h.owner){
+      ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fillRect(bx,by,bw,bh);
+    }
+    // Podświetlenie zaznaczonego
+    if(isSel){ctx.fillStyle='rgba(240,208,60,0.12)';ctx.fillRect(bx,by,bw,bh);}
     ctx.restore();
   } else {
-    ctx.fillStyle=topFill;
-    ctx.fill();
-    // Dekoracyjne „ziarno" terenu
-    if(h.terrain==='green'&&!h.building){
-      for(let i=0;i<4;i++){
-        const bx=sx+(Math.random()-0.5)*HS*0.7, by=sy+(Math.random()-0.5)*HS*0.3;
-        ctx.fillStyle='rgba(50,100,30,0.4)';
-        ctx.beginPath(); ctx.arc(bx,by,2,0,Math.PI*2); ctx.fill();
-      }
-    }
+    // Fallback kolor
+    let fc=h.terrain==='green'
+      ?(h.owner==='player'?'#2a6a20':h.owner==='enemy'?'#5a2510':'#1e4a14')
+      :(h.owner==='player'?'#3a3a6a':h.owner==='enemy'?'#4a1a3a':'#222230');
+    if(isSel) fc=blendHex(fc,'#f0d060',0.22);
+    ctx.fillStyle=fc; ctx.fill();
   }
- 
-  // Obramowanie górne
+
+  // ── Obramowanie ──
   ctx.beginPath();
   top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
   ctx.closePath();
-  ctx.strokeStyle=isSel?'#f0d060':
-    h.owner==='player'?'rgba(60,160,40,0.7)':
-    h.owner==='enemy' ?'rgba(160,40,20,0.7)':'rgba(40,60,20,0.35)';
-  ctx.lineWidth=isSel?2.2:1;
-  ctx.stroke();
- 
-  // ── Budynek / placeholder ──
-  drawBuilding(h, sx, sy, top);
- 
-  // ── Pierścień postępu przejęcia ──
+  ctx.strokeStyle=isSel?'#f0d060':h.owner==='player'?'rgba(60,160,40,0.8)':h.owner==='enemy'?'rgba(160,40,20,0.8)':'rgba(40,60,20,0.35)';
+  ctx.lineWidth=isSel?2.5:1; ctx.stroke();
+
+  // ── Budynek PNG ──
+  if(h.building&&h.buildProg===null){
+    const bim=loadImg(h.buildingSrc);
+    if(imgReady(bim)){
+      const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
+      const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
+      // Skaluj PNG tak żeby wypełniał hex, wyśrodkowany, przesunięty lekko w górę
+      const iw=bim.naturalWidth,ih=bim.naturalHeight;
+      const scale=Math.max(bw/iw, bh/ih)*1.05;
+      const dw=iw*scale,dh=ih*scale;
+      ctx.save();
+      // Clip do kształtu hexa żeby PNG nie wychodził poza
+      ctx.beginPath();
+      top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+      ctx.closePath(); ctx.clip();
+      ctx.drawImage(bim, sx-dw/2, by-dh*0.05, dw, dh);
+      ctx.restore();
+    } else {
+      // Fallback placeholder
+      drawBuildingPlaceholder(h,sx,sy);
+    }
+  }
+
+  // Fallback gdy budynek w trakcie budowania
+  if(h.building&&h.buildProg!==null) drawBuildingPlaceholder(h,sx,sy);
+
+  // ── Pierścień przejęcia ──
   if(h.claimProg!==null){
     ctx.save();
     ctx.beginPath();
     ctx.arc(sx,sy-4,HS*0.55,-Math.PI/2,-Math.PI/2+Math.PI*2*h.claimProg,false);
-    ctx.strokeStyle='rgba(240,208,60,0.9)';
-    ctx.lineWidth=3.5;
-    ctx.stroke();
+    ctx.strokeStyle='rgba(240,208,60,0.9)'; ctx.lineWidth=3.5; ctx.stroke();
     ctx.restore();
   }
   // ── Pierścień budowania ──
@@ -479,134 +481,77 @@ function drawIsoHex(key){
     ctx.save();
     ctx.beginPath();
     ctx.arc(sx,sy-4,HS*0.42,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
-    ctx.strokeStyle='rgba(80,220,80,0.85)';
-    ctx.lineWidth=3;
-    ctx.stroke();
+    ctx.strokeStyle='rgba(80,220,80,0.85)'; ctx.lineWidth=3; ctx.stroke();
     ctx.restore();
   }
- 
-  // ── Kropka właściciela ──
+
+  // ── Dot właściciela ──
   if(h.owner){
-    const dx=isoProject(HS*0.55,0);
-    const dotX=sx+dx.x, dotY=sy+dx.y-HS*0.05;
-    ctx.beginPath(); ctx.arc(dotX,dotY,5,0,Math.PI*2);
+    const dp=isoProject(HS*0.52,0);
+    ctx.beginPath(); ctx.arc(sx+dp.x,sy+dp.y-3,5,0,Math.PI*2);
     ctx.fillStyle=h.owner==='player'?'#50e060':'#e04040';
-    ctx.fill();
-    ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=1; ctx.stroke();
   }
 }
- 
-/* ══════════════════════════
-   BUILDING DRAW
-   Jeśli PNG wgrane → rysuje PNG
-   Jeśli nie → rysuje kolorowy placeholder z etykietą
-══════════════════════════ */
-function drawBuilding(h, sx, sy, top){
-  if(!h.building) return;
- 
-  // Bounding box górnej powierzchni (do skalowania PNG)
-  const xs=top.map(p=>p.x), ys=top.map(p=>p.y);
-  const bx=Math.min(...xs), by=Math.min(...ys);
-  const bw=Math.max(...xs)-bx, bh=Math.max(...ys)-by;
- 
-  // Klucz obrazka
-  let imgKey=h.building;
-  if(h.building==='market') imgKey=h.owner==='enemy'?'market_enemy':'market_player';
-  const im=IMGS[imgKey];
- 
-  if(im&&im.complete&&im.naturalWidth>0){
-    // PNG: narysuj wyśrodkowane na górnej powierzchni, przesunięte lekko w górę
-    const iw=im.naturalWidth, ih=im.naturalHeight;
-    const scale=Math.min(bw*0.85/iw, bh*1.2/ih);
-    const dw=iw*scale, dh=ih*scale;
-    ctx.drawImage(im, sx-dw/2, by-dh*0.35, dw, dh);
-    return;
-  }
- 
-  // ── PLACEHOLDER ──
-  // Prostokąt izometryczny na środku hexa z etykietą
-  const pw=HS*0.7, ph=HS*0.35;
-  const col = h.building==='market'  ? (h.owner==='enemy'?'rgba(160,40,40,0.75)':'rgba(40,100,160,0.75)') :
-              h.building==='sawmill' ? 'rgba(120,80,30,0.75)' :
-                                       'rgba(80,80,100,0.75)';
-  // Rysujemy izometryczny prostopadłościan (uproszczony)
-  const boxTop=[
-    {x:sx,      y:sy-ph*2},
-    {x:sx+pw*0.6, y:sy-ph*1.5},
-    {x:sx,      y:sy-ph},
-    {x:sx-pw*0.6, y:sy-ph*1.5},
-  ];
-  // Góra
+
+function drawSide(a,b,color,isSel){
+  const quad=[a,b,{x:b.x,y:b.y+DEPTH},{x:a.x,y:a.y+DEPTH}];
   ctx.beginPath();
-  boxTop.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  quad.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
   ctx.closePath();
-  ctx.fillStyle=col; ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=0.8; ctx.stroke();
- 
-  // Prawa ściana
-  const wallR=[
-    boxTop[1], boxTop[2],
-    {x:boxTop[2].x, y:boxTop[2].y+ph},
-    {x:boxTop[1].x, y:boxTop[1].y+ph},
+  ctx.fillStyle=color; ctx.fill();
+  if(isSel){ctx.strokeStyle='rgba(240,208,60,0.4)';ctx.lineWidth=0.8;ctx.stroke();}
+}
+
+function drawBuildingPlaceholder(h,sx,sy){
+  const ph=HS*0.35,pw=HS*0.65;
+  const col=h.building==='townhall'
+    ?(h.owner==='enemy'?'rgba(160,40,40,0.8)':'rgba(40,80,160,0.8)')
+    :h.building==='sawmill'?'rgba(120,80,30,0.8)':'rgba(80,80,100,0.8)';
+  const bt=[
+    {x:sx,y:sy-ph*2},{x:sx+pw*0.6,y:sy-ph*1.5},
+    {x:sx,y:sy-ph},{x:sx-pw*0.6,y:sy-ph*1.5}
   ];
-  ctx.beginPath();
-  wallR.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=darken(col,0.55); ctx.fill();
- 
-  // Lewa ściana
-  const wallL=[
-    boxTop[2], boxTop[3],
-    {x:boxTop[3].x, y:boxTop[3].y+ph},
-    {x:boxTop[2].x, y:boxTop[2].y+ph},
-  ];
-  ctx.beginPath();
-  wallL.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.fillStyle=darken(col,0.42); ctx.fill();
- 
-  // Etykieta
-  const label={sawmill:'TARTAK',quarry:'KAMIENIOŁOM',market:'RYNEK'}[h.building]||'';
+  ctx.beginPath();bt.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.closePath();ctx.fillStyle=col;ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=0.8;ctx.stroke();
+  const wr=[bt[1],bt[2],{x:bt[2].x,y:bt[2].y+ph},{x:bt[1].x,y:bt[1].y+ph}];
+  ctx.beginPath();wr.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.closePath();ctx.fillStyle=darken(col,0.55);ctx.fill();
+  const wl=[bt[2],bt[3],{x:bt[3].x,y:bt[3].y+ph},{x:bt[2].x,y:bt[2].y+ph}];
+  ctx.beginPath();wl.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.closePath();ctx.fillStyle=darken(col,0.42);ctx.fill();
+  const lbl={sawmill:'TARTAK',quarry:'KAMIENIOŁOM',townhall:'RATUSZ'}[h.building]||'';
   ctx.font=`bold ${Math.round(HS*0.14)}px Cinzel,serif`;
-  ctx.fillStyle='rgba(255,240,180,0.9)';
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(label, sx, sy-ph*1.5-2);
+  ctx.fillStyle='rgba(255,240,180,0.9)';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(lbl,sx,sy-ph*1.5-2);
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    KOLOR HELPERS
-══════════════════════════ */
-function darken(hex, factor){
-  const c=parseHex(hex);
-  return toHex(Math.round(c[0]*factor),Math.round(c[1]*factor),Math.round(c[2]*factor),c[3]);
+═══════════════════════════════════════ */
+function darken(hex,f){
+  const c=parseCol(hex);
+  return toCol(c[0]*f,c[1]*f,c[2]*f,c[3]);
 }
 function blendHex(a,b,t){
-  const ca=parseHex(a),cb=parseHex(b);
-  return toHex(
-    Math.round(ca[0]+(cb[0]-ca[0])*t),
-    Math.round(ca[1]+(cb[1]-ca[1])*t),
-    Math.round(ca[2]+(cb[2]-ca[2])*t),
-    ca[3]
-  );
+  const ca=parseCol(a),cb=parseCol(b);
+  return toCol(ca[0]+(cb[0]-ca[0])*t,ca[1]+(cb[1]-ca[1])*t,ca[2]+(cb[2]-ca[2])*t,ca[3]);
 }
-function parseHex(h){
-  // obsługuje #rrggbb i rgba(...)
-  if(h.startsWith('rgba')){
-    const m=h.match(/[\d.]+/g);
-    return [+m[0],+m[1],+m[2],+m[3]];
-  }
+function parseCol(h){
+  if(h.startsWith('rgba')){const m=h.match(/[\d.]+/g);return[+m[0],+m[1],+m[2],+m[3]];}
   const s=h.replace('#','');
-  return [parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16),1];
+  return[parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16),1];
 }
-function toHex(r,g,b,a){
-  const clamp=v=>Math.max(0,Math.min(255,v));
-  if(a<1) return `rgba(${clamp(r)},${clamp(g)},${clamp(b)},${a.toFixed(2)})`;
-  return '#'+[r,g,b].map(v=>clamp(v).toString(16).padStart(2,'0')).join('');
+function toCol(r,g,b,a){
+  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
+  if(a<1) return `rgba(${cl(r)},${cl(g)},${cl(b)},${a.toFixed(2)})`;
+  return '#'+[r,g,b].map(v=>cl(v).toString(16).padStart(2,'0')).join('');
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    TIMERS
-══════════════════════════ */
+═══════════════════════════════════════ */
 function updateTimers(){
   const now=Date.now();
   for(const k of Object.keys(hexes)){
@@ -621,22 +566,18 @@ function updateTimers(){
     }
   }
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    INPUT
-══════════════════════════ */
+═══════════════════════════════════════ */
 let clickCount={},clickTimer={};
- 
+
 canvas.addEventListener('click',e=>{
   const rect=canvas.getBoundingClientRect();
   const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX,originY);
   const key=hexKey(q,r);
   if(!hexes[key]) return;
- 
-  if(selected!==key){
-    selected=key; showHexInfo(key); return;
-  }
-  // Drugie kliknięcie na ten sam hex
+  if(selected!==key){selected=key;showHexInfo(key);return;}
   clickCount[key]=(clickCount[key]||0)+1;
   clearTimeout(clickTimer[key]);
   if(clickCount[key]>=2){
@@ -646,7 +587,7 @@ canvas.addEventListener('click',e=>{
   }
   showHexInfo(key);
 });
- 
+
 canvas.addEventListener('mousemove',e=>{
   const rect=canvas.getBoundingClientRect();
   const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX,originY);
@@ -655,53 +596,53 @@ canvas.addEventListener('mousemove',e=>{
   if(hexes[key]){
     const h=hexes[key];
     const cost=getClaimCost(h);
-    let txt=`<b>${h.terrain==='green'?'🌿 Zielone':'🪨 Szare'}</b><br>`;
-    txt+=`Wł.: ${ownerLabel(h.owner)}<br>`;
+    let txt=`<b>${h.terrain==='green'?'🌿 Las':'🪨 Kamieniołom'}</b><br>`;
+    txt+=`Właściciel: ${ownerLabel(h.owner)}<br>`;
     if(h.building) txt+=`Budynek: <b>${bName(h.building)}</b><br>`;
     if(h.owner!=='player') txt+=`Przejęcie: <b>${cost}💰</b>`;
-    if(h.owner===null&&!isAdjPlayer(h)) txt+=`<br><span style="color:#4a4a1a">Niedostępne</span>`;
-    tt.innerHTML=txt; tt.style.display='block';
-    tt.style.left=(e.clientX+14)+'px'; tt.style.top=(e.clientY-8)+'px';
-  } else { tt.style.display='none'; }
+    if(!h.owner&&!isAdjPlayer(h)) txt+=`<br><span style="color:#4a4a1a">Niedostępne</span>`;
+    tt.innerHTML=txt;tt.style.display='block';
+    tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-8)+'px';
+  } else {tt.style.display='none';}
 });
 canvas.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none');
 window.addEventListener('resize',()=>{fitCanvas();});
- 
+
 function handleDoubleClick(key){
   const h=hexes[key];
   if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null)
     openMusicModal(key);
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    SIDEBAR
-══════════════════════════ */
+═══════════════════════════════════════ */
 function showHexInfo(key){
   const h=hexes[key];
   const ibox=document.getElementById('hex-info-box');
   const abox=document.getElementById('action-box');
   if(!h){ibox.innerHTML='';abox.innerHTML='';return;}
- 
-  let info=`<b>Teren:</b> ${h.terrain==='green'?'🌿 Zielony':'🪨 Szary'}<br>`;
+
+  let info=`<b>Teren:</b> ${h.terrain==='green'?'🌿 Las':'🪨 Kamień'}<br>`;
   info+=`<b>Właściciel:</b> ${ownerLabel(h.owner)}<br>`;
   if(h.building) info+=`<b>Budynek:</b> ${bName(h.building)}<br>`;
   ibox.innerHTML=info;
   abox.innerHTML='';
- 
+
   if(!h.owner&&isAdjPlayer(h)&&h.claimProg===null)
     addBtn(abox,`🚩 Przejmij (${CFG.claimCostEmpty}💰)`,'',gold<CFG.claimCostEmpty,()=>startClaim(key));
- 
+
   if(!h.owner&&!isAdjPlayer(h)){
-    const d=document.createElement('div');
-    d.className='hex-info';d.style.cssText='color:#2a3a0a;font-size:10px;margin-top:4px;';
+    const d=document.createElement('div');d.className='hex-info';
+    d.style.cssText='color:#2a3a0a;font-size:10px;margin-top:4px;';
     d.textContent='Nie sąsiaduje z Twoim terytorium.';abox.appendChild(d);
   }
- 
+
   if(h.owner==='enemy'&&isAdjPlayer(h)&&h.claimProg===null){
     const c=getClaimCost(h);
     addBtn(abox,`⚔ Przejmij (${c}💰)`,'danger',gold<c,()=>startClaim(key));
   }
- 
+
   if(h.owner==='player'&&!h.building&&h.buildProg===null){
     if(h.terrain==='green')
       addBtn(abox,`🏗 Tartak (${CFG.buildSawmillWood}🪵)`,'',wood<CFG.buildSawmillWood,()=>startBuild(key,'sawmill'));
@@ -709,7 +650,7 @@ function showHexInfo(key){
       addBtn(abox,`🏗 Kamieniołom (${CFG.buildQuarryStone}🪨+${CFG.buildQuarryWood}🪵)`,'',
         stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood,()=>startBuild(key,'quarry'));
   }
- 
+
   if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null){
     const bonus=getAdjBonus(key);
     addBtn(abox,`🎵 Wydobądź ${h.building==='sawmill'?'drewno':'kamień'} (×${bonus.toFixed(2)})`,'',false,()=>openMusicModal(key));
@@ -717,16 +658,15 @@ function showHexInfo(key){
     hint.style.cssText='color:#2a4a0a;font-size:9px;margin-top:2px;';
     hint.textContent='(lub kliknij 2× na mapie)';abox.appendChild(hint);
   }
- 
+
   if(h.claimProg!==null) addProgress(abox,'pclaim-'+key,h.claimProg,'Przejmowanie…');
   if(h.buildProg!==null)  addProgress(abox,'pbuild-'+key,h.buildProg,'Budowanie…');
 }
- 
+
 function addBtn(parent,text,cls,disabled,fn){
   const b=document.createElement('button');
   b.className='action-btn'+(cls?' '+cls:'');
-  b.textContent=text; b.disabled=disabled; b.onclick=fn;
-  parent.appendChild(b);
+  b.textContent=text;b.disabled=disabled;b.onclick=fn;parent.appendChild(b);
 }
 function addProgress(parent,id,prog,label){
   const pw=document.createElement('div');pw.className='progress-wrap';
@@ -734,71 +674,75 @@ function addProgress(parent,id,prog,label){
   pb.id=id;pb.style.width=(prog*100)+'%';pw.appendChild(pb);parent.appendChild(pw);
   const lbl=document.createElement('div');lbl.className='prog-label';lbl.textContent=label;parent.appendChild(lbl);
 }
- 
 function ownerLabel(o){
   if(o==='player') return '<span style="color:#50e060">Twoje</span>';
   if(o==='enemy')  return '<span style="color:#e04040">Wróg</span>';
   return 'Wolne';
 }
-function bName(b){return{sawmill:'Tartak',quarry:'Kamieniołom',market:'Rynek'}[b]||b;}
-function isAdjPlayer(h){return getNeighbors(h.q,h.r).some(nb=>{const k=hexKey(nb.q,nb.r);return hexes[k]&&hexes[k].owner==='player';});}
+function bName(b){return{sawmill:'Tartak',quarry:'Kamieniołom',townhall:'Ratusz'}[b]||b;}
+function isAdjPlayer(h){
+  return getNeighbors(h.q,h.r).some(nb=>{const k=hexKey(nb.q,nb.r);return hexes[k]&&hexes[k].owner==='player';});
+}
 function getClaimCost(h){
   if(!h.owner) return CFG.claimCostEmpty;
   if(h.owner==='enemy'){
-    if(h.building==='market') return CFG.claimCostMarket;
+    if(h.building==='townhall') return CFG.claimCostMarket;
     if(h.building) return CFG.claimCostBuilding;
     return CFG.claimCostEnemy;
   }
   return CFG.claimCostEmpty;
 }
 function getAdjBonus(key){
-  const h=hexes[key];if(!h.building||h.building==='market') return 1;
+  const h=hexes[key];if(!h.building||h.building==='townhall') return 1;
   let b=1;
-  for(const nb of getNeighbors(h.q,h.r)){const k=hexKey(nb.q,nb.r);if(hexes[k]&&hexes[k].owner==='player'&&hexes[k].building===h.building)b+=CFG.adjBonus;}
+  for(const nb of getNeighbors(h.q,h.r)){
+    const k=hexKey(nb.q,nb.r);
+    if(hexes[k]&&hexes[k].owner==='player'&&hexes[k].building===h.building) b+=CFG.adjBonus;
+  }
   return b;
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    CLAIM & BUILD
-══════════════════════════ */
+═══════════════════════════════════════ */
 function startClaim(key){
   const h=hexes[key];if(h.claimProg!==null) return;
   const cost=getClaimCost(h);if(gold<cost){alert('Za mało złota!');return;}
-  gold-=cost; h.claimStart=Date.now(); h.claimProg=0;
-  updateHUD(); showHexInfo(key);
+  gold-=cost;h.claimStart=Date.now();h.claimProg=0;
+  updateHUD();showHexInfo(key);
 }
 function completeClaim(key){
   const h=hexes[key];if(h.claimProg===null) return;
-  const wasEnemyMarket=h.owner==='enemy'&&h.building==='market';
+  const wasEnemyTown=h.owner==='enemy'&&h.building==='townhall';
   const wasEnemy=h.owner==='enemy';
-  h.owner='player'; h.claimProg=null; h.claimStart=null;
-  if(wasEnemy&&!wasEnemyMarket) h.building=null;
-  showHexInfo(key); updateHUD();
-  if(wasEnemyMarket) document.getElementById('win-screen').classList.add('show');
+  h.owner='player';h.claimProg=null;h.claimStart=null;
+  if(wasEnemy&&!wasEnemyTown) h.building=null;
+  showHexInfo(key);updateHUD();
+  if(wasEnemyTown) document.getElementById('win-screen').classList.add('show');
 }
 function startBuild(key,type){
   const h=hexes[key];
   if(type==='sawmill'){if(wood<CFG.buildSawmillWood){alert('Za mało drewna!');return;}wood-=CFG.buildSawmillWood;}
   else{if(stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood){alert('Za mało surowców!');return;}stone-=CFG.buildQuarryStone;wood-=CFG.buildQuarryWood;}
-  h.buildType=type; h.buildStart=Date.now(); h.buildProg=0;
-  updateHUD(); showHexInfo(key);
+  // Losuj PNG budynku już teraz
+  h.buildingSrc=type==='sawmill'?randFrom(SRC.tartak):randFrom(SRC.kamieniolom);
+  h.buildType=type;h.buildStart=Date.now();h.buildProg=0;
+  updateHUD();showHexInfo(key);
 }
 function completeBuild(key){
   const h=hexes[key];if(h.buildProg===null) return;
-  h.building=h.buildType; h.buildProg=null; h.buildStart=null; h.buildType=null;
+  h.building=h.buildType;h.buildProg=null;h.buildStart=null;h.buildType=null;
   showHexInfo(key);
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    MUSIC MODAL
-══════════════════════════ */
+═══════════════════════════════════════ */
 const NOTE_NAMES=['c','d','e','f','g','a','h'];
 const STAFF_TOP_Y=22, STAFF_STEP=11;
- 
-function noteScreenY(idx){ return 77-idx*(STAFF_STEP/2); }
- 
+function noteScreenY(idx){return 77-idx*(STAFF_STEP/2);}
 let mCtx={key:null,target:null,idx:0};
- 
+
 function openMusicModal(key){
   mCtx.key=key;
   mCtx.target=NOTE_NAMES[Math.floor(Math.random()*NOTE_NAMES.length)];
@@ -825,18 +769,16 @@ function confirmNote(){
     const amount=Math.max(1,Math.round(bonus));
     const h=hexes[mCtx.key];
     if(h.building==='sawmill') wood+=amount; else stone+=amount;
-    updateHUD(); if(selected===mCtx.key) showHexInfo(mCtx.key);
+    updateHUD();if(selected===mCtx.key) showHexInfo(mCtx.key);
     setTimeout(closeMusicModal,1100);
   } else {
     resEl.textContent=`✗ Zagrałeś ${chosen}¹, cel: ${mCtx.target}¹. Spróbuj ponownie.`;
     resEl.className='music-result fail';
   }
 }
- 
 function renderStaff(){
   const svg=document.getElementById('staff-svg');
-  const W=296,H=120;
-  const staffLeft=46,staffRight=W-12;
+  const W=296,H=120,staffLeft=46,staffRight=W-12;
   let s='';
   s+=`<rect width="${W}" height="${H}" rx="9" fill="#020c02" stroke="#3a5a1a" stroke-width="1.5"/>`;
   for(let i=0;i<5;i++){
@@ -844,37 +786,38 @@ function renderStaff(){
     s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.85" opacity="0.65"/>`;
   }
   s+=`<text x="4" y="${STAFF_TOP_Y+STAFF_STEP*4+4}" font-size="50" font-family="Georgia,'Times New Roman',serif" fill="#d4af37" opacity="0.88">𝄞</text>`;
-  const nx=staffLeft+120;
-  const ny=noteScreenY(mCtx.idx);
+  const nx=staffLeft+120, ny=noteScreenY(mCtx.idx);
   if(mCtx.idx===0) s+=`<line x1="${nx-11}" y1="${ny}" x2="${nx+11}" y2="${ny}" stroke="#c8b87a" stroke-width="1.2"/>`;
   s+=`<ellipse cx="${nx}" cy="${ny}" rx="7.5" ry="5" fill="#f0d060" transform="rotate(-14,${nx},${ny})"/>`;
-  const stemUp=mCtx.idx<4;
-  const stemX=stemUp?nx+7:nx-7;
+  const stemUp=mCtx.idx<4,stemX=stemUp?nx+7:nx-7;
   s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${ny+(stemUp?-30:30)}" stroke="#f0d060" stroke-width="1.6"/>`;
   s+=`<text x="${nx}" y="${H-5}" font-size="12" fill="#f0d060" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${NOTE_NAMES[mCtx.idx]}¹</text>`;
   s+=`<text x="${W-8}" y="${H-5}" font-size="10" fill="#5a6a2a" text-anchor="end" font-family="Cinzel,serif">cel: ${mCtx.target}¹</text>`;
   svg.innerHTML=s;
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    HUD & SELL
-══════════════════════════ */
+═══════════════════════════════════════ */
 function updateHUD(){
   document.getElementById('hud-gold').textContent=gold;
   document.getElementById('hud-wood').textContent=wood;
   document.getElementById('hud-stone').textContent=stone;
 }
 let sellOpen=false;
-function toggleSellPanel(){sellOpen=!sellOpen;document.getElementById('sell-panel').classList.toggle('show',sellOpen);}
+function toggleSellPanel(){
+  sellOpen=!sellOpen;
+  document.getElementById('sell-panel').classList.toggle('show',sellOpen);
+}
 function sellRes(type){
   if(type==='wood'){if(wood<CFG.sellWoodRate){alert('Potrzebujesz '+CFG.sellWoodRate+' drewna.');return;}wood-=CFG.sellWoodRate;gold+=CFG.sellWoodGold;}
   else{if(stone<CFG.sellStoneRate){alert('Potrzebujesz '+CFG.sellStoneRate+' kamienia.');return;}stone-=CFG.sellStoneRate;gold+=CFG.sellStoneGold;}
   updateHUD();
 }
- 
-/* ══════════════════════════
+
+/* ═══════════════════════════════════════
    START
-══════════════════════════ */
+═══════════════════════════════════════ */
 initGame();
 </script>
 </body>
