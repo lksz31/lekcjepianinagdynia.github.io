@@ -46,10 +46,14 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
 .music-result{text-align:center;font-family:'Crimson Text',serif;font-size:.8rem;min-height:16px;}
 .music-result.ok{color:#60e870;}
 .music-result.fail{color:#e05050;}
-/* Ikonka wydobycia przy kafelku */
 #harvest-icon{position:fixed;z-index:490;display:none;cursor:pointer;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8));transition:transform .1s;}
 #harvest-icon:hover{transform:scale(1.15);}
 #harvest-icon.show{display:block;}
+/* Przełącznik klucza */
+.clef-switch{display:flex;gap:6px;justify-content:center;}
+.clef-btn{padding:4px 12px;background:transparent;border:1px solid #3a5a1a;color:#6a9a5a;font-family:'Cinzel',serif;font-size:.6rem;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.06em;}
+.clef-btn.on{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.1);}
+.clef-btn:hover{border-color:#d4af37;color:#d4af37;}
 #tooltip{position:fixed;pointer-events:none;background:rgba(2,8,2,0.95);border:1px solid #3a5a1a;border-radius:6px;padding:5px 9px;font-family:'Crimson Text',serif;font-size:11.5px;color:#c8b87a;z-index:200;display:none;max-width:175px;line-height:1.5;}
 #win-screen{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);flex-direction:column;gap:16px;}
 #win-screen.show{display:flex;}
@@ -111,17 +115,21 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:
 <div id="music-modal">
   <div class="music-panel">
     <h2>🎵 <span id="music-modal-title">Wydobycie</span></h2>
+    <div class="clef-switch">
+      <button class="clef-btn on" id="clef-treble" onclick="setClef('treble')">𝄞 Wiolinowy</button>
+      <button class="clef-btn" id="clef-bass" onclick="setClef('bass')">𝄢 Basowy +20%</button>
+    </div>
     <div class="music-task">Zagraj nutę: <b id="music-target-note">c</b></div>
-    <div style="margin:2px auto;">
-      <svg id="staff-svg" width="258" height="110" viewBox="0 0 258 110" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div style="margin:2px auto;overflow:hidden;">
+      <svg id="staff-svg" width="280" height="140" viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
     <div class="note-arrow-row">
-      <button class="note-arr-btn" onclick="moveNote(1)">▲</button>
-      <button class="note-arr-btn" onclick="moveNote(-1)">▼</button>
+      <button class="note-arr-btn" id="note-up-btn" onclick="moveNote(1)">▲</button>
+      <button class="note-arr-btn" id="note-dn-btn" onclick="moveNote(-1)">▼</button>
     </div>
     <div id="music-result" class="music-result"></div>
     <div class="music-controls">
-      <button class="mus-btn" onclick="closeMusicModal()">✕ Zamknij</button>
+      <button class="mus-btn primary" onclick="confirmNote()">✓ Zatwierdź</button>
     </div>
   </div>
 </div>
@@ -231,31 +239,34 @@ const HS    = 120;
 const DEPTH = 30;
 const SQRT3 = Math.sqrt(3);
 
-// Izometria dopasowana do PNG (pointy-top hex, kąt bardziej stromy)
-const ISO_SY = 0.43; // Y-scale: 0.25=klasyczna 2:1, 0.43=dopasowane do PNG ratio 1.16:1
+// ══ CZYSTY 2D POINTY-TOP HEX ══
+// Wierzchołek na północy (góra), dolny na południu
+// Spłaszczony scale_y=0.745 żeby pasować do proporcji PNG (ratio ~1.16:1)
+const HEX_SY = 0.745; // spłaszczenie Y (1.0 = kółko, 0.745 = proporcje PNG)
 
-function isoProject(wx, wy){
-  return { x:(wx-wy)*0.5, y:(wx+wy)*ISO_SY };
+// Narożnik hexa w 2D (sx,sy = środek na ekranie)
+function hexCornerPt(sx, sy, i){
+  const a = -Math.PI/2 + Math.PI/3*i; // i=0 = górny wierzchołek (N), CW
+  return {x: sx + HS*Math.cos(a), y: sy + HS*Math.sin(a)*HEX_SY};
 }
-function isoUnproject(sx, sy){
-  const A=sx*2, B=sy/ISO_SY;
-  return { wx:(A+B)/2, wy:(B-A)/2 };
-}
-// Pointy-top axial->world: wierzchołek hexa skierowany ku górze
-function axialToWorld(q,r){
-  return { wx: HS*SQRT3*(q + r/2), wy: HS*1.5*r };
-}
+
+// Axial -> ekran (pointy-top)
+// Odstęp między sąsiadami: horiz=SQRT3*HS, vert=1.5*HS*HEX_SY
 function axialToScreen(q,r,ox,oy){
-  const {wx,wy}=axialToWorld(q,r);
-  const p=isoProject(wx,wy);
-  return {sx:p.x+ox, sy:p.y+oy};
+  const sx = SQRT3*HS*(q + r/2) + ox;
+  const sy = 1.5*HS*HEX_SY*r   + oy;
+  return {sx,sy};
 }
+
+// Ekran -> axial (odwrotność)
 function screenToAxial(px,py,ox,oy){
-  const {wx,wy}=isoUnproject(px-ox,py-oy);
-  const q=wx/(HS*SQRT3)-wy/(HS*3);
-  const r=wy/(HS*1.5);
+  const x=px-ox, y=py-oy;
+  // Odwrotność: q=(x*2/3-y*2/(3*HEX_SY)) / (SQRT3*HS)... użyj kubicznego zaokrąglenia
+  const q = (x*(2/3) - y*(2/(3*HEX_SY*SQRT3))) / HS;
+  const r = y / (1.5*HS*HEX_SY);
   return hexRound(q,r);
 }
+
 function hexRound(q,r){
   const s=-q-r;
   let rq=Math.round(q),rr=Math.round(r),rs=Math.round(s);
@@ -263,17 +274,16 @@ function hexRound(q,r){
   if(dq>dr&&dq>ds) rq=-rr-rs; else if(dr>ds) rr=-rq-rs;
   return {q:rq,r:rr};
 }
-// Pointy-top hex: narożniki obróćone o 30° (Math.PI/6)
+
+// Narożniki górnej powierzchni hexa
 function isoHexTop(sx,sy){
   const pts=[];
-  for(let i=0;i<6;i++){
-    const a=Math.PI/6 + Math.PI/3*i; // pointy-top = +30°
-    const lx=HS*Math.cos(a), ly=HS*Math.sin(a);
-    const p=isoProject(lx,ly);
-    pts.push({x:sx+p.x, y:sy+p.y});
-  }
+  for(let i=0;i<6;i++) pts.push(hexCornerPt(sx,sy,i));
   return pts;
 }
+
+// isoProject potrzebny tylko dla dotstanu właściciela — upraszczamy
+function isoProject(wx,wy){return{x:wx,y:wy*HEX_SY};}
 const HEX_DIRS=[{q:1,r:0},{q:0,r:-1},{q:-1,r:-1},{q:-1,r:0},{q:0,r:1},{q:1,r:1}]; // pointy-top
 function hexKey(q,r){return q+','+r;}
 function getNeighbors(q,r){return HEX_DIRS.map(d=>({q:q+d.q,r:r+d.r}));}
@@ -312,9 +322,10 @@ function initGame(){
     }
   }
 
-  // Painter's algorithm dla pointy-top izometrii:
-  // hex (q,r) jest "przed" hex (q,r-1) i (q-1,r)
-  // Sortuj: r rosnąco, potem q rosnąco
+  // Painter's algorithm: rysuj od tyłu do przodu
+  // W N-S pointy-top z widokiem z góry-przodu:
+  // hex z mniejszym r jest "dalej" (rysowany pierwszy)
+  // przy równym r: większe q jest "dalej na prawo" (rysuj pierwsze)
   drawOrder=Object.keys(hexes).sort((a,b)=>{
     const ha=hexes[a],hb=hexes[b];
     if(ha.r!==hb.r) return ha.r-hb.r;
@@ -421,11 +432,12 @@ function fitCanvas(){
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(const k of Object.keys(hexes)){
     const h=hexes[k],{sx,sy}=axialToScreen(h.q,h.r,0,0);
-    minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);
-    minY=Math.min(minY,sy);maxY=Math.max(maxY,sy);
+    // Uwzględnij pełne rozmiary hexa (nie tylko środki)
+    minX=Math.min(minX,sx-HS);maxX=Math.max(maxX,sx+HS);
+    minY=Math.min(minY,sy-HS*HEX_SY);maxY=Math.max(maxY,sy+HS*HEX_SY+DEPTH);
   }
   originX=W/2-(minX+maxX)/2;
-  originY=H/2-(minY+maxY)/2+DEPTH/2;
+  originY=H/2-(minY+maxY)/2;
 }
 
 /* ═══════════════════════════════════════
@@ -467,12 +479,12 @@ function drawIsoHex(key){
   const top=isoHexTop(sx,sy);
   const isSel=selected===key;
 
-  // ── Boki dla pointy-top izometrii ──
-  // narożniki (pointy-top): 0=góra, 1=prawy-góra, 2=prawy-dół, 3=dół, 4=lewy-dół, 5=lewy-góra
-  // W izometrii widoczne dolne boki: 2→3 (prawy-dół→dół), 3→4 (dół→lewy-dół)
+  // ── Boki hexa: N=0,NE=1,SE=2,S=3,SW=4,NW=5 ──
+  // Widoczne dolne boki (3D look): SE(1→2), S(2→3), SW(3→4)
   const sideBase = h.owner==='player'?'#1a3a10':h.owner==='enemy'?'#3a1010':'#1a1a10';
-  drawSide(top[2],top[3],darken(sideBase,0.40),isSel); // prawy bok
-  drawSide(top[3],top[4],darken(sideBase,0.28),isSel); // lewy bok
+  drawSide(top[1],top[2],darken(sideBase,0.50),isSel); // SE bok (jaśniejszy)
+  drawSide(top[2],top[3],darken(sideBase,0.35),isSel); // S  bok (środek)
+  drawSide(top[3],top[4],darken(sideBase,0.45),isSel); // SW bok
 
   // ── Górna powierzchnia ──
   ctx.beginPath();
@@ -557,22 +569,25 @@ function drawIsoHex(key){
     ctx.restore();
   }
 
-  // ── Dot właściciela ──
+  // ── Dot właściciela (prawy górny narożnik) ──
   if(h.owner){
-    const dp=isoProject(HS*0.52,0);
-    ctx.beginPath(); ctx.arc(sx+dp.x,sy+dp.y-3,5,0,Math.PI*2);
+    // NE narożnik hexa = top[1]
+    const dotX=top[1].x-2, dotY=top[1].y+4;
+    ctx.beginPath(); ctx.arc(dotX,dotY,6,0,Math.PI*2);
     ctx.fillStyle=h.owner==='player'?'#50e060':'#e04040';
-    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
   }
   // ── Pierścień timera ratusza ──
   if(h.building==='townhall'&&h.owner==='player'){
     const prog=Math.min(1,(Date.now()-lastTownhallTick)/CFG.townhallInterval);
-    const r=10;
+    const ringR=10;
+    // Środek-górna część hexa
+    const ringY=sy-HS*HEX_SY*0.5;
     ctx.save();
-    ctx.beginPath(); ctx.arc(sx,sy-HS*0.3,r,0,Math.PI*2);
-    ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=3; ctx.stroke();
-    ctx.beginPath(); ctx.arc(sx,sy-HS*0.3,r,-Math.PI/2,-Math.PI/2+Math.PI*2*prog,false);
-    ctx.strokeStyle='rgba(212,175,55,0.95)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx,ringY,ringR,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=3.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx,ringY,ringR,-Math.PI/2,-Math.PI/2+Math.PI*2*prog,false);
+    ctx.strokeStyle='rgba(212,175,55,0.95)'; ctx.lineWidth=3.5; ctx.stroke();
     ctx.restore();
   }
 }
@@ -864,12 +879,14 @@ function showHexInfo(key){
 
   if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null){
     const bonus=getAdjBonus(key);
+    const clefBonus=currentClef==='bass'?(1+BASS_BONUS):1;
+    const totalBonus=bonus*clefBonus;
     const isSaw=h.building==='sawmill';
     const hbtn=document.createElement('button');
     hbtn.className='action-btn';
     hbtn.style.cssText='display:flex;align-items:center;gap:7px;padding:8px 10px;';
-    hbtn.innerHTML=`<img src="${isSaw?SRC.token_drewno:SRC.token_kamien}" style="height:28px;image-rendering:pixelated;">`
-      +`<span>Wydobądź (×${bonus.toFixed(2)})</span>`;
+    hbtn.innerHTML=`<img src="${isSaw?SRC.token_drewno:SRC.token_kamien}" style="height:26px;image-rendering:pixelated;">`
+      +`<span>Wydobądź (×${totalBonus.toFixed(2)})</span>`;
     hbtn.onclick=()=>openMusicModal(key);
     abox.appendChild(hbtn);
   }
@@ -961,12 +978,87 @@ function completeBuild(key){
 /* ═══════════════════════════════════════
    MUSIC MODAL
 ═══════════════════════════════════════ */
-const NOTE_NAMES=['c','d','e','f','g','a','h'];
-const STAFF_TOP_Y=20, STAFF_STEP=11;
-function noteScreenY(idx){return 70-idx*(STAFF_STEP/2);}
-let mCtx={key:null,target:null,idx:0,hexScreenX:0,hexScreenY:0};
 
-// Pozycja ekranowa środka zaznaczonego hexa
+/* ═══════════════════════════════════════
+   NUTY — PEŁNY ZAKRES
+═══════════════════════════════════════ */
+const NOTES_TREBLE = [
+  {id:'g',  name:'g',  freq:196.00, staffPos:-3, ledgers:[-2,-3]},
+  {id:'a',  name:'a',  freq:220.00, staffPos:-2, ledgers:[-2]},
+  {id:'h',  name:'h',  freq:246.94, staffPos:-1, ledgers:[]},
+  {id:'c1', name:'c¹', freq:261.63, staffPos:-0.5,ledgers:[-0.5]},
+  {id:'d1', name:'d¹', freq:293.66, staffPos:0,  ledgers:[]},
+  {id:'e1', name:'e¹', freq:329.63, staffPos:1,  ledgers:[]},
+  {id:'f1', name:'f¹', freq:349.23, staffPos:2,  ledgers:[]},
+  {id:'g1', name:'g¹', freq:392.00, staffPos:3,  ledgers:[]},
+  {id:'a1', name:'a¹', freq:440.00, staffPos:4,  ledgers:[]},
+  {id:'h1', name:'h¹', freq:493.88, staffPos:5,  ledgers:[]},
+  {id:'c2', name:'c²', freq:523.25, staffPos:6,  ledgers:[]},
+  {id:'d2', name:'d²', freq:587.33, staffPos:7,  ledgers:[]},
+  {id:'e2', name:'e²', freq:659.25, staffPos:8,  ledgers:[]},
+  {id:'f2', name:'f²', freq:698.46, staffPos:9,  ledgers:[]},
+  {id:'g2', name:'g²', freq:783.99, staffPos:10, ledgers:[]},
+  {id:'a2', name:'a²', freq:880.00, staffPos:11, ledgers:[]},
+  {id:'h2', name:'h²', freq:987.77, staffPos:12, ledgers:[]},
+  {id:'c3', name:'c³', freq:1046.5, staffPos:13, ledgers:[13]},
+  {id:'d3', name:'d³', freq:1174.7, staffPos:14, ledgers:[13]},
+  {id:'e3', name:'e³', freq:1318.5, staffPos:15, ledgers:[13,15]},
+];
+// Klucz basowy: staffPos relatywny — linia 1=G wielkie=staffPos 0
+const NOTES_BASS = [
+  {id:'C',  name:'C',  freq:65.41,  staffPos:-3, ledgers:[-2,-3]},
+  {id:'D',  name:'D',  freq:73.42,  staffPos:-2, ledgers:[-2]},
+  {id:'E',  name:'E',  freq:82.41,  staffPos:-1, ledgers:[-1]},
+  {id:'F',  name:'F',  freq:87.31,  staffPos:-0.5,ledgers:[]},
+  {id:'G',  name:'G',  freq:98.00,  staffPos:0,  ledgers:[]},
+  {id:'A',  name:'A',  freq:110.00, staffPos:1,  ledgers:[]},
+  {id:'H',  name:'H',  freq:123.47, staffPos:2,  ledgers:[]},
+  {id:'c',  name:'c',  freq:130.81, staffPos:3,  ledgers:[]},
+  {id:'d',  name:'d',  freq:146.83, staffPos:4,  ledgers:[]},
+  {id:'e',  name:'e',  freq:164.81, staffPos:5,  ledgers:[]},
+  {id:'f',  name:'f',  freq:174.61, staffPos:6,  ledgers:[]},
+  {id:'g',  name:'g',  freq:196.00, staffPos:7,  ledgers:[]},
+  {id:'a',  name:'a',  freq:220.00, staffPos:8,  ledgers:[]},
+  {id:'h',  name:'h',  freq:246.94, staffPos:9,  ledgers:[]},
+  {id:'c1', name:'c¹', freq:261.63, staffPos:10, ledgers:[10]},
+  {id:'d1', name:'d¹', freq:293.66, staffPos:11, ledgers:[10]},
+  {id:'e1', name:'e¹', freq:329.63, staffPos:12, ledgers:[10,12]},
+  {id:'f1', name:'f¹', freq:349.23, staffPos:13, ledgers:[10,12]},
+];
+const BASS_BONUS = 0.20; // +20% wydobycia za klucz basowy
+
+let currentClef='treble';
+let currentNotes=NOTES_TREBLE;
+let mCtx={key:null,target:null,noteIdx:0,hexScreenX:0,hexScreenY:0};
+
+function setClef(clef){
+  currentClef=clef;
+  currentNotes=clef==='treble'?NOTES_TREBLE:NOTES_BASS;
+  document.getElementById('clef-treble').classList.toggle('on',clef==='treble');
+  document.getElementById('clef-bass').classList.toggle('on',clef==='bass');
+  // Jeśli okno otwarte — odśwież
+  if(document.getElementById('music-modal').classList.contains('show')){
+    pickNewNote();
+  }
+}
+
+/* Dźwięk kliknięcia */
+let audioCtxM=null;
+function playClickSound(up){
+  try{
+    if(!audioCtxM) audioCtxM=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtxM.state==='suspended') audioCtxM.resume();
+    const osc=audioCtxM.createOscillator();
+    const gain=audioCtxM.createGain();
+    osc.connect(gain);gain.connect(audioCtxM.destination);
+    osc.type='sine';
+    osc.frequency.value=up?880:660;
+    gain.gain.setValueAtTime(0.18,audioCtxM.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtxM.currentTime+0.12);
+    osc.start();osc.stop(audioCtxM.currentTime+0.12);
+  }catch(e){}
+}
+
 function getHexScreenPos(key){
   const h=hexes[key];
   if(!h) return {x:400,y:300};
@@ -978,10 +1070,10 @@ function getHexScreenPos(key){
 
 function positionModal(hx,hy){
   const modal=document.getElementById('music-modal');
-  const W=290, H=280; // przybliżona wysokość okna
-  const vw=window.innerWidth, vh=window.innerHeight;
-  let left=hx+30, top=hy-H/2;
-  if(left+W>vw-10) left=hx-W-30;
+  const W=290,H=360;
+  const vw=window.innerWidth,vh=window.innerHeight;
+  let left=hx+40, top=hy-H/2;
+  if(left+W>vw-10) left=hx-W-40;
   if(top<72) top=72;
   if(top+H>vh-10) top=vh-H-10;
   modal.style.left=left+'px';
@@ -993,16 +1085,16 @@ function openMusicModal(key){
   const pos=getHexScreenPos(key);
   mCtx.hexScreenX=pos.x; mCtx.hexScreenY=pos.y;
   pickNewNote();
-  positionModal(pos.x, pos.y);
+  positionModal(pos.x,pos.y);
   document.getElementById('music-modal').classList.add('show');
-  // Pokaż ikonkę przy hexie
   showHarvestIcon(key);
 }
 
 function pickNewNote(){
-  mCtx.target=NOTE_NAMES[Math.floor(Math.random()*NOTE_NAMES.length)];
-  mCtx.idx=Math.floor(NOTE_NAMES.length/2); // start na środku
-  document.getElementById('music-target-note').textContent=mCtx.target+'¹';
+  const idx=Math.floor(Math.random()*currentNotes.length);
+  mCtx.target=currentNotes[idx];
+  mCtx.noteIdx=Math.floor(currentNotes.length/2);
+  document.getElementById('music-target-note').textContent=mCtx.target.name;
   document.getElementById('music-result').textContent='';
   document.getElementById('music-result').className='music-result';
   renderStaff();
@@ -1013,7 +1105,6 @@ function closeMusicModal(){
   document.getElementById('harvest-icon').classList.remove('show');
 }
 
-// Kliknięcie poza oknem zamyka modal
 document.addEventListener('mousedown',e=>{
   const modal=document.getElementById('music-modal');
   const icon=document.getElementById('harvest-icon');
@@ -1023,75 +1114,108 @@ document.addEventListener('mousedown',e=>{
 });
 
 function moveNote(dir){
-  mCtx.idx=Math.max(0,Math.min(NOTE_NAMES.length-1,mCtx.idx+dir));
+  // dir: +1=wyżej, -1=niżej
+  mCtx.noteIdx=Math.max(0,Math.min(currentNotes.length-1,mCtx.noteIdx+dir));
+  playClickSound(dir>0);
   renderStaff();
-  // Natychmiastowe zatwierdzenie po każdym ruchu — sprawdź czy to cel
-  const chosen=NOTE_NAMES[mCtx.idx];
-  if(chosen===mCtx.target){
-    triggerHarvest();
-  }
-}
-
-function triggerHarvest(){
-  const bonus=getAdjBonus(mCtx.key);
-  const amount=Math.max(1,Math.round(bonus));
-  const h=hexes[mCtx.key];
-  const resEl=document.getElementById('music-result');
-  resEl.textContent='✓ '+amount+(h.building==='sawmill'?' 🪵':' 🪨');
-  resEl.className='music-result ok';
-  if(h.building==='sawmill') wood+=amount; else stone+=amount;
-  updateHUD();
-  if(selected===mCtx.key) showHexInfo(mCtx.key);
-  // Natychmiast losuj nową nutę (bez zamykania okna)
-  setTimeout(()=>{ pickNewNote(); },500);
+  document.getElementById('music-result').textContent='';
+  document.getElementById('music-result').className='music-result';
 }
 
 function confirmNote(){
-  // Zachowane dla kompatybilności — teraz triggeruje moveNote logic
-  const chosen=NOTE_NAMES[mCtx.idx];
+  const chosen=currentNotes[mCtx.noteIdx];
   const resEl=document.getElementById('music-result');
-  if(chosen===mCtx.target){
-    triggerHarvest();
+  if(chosen.id===mCtx.target.id){
+    // Oblicz wydobycie
+    const baseBonus=getAdjBonus(mCtx.key);
+    const clefBonus=currentClef==='bass'?(1+BASS_BONUS):1;
+    const amount=Math.max(1,Math.round(baseBonus*clefBonus));
+    const h=hexes[mCtx.key];
+    resEl.textContent='✓ +'+amount+(h.building==='sawmill'?' 🪵':' 🪨');
+    resEl.className='music-result ok';
+    if(h.building==='sawmill') wood+=amount; else stone+=amount;
+    updateHUD();
+    if(selected===mCtx.key) showHexInfo(mCtx.key);
+    // Po chwili — nowa nuta
+    setTimeout(()=>{ pickNewNote(); },600);
   } else {
-    resEl.textContent='✗ Spróbuj: '+mCtx.target+'¹';
+    resEl.textContent='✗ Zagrano: '+chosen.name+', cel: '+mCtx.target.name;
     resEl.className='music-result fail';
   }
 }
 
-// Ikonka wydobycia przy kafelku
 function showHarvestIcon(key){
   const h=hexes[key];
   if(!h) return;
   const icon=document.getElementById('harvest-icon');
   const pos=getHexScreenPos(key);
-  const wrap=document.getElementById('game-wrap');
-  const wr=wrap.getBoundingClientRect();
-  // Pozycja po lewej stronie hexa
-  icon.style.left=(pos.x-50)+'px';
+  icon.style.left=(pos.x-55)+'px';
   icon.style.top=(pos.y-24)+'px';
   icon.innerHTML=h.building==='sawmill'
-    ?`<img src="${SRC.token_drewno}" style="height:40px;image-rendering:pixelated;">`
-    :`<img src="${SRC.token_kamien}" style="height:40px;image-rendering:pixelated;">`;
+    ?`<img src="${SRC.token_drewno}" style="height:38px;image-rendering:pixelated;">`
+    :`<img src="${SRC.token_kamien}" style="height:38px;image-rendering:pixelated;">`;
   icon.classList.add('show');
 }
 
+/* ═══════════════════════════════════════
+   RYSOWANIE PIĘCIOLINII
+═══════════════════════════════════════ */
 function renderStaff(){
   const svg=document.getElementById('staff-svg');
-  const W=258,H=110,staffLeft=38,staffRight=W-10;
+  const W=280, H=140;
+  // Pięciolinia: 5 linii, STEP=12px między liniami
+  // Linia 1 (najniższa) na Y=staffBot, linia 5 na Y=staffBot-4*STEP
+  const STEP=12;   // odległość między liniami
+  const staffBot=H-28; // Y dolnej linii
+  const staffLeft=44, staffRight=W-12;
+  const noteX=staffLeft+125; // X nuty
+
+  // staffPos 0 = linia 1 (dolna), każdy +1 = jedno miejsce wyżej (pół kroku)
+  // Y pozycja nuty: staffBot - staffPos*(STEP/2)
+  function posToY(sp){ return staffBot - sp*(STEP/2); }
+
+  const chosen=currentNotes[mCtx.noteIdx];
+  const target=mCtx.target;
+
   let s='';
+  // Tło
   s+=`<rect width="${W}" height="${H}" rx="8" fill="#020c02" stroke="#3a5a1a" stroke-width="1.5"/>`;
+
+  // 5 linii pięciolinii
   for(let i=0;i<5;i++){
-    const ly=STAFF_TOP_Y+i*STAFF_STEP;
-    s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.85" opacity="0.65"/>`;
+    const ly=staffBot-i*STEP;
+    s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.9" opacity="0.7"/>`;
   }
-  s+=`<text x="2" y="${STAFF_TOP_Y+STAFF_STEP*4+3}" font-size="44" font-family="Georgia,'Times New Roman',serif" fill="#d4af37" opacity="0.88">𝄞</text>`;
-  const nx=staffLeft+100, ny=noteScreenY(mCtx.idx);
-  if(mCtx.idx===0) s+=`<line x1="${nx-11}" y1="${ny}" x2="${nx+11}" y2="${ny}" stroke="#c8b87a" stroke-width="1.2"/>`;
-  s+=`<ellipse cx="${nx}" cy="${ny}" rx="7.5" ry="5" fill="#f0d060" transform="rotate(-14,${nx},${ny})"/>`;
-  const stemUp=mCtx.idx<4,stemX=stemUp?nx+7:nx-7;
-  s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${ny+(stemUp?-30:30)}" stroke="#f0d060" stroke-width="1.6"/>`;
-  // BEZ podpisu nuty — tylko cel w rogu
-  s+=`<text x="${W-8}" y="${H-5}" font-size="10" fill="#5a6a2a" text-anchor="end" font-family="Cinzel,serif">cel: ${mCtx.target}¹</text>`;
+
+  // Klucz
+  if(currentClef==='treble'){
+    // Klucz wiolinowy
+    s+=`<text x="4" y="${staffBot+4}" font-size="60" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄞</text>`;
+  } else {
+    // Klucz basowy
+    s+=`<text x="6" y="${staffBot-STEP*1.5}" font-size="36" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄢</text>`;
+  }
+
+  // Dodane linie ledger dla WYBRANEJ nuty
+  const allLedgers = new Set(chosen.ledgers || []);
+  allLedgers.forEach(lp=>{
+    const ly=posToY(lp);
+    s+=`<line x1="${noteX-11}" y1="${ly}" x2="${noteX+11}" y2="${ly}" stroke="#c8b87a" stroke-width="1.3"/>`;
+  });
+
+  // Nuta wybrana
+  const ny=posToY(chosen.staffPos);
+  const stemUp=chosen.staffPos<4.5; // poniżej środka pięciolinii => ogon w górę
+  const stemX=stemUp?noteX+7.5:noteX-7.5;
+  const stemY2=ny+(stemUp?-28:28);
+  s+=`<ellipse cx="${noteX}" cy="${ny}" rx="7.5" ry="5" fill="#f0d060" transform="rotate(-14,${noteX},${ny})"/>`;
+  s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${stemY2}" stroke="#f0d060" stroke-width="1.6"/>`;
+
+  // Nazwa nuty docelowej — wyświetlana z boku (nie na pięciolinii)
+  const targetY=posToY(target.staffPos);
+  // Mały wskaźnik celu: strzałka po prawej stronie pięciolinii
+  s+=`<text x="${W-6}" y="${targetY+4}" font-size="9" fill="#5a8a4a" text-anchor="end" font-family="Cinzel,serif" opacity="0.8">← ${target.name}</text>`;
+
   svg.innerHTML=s;
 }
 
