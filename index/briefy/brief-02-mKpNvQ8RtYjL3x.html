@@ -11,7 +11,6 @@
   :root{--gold:#d4af37;--gold-light:#f0d060;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-
   .site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;}
   .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:1rem;}
   .header-left{display:flex;align-items:center;gap:14px;}
@@ -22,7 +21,6 @@
   .back-btn:hover{background:var(--gold);transform:translateY(-1px);}
   .back-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   @media(max-width:500px){.back-btn span{display:none;}.back-btn{padding:8px 12px;}}
-
   .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
   .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
   .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
@@ -31,7 +29,6 @@
   .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
   .mobile-nav a.mn-cta:hover{background:var(--gold);}
   @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
-
   .hero{background:var(--navy);padding:60px 5% 55px;position:relative;overflow:hidden;}
   .hero::before{content:'♪';position:absolute;font-size:22rem;font-family:serif;color:rgba(255,255,255,0.03);top:-60px;right:-40px;pointer-events:none;line-height:1;}
   .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(to right,var(--gold),var(--gold-light),var(--gold));}
@@ -42,21 +39,17 @@
   .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,5vw,3.4rem);color:white;line-height:1.15;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.25s;}
   .hero h1 em{font-style:italic;color:var(--gold);}
   .hero-lead{font-size:clamp(0.88rem,2vw,1.05rem);color:rgba(255,255,255,0.6);max-width:560px;line-height:1.7;font-weight:300;padding-left:18px;border-left:3px solid var(--gold);opacity:0;animation:fadeUp 0.7s ease forwards 0.4s;}
-
   .article-wrap{max-width:960px;margin:0 auto;padding:44px 5% 50px;}
   .article-card{background:white;border-radius:28px;border:1px solid var(--border);box-shadow:0 4px 28px rgba(0,0,0,0.07);padding:50px 58px;opacity:0;transform:translateY(24px);transition:opacity 0.8s cubic-bezier(0.2,0.8,0.2,1),transform 0.8s cubic-bezier(0.2,0.8,0.2,1);}
   .article-card.visible{opacity:1;transform:translateY(0);}
   @media(max-width:700px){.article-card{padding:26px 22px;}}
-
   .img-float{float:right;width:44%;margin:4px 0 22px 30px;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.09);background:#f8fafc;}
   .img-float img{width:100%;display:block;}
   .img-float figcaption{font-size:0.7rem;color:var(--text-mid);padding:8px 12px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
   @media(max-width:620px){.img-float{float:none;width:100%;margin:0 0 22px 0;}}
-
   .img-full{width:100%;margin:28px 0;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.09);clear:both;}
   .img-full img{width:100%;display:block;}
   .img-full figcaption{font-size:0.7rem;color:var(--text-mid);padding:8px 12px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
-
   .article-card .art-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:14px;display:block;}
   .article-card h2{font-family:'Playfair Display',serif;font-size:clamp(1.45rem,3vw,2rem);color:var(--navy);margin-bottom:26px;line-height:1.2;}
   .article-card p{font-size:1rem;line-height:1.9;color:var(--text);margin-bottom:20px;text-align:justify;hyphens:auto;}
@@ -66,19 +59,16 @@
   .article-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--navy);margin:32px 0 14px;padding-left:16px;border-left:3px solid var(--gold);clear:both;}
   .blockquote{margin:28px 0;padding:16px 24px;border-left:4px solid var(--navy);background:#f0f4ff;border-radius:0 12px 12px 0;clear:both;}
   .blockquote p{font-family:'Playfair Display',serif!important;font-style:italic;color:var(--navy)!important;font-size:1.05rem!important;line-height:1.65!important;margin:0!important;text-align:left!important;}
-
   .harmonic-table{width:100%;border-collapse:collapse;margin:24px 0;clear:both;}
   .harmonic-table th{background:var(--navy);color:white;padding:10px 14px;font-size:0.8rem;font-weight:600;text-align:left;}
   .harmonic-table td{padding:9px 14px;font-size:0.85rem;border-bottom:1px solid var(--border);}
   .harmonic-table tr:nth-child(even) td{background:#f8fafc;}
   .harmonic-table td:first-child{font-weight:700;color:var(--navy);}
-
   .tags-section{margin-top:36px;padding-top:26px;border-top:1px solid var(--border);clear:both;}
   .tags-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
   .tags-wrap{display:flex;flex-wrap:wrap;gap:8px;}
   .tag{border:1.5px solid var(--navy);color:var(--navy);padding:5px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;transition:0.2s;cursor:default;}
   .tag:hover{background:var(--navy);color:white;}
-
   .sources-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
   .sources-inner{background:#f8fafc;border-radius:20px;border:1px solid var(--border);padding:24px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.1s,transform 0.7s 0.1s;}
   .sources-inner.visible{opacity:1;transform:translateY(0);}
@@ -86,14 +76,12 @@
   .sources-inner ol{padding-left:18px;font-size:0.8rem;color:var(--text-mid);line-height:1.8;}
   .sources-inner a{color:var(--navy);font-weight:500;}
   .sources-inner a:hover{color:var(--gold);}
-
   .cal-wrap{max-width:960px;margin:0 auto;padding:0 5% 50px;}
   .cal-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:28px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.2s,transform 0.7s 0.2s;}
   .cal-inner.visible{opacity:1;transform:translateY(0);}
   .cal-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
   .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;filter:invert(92%) hue-rotate(190deg);}
   @media(max-width:500px){.cal-inner iframe{height:260px;}}
-
   .site-footer-main{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:10px;}
   .footer-main-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
   @media(max-width:900px){.footer-main-inner{grid-template-columns:1fr 1fr;gap:2rem;}}
@@ -116,12 +104,11 @@
   .footer-bot{border-top:1px solid #e8eaee;padding:0.85rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
   .footer-cop{font-size:11px;color:#c0c0cc;}
   .footer-loc{font-size:12px;color:#aaa;}
-
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
-
+ 
 <header class="site-header">
   <div class="header-inner">
     <div class="header-left">
@@ -134,7 +121,7 @@
     </a>
   </div>
 </header>
-
+ 
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
@@ -144,7 +131,7 @@
     <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
-
+ 
 <div class="hero">
   <div class="hero-inner">
     <div class="brief-badge"><div class="brief-badge-line"></div><div class="brief-badge-text">Brief No. 2</div></div>
@@ -152,38 +139,38 @@
     <p class="hero-lead">Dlaczego pianino brzmi inaczej niż skrzypce, choć grają tę samą nutę? Odpowiedź kryje się w alikwotach — dźwiękach ukrytych w każdym dźwięku.</p>
   </div>
 </div>
-
+ 
 <div class="article-wrap">
   <div class="article-card clearfix" id="article">
     <span class="art-label">Akustyka muzyczna · Teoria dźwięku</span>
     <h2>Trzy rodzaje dźwięków</h2>
-
+ 
     <figure class="img-float">
-      <img src="../ilustracje/brief_02_Harmonic_partials_on_strings.svg" alt="Drgania struny — alikwoty">
+      <img src="ilustracje/brief_02_Harmonic_partials_on_strings.svg" alt="Drgania struny — alikwoty">
       <figcaption>Drgania struny: ton podstawowy i kolejne alikwoty (½, ⅓, ¼…)</figcaption>
     </figure>
-
+ 
     <p>Istnieją <strong>trzy rodzaje dźwięków</strong>: dźwięk prosty oraz dźwięki złożone — muzyczny i niemuzyczny. Dźwięk prosty składa się wyłącznie z jednej częstotliwości. Dźwięk muzyczny składa się z kilku dźwięków prostych i regularnie powtarzających się drgań. Natomiast niemuzyczny hałas czy szum składa się z dźwięków prostych, ale nieregularnie powtarzających się.</p>
-
+ 
     <p>W muzyce instrumenty wykorzystują <strong>dźwięki muzyczne</strong>. Wyjątkiem są instrumenty mogące wydać dźwięk zbliżony do prostego — na przykład niektóre piszczałki organowe czy flażolety.</p>
-
+ 
     <div class="blockquote"><p>Każdy dźwięk zagrany na pianinie brzmi bogato i głęboko, ponieważ zawiera w sobie wiele ukrytych dźwięków — alikwotów.</p></div>
-
+ 
     <h3>Czym są alikwoty?</h3>
-
+ 
     <p>Każdy dźwięk złożony składa się z pewnej sekwencji dźwięków, które razem tworzą barwę dźwięku podstawowego. Alikwoty — zwane też <strong>przytonami, tonami górnymi lub harmonicznymi</strong> — to właśnie te ukryte składowe każdego dźwięku muzycznego.</p>
-
+ 
     <p>Kolejne tony harmoniczne pozostają do siebie w stosunku kolejnych liczb naturalnych: <strong>1 : 2 : 3 : 4 : 5…</strong> Dzieje się tak, ponieważ gdy młoteczek w pianinie uderzy strunę, zaczyna ona wibrować jako całość — dając ton podstawowy, najgłośniejszy. Jednocześnie struna samorzutnie dzieli się na dwie połowy, każda wydając cichszy, wyższy dźwięk. Następnie na trzy części — dając kolejny, jeszcze wyższy dźwięk. Teoretycznie ciąg ten ciągnie się w nieskończoność, lecz kolejne tony stają się coraz cichsze i w pewnym momencie przestają być słyszalne.</p>
-
+ 
     <figure class="img-full">
-      <img src="../ilustracje/brief_02_szereg_nut_-_alikwoty.png" alt="Szereg alikwotów dźwięku C">
-      <figcaption>Szereg alikwotów dźwięku C: C₁, C, G, c, e, g, b, c¹, d¹, e¹, fis¹, g¹, a¹, b¹, h¹, c²…</figcaption>
+      <img src="ilustracje/brief_02_szereg_nut_-_alikwoty.png" alt="Szereg alikwotów dźwięku C">
+      <figcaption>Szereg alikwotów dźwięku C: C₁, C, G, c, e, g, b♭, c¹, d¹, e¹, f♯¹, g¹, a¹, b♭¹, b¹, c²…</figcaption>
     </figure>
-
+ 
     <h3>Szereg alikwotów dźwięku C</h3>
-
+ 
     <p>Sumując kolejne alikwoty dźwięku <strong>C</strong>, otrzymujemy następujący szereg:</p>
-
+ 
     <table class="harmonic-table">
       <tr><th>Nr harmonicznej</th><th>Dźwięk</th><th>Interwał od podstawy</th></tr>
       <tr><td>1</td><td>C₁</td><td>Ton podstawowy</td></tr>
@@ -195,9 +182,9 @@
       <tr><td>7</td><td>b♭¹</td><td>Septyma mała + dwie oktawy</td></tr>
       <tr><td>8</td><td>c²</td><td>Trzy oktawy</td></tr>
     </table>
-
+ 
     <p>Alikwoty są <strong>wykorzystywane w muzyce współczesnej</strong> — kompozytorzy i wykonawcy świadomie operują barwą dźwięku, wiedząc, że różne instrumenty wzmacniają różne harmoniczne, co daje każdemu z nich niepowtarzalne brzmienie.</p>
-
+ 
     <div class="tags-section">
       <span class="tags-label">Pojęcia kluczowe</span>
       <div class="tags-wrap">
@@ -209,7 +196,7 @@
     </div>
   </div>
 </div>
-
+ 
 <div class="sources-wrap">
   <div class="sources-inner" id="src">
     <span class="src-label">Źródła</span>
@@ -218,14 +205,14 @@
     </ol>
   </div>
 </div>
-
+ 
 <div class="cal-wrap">
   <div class="cal-inner" id="cal">
     <span class="cal-label">📅 Wolne terminy zajęć</span>
     <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
   </div>
 </div>
-
+ 
 <footer class="site-footer-main">
   <div class="footer-main-inner">
     <div>
@@ -264,7 +251,7 @@
     </div>
   </div>
 </footer>
-
+ 
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
 ['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
