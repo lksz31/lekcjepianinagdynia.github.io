@@ -1,1 +1,830 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Hexagonalna Kraina Muzyki</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;width:100%;overflow:hidden;background:#0d1a0d;font-family:'Cinzel',serif;}
+#hud{position:fixed;top:0;left:0;right:0;height:50px;background:rgba(5,10,5,0.97);border-bottom:1px solid #2a4a1a;display:flex;align-items:center;gap:14px;padding:0 14px;z-index:100;}
+.res{display:flex;align-items:center;gap:4px;font-size:11px;color:#c8b87a;letter-spacing:.05em;white-space:nowrap;}
+.res-val{font-weight:700;color:#d4af37;min-width:28px;}
+#hud-sep{flex:1;}
+#hud-turn{font-size:10px;color:#4a5a3a;letter-spacing:.1em;}
+#sell-btn{padding:4px 10px;background:transparent;border:1px solid #3a5a1a;color:#6a9a4a;font-family:'Cinzel',serif;font-size:9px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.06em;}
+#sell-btn:hover{border-color:#d4af37;color:#d4af37;}
+#game-wrap{position:fixed;inset:50px 200px 0 0;overflow:hidden;background:#0d1a0d;}
+#map-canvas{display:block;cursor:pointer;}
+#sidebar{position:fixed;right:0;top:50px;bottom:0;width:200px;background:rgba(4,8,4,0.97);border-left:1px solid #2a4a1a;padding:10px 8px;overflow-y:auto;z-index:50;display:flex;flex-direction:column;gap:6px;}
+#sidebar h3{font-size:8px;color:#3a4a2a;letter-spacing:.14em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid #1a2a0a;}
+.hex-info{font-family:'Crimson Text',serif;font-size:11.5px;color:#7a8a5a;line-height:1.55;}
+.hex-info b{color:#b8a86a;font-family:'Cinzel',serif;font-size:9px;}
+.action-btn{width:100%;padding:6px 8px;background:transparent;border:1px solid #3a5a2a;color:#7a9a6a;font-family:'Cinzel',serif;font-size:8.5px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.05em;margin-top:3px;text-align:left;}
+.action-btn:hover:not(:disabled){border-color:#d4af37;color:#d4af37;}
+.action-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.action-btn.danger{border-color:#5a2a1a;color:#9a5a3a;}
+.action-btn.danger:hover:not(:disabled){border-color:#d47037;color:#d47037;}
+.progress-wrap{margin-top:4px;height:3px;background:#1a2a0a;border-radius:2px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,#2a6a20,#d4af37);border-radius:2px;}
+.prog-label{font-family:'Crimson Text',serif;font-size:9px;color:#4a5a3a;margin-top:2px;}
+#music-modal{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);}
+#music-modal.show{display:flex;}
+.music-panel{background:#030c03;border:2px solid #3a5a2a;border-radius:12px;padding:20px 22px;width:340px;max-width:96vw;display:flex;flex-direction:column;gap:10px;color:#c8b87a;}
+.music-panel h2{font-size:.82rem;color:#d4af37;letter-spacing:.16em;text-align:center;}
+.music-task{font-family:'Crimson Text',serif;font-size:1rem;text-align:center;color:#8a9a6a;}
+.music-task b{font-size:1.5rem;color:#d4af37;font-family:'Cinzel',serif;}
+.staff-wrap{margin:4px auto;}
+.note-arrow-row{display:flex;justify-content:center;gap:14px;}
+.note-arr-btn{width:38px;height:38px;background:transparent;border:1px solid #3a5a2a;color:#d4af37;font-size:20px;cursor:pointer;border-radius:4px;transition:.15s;display:flex;align-items:center;justify-content:center;}
+.note-arr-btn:hover{background:rgba(212,175,55,.12);border-color:#d4af37;}
+.music-controls{display:flex;justify-content:center;gap:10px;}
+.mus-btn{padding:7px 16px;background:transparent;border:1px solid #3a5a2a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.1em;}
+.mus-btn:hover{border-color:#d4af37;color:#d4af37;}
+.mus-btn.primary{border-color:#d4af37;color:#d4af37;}
+.mus-btn.primary:hover{background:rgba(212,175,55,.15);}
+.music-result{text-align:center;font-family:'Crimson Text',serif;font-size:.88rem;min-height:20px;}
+.music-result.ok{color:#60d870;}
+.music-result.fail{color:#e05050;}
+#tooltip{position:fixed;pointer-events:none;background:rgba(3,8,3,0.94);border:1px solid #3a5a2a;border-radius:6px;padding:5px 9px;font-family:'Crimson Text',serif;font-size:11.5px;color:#c8b87a;z-index:200;display:none;max-width:170px;line-height:1.5;}
+#win-screen{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);flex-direction:column;gap:16px;}
+#win-screen.show{display:flex;}
+#win-screen h1{font-size:2rem;color:#d4af37;letter-spacing:.15em;text-shadow:0 0 30px rgba(212,175,55,.7);}
+#win-screen p{font-family:'Crimson Text',serif;font-size:1rem;color:#8a9a6a;}
+.win-btn{padding:10px 26px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
+.win-btn:hover{background:#d4af37;color:#040c04;}
+#sell-panel{position:fixed;right:210px;top:50px;background:#030c03;border:1px solid #3a5a2a;border-radius:8px;padding:12px 14px;z-index:150;display:none;min-width:155px;}
+#sell-panel.show{display:block;}
+#sell-panel h4{font-size:.58rem;color:#5a6a3a;letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase;}
+.sell-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;}
+.sell-row label{font-family:'Crimson Text',serif;font-size:.78rem;color:#8a9a6a;}
+.sell-row button{padding:3px 8px;background:transparent;border:1px solid #3a5a2a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;}
+.sell-row button:hover{border-color:#d4af37;color:#d4af37;}
+.close-small{margin-top:5px;padding:3px 8px;background:transparent;border:1px solid #2a2a1a;color:#4a4a2a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;width:100%;}
+.close-small:hover{border-color:#6a6a3a;color:#8a8a5a;}
+</style>
+</head>
+<body>
 
+<div id="hud">
+  <div class="res">💰 <span>Złoto:</span><span class="res-val" id="hud-gold">50</span></div>
+  <div class="res">🪵 <span>Drewno:</span><span class="res-val" id="hud-wood">10</span></div>
+  <div class="res">🪨 <span>Kamień:</span><span class="res-val" id="hud-stone">5</span></div>
+  <div id="hud-sep"></div>
+  <button id="sell-btn" onclick="toggleSellPanel()">💱 Sprzedaj</button>
+  <span id="hud-turn">Runda 1</span>
+</div>
+
+<div id="sell-panel">
+  <h4>Sprzedaż</h4>
+  <div class="sell-row"><label>10 🪵 → 1 💰</label><button onclick="sellResource('wood')">Sprzedaj</button></div>
+  <div class="sell-row"><label>10 🪨 → 3 💰</label><button onclick="sellResource('stone')">Sprzedaj</button></div>
+  <button class="close-small" onclick="toggleSellPanel()">Zamknij</button>
+</div>
+
+<div id="game-wrap">
+  <canvas id="map-canvas"></canvas>
+</div>
+
+<div id="sidebar">
+  <h3>Zaznaczone pole</h3>
+  <div id="hex-info-box" class="hex-info"><span style="color:#2a3a1a;font-style:italic;">Kliknij hex…</span></div>
+  <div id="action-box"></div>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="music-modal">
+  <div class="music-panel">
+    <h2>🎵 Wydobycie Surowca</h2>
+    <div class="music-task">Zagraj nutę: <b id="music-target-note">c</b></div>
+    <div class="staff-wrap">
+      <svg id="staff-svg" width="296" height="120" viewBox="0 0 296 120" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="note-arrow-row">
+      <button class="note-arr-btn" onclick="moveNote(-1)" title="Wyżej (▲)">▲</button>
+      <button class="note-arr-btn" onclick="moveNote(1)" title="Niżej (▼)">▼</button>
+    </div>
+    <div class="music-controls">
+      <button class="mus-btn" onclick="closeMusicModal()">Anuluj</button>
+      <button class="mus-btn primary" onclick="confirmNote()">✓ Zatwierdź</button>
+    </div>
+    <div id="music-result" class="music-result"></div>
+  </div>
+</div>
+
+<div id="win-screen">
+  <h1>🏆 Zwycięstwo!</h1>
+  <p>Przejąłeś rynek wroga!</p>
+  <button class="win-btn" onclick="location.reload()">🎲 Nowa gra</button>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const CFG = {
+  startGold:50, startWood:10, startStone:5,
+  claimTime:4000, buildTime:4000,
+  claimCostEmpty:10, claimCostEnemy:30,
+  claimCostBuilding:30, claimCostMarket:50,
+  buildSawmillWood:7,
+  buildQuarryStone:12, buildQuarryWood:5,
+  sellWoodRate:10, sellWoodGold:1,
+  sellStoneRate:10, sellStoneGold:3,
+  adjacencyBonus:0.25,
+};
+
+/* ══════════════════════════════════════════
+   HEX MATH (axial coords, flat-top)
+══════════════════════════════════════════ */
+const HEX_SIZE = 34;
+const SQRT3 = Math.sqrt(3);
+
+function hexToPixel(q, r, ox, oy) {
+  return {
+    x: HEX_SIZE * 1.5 * q + ox,
+    y: HEX_SIZE * SQRT3 * (r + q / 2) + oy
+  };
+}
+
+function pixelToHex(px, py, ox, oy) {
+  const x = px - ox, y = py - oy;
+  const q = x * (2/3) / HEX_SIZE;
+  const r = (-x/3 + SQRT3/3 * y) / HEX_SIZE;
+  return hexRound(q, r);
+}
+
+function hexRound(q, r) {
+  const s = -q - r;
+  let rq=Math.round(q), rr=Math.round(r), rs=Math.round(s);
+  const dq=Math.abs(rq-q), dr=Math.abs(rr-r), ds=Math.abs(rs-s);
+  if(dq>dr && dq>ds) rq=-rr-rs;
+  else if(dr>ds) rr=-rq-rs;
+  return {q:rq, r:rr};
+}
+
+const HEX_DIRS = [{q:1,r:0},{q:1,r:-1},{q:0,r:-1},{q:-1,r:0},{q:-1,r:1},{q:0,r:1}];
+
+function hexKey(q, r) { return q+','+r; }
+
+function getNeighbors(q, r) {
+  return HEX_DIRS.map(d => ({q: q+d.q, r: r+d.r}));
+}
+
+function hexCorners(cx, cy) {
+  const pts = [];
+  for(let i=0; i<6; i++){
+    const a = Math.PI/3 * i; // flat-top = 0° first
+    pts.push({x: cx + HEX_SIZE*Math.cos(a), y: cy + HEX_SIZE*Math.sin(a)});
+  }
+  return pts;
+}
+
+/* ══════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════ */
+let gold = CFG.startGold;
+let wood  = CFG.startWood;
+let stone = CFG.startStone;
+let hexes = {}; // key -> hex object
+let selected = null;
+let originX = 0, originY = 0;
+
+// hex object: {q,r,terrain,owner,building,claimProg,buildProg,buildType}
+// terrain: 'green'|'gray'
+// owner: 'player'|'enemy'|null
+// building: null|'sawmill'|'quarry'|'market'
+// claimProg: 0..1 | null
+// buildProg: 0..1 | null
+
+/* ══════════════════════════════════════════
+   MAP GENERATION
+══════════════════════════════════════════ */
+function initGame() {
+  hexes = {};
+  // 10 columns × 10 rows using offset→axial (pointy-top offset coords for a rectangular patch)
+  const COLS = 10, ROWS = 10;
+  for(let row=0; row<ROWS; row++){
+    for(let col=0; col<COLS; col++){
+      // odd-r offset to axial
+      const q = col - Math.floor((row)/2);
+      const r = row;
+      const key = hexKey(q,r);
+      hexes[key] = {
+        q, r,
+        terrain: Math.random() < 0.55 ? 'green' : 'gray',
+        owner: null, building: null,
+        claimProg: null, claimStart: null,
+        buildProg: null, buildStart: null, buildType: null
+      };
+    }
+  }
+
+  // Collect all keys sorted by q+r for player (top-left) and enemy (bottom-right)
+  const allKeys = Object.keys(hexes);
+  allKeys.sort((a,b)=>{
+    const ha=hexes[a], hb=hexes[b];
+    return (ha.q+ha.r)-(hb.q+hb.r);
+  });
+
+  // Player: pick first hex as sawmill (green), find neighbors for quarry+market
+  let sawKey = allKeys[0];
+  hexes[sawKey].terrain = 'green';
+
+  let quarryKey = null, marketKey = null;
+  for(const nb of getNeighbors(hexes[sawKey].q, hexes[sawKey].r)){
+    const k = hexKey(nb.q, nb.r);
+    if(!hexes[k]) continue;
+    if(!quarryKey){ quarryKey = k; continue; }
+    if(!marketKey){ marketKey = k; break; }
+  }
+  // Fallback if not enough neighbors
+  if(!quarryKey){ quarryKey = allKeys[1]||sawKey; }
+  if(!marketKey){ marketKey = allKeys[2]||sawKey; }
+
+  hexes[sawKey].terrain    = 'green';
+  hexes[quarryKey].terrain = 'gray';
+
+  hexes[sawKey].owner    = 'player'; hexes[sawKey].building    = 'sawmill';
+  hexes[quarryKey].owner = 'player'; hexes[quarryKey].building = 'quarry';
+  hexes[marketKey].owner = 'player'; hexes[marketKey].building = 'market';
+
+  // Enemy: bottom-right
+  const revKeys = [...allKeys].reverse();
+  let eMk = null, eS = null, eQ = null;
+  for(const k of revKeys){
+    if(k===sawKey||k===quarryKey||k===marketKey) continue;
+    if(!eMk){ eMk=k; continue; }
+    break;
+  }
+  if(eMk){
+    hexes[eMk].owner='enemy'; hexes[eMk].building='market';
+    // Find 2 neighbors of enemy market
+    for(const nb of getNeighbors(hexes[eMk].q, hexes[eMk].r)){
+      const k=hexKey(nb.q,nb.r);
+      if(!hexes[k]||k===sawKey||k===quarryKey||k===marketKey) continue;
+      if(!eS){ eS=k; continue; }
+      if(!eQ){ eQ=k; break; }
+    }
+    if(!eS){ eS=revKeys.find(k=>k!==eMk&&k!==sawKey&&k!==quarryKey&&k!==marketKey)||eMk; }
+    if(!eQ){ eQ=revKeys.find(k=>k!==eMk&&k!==eS&&k!==sawKey&&k!==quarryKey&&k!==marketKey)||eMk; }
+    hexes[eS].owner='enemy'; hexes[eS].terrain='green'; hexes[eS].building='sawmill';
+    hexes[eQ].owner='enemy'; hexes[eQ].terrain='gray';  hexes[eQ].building='quarry';
+  }
+
+  fitCanvas();
+  updateHUD();
+  requestAnimationFrame(gameLoop);
+}
+
+/* ══════════════════════════════════════════
+   CANVAS
+══════════════════════════════════════════ */
+const canvas = document.getElementById('map-canvas');
+const ctx    = canvas.getContext('2d');
+
+function fitCanvas() {
+  const wrap = document.getElementById('game-wrap');
+  canvas.width  = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+  // Centre the grid
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  for(const k of Object.keys(hexes)){
+    const h=hexes[k], p=hexToPixel(h.q,h.r,0,0);
+    minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x);
+    minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y);
+  }
+  originX = canvas.width/2  - (minX+maxX)/2;
+  originY = canvas.height/2 - (minY+maxY)/2;
+}
+
+/* ══════════════════════════════════════════
+   DRAW
+══════════════════════════════════════════ */
+function gameLoop() {
+  updateTimers();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = '#0d1a0d';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  for(const k of Object.keys(hexes)) drawHex(k);
+}
+
+function drawHex(key) {
+  const h = hexes[key];
+  const {x,y} = hexToPixel(h.q, h.r, originX, originY);
+  const corners = hexCorners(x,y);
+  const isSel = selected===key;
+
+  // Fill
+  let fill;
+  if(h.owner==='player')       fill = h.terrain==='green' ? '#1a4020' : '#252540';
+  else if(h.owner==='enemy')   fill = h.terrain==='green' ? '#3a1a10' : '#2a1030';
+  else                         fill = h.terrain==='green' ? '#111e11' : '#14141e';
+  if(isSel) fill = blendColor(fill, '#d4af37', 0.18);
+
+  ctx.beginPath();
+  ctx.moveTo(corners[0].x, corners[0].y);
+  for(let i=1;i<6;i++) ctx.lineTo(corners[i].x, corners[i].y);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+
+  // Border
+  ctx.strokeStyle = isSel ? '#d4af37' :
+    h.owner==='player' ? '#2a5a2a' :
+    h.owner==='enemy'  ? '#5a2010' : '#1a2a1a';
+  ctx.lineWidth = isSel ? 2.5 : 1;
+  ctx.stroke();
+
+  // Claim ring
+  if(h.claimProg!==null){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x,y,HEX_SIZE*0.72,-Math.PI/2,-Math.PI/2+Math.PI*2*h.claimProg,false);
+    ctx.strokeStyle='rgba(212,175,55,0.8)';
+    ctx.lineWidth=3;
+    ctx.stroke();
+    ctx.restore();
+  }
+  // Build ring
+  if(h.buildProg!==null){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x,y,HEX_SIZE*0.58,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
+    ctx.strokeStyle='rgba(80,200,80,0.75)';
+    ctx.lineWidth=2.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Icon
+  const sz = Math.round(HEX_SIZE*0.46);
+  ctx.font = sz+'px serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  let icon = h.terrain==='green' ? '🌿' : '🪨';
+  if(h.building==='market')  icon='🏪';
+  else if(h.building==='sawmill') icon='⚙';
+  else if(h.building==='quarry')  icon='⛏';
+  ctx.fillText(icon, x, y);
+
+  // Owner dot
+  if(h.owner){
+    ctx.beginPath();
+    ctx.arc(x+HEX_SIZE*0.52, y-HEX_SIZE*0.52, 5, 0, Math.PI*2);
+    ctx.fillStyle = h.owner==='player' ? '#50d060' : '#e04040';
+    ctx.fill();
+  }
+
+  // Building label
+  if(h.building && h.building!=='market'){
+    ctx.font = `bold ${Math.round(HEX_SIZE*0.17)}px Cinzel,serif`;
+    ctx.fillStyle = h.owner==='player'?'#80c880':'#c88080';
+    ctx.textBaseline='bottom';
+    ctx.fillText(h.building==='sawmill'?'TARTAK':'KAMIENIOŁOM', x, y+HEX_SIZE*0.84);
+  }
+}
+
+function blendColor(base, target, t) {
+  const parse = c=>{
+    const r=parseInt(c.slice(1,3),16), g=parseInt(c.slice(3,5),16), b=parseInt(c.slice(5,7),16);
+    return [r,g,b];
+  };
+  const b=parse(base.length===4?base+base.slice(1):base);
+  const tg=parse(target);
+  const r=Math.round(b[0]+(tg[0]-b[0])*t);
+  const g=Math.round(b[1]+(tg[1]-b[1])*t);
+  const bl=Math.round(b[2]+(tg[2]-b[2])*t);
+  return '#'+[r,g,bl].map(v=>Math.max(0,Math.min(255,v)).toString(16).padStart(2,'0')).join('');
+}
+
+/* ══════════════════════════════════════════
+   TIMERS
+══════════════════════════════════════════ */
+function updateTimers() {
+  const now = Date.now();
+  for(const k of Object.keys(hexes)){
+    const h = hexes[k];
+    if(h.claimStart!==null){
+      h.claimProg = Math.min(1,(now-h.claimStart)/CFG.claimTime);
+      if(h.claimProg>=1) completeClaim(k);
+    }
+    if(h.buildStart!==null){
+      h.buildProg = Math.min(1,(now-h.buildStart)/CFG.buildTime);
+      if(h.buildProg>=1) completeBuild(k);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════
+   INPUT
+══════════════════════════════════════════ */
+let clickCount = {};
+let clickTimer  = {};
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const {q,r} = pixelToHex(e.clientX-rect.left, e.clientY-rect.top, originX, originY);
+  const key = hexKey(q,r);
+  if(!hexes[key]) return;
+
+  if(selected !== key){
+    selected = key;
+    showHexInfo(key);
+    return;
+  }
+
+  // Double-click on same hex = action
+  clickCount[key] = (clickCount[key]||0)+1;
+  clearTimeout(clickTimer[key]);
+  if(clickCount[key]>=2){
+    clickCount[key]=0;
+    handleDoubleClick(key);
+  } else {
+    clickTimer[key]=setTimeout(()=>{clickCount[key]=0;},450);
+  }
+  showHexInfo(key);
+});
+
+canvas.addEventListener('mousemove', e=>{
+  const rect=canvas.getBoundingClientRect();
+  const {q,r}=pixelToHex(e.clientX-rect.left, e.clientY-rect.top, originX, originY);
+  const key=hexKey(q,r);
+  const tt=document.getElementById('tooltip');
+  if(hexes[key]){
+    const h=hexes[key];
+    const cost = getClaimCost(h);
+    let txt=`<b>${h.terrain==='green'?'Zielone pole':'Szare pole'}</b><br>`;
+    txt+=`Właściciel: ${ownerLabel(h.owner)}<br>`;
+    if(h.building) txt+=`Budynek: <b>${bName(h.building)}</b><br>`;
+    if(h.owner!=='player'){
+      txt+=`Przejęcie: <b>${cost}💰</b>`;
+      if(!isAdjacentPlayer(h)) txt+=` <span style="color:#5a4a2a;">(niedostępne)</span>`;
+    }
+    tt.innerHTML=txt;
+    tt.style.display='block';
+    tt.style.left=(e.clientX+14)+'px';
+    tt.style.top=(e.clientY-8)+'px';
+  } else {
+    tt.style.display='none';
+  }
+});
+canvas.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none');
+window.addEventListener('resize',()=>{fitCanvas();});
+
+function ownerLabel(o){
+  if(o==='player') return '<span style="color:#50d060">Twoje</span>';
+  if(o==='enemy')  return '<span style="color:#e04040">Wróg</span>';
+  return 'Wolne';
+}
+
+function handleDoubleClick(key){
+  const h=hexes[key];
+  if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null){
+    openMusicModal(key);
+  }
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR INFO & ACTIONS
+══════════════════════════════════════════ */
+function showHexInfo(key) {
+  const h = hexes[key];
+  const ibox  = document.getElementById('hex-info-box');
+  const abox  = document.getElementById('action-box');
+  if(!h){ ibox.innerHTML=''; abox.innerHTML=''; return; }
+
+  let info = `<b>Teren:</b> ${h.terrain==='green'?'🌿 Zielony':'🪨 Szary'}<br>`;
+  info += `<b>Właściciel:</b> ${ownerLabel(h.owner)}<br>`;
+  if(h.building) info += `<b>Budynek:</b> ${bName(h.building)}<br>`;
+  if(h.claimProg!==null) info += `<span style="color:#a09050">Przejmowanie…${Math.round(h.claimProg*100)}%</span><br>`;
+  if(h.buildProg!==null) info += `<span style="color:#50a050">Budowanie…${Math.round(h.buildProg*100)}%</span><br>`;
+  ibox.innerHTML = info;
+
+  abox.innerHTML='';
+
+  // ── Claim empty ──
+  if(!h.owner && isAdjacentPlayer(h) && h.claimProg===null){
+    addBtn(abox, `🚩 Przejmij (${CFG.claimCostEmpty}💰)`, '', gold<CFG.claimCostEmpty, ()=>startClaim(key));
+  }
+
+  // ── Claim enemy ──
+  if(h.owner==='enemy' && isAdjacentPlayer(h) && h.claimProg===null){
+    const c = getClaimCost(h);
+    addBtn(abox, `⚔ Przejmij (${c}💰)`, 'danger', gold<c, ()=>startClaim(key));
+  }
+
+  // ── Not adjacent notice ──
+  if(!h.owner && !isAdjacentPlayer(h) && h.claimProg===null){
+    const d=document.createElement('div');
+    d.className='hex-info'; d.style.cssText='color:#2a3a1a;font-size:10px;margin-top:4px;';
+    d.textContent='Nie sąsiaduje z Twoim terytorium.';
+    abox.appendChild(d);
+  }
+
+  // ── Build ──
+  if(h.owner==='player' && !h.building && h.buildProg===null){
+    if(h.terrain==='green'){
+      addBtn(abox, `🏗 Tartak (${CFG.buildSawmillWood}🪵)`, '', wood<CFG.buildSawmillWood, ()=>startBuild(key,'sawmill'));
+    } else {
+      addBtn(abox, `🏗 Kamieniołom (${CFG.buildQuarryStone}🪨+${CFG.buildQuarryWood}🪵)`, '',
+        stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood, ()=>startBuild(key,'quarry'));
+    }
+  }
+
+  // ── Harvest ──
+  if(h.owner==='player' && (h.building==='sawmill'||h.building==='quarry') && h.buildProg===null && h.claimProg===null){
+    const label = h.building==='sawmill'
+      ? `🎵 Wydobądź drewno (bonus ×${getAdjBonus(key).toFixed(2)})`
+      : `🎵 Wydobądź kamień (bonus ×${getAdjBonus(key).toFixed(2)})`;
+    addBtn(abox, label, '', false, ()=>openMusicModal(key));
+    const hint=document.createElement('div');
+    hint.className='hex-info'; hint.style.cssText='color:#2a4a2a;font-size:9px;margin-top:2px;';
+    hint.textContent='(lub kliknij dwukrotnie na mapie)';
+    abox.appendChild(hint);
+  }
+
+  // Progress bars
+  if(h.claimProg!==null){
+    const pw=document.createElement('div'); pw.className='progress-wrap';
+    const pb=document.createElement('div'); pb.className='progress-bar';
+    pb.id='pclaim-'+key; pb.style.width=(h.claimProg*100)+'%'; pw.appendChild(pb); abox.appendChild(pw);
+    const lbl=document.createElement('div'); lbl.className='prog-label'; lbl.textContent='Przejmowanie pola…'; abox.appendChild(lbl);
+  }
+  if(h.buildProg!==null){
+    const pw=document.createElement('div'); pw.className='progress-wrap';
+    const pb=document.createElement('div'); pb.className='progress-bar';
+    pb.id='pbuild-'+key; pb.style.width=(h.buildProg*100)+'%'; pw.appendChild(pb); abox.appendChild(pw);
+    const lbl=document.createElement('div'); lbl.className='prog-label'; lbl.textContent='Budowanie…'; abox.appendChild(lbl);
+  }
+}
+
+function addBtn(parent, text, cls, disabled, fn) {
+  const b = document.createElement('button');
+  b.className = 'action-btn'+(cls?' '+cls:'');
+  b.textContent = text;
+  b.disabled = disabled;
+  b.onclick = fn;
+  parent.appendChild(b);
+}
+
+function bName(b){ return {sawmill:'Tartak',quarry:'Kamieniołom',market:'Rynek'}[b]||b; }
+
+function isAdjacentPlayer(h){
+  return getNeighbors(h.q,h.r).some(nb=>{
+    const k=hexKey(nb.q,nb.r);
+    return hexes[k]&&hexes[k].owner==='player';
+  });
+}
+
+function getClaimCost(h){
+  if(!h.owner) return CFG.claimCostEmpty;
+  if(h.owner==='enemy'){
+    if(h.building==='market') return CFG.claimCostMarket;
+    if(h.building) return CFG.claimCostBuilding;
+    return CFG.claimCostEnemy;
+  }
+  return CFG.claimCostEmpty;
+}
+
+/* ══════════════════════════════════════════
+   CLAIM
+══════════════════════════════════════════ */
+function startClaim(key){
+  const h=hexes[key];
+  if(h.claimProg!==null) return;
+  const cost=getClaimCost(h);
+  if(gold<cost){alert('Za mało złota!');return;}
+  gold -= cost;
+  h.claimStart = Date.now();
+  h.claimProg  = 0;
+  updateHUD();
+  showHexInfo(key);
+}
+
+function completeClaim(key){
+  const h=hexes[key];
+  if(h.claimProg===null) return;
+  const wasEnemyMarket = h.owner==='enemy' && h.building==='market';
+  const wasEnemy       = h.owner==='enemy';
+  h.owner      = 'player';
+  h.claimProg  = null;
+  h.claimStart = null;
+  if(wasEnemy && !wasEnemyMarket) h.building=null; // enemy buildings destroyed on claim
+  showHexInfo(key);
+  updateHUD();
+  if(wasEnemyMarket) showWin();
+}
+
+/* ══════════════════════════════════════════
+   BUILD
+══════════════════════════════════════════ */
+function startBuild(key, type){
+  const h=hexes[key];
+  if(type==='sawmill'){
+    if(wood<CFG.buildSawmillWood){alert('Za mało drewna!');return;}
+    wood-=CFG.buildSawmillWood;
+  } else {
+    if(stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood){alert('Za mało surowców!');return;}
+    stone-=CFG.buildQuarryStone; wood-=CFG.buildQuarryWood;
+  }
+  h.buildType  = type;
+  h.buildStart = Date.now();
+  h.buildProg  = 0;
+  updateHUD();
+  showHexInfo(key);
+}
+
+function completeBuild(key){
+  const h=hexes[key];
+  if(h.buildProg===null) return;
+  h.building  = h.buildType;
+  h.buildProg = null;
+  h.buildStart= null;
+  h.buildType = null;
+  showHexInfo(key);
+}
+
+/* ══════════════════════════════════════════
+   ADJACENCY BONUS
+══════════════════════════════════════════ */
+function getAdjBonus(key){
+  const h=hexes[key];
+  if(!h.building||h.building==='market') return 1;
+  let b=1;
+  for(const nb of getNeighbors(h.q,h.r)){
+    const k=hexKey(nb.q,nb.r);
+    if(hexes[k]&&hexes[k].owner==='player'&&hexes[k].building===h.building) b+=CFG.adjacencyBonus;
+  }
+  return b;
+}
+
+/* ══════════════════════════════════════════
+   MUSIC MINI-GAME
+══════════════════════════════════════════ */
+const NOTE_NAMES = ['c','d','e','f','g','a','h'];
+// Staff positions (0=c¹ lowest, 6=h¹ highest)
+// In SVG: 5 staff lines, spacing=11px, top line y=22, bottom line y=66
+// Note positions: each semistep = 5.5px up
+// pos 0 = c¹ = ledger line below staff (y≈77), pos 2 = e¹ = bottom staff line y=66, pos 4 = g¹ = y=55 etc.
+const STAFF_TOP  = 22;
+const STAFF_STEP = 11;
+const NOTE_STEP  = STAFF_STEP/2; // half-step per note = 5.5px
+
+function noteY(idx){ // idx 0=c, ascending
+  // c¹ sits 1 ledger below bottom line (y=66+11=77), each note up = -5.5
+  return 77 - idx*NOTE_STEP;
+}
+
+let mCtx = {key:null, target:null, idx:0};
+
+function openMusicModal(key){
+  mCtx.key    = key;
+  mCtx.target = NOTE_NAMES[Math.floor(Math.random()*NOTE_NAMES.length)];
+  mCtx.idx    = 2; // start on e¹
+  document.getElementById('music-target-note').textContent = mCtx.target+'¹';
+  document.getElementById('music-result').textContent='';
+  document.getElementById('music-result').className='music-result';
+  renderStaff();
+  document.getElementById('music-modal').classList.add('show');
+}
+
+function closeMusicModal(){
+  document.getElementById('music-modal').classList.remove('show');
+}
+
+function moveNote(dir){
+  // dir: -1 = up (higher pitch = higher idx), +1 = down
+  mCtx.idx = Math.max(0,Math.min(NOTE_NAMES.length-1, mCtx.idx-dir));
+  renderStaff();
+  document.getElementById('music-result').textContent='';
+  document.getElementById('music-result').className='music-result';
+}
+
+function confirmNote(){
+  const chosen = NOTE_NAMES[mCtx.idx];
+  const resEl  = document.getElementById('music-result');
+  if(chosen===mCtx.target){
+    resEl.textContent = '✓ Brawo! Poprawna nuta!';
+    resEl.className   = 'music-result ok';
+    // Harvest
+    const bonus  = getAdjBonus(mCtx.key);
+    const amount = Math.max(1,Math.round(bonus));
+    const h      = hexes[mCtx.key];
+    if(h.building==='sawmill') wood  += amount;
+    else                       stone += amount;
+    updateHUD();
+    if(selected===mCtx.key) showHexInfo(mCtx.key);
+    setTimeout(closeMusicModal, 1100);
+  } else {
+    resEl.textContent = `✗ Zagrałeś ${chosen}¹, cel: ${mCtx.target}¹. Spróbuj ponownie.`;
+    resEl.className   = 'music-result fail';
+  }
+}
+
+/* ══════════════════════════════════════════
+   STAFF SVG
+══════════════════════════════════════════ */
+function renderStaff(){
+  const svg = document.getElementById('staff-svg');
+  const W=296, H=120;
+  const staffLeft=46, staffRight=W-12;
+  const clefX=2;
+
+  let s='';
+  // Dark bg
+  s+=`<rect width="${W}" height="${H}" rx="9" fill="#020c02" stroke="#3a5a2a" stroke-width="1.5"/>`;
+
+  // 5 staff lines
+  for(let i=0;i<5;i++){
+    const ly = STAFF_TOP + i*STAFF_STEP;
+    s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.85" opacity="0.65"/>`;
+  }
+
+  // Treble clef
+  s+=`<text x="${clefX+3}" y="${STAFF_TOP+STAFF_STEP*4+4}" font-size="50" font-family="Georgia,'Times New Roman',serif" fill="#d4af37" opacity="0.88">𝄞</text>`;
+
+  // Horizontal position of note
+  const nx = staffLeft + 120;
+  const ny = noteY(mCtx.idx);
+
+  // Ledger line for c¹ (below staff)
+  if(mCtx.idx===0){
+    s+=`<line x1="${nx-11}" y1="${ny}" x2="${nx+11}" y2="${ny}" stroke="#c8b87a" stroke-width="1.2"/>`;
+  }
+  // Ledger line for h¹ (above staff — idx 6 => y = 77-6*5.5=44; staff top=22; line1=22; so h1 is on line2=33, no ledger needed)
+  // Actually let's check: idx=6 => y=77-33=44 = staff line at 22+2*11=44 = line3. OK within staff.
+
+  // Note head
+  s+=`<ellipse cx="${nx}" cy="${ny}" rx="7.5" ry="5" fill="#d4af37" transform="rotate(-14,${nx},${ny})"/>`;
+
+  // Stem
+  const stemUp = mCtx.idx<4;
+  const stemX  = stemUp ? nx+7 : nx-7;
+  const stemY2 = ny + (stemUp ? -30 : 30);
+  s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${stemY2}" stroke="#d4af37" stroke-width="1.6"/>`;
+
+  // Note name label
+  const dispName = NOTE_NAMES[mCtx.idx]+'¹';
+  s+=`<text x="${nx}" y="${H-5}" font-size="12" fill="#d4af37" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${dispName}</text>`;
+
+  // Target reminder
+  s+=`<text x="${W-8}" y="${H-5}" font-size="10" fill="#5a6a3a" text-anchor="end" font-family="Cinzel,serif">cel: ${mCtx.target}¹</text>`;
+
+  // Arrow hints
+  s+=`<text x="${nx+22}" y="${ny-8}" font-size="9" fill="#4a6a3a" text-anchor="start" font-family="Crimson Text,serif">${NOTE_NAMES[Math.min(6,mCtx.idx+1)]}¹▲</text>`;
+  if(mCtx.idx>0) s+=`<text x="${nx+22}" y="${ny+14}" font-size="9" fill="#4a6a3a" text-anchor="start" font-family="Crimson Text,serif">${NOTE_NAMES[Math.max(0,mCtx.idx-1)]}¹▼</text>`;
+
+  svg.innerHTML=s;
+}
+
+/* ══════════════════════════════════════════
+   HUD & SELL
+══════════════════════════════════════════ */
+function updateHUD(){
+  document.getElementById('hud-gold').textContent  = gold;
+  document.getElementById('hud-wood').textContent  = wood;
+  document.getElementById('hud-stone').textContent = stone;
+}
+
+let sellOpen=false;
+function toggleSellPanel(){
+  sellOpen=!sellOpen;
+  document.getElementById('sell-panel').classList.toggle('show',sellOpen);
+}
+
+function sellResource(type){
+  if(type==='wood'){
+    if(wood<CFG.sellWoodRate){alert('Potrzebujesz co najmniej '+CFG.sellWoodRate+' drewna.');return;}
+    wood  -= CFG.sellWoodRate;
+    gold  += CFG.sellWoodGold;
+  } else {
+    if(stone<CFG.sellStoneRate){alert('Potrzebujesz co najmniej '+CFG.sellStoneRate+' kamienia.');return;}
+    stone -= CFG.sellStoneRate;
+    gold  += CFG.sellStoneGold;
+  }
+  updateHUD();
+}
+
+/* ══════════════════════════════════════════
+   WIN
+══════════════════════════════════════════ */
+function showWin(){
+  document.getElementById('win-screen').classList.add('show');
+}
+
+/* ══════════════════════════════════════════
+   START
+══════════════════════════════════════════ */
+initGame();
+</script>
+</body>
+</html>
