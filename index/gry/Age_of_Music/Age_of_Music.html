@@ -220,8 +220,8 @@ const CFG = {
 /* ═══════════════════════════════════════
    ISO HEX MATH
 ═══════════════════════════════════════ */
-const HS    = 44;
-const DEPTH = 20;
+const HS    = 120;
+const DEPTH = 30;
 const SQRT3 = Math.sqrt(3);
 
 // Klasyczna izometria 2:1
@@ -389,15 +389,26 @@ const ctx=canvas.getContext('2d');
 
 function fitCanvas(){
   const wrap=document.getElementById('game-wrap');
-  canvas.width=wrap.clientWidth; canvas.height=wrap.clientHeight;
+  const W=wrap.clientWidth, H=wrap.clientHeight;
+  const dpr=window.devicePixelRatio||1;
+  // HiDPI: canvas pixel buffer = logical * dpr
+  canvas.width  = Math.round(W*dpr);
+  canvas.height = Math.round(H*dpr);
+  canvas.style.width  = W+'px';
+  canvas.style.height = H+'px';
+  // Scale context to match DPR - pixel art stays sharp
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  // PIXEL ART: wyłącz anti-aliasing
+  ctx.imageSmoothingEnabled=false;
+  // Wyśrodkuj mapę (w logicznych pikselach)
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(const k of Object.keys(hexes)){
     const h=hexes[k],{sx,sy}=axialToScreen(h.q,h.r,0,0);
     minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);
     minY=Math.min(minY,sy);maxY=Math.max(maxY,sy);
   }
-  originX=canvas.width/2-(minX+maxX)/2;
-  originY=canvas.height/2-(minY+maxY)/2+DEPTH/2;
+  originX=W/2-(minX+maxX)/2;
+  originY=H/2-(minY+maxY)/2+DEPTH/2;
 }
 
 /* ═══════════════════════════════════════
@@ -409,20 +420,21 @@ const BG_IMG = new Image();
 BG_IMG.src = '/index/gry/Age_of_Music/ilustracje/concept_art/tło_1.png';
 
 function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const W=canvas.width/(window.devicePixelRatio||1);
+  const H=canvas.height/(window.devicePixelRatio||1);
+  ctx.imageSmoothingEnabled=false;
+  ctx.clearRect(0,0,W,H);
   if(BG_IMG.complete && BG_IMG.naturalWidth>0){
-    // Wypełnij canvas obrazkiem, zachowując proporcje (cover)
     const iw=BG_IMG.naturalWidth, ih=BG_IMG.naturalHeight;
-    const scale=Math.max(canvas.width/iw, canvas.height/ih);
+    const scale=Math.max(W/iw, H/ih);
     const dw=iw*scale, dh=ih*scale;
-    ctx.drawImage(BG_IMG,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh);
-    // Lekkie przyciemnienie żeby kafelki były czytelne
+    ctx.drawImage(BG_IMG,(W-dw)/2,(H-dh)/2,dw,dh);
     ctx.fillStyle='rgba(0,0,0,0.38)';
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillRect(0,0,W,H);
   } else {
-    const sky=ctx.createLinearGradient(0,0,0,canvas.height);
+    const sky=ctx.createLinearGradient(0,0,0,H);
     sky.addColorStop(0,'#2a4a18'); sky.addColorStop(1,'#0e1e08');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
   }
   for(const k of drawOrder) drawIsoHex(k);
 }
@@ -453,20 +465,20 @@ function drawIsoHex(key){
 
   const terrainImg=loadImg(h.terrainSrc);
   if(imgReady(terrainImg)){
-    // Clipujemy PNG terenu w kształcie hexa
     ctx.save();
-    ctx.clip();
+    ctx.clip(); // clip do kształtu hexa (ścieżka już narysowana wyżej)
     const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
     const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
-    ctx.drawImage(terrainImg,bx,by,bw,bh);
-    // Przyciemnienie jeśli należy do wroga lub bez właściciela
-    if(h.owner==='enemy'){
-      ctx.fillStyle='rgba(80,0,0,0.28)';ctx.fillRect(bx,by,bw,bh);
-    } else if(!h.owner){
-      ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fillRect(bx,by,bw,bh);
-    }
-    // Podświetlenie zaznaczonego
-    if(isSel){ctx.fillStyle='rgba(240,208,60,0.12)';ctx.fillRect(bx,by,bw,bh);}
+    // Skaluj PNG tak żeby SZEROKOŚĆ pasowała do hexa - zachowuje proporcje pikseli
+    const iw=terrainImg.naturalWidth, ih=terrainImg.naturalHeight;
+    const scaleW=bw/iw, scaleH=bh/ih;
+    const sc=Math.max(scaleW,scaleH); // cover - bez białych pasków
+    const dw=iw*sc, dh=ih*sc;
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(terrainImg, bx+(bw-dw)/2, by+(bh-dh)/2, dw, dh);
+    if(h.owner==='enemy'){ctx.fillStyle='rgba(80,0,0,0.28)';ctx.fillRect(bx,by,bw,bh);}
+    else if(!h.owner){ctx.fillStyle='rgba(0,0,0,0.18)';ctx.fillRect(bx,by,bw,bh);}
+    if(isSel){ctx.fillStyle='rgba(240,208,60,0.10)';ctx.fillRect(bx,by,bw,bh);}
     ctx.restore();
   } else {
     // Fallback kolor
@@ -490,17 +502,14 @@ function drawIsoHex(key){
     if(imgReady(bim)){
       const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
       const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
-      // Skaluj PNG tak żeby wypełniał hex, wyśrodkowany, przesunięty lekko w górę
-      const iw=bim.naturalWidth,ih=bim.naturalHeight;
-      const scale=Math.max(bw/iw, bh/ih)*1.05;
-      const dw=iw*scale,dh=ih*scale;
-      ctx.save();
-      // Clip do kształtu hexa żeby PNG nie wychodził poza
-      ctx.beginPath();
-      top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-      ctx.closePath(); ctx.clip();
-      ctx.drawImage(bim, sx-dw/2, by-dh*0.05, dw, dh);
-      ctx.restore();
+      // Budynek: skaluj PNG do szerokości hexa, pozwól wystawać w górę (izometryczny look)
+      const iw=bim.naturalWidth, ih=bim.naturalHeight;
+      // Skaluj tak żeby szerokość PNG = szerokość hexa
+      const sc = bw / iw;
+      const dw = iw*sc, dh = ih*sc;
+      ctx.imageSmoothingEnabled=false;
+      // Wyśrodkuj poziomo, ustaw dół PNG na dół hexa
+      ctx.drawImage(bim, bx+(bw-dw)/2, by+bh-dh, dw, dh);
     } else {
       // Fallback placeholder
       drawBuildingPlaceholder(h,sx,sy);
@@ -745,7 +754,7 @@ canvas.addEventListener('mousemove',e=>{
   } else {tt.style.display='none';}
 });
 canvas.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none');
-window.addEventListener('resize',()=>{fitCanvas();});
+window.addEventListener('resize',()=>{fitCanvas(); ctx.imageSmoothingEnabled=false;});
 
 function handleDoubleClick(key){
   const h=hexes[key];
