@@ -206,28 +206,41 @@ const CFG = {
   sellWoodRate:10, sellWoodGold:1,
   sellStoneRate:10, sellStoneGold:3,
   adjBonus:0.25,
+  // Rynek
+  marketInterval:10000,
+  marketBase:0.2,
+  marketGroupBonus:0.1,
+  // Ratusz
+  townhallInterval:15000,
+  townhallGold:3,
+  townhallWood:2,
+  townhallStone:2,
 };
 
 /* ═══════════════════════════════════════
    ISO HEX MATH
 ═══════════════════════════════════════ */
-const HS    = 44;   // circumradius hexa
-const DEPTH = 14;   // grubość boku
+const HS    = 44;
+const DEPTH = 20;
 const SQRT3 = Math.sqrt(3);
 
-function isoProject(x,y){
-  return { x:(x-y)*Math.cos(Math.PI/6), y:(x+y)*Math.sin(Math.PI/6) };
+// Klasyczna izometria 2:1
+function isoProject(wx, wy){
+  return { x:(wx-wy)*0.5, y:(wx+wy)*0.25 };
+}
+function isoUnproject(sx, sy){
+  return { wx: sx+sy*2, wy: sy*2-sx };
+}
+function axialToWorld(q,r){
+  return { wx:HS*1.5*q, wy:HS*SQRT3*(r+q/2) };
 }
 function axialToScreen(q,r,ox,oy){
-  const wx=HS*1.5*q, wy=HS*SQRT3*(r+q/2);
+  const {wx,wy}=axialToWorld(q,r);
   const p=isoProject(wx,wy);
   return {sx:p.x+ox, sy:p.y+oy};
 }
 function screenToAxial(px,py,ox,oy){
-  const ix=px-ox, iy=py-oy;
-  const cos30=Math.cos(Math.PI/6), sin30=Math.sin(Math.PI/6);
-  const A=ix/cos30, B=iy/sin30;
-  const wx=(A+B)/2, wy=(B-A)/2;
+  const {wx,wy}=isoUnproject(px-ox,py-oy);
   const q=wx/(HS*1.5);
   const r=wy/(HS*SQRT3)-q/2;
   return hexRound(q,r);
@@ -257,6 +270,8 @@ function getNeighbors(q,r){return HEX_DIRS.map(d=>({q:q+d.q,r:r+d.r}));}
    STATE
 ═══════════════════════════════════════ */
 let gold=CFG.startGold, wood=CFG.startWood, stone=CFG.startStone;
+let goldAccum=0; // akumulator ułamkowego złota z rynków
+let lastMarketTick=0, lastTownhallTick=0;
 let hexes={}, drawOrder=[], selected=null;
 let originX=0, originY=0;
 
@@ -284,23 +299,28 @@ function initGame(){
     }
   }
 
-  // Painter's sort
+  // Painter's algorithm: r rosnąco, przy równym r q rosnąco
   drawOrder=Object.keys(hexes).sort((a,b)=>{
     const ha=hexes[a],hb=hexes[b];
-    return (ha.r+ha.q)-(hb.r+hb.q);
+    if(ha.r!==hb.r) return ha.r-hb.r;
+    return ha.q-hb.q;
   });
 
-  // ── Gracz (top-left) ──
-  const pKeys=[...drawOrder];
-  let sawKey=pKeys[0], quarryKey=null, townKey=null;
+  // ── Gracz (środek lewego boku: row=5, col=0) ──
+  // offset axial: q=col-floor(row/2), r=row
+  const pStartR=5, pStartQ=0-Math.floor(5/2); // q=-2, r=5
+  const pStartKey=hexKey(pStartQ,pStartR);
+  // fallback jeśli hex nie istnieje
+  const pBase=hexes[pStartKey]?pStartKey:drawOrder[0];
+  let sawKey=pBase, quarryKey=null, townKey=null;
   for(const nb of getNeighbors(hexes[sawKey].q,hexes[sawKey].r)){
     const k=hexKey(nb.q,nb.r);
     if(!hexes[k]) continue;
     if(!quarryKey){quarryKey=k;continue;}
     if(!townKey){townKey=k;break;}
   }
-  quarryKey=quarryKey||pKeys[1]||sawKey;
-  townKey  =townKey  ||pKeys[2]||sawKey;
+  quarryKey=quarryKey||drawOrder[1]||sawKey;
+  townKey  =townKey  ||drawOrder[2]||sawKey;
 
   hexes[sawKey].terrain='green';
   hexes[sawKey].terrainSrc=randFrom(SRC.drewno);
@@ -318,14 +338,19 @@ function initGame(){
   hexes[townKey].building='townhall';
   hexes[townKey].buildingSrc=SRC.ratusz_player;
 
-  // ── Wróg (bottom-right) ──
-  const eKeys=[...drawOrder].reverse();
-  let eTown=null,eS=null,eQ=null;
-  for(const k of eKeys){
-    if(k===sawKey||k===quarryKey||k===townKey) continue;
-    if(!eTown){eTown=k;continue;}
-    break;
+  // ── Wróg (środek prawego boku: row=5, col=9) ──
+  const eStartR=5, eStartQ=9-Math.floor(5/2); // q=7, r=5
+  const eStartKey=hexKey(eStartQ,eStartR);
+  let eTown=hexes[eStartKey]?eStartKey:null;
+  // unikaj kolizji z graczem
+  if(!eTown||eTown===sawKey||eTown===quarryKey||eTown===townKey){
+    const eKeys=[...drawOrder].reverse();
+    for(const k of eKeys){
+      if(k===sawKey||k===quarryKey||k===townKey) continue;
+      eTown=k; break;
+    }
   }
+  let eS=null,eQ=null;
   if(eTown){
     hexes[eTown].owner='enemy';
     hexes[eTown].building='townhall';
@@ -351,6 +376,7 @@ function initGame(){
     hexes[eQ].buildingSrc=randFrom(SRC.kamieniolom);
   }
 
+  lastMarketTick=Date.now(); lastTownhallTick=Date.now();
   fitCanvas(); updateHUD();
   requestAnimationFrame(gameLoop);
 }
@@ -379,11 +405,25 @@ function fitCanvas(){
 ═══════════════════════════════════════ */
 function gameLoop(){ updateTimers(); draw(); requestAnimationFrame(gameLoop); }
 
+const BG_IMG = new Image();
+BG_IMG.src = '/index/gry/Age_of_Music/ilustracje/concept_art/tło_1.png';
+
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  const sky=ctx.createLinearGradient(0,0,0,canvas.height);
-  sky.addColorStop(0,'#2a4a18'); sky.addColorStop(1,'#0e1e08');
-  ctx.fillStyle=sky; ctx.fillRect(0,0,canvas.width,canvas.height);
+  if(BG_IMG.complete && BG_IMG.naturalWidth>0){
+    // Wypełnij canvas obrazkiem, zachowując proporcje (cover)
+    const iw=BG_IMG.naturalWidth, ih=BG_IMG.naturalHeight;
+    const scale=Math.max(canvas.width/iw, canvas.height/ih);
+    const dw=iw*scale, dh=ih*scale;
+    ctx.drawImage(BG_IMG,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh);
+    // Lekkie przyciemnienie żeby kafelki były czytelne
+    ctx.fillStyle='rgba(0,0,0,0.38)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  } else {
+    const sky=ctx.createLinearGradient(0,0,0,canvas.height);
+    sky.addColorStop(0,'#2a4a18'); sky.addColorStop(1,'#0e1e08');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
   for(const k of drawOrder) drawIsoHex(k);
 }
 
@@ -398,11 +438,13 @@ function drawIsoHex(key){
   const top=isoHexTop(sx,sy);
   const isSel=selected===key;
 
-  // ── Boki (grubość) ──
+  // ── Boki widoczne w izometrii 2:1 (dolna połowa hexa) ──
+  // narożniki 0=prawy, 1=prawy-dolny, 2=lewy-dolny, 3=lewy, 4=lewy-górny, 5=prawy-górny
+  // Widoczne: prawy (0→1), prawy-dolny (1→2), lewy-dolny (2→3)
   const sideBase = h.owner==='player'?'#1a3a10':h.owner==='enemy'?'#3a1010':'#1a1a10';
-  drawSide(top[0],top[1],darken(sideBase,0.50),isSel);
-  drawSide(top[1],top[2],darken(sideBase,0.35),isSel);
-  drawSide(top[2],top[3],darken(sideBase,0.45),isSel);
+  drawSide(top[0],top[1],darken(sideBase,0.45),isSel); // prawy
+  drawSide(top[1],top[2],darken(sideBase,0.32),isSel); // prawy-dolny
+  drawSide(top[2],top[3],darken(sideBase,0.38),isSel); // lewy-dolny
 
   // ── Górna powierzchnia ──
   ctx.beginPath();
@@ -552,6 +594,93 @@ function toCol(r,g,b,a){
 /* ═══════════════════════════════════════
    TIMERS
 ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   INCOME — RYNEK & RATUSZ
+═══════════════════════════════════════ */
+
+// Znajdź wszystkie grupy połączonych rynków gracza (flood-fill po sąsiadach)
+function getMarketGroups(){
+  const visited=new Set();
+  const groups=[];
+  for(const k of Object.keys(hexes)){
+    const h=hexes[k];
+    if(h.owner==='player'&&h.building==='market'&&!visited.has(k)){
+      // BFS
+      const group=[];
+      const queue=[k];
+      visited.add(k);
+      while(queue.length){
+        const cur=queue.shift();
+        group.push(cur);
+        for(const nb of getNeighbors(hexes[cur].q,hexes[cur].r)){
+          const nk=hexKey(nb.q,nb.r);
+          if(!visited.has(nk)&&hexes[nk]&&hexes[nk].owner==='player'&&hexes[nk].building==='market'){
+            visited.add(nk); queue.push(nk);
+          }
+        }
+      }
+      groups.push(group);
+    }
+  }
+  return groups;
+}
+
+function tickMarkets(){
+  // Dla każdej grupy rynków:
+  // każdy rynek w grupie generuje: bazowe + (rozmiar_grupy-1)*bonus
+  const groups=getMarketGroups();
+  let totalGold=0;
+  for(const group of groups){
+    const groupSize=group.length;
+    // premia = (groupSize-1) * 0.1 na każdy rynek w grupie
+    const perMarket=CFG.marketBase+(groupSize-1)*CFG.marketGroupBonus;
+    totalGold+=perMarket*groupSize;
+  }
+  if(totalGold>0){
+    goldAccum+=totalGold;
+    const whole=Math.floor(goldAccum);
+    if(whole>0){ gold+=whole; goldAccum-=whole; updateHUD(); }
+    showIncomeNotif('rynek','+'+totalGold.toFixed(2)+'💰');
+  }
+}
+
+function tickTownhall(){
+  // Każdy ratusz gracza generuje zasoby
+  let count=0;
+  for(const k of Object.keys(hexes)){
+    const h=hexes[k];
+    if(h.owner==='player'&&h.building==='townhall') count++;
+  }
+  if(count>0){
+    gold +=CFG.townhallGold *count;
+    wood +=CFG.townhallWood *count;
+    stone+=CFG.townhallStone*count;
+    updateHUD();
+    showIncomeNotif('ratusz','+'+CFG.townhallGold+'💰 +'+CFG.townhallWood+'🪵 +'+CFG.townhallStone+'🪨');
+  }
+}
+
+// Pływające powiadomienie o dochodzie
+function showIncomeNotif(src,text){
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;left:50%;top:60px;transform:translateX(-50%);'
+    +'background:rgba(4,12,4,0.88);border:1px solid #3a5a1a;border-radius:6px;'
+    +'padding:4px 12px;font-family:Cinzel,serif;font-size:10px;color:#f0d060;'
+    +'z-index:300;pointer-events:none;letter-spacing:.08em;white-space:nowrap;'
+    +'animation:fadeup 1.8s ease forwards;';
+  el.textContent=src+': '+text;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1900);
+}
+
+// CSS dla animacji powiadomień
+if(!document.getElementById('notif-style')){
+  const st=document.createElement('style');
+  st.id='notif-style';
+  st.textContent='@keyframes fadeup{0%{opacity:0;top:60px;}15%{opacity:1;top:54px;}80%{opacity:1;}100%{opacity:0;top:38px;}}';
+  document.head.appendChild(st);
+}
+
 function updateTimers(){
   const now=Date.now();
   for(const k of Object.keys(hexes)){
@@ -564,6 +693,16 @@ function updateTimers(){
       h.buildProg=Math.min(1,(now-h.buildStart)/CFG.buildTime);
       if(h.buildProg>=1) completeBuild(k);
     }
+  }
+  // Dochód z rynków (co 10s)
+  if(now-lastMarketTick>=CFG.marketInterval){
+    lastMarketTick=now;
+    tickMarkets();
+  }
+  // Dochód z ratusza (co 15s)
+  if(now-lastTownhallTick>=CFG.townhallInterval){
+    lastTownhallTick=now;
+    tickTownhall();
   }
 }
 
@@ -626,6 +765,15 @@ function showHexInfo(key){
   let info=`<b>Teren:</b> ${h.terrain==='green'?'🌿 Las':'🪨 Kamień'}<br>`;
   info+=`<b>Właściciel:</b> ${ownerLabel(h.owner)}<br>`;
   if(h.building) info+=`<b>Budynek:</b> ${bName(h.building)}<br>`;
+  if(h.building==='market'&&h.owner==='player'){
+    const groups=getMarketGroups();
+    const myGroup=groups.find(g=>g.includes(key))||[key];
+    const perMkt=CFG.marketBase+(myGroup.length-1)*CFG.marketGroupBonus;
+    info+=`<span style="color:#90b850;font-size:10px;">💰 co 10s: +${perMkt.toFixed(2)} (grupa: ${myGroup.length})</span><br>`;
+  }
+  if(h.building==='townhall'&&h.owner==='player'){
+    info+=`<span style="color:#90b850;font-size:10px;">co 15s: +${CFG.townhallGold}💰 +${CFG.townhallWood}🪵 +${CFG.townhallStone}🪨</span><br>`;
+  }
   ibox.innerHTML=info;
   abox.innerHTML='';
 
