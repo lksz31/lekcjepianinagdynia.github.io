@@ -14,7 +14,6 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 #loading-screen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8vh;background:#000;transition:opacity 0.8s ease;overflow:hidden;}
 #loading-screen.fade-out{opacity:0;pointer-events:none;}
 #loading-bg{position:absolute;inset:0;overflow:hidden;}
-
 #loading-content{position:relative;width:min(520px,88vw);display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 20px;background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(4px);}
 #loading-title{font-family:'Cinzel',serif;font-size:clamp(1.1rem,4vw,1.9rem);font-weight:900;color:#d4af37;letter-spacing:.22em;text-shadow:0 0 40px rgba(212,175,55,.9),0 2px 12px rgba(0,0,0,1);text-align:center;}
 #loading-sub{font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;letter-spacing:.12em;text-align:center;}
@@ -39,6 +38,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 .start-btn.active{opacity:1;pointer-events:all;}
 .start-btn:hover{background:#d4af37;color:#050a05;}
 .ornament{position:relative;color:#3a4a2a;font-size:.9rem;letter-spacing:.4em;}
+
 #tut-ov{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0);align-items:center;justify-content:center;padding:16px;}
 #tut-ov.show{display:flex;}
 .tut-panel{background:rgba(4,10,4,0.88);border:2px solid #3a5a2a;border-radius:14px;padding:24px 28px;max-width:520px;width:100%;max-height:90dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;color:#c8b87a;font-family:'Cinzel',serif;backdrop-filter:blur(6px);}
@@ -54,24 +54,28 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 .tut-alpha .alpha-badge{display:inline-block;background:rgba(212,175,55,.15);border:1px solid #604a10;border-radius:3px;padding:1px 7px;font-size:.6rem;color:#a08030;letter-spacing:.1em;margin-bottom:6px;}
 .tut-start-btn{align-self:center;padding:10px 36px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;letter-spacing:.2em;cursor:pointer;border-radius:3px;transition:.2s;}
 .tut-start-btn:hover{background:#d4af37;color:#050a05;}
-#hdr{display:none;align-items:center;gap:10px;padding:0 12px;height:44px;background:rgba(0,0,0,0.85);border-bottom:1px solid #1a2a0a;flex-shrink:0;flex-wrap:nowrap;overflow:hidden;}
-#hdr-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+
+/* ══ HUD — większy ══ */
+#hdr{display:none;align-items:center;gap:10px;padding:0 14px;height:56px;background:rgba(0,0,0,0.92);border-bottom:2px solid #1a2a0a;flex-shrink:0;flex-wrap:nowrap;overflow:hidden;}
+#hdr-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
 #hdr-right{display:flex;align-items:center;gap:10px;flex:1;overflow:hidden;min-width:0;}
-.hud-sep{color:#222;flex-shrink:0;}
-.hud-mic-row{display:flex;align-items:center;gap:7px;}
-.hud-mdot{width:8px;height:8px;border-radius:50%;background:#222;flex-shrink:0;}
-.hud-mdot.on{background:#0f0;box-shadow:0 0 6px #0f0;}
+.hud-sep{color:#333;flex-shrink:0;font-size:16px;}
+.hud-mic-row{display:flex;align-items:center;gap:8px;}
+.hud-mdot{width:10px;height:10px;border-radius:50%;background:#222;flex-shrink:0;}
+.hud-mdot.on{background:#0f0;box-shadow:0 0 8px #0f0;}
 .hud-mdot.q{background:#225522;}
-#hud-note{color:#d4af37;font-size:13px;font-weight:bold;min-width:30px;}
-.vu{width:60px;height:4px;background:#111;border-radius:2px;overflow:hidden;flex-shrink:0;}
+#hud-note{color:#d4af37;font-size:15px;font-weight:bold;min-width:34px;}
+.vu{width:70px;height:5px;background:#111;border-radius:2px;overflow:hidden;flex-shrink:0;}
 .vuf{height:100%;width:0;background:linear-gradient(90deg,#2a6,#ff0,#f40);transition:width .05s;}
-.hud-label{font-size:9px;color:#4a5a3a;letter-spacing:1px;flex-shrink:0;}
-.hud-val{color:#88cc66;font-size:11px;min-width:20px;flex-shrink:0;}
-.hud-slider{-webkit-appearance:none;appearance:none;width:55px;height:4px;background:#1a2a0a;border-radius:2px;outline:none;cursor:pointer;flex-shrink:0;}
-.hud-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#88cc66;border-radius:50%;cursor:pointer;}
-#hud-menu-btn{background:none;border:1px solid #2a3a1a;color:#4a6a3a;font:11px 'Cinzel',serif;padding:4px 10px;border-radius:3px;cursor:pointer;letter-spacing:1px;transition:.15s;flex-shrink:0;}
+.hud-label{font-size:10px;color:#4a5a3a;letter-spacing:1px;flex-shrink:0;}
+.hud-val{color:#88cc66;font-size:12px;min-width:24px;flex-shrink:0;}
+.hud-slider{-webkit-appearance:none;appearance:none;width:60px;height:5px;background:#1a2a0a;border-radius:2px;outline:none;cursor:pointer;flex-shrink:0;}
+.hud-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#88cc66;border-radius:50%;cursor:pointer;}
+#hud-menu-btn{background:none;border:1px solid #2a3a1a;color:#4a6a3a;font:12px 'Cinzel',serif;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;transition:.15s;flex-shrink:0;}
 #hud-menu-btn:hover{border-color:#d4af37;color:#d4af37;}
+#hud-creatures{font-size:13px;color:#d4af37;letter-spacing:.08em;font-family:'Cinzel',serif;flex-shrink:0;}
 @media(max-width:600px){#hud-mic-extra{display:none!important;}}
+
 #ga{display:none;flex:1;overflow:hidden;flex-direction:column;min-height:0;}
 #game-row{flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0;}
 #canvas-wrap{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#080f08;background-size:cover;background-position:center;}
@@ -80,14 +84,16 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 #pl img{position:absolute;transform:translate(-50%,-75%);image-rendering:pixelated;filter:drop-shadow(0 2px 8px rgba(0,0,0,.9)) drop-shadow(0 0 12px rgba(255,200,50,.4));}
 @keyframes pg{0%,100%{filter:drop-shadow(0 2px 8px rgba(0,0,0,.9)) drop-shadow(0 0 8px rgba(255,200,50,.25));}50%{filter:drop-shadow(0 2px 8px rgba(0,0,0,.9)) drop-shadow(0 0 20px rgba(255,200,50,.8));}}
 #pl img{animation:pg 1.8s ease-in-out infinite;}
+
 #side-bar{width:0;overflow:hidden;background:rgba(0,0,0,.88);border-left:2px solid #2a1a0a;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;transition:width .3s,padding .3s;flex-shrink:0;}
-#side-bar.show{width:130px;padding:8px 5px;}
+#side-bar.show{width:140px;padding:8px 5px;}
 #side-bar h4{font-size:.55rem;color:#6a5a3a;letter-spacing:.08em;text-transform:uppercase;text-align:center;width:100%;border-bottom:1px solid #1a1a0a;padding-bottom:4px;}
 .ctrl-table{width:100%;border-collapse:collapse;}
 .ctrl-table th{font-size:.52rem;color:#6a5030;letter-spacing:.06em;padding:3px;border-bottom:1px solid #1a1a0a;text-align:left;}
 .ctrl-table td{font-size:.65rem;font-family:'Crimson Text',serif;color:#5a6a3a;padding:3px 3px;}
 .ctrl-table tr:nth-child(even) td{background:rgba(0,0,0,.2);}
 .ctrl-key{background:rgba(212,175,55,.1);border:1px solid #3a3a1a;border-radius:2px;padding:1px 5px;color:#a09850;font-family:'Cinzel',serif;font-size:.52rem;}
+
 #note-bar{flex-shrink:0;background:rgba(0,0,0,.72);border-top:1px solid #2a3a1a;padding:6px 8px 8px;display:none;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
 #note-bar.show{display:flex;}
 .note-tile{cursor:pointer;border:2px solid #3a4a2a;border-radius:8px;background:rgba(3,8,3,.65);padding:3px 3px 2px;transition:all .12s;user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:1px;}
@@ -95,48 +101,54 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 .note-tile.mic-only{cursor:default;opacity:0.6;}
 .note-tile.mic-only:hover{border-color:#3a4a2a;box-shadow:none;transform:none;}
 .note-tile.pressing,.note-tile:active{border-color:#d4af37;box-shadow:0 0 20px rgba(212,175,55,.6);transform:scale(.94);background:rgba(212,175,55,.1);}
-@media(min-width:600px) and (max-width:1024px){.note-tile{padding:5px 5px 4px;}}
+
 #wo{display:none;position:absolute;inset:0;background:rgba(0,0,0,.83);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50;backdrop-filter:blur(4px);}
 #wo.show{display:flex;}
 #wo h2{font-size:1.5rem;font-weight:900;color:#d4af37;text-shadow:0 0 28px rgba(212,175,55,.8);letter-spacing:.1em;text-align:center;}
 .wb{padding:8px 22px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;cursor:pointer;border-radius:2px;transition:.2s;}
 .wb:hover{background:#d4af37;color:#050a05;}
+
+/* ══ MENU — większy ══ */
 .ov{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:12px;}
 .ov.show{display:flex;}
 #menu-ov{flex-direction:column;gap:0;}
-.menu-wrap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(380px,95vw);max-height:92dvh;overflow-y:auto;}
-.menu-title{color:#d4af37;font-size:.9rem;letter-spacing:.25em;text-align:center;margin-bottom:14px;}
-.menu-list{display:flex;flex-direction:column;gap:7px;width:100%;}
-.menu-item{background:#0a150a;border:2px solid #2a3a1a;border-radius:8px;padding:12px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .18s;width:100%;}
+.menu-wrap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(440px,95vw);max-height:92dvh;overflow-y:auto;}
+.menu-title{color:#d4af37;font-size:1.05rem;letter-spacing:.25em;text-align:center;margin-bottom:16px;}
+.menu-list{display:flex;flex-direction:column;gap:8px;width:100%;}
+.menu-item{background:#0a150a;border:2px solid #2a3a1a;border-radius:10px;padding:15px 22px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;width:100%;}
 .menu-item:hover{border-color:#d4af37;box-shadow:0 0 14px rgba(212,175,55,.2);}
-.menu-item-icon{font-size:1.2rem;width:26px;text-align:center;flex-shrink:0;}
-.menu-item-label{font-size:.7rem;color:#c8b87a;letter-spacing:.1em;}
-.menu-back-btn{margin-top:10px;padding:6px 20px;background:transparent;border:1px solid #3a3a1a;color:#6a6a3a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:3px;transition:.2s;align-self:center;}
+.menu-item-icon{font-size:1.4rem;width:30px;text-align:center;flex-shrink:0;}
+.menu-item-label{font-size:.82rem;color:#c8b87a;letter-spacing:.1em;}
+.menu-back-btn{margin-top:12px;padding:8px 24px;background:transparent;border:1px solid #3a3a1a;color:#6a6a3a;font-family:'Cinzel',serif;font-size:.68rem;cursor:pointer;border-radius:3px;transition:.2s;align-self:center;}
 .menu-back-btn:hover{border-color:#d4af37;color:#d4af37;}
-.subpanel{width:min(480px,95vw);background:#09140a;border:2px solid #2a3a1a;border-radius:12px;padding:18px 22px;color:#c8b87a;max-height:88dvh;overflow-y:auto;}
-.subpanel h3{font-size:.85rem;color:#d4af37;letter-spacing:.18em;margin-bottom:12px;text-align:center;padding-bottom:7px;border-bottom:1px solid #1a2a0a;}
-.srow{margin-bottom:12px;}
-.srow>label{display:block;font-size:.6rem;color:#7a6a3a;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;}
+.subpanel{width:min(520px,95vw);background:#09140a;border:2px solid #2a3a1a;border-radius:12px;padding:20px 26px;color:#c8b87a;max-height:88dvh;overflow-y:auto;}
+.subpanel h3{font-size:.9rem;color:#d4af37;letter-spacing:.18em;margin-bottom:14px;text-align:center;padding-bottom:8px;border-bottom:1px solid #1a2a0a;}
+.srow{margin-bottom:14px;}
+.srow>label{display:block;font-size:.65rem;color:#7a6a3a;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
 .sval{color:#d4af37;font-weight:700;}
 .srow input[type=range]{width:100%;cursor:pointer;accent-color:#d4af37;margin-top:2px;}
-.srow input[type=checkbox]{accent-color:#d4af37;width:15px;height:15px;cursor:pointer;vertical-align:middle;margin-right:5px;}
-.sinfo{font-family:'Crimson Text',serif;font-size:.72rem;color:#4a5a3a;line-height:1.5;margin-top:3px;}
-.mgrp{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
-.mmode{padding:5px 11px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.58rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.srow input[type=checkbox]{accent-color:#d4af37;width:16px;height:16px;cursor:pointer;vertical-align:middle;margin-right:6px;}
+.sinfo{font-family:'Crimson Text',serif;font-size:.75rem;color:#4a5a3a;line-height:1.5;margin-top:3px;}
+.mgrp{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
+.mmode{padding:6px 13px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:4px;transition:.2s;}
 .mmode:hover,.mmode.on{border-color:#d4af37;color:#d4af37;}
 .mmode.on{background:rgba(212,175,55,.1);}
-.hz-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-top:5px;}
+.hz-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-top:6px;}
 .hz-row{font-family:'Crimson Text',serif;font-size:.68rem;color:#5a6a3a;}
 .hz-row b{color:#8a8040;}
-.subclose{display:block;margin:12px auto 0;padding:6px 20px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.65rem;cursor:pointer;border-radius:3px;transition:.2s;letter-spacing:.1em;}
+.subclose{display:block;margin:14px auto 0;padding:7px 22px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.68rem;cursor:pointer;border-radius:3px;transition:.2s;letter-spacing:.1em;}
 .subclose:hover{background:#d4af37;color:#050a05;}
 .exit-logo{display:flex;flex-direction:column;align-items:center;gap:5px;}
 .exit-logo-text{font-size:.65rem;color:#5a6a3a;letter-spacing:.12em;}
-.size-shape-row{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
-.size-shape-btn{padding:5px 14px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.58rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.size-shape-row{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;}
+.size-shape-btn{padding:6px 16px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:4px;transition:.2s;}
 .size-shape-btn:hover,.size-shape-btn.on{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.1);}
 .size-sub-row{margin-top:8px;}
-.size-sub-row>label{display:block;font-size:.58rem;color:#7a6a3a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+.size-sub-row>label{display:block;font-size:.6rem;color:#7a6a3a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
+
+/* Zakres nut — specjalny styl */
+.range-info{font-family:'Crimson Text',serif;font-size:.72rem;color:#6a5a3a;line-height:1.5;margin-top:6px;background:rgba(0,0,0,.3);border:1px solid #2a2a1a;border-radius:6px;padding:8px 10px;}
+.range-info b{color:#a09050;}
 </style>
 </head>
 <body>
@@ -147,9 +159,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   <div id="loading-content">
     <div id="loading-title">Muzyczny Labirynt</div>
     <div id="loading-sub">Wczytywanie świata…</div>
-    <div id="loading-bar-wrap">
-      <div id="loading-bar"></div>
-    </div>
+    <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
     <div id="loading-count">0 / 0</div>
     <div id="loading-tip">Znajdź wyjście śpiewając właściwą nutę…</div>
   </div>
@@ -207,7 +217,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 <div id="hdr">
   <div id="hdr-left">
     <button id="hud-menu-btn" onclick="openMenu()">☰ Menu</button>
-    <span id="hud-creatures" style="font-size:11px;color:#d4af37;letter-spacing:.08em;font-family:'Cinzel',serif;flex-shrink:0;">🐾 0/0</span>
+    <span id="hud-creatures">🐾 0/0</span>
     <div class="hud-sep">|</div>
     <div class="hud-mic-row">
       <div class="hud-mdot" id="mdot"></div>
@@ -279,7 +289,18 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
           <label>Klucz nutowy</label>
           <div class="mgrp">
             <button class="mmode on" id="clefG" onclick="setClef('G')">𝄞 Wiolinowy</button>
-            <button class="mmode" id="clefGB" onclick="setClef('GB')">𝄞+𝄢 Basowy</button>
+            <button class="mmode" id="clefB" onclick="setClef('B')">𝄢 Basowy</button>
+            <button class="mmode" id="clefGB" onclick="setClef('GB')">𝄞+𝄢 Oba</button>
+          </div>
+        </div>
+        <div class="srow">
+          <label>Zakres nut</label>
+          <div class="mgrp">
+            <button class="mmode on" id="rangeSmall" onclick="setNoteRange('small')">Mała → Razkreślna</button>
+            <button class="mmode" id="rangeBig" onclick="setNoteRange('big')">Wielka → Dwukreślna</button>
+          </div>
+          <div class="range-info" id="range-info-box">
+            Aktualny zakres: <b id="range-info-text">c¹ — h¹</b>
           </div>
         </div>
         <div class="srow">
@@ -360,9 +381,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 
 /* ══ BASE URL ══ */
 const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano_maze/';
-// URL dla obrazków wyświetlanych w HTML (ta sama domena co strona = brak CORS)
 const SITE_BASE = '/index/gry/piano_maze/';
-// Tło podczas tutorialu i gry
 const BG_GAME_SRC = SITE_BASE + 'loading_screen/loading screen maze.png';
 
 /* ══ TILE SOURCES ══ */
@@ -418,7 +437,7 @@ const IMGS = {
   'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
   'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
   'bgs': [
-    SITE_BASE + 'loading_screen/tło maze i tutorial maze.png',
+    SITE_BASE + 'loading_screen/t\u0142o maze i tutorial maze.png',
     SITE_BASE + 'loading_screen/loading screen maze.png',
   ],
 };
@@ -444,14 +463,12 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + 'loading_screen/tło Music maze okładka.png';
-  // Załaduj obrazek przez Image() — gdy gotowy, ustaw tło i pokaż natychmiast
+  const bgSrc = BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png';
   const bgImgEl = document.createElement('img');
   bgImgEl.crossOrigin = 'anonymous';
   bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.6s;';
   bgImgEl.onload = () => { bgImgEl.style.opacity = '1'; };
   bgImgEl.onerror = () => {
-    // fallback: spróbuj bez crossOrigin
     const bgFallback = document.createElement('img');
     bgFallback.style.cssText = bgImgEl.style.cssText;
     bgFallback.onload = () => { bgFallback.style.opacity = '1'; };
@@ -498,7 +515,6 @@ const CREATURE_IMGS = {
     document.getElementById('loading-count').textContent = loaded + ' / ' + total;
     if (loaded >= total) finish();
   }
-
   function finish() {
     clearInterval(tipInterval);
     document.getElementById('loading-sub').textContent = 'Gotowe!';
@@ -507,18 +523,15 @@ const CREATURE_IMGS = {
       ls.classList.add('fade-out');
       setTimeout(() => {
         if(ls.parentNode) ls.parentNode.removeChild(ls);
-        // Pokaż ekran wyboru postaci dopiero po zniknięciu loading screena
         document.getElementById('char-screen').style.display = 'flex';
       }, 850);
     }, 500);
   }
-
   allUrls.forEach(url => {
     const img = new Image();
     img.onload = img.onerror = onLoad;
     img.src = url;
   });
-
   if (total === 0) finish();
 })();
 
@@ -534,7 +547,6 @@ const CHARS = [
   document.getElementById('char-img-'+i).src=src;
   document.getElementById('mchar-img-'+i).src=src;
 });
-// Concept art jako <img> zamiast background-image (omija CORS)
 const rBg=(IMGS.bgs||[])[Math.floor(Math.random()*(IMGS.bgs||['']).length)]||'';
 if(rBg){
   const charBgEl = document.getElementById('char-bg');
@@ -556,8 +568,7 @@ const TILES_BY_PATH = {
   'WALL':['filler_1','filler_2','filler_3','filler_4','filler_5'],'EXIT':['exit_1'],
 };
 function openKey(s){return[...s].sort().join('');}
-function pickTileName(openSet,isGoal){
-  // Cel dostaje normalny kafelek drogi — drzwi będą narysowane jako token na wierzchu
+function pickTileName(openSet){
   const k=openKey(openSet);
   if(TILES_BY_PATH[k]){const a=TILES_BY_PATH[k];return a[Math.floor(Math.random()*a.length)];}
   return TILES_BY_PATH['WALL'][Math.floor(Math.random()*5)];
@@ -572,30 +583,210 @@ function preloadAll(cb){
   });
 }
 
-/* ══ NOTES ══ */
-const NOTE_COLOR_DEFAULT='#c8b87a';
-const NOTES_G=[
-  {id:'c1',freq:261.63,dir:'N',name:'c\u00b9',colorFull:'#e8c040',staffY:10,clef:'G'},
-  {id:'d1',freq:293.66,dir:'N',name:'d\u00b9',colorFull:'#e8c040',staffY:9,clef:'G'},
-  {id:'e1',freq:329.63,dir:'E',name:'e\u00b9',colorFull:'#f06868',staffY:8,clef:'G'},
-  {id:'f1',freq:349.23,dir:'E',name:'f\u00b9',colorFull:'#f06868',staffY:7,clef:'G'},
-  {id:'g1',freq:392.00,dir:'S',name:'g\u00b9',colorFull:'#50a8f0',staffY:6,clef:'G'},
-  {id:'a1',freq:440.00,dir:'S',name:'a\u00b9',colorFull:'#50a8f0',staffY:5,clef:'G'},
-  {id:'h1',freq:493.88,dir:'W',name:'h\u00b9',colorFull:'#60d870',staffY:4,clef:'G'},
+/* ══════════════════════════════════════════════════
+   NOTY — pełen zakres z pozycjami na pięciolinii
+   staffY_G: pozycja w kluczu wiolinowym (10=c¹ na dodanej dolnej)
+   staffY_B: pozycja w kluczu basowym (7=c na linii dolnej)
+   Kolory — jeden zestaw 4 kolorów (kierunek = kolor)
+   ══════════════════════════════════════════════════ */
+const DIR_COLORS = { N:'#e8c040', E:'#f06868', S:'#50a8f0', W:'#60d870' };
+const NOTE_COLOR_DEFAULT = '#c8b87a';
+
+// Definicje WSZYSTKICH nut w pełnym zakresie
+// Nuty wielkie: C D E F G A H (65–123 Hz)
+// Nuty małe: c d e f g a h (130–246 Hz)
+// Nuty razkreślne: c1 d1 e1 f1 g1 a1 h1 (261–493 Hz)
+// Nuty dwukreślne: c2 d2 e2 f2 g2 a2 h2 (523–987 Hz)
+
+// staffY_G: im wyżej na pięciolinii wiolinowej, tym niższy (0 = górna przerwa nad V linią)
+// staffY_B: pozycja na basowej
+
+const ALL_NOTE_DEFS = [
+  // Wielkie (klucz basowy, poniżej c)
+  {id:'C',  freq:65.41,  name:'C',  clef:'B', staffY_G:null, staffY_B:14},
+  {id:'D',  freq:73.42,  name:'D',  clef:'B', staffY_G:null, staffY_B:13},
+  {id:'E',  freq:82.41,  name:'E',  clef:'B', staffY_G:null, staffY_B:12},
+  {id:'F',  freq:87.31,  name:'F',  clef:'B', staffY_G:null, staffY_B:11},
+  {id:'G',  freq:98.00,  name:'G',  clef:'B', staffY_G:null, staffY_B:10},
+  {id:'A',  freq:110.00, name:'A',  clef:'B', staffY_G:null, staffY_B:9},
+  {id:'H',  freq:123.47, name:'H',  clef:'B', staffY_G:null, staffY_B:8},
+  // Małe (klucz basowy)
+  {id:'c',  freq:130.81, name:'c',  clef:'B', staffY_G:null, staffY_B:7},
+  {id:'d',  freq:146.83, name:'d',  clef:'B', staffY_G:null, staffY_B:6},
+  {id:'e',  freq:164.81, name:'e',  clef:'B', staffY_G:null, staffY_B:5},
+  {id:'f',  freq:174.61, name:'f',  clef:'B', staffY_G:null, staffY_B:4},
+  {id:'g',  freq:196.00, name:'g',  clef:'B', staffY_G:null, staffY_B:3},
+  {id:'a',  freq:220.00, name:'a',  clef:'B', staffY_G:null, staffY_B:2},
+  {id:'h',  freq:246.94, name:'h',  clef:'B', staffY_G:null, staffY_B:1},
+  // c1 — przełomowe: basowy staffY_B=0, wiolinowy staffY_G=10
+  {id:'c1', freq:261.63, name:'c\u00b9', clef:'G', staffY_G:10, staffY_B:0},
+  {id:'d1', freq:293.66, name:'d\u00b9', clef:'G', staffY_G:9,  staffY_B:-1},
+  {id:'e1', freq:329.63, name:'e\u00b9', clef:'G', staffY_G:8,  staffY_B:-2},
+  {id:'f1', freq:349.23, name:'f\u00b9', clef:'G', staffY_G:7,  staffY_B:-3},
+  {id:'g1', freq:392.00, name:'g\u00b9', clef:'G', staffY_G:6,  staffY_B:-4},
+  {id:'a1', freq:440.00, name:'a\u00b9', clef:'G', staffY_G:5,  staffY_B:-5},
+  {id:'h1', freq:493.88, name:'h\u00b9', clef:'G', staffY_G:4,  staffY_B:-6},
+  // Dwukreślne (klucz wiolinowy)
+  {id:'c2', freq:523.25, name:'c\u00b2', clef:'G', staffY_G:3,  staffY_B:-7},
+  {id:'d2', freq:587.33, name:'d\u00b2', clef:'G', staffY_G:2,  staffY_B:-8},
+  {id:'e2', freq:659.25, name:'e\u00b2', clef:'G', staffY_G:1,  staffY_B:-9},
+  {id:'f2', freq:698.46, name:'f\u00b2', clef:'G', staffY_G:0,  staffY_B:-10},
+  {id:'g2', freq:784.00, name:'g\u00b2', clef:'G', staffY_G:-1, staffY_B:-11},
+  {id:'a2', freq:880.00, name:'a\u00b2', clef:'G', staffY_G:-2, staffY_B:-12},
+  {id:'h2', freq:987.77, name:'h\u00b2', clef:'G', staffY_G:-3, staffY_B:-13},
 ];
-const NOTES_B=[
-  {id:'c',freq:130.81,dir:'N',name:'c',colorFull:'#e8c040',staffY:7,clef:'B'},
-  {id:'d',freq:146.83,dir:'N',name:'d',colorFull:'#e8c040',staffY:5,clef:'B'},
-  {id:'e',freq:164.81,dir:'E',name:'e',colorFull:'#f06868',staffY:4,clef:'B'},
-  {id:'f',freq:174.61,dir:'E',name:'f',colorFull:'#f06868',staffY:2,clef:'B'},
-  {id:'g',freq:196.00,dir:'S',name:'g',colorFull:'#50a8f0',staffY:1,clef:'B'},
-  {id:'a',freq:220.00,dir:'S',name:'a',colorFull:'#50a8f0',staffY:0,clef:'B'},
-  {id:'h',freq:246.94,dir:'W',name:'h',colorFull:'#60d870',staffY:-1,clef:'B'},
-];
+
+// Grupy zakresów (ID nut wg kombinacji klucz+zakres)
+const NOTE_RANGE_MAP = {
+  'G_small':  ['c1','d1','e1','f1','g1','a1','h1'],
+  'G_big':    ['c1','d1','e1','f1','g1','a1','h1','c2','d2','e2','f2','g2','a2','h2'],
+  'B_small':  ['c','d','e','f','g','a','h','c1'],
+  'B_big':    ['C','D','E','F','G','A','H','c','d','e','f','g','a','h','c1'],
+  'GB_small': ['c','d','e','f','g','a','h','c1','d1','e1','f1','g1','a1','h1'],
+  'GB_big':   ['C','D','E','F','G','A','H','c','d','e','f','g','a','h','c1','d1','e1','f1','g1','a1','h1','c2','d2','e2','f2','g2','a2','h2'],
+};
+
+// Opis zakresu do wyświetlenia
+const NOTE_RANGE_LABELS = {
+  'G_small':  'c\u00b9 \u2014 h\u00b9',
+  'G_big':    'c\u00b9 \u2014 h\u00b2',
+  'B_small':  'c \u2014 c\u00b9',
+  'B_big':    'C \u2014 c\u00b9',
+  'GB_small': 'c \u2014 h\u00b9',
+  'GB_big':   'C \u2014 h\u00b2',
+};
+
 const ARR={N:'\u2191',S:'\u2193',W:'\u2190',E:'\u2192'};
-let MN=NOTES_G.slice();
 let coloredNotes=false;
-function noteColor(n){return coloredNotes?n.colorFull:NOTE_COLOR_DEFAULT;}
+function noteColor(n,dir){return coloredNotes?DIR_COLORS[dir]||NOTE_COLOR_DEFAULT:NOTE_COLOR_DEFAULT;}
+
+/* ══ STAN NUT AKTYWNYCH ══ */
+// MN = aktywne nuty, każda z {id, freq, name, dir, clef, staffY (wg klucza wyświetlanego)}
+let MN = [];
+let clefMode = 'G';
+let noteRange = 'small'; // 'small' lub 'big'
+
+function getRangeKey() {
+  return clefMode + '_' + noteRange;
+}
+
+// Stały kierunek wg nazwy nuty (niezależnie od oktawy):
+// C, D → N (góra)   E, F → E (prawo)   G, A → S (dół)   H → W (lewo)
+const DIR_BY_NOTE_BASE = {
+  'C':'N','D':'N',
+  'E':'E','F':'E',
+  'G':'S','A':'S',
+  'H':'W',
+};
+
+function getNoteBase(id) {
+  // 'c1' -> 'C', 'h2' -> 'H', 'C' -> 'C'
+  return id.replace(/[0-9]/g, '').toUpperCase();
+}
+
+function resolveDisplayProps(n) {
+  let displayClef = n.clef;
+  let staffY = n.clef === 'G' ? n.staffY_G : n.staffY_B;
+  if (clefMode === 'B' && n.clef === 'G') { staffY = n.staffY_B; displayClef = 'B'; }
+  if (clefMode === 'G' && n.clef === 'B') { staffY = n.staffY_G !== null ? n.staffY_G : (n.staffY_B + 10); displayClef = 'G'; }
+  return { displayClef, staffY };
+}
+
+// Buduje MN: dla każdego kierunku losuje JEDNĄ nutę z aktywnego zakresu
+// przypisaną temu kierunkowi przez nazwę (C/D→N, E/F→E, G/A→S, H→W)
+function buildActiveNotes() {
+  const key = getRangeKey();
+  const ids = NOTE_RANGE_MAP[key] || NOTE_RANGE_MAP['G_small'];
+  const pool = ids.map(id => ALL_NOTE_DEFS.find(n => n.id === id)).filter(Boolean);
+  if (!pool.length) return;
+
+  // Podziel pulę na grupy wg kierunku
+  const groups = { N:[], E:[], S:[], W:[] };
+  pool.forEach(n => {
+    const dir = DIR_BY_NOTE_BASE[getNoteBase(n.id)];
+    if (dir) groups[dir].push(n);
+  });
+
+  // Dla każdego kierunku losuj jedną nutę z jego grupy
+  MN = ['N','E','S','W'].map(dir => {
+    const g = groups[dir];
+    if (!g || !g.length) return null;
+    const n = g[Math.floor(Math.random() * g.length)];
+    const { displayClef, staffY } = resolveDisplayProps(n);
+    return { ...n, dir, displayClef, staffY };
+  }).filter(Boolean);
+
+  updateRangeInfoBox();
+}
+
+function updateRangeInfoBox() {
+  const key = getRangeKey();
+  const el = document.getElementById('range-info-text');
+  if (el) el.textContent = NOTE_RANGE_LABELS[key] || '';
+}
+
+/* ══ NOTE SVG — obsługuje duży zakres ══ */
+function noteSVG(n, W, H, showLabel) {
+  W = W||80; H = H||92;
+  const dir = n.dir;
+  const c = noteColor(n, dir);
+  const isB = n.displayClef === 'B';
+  const sg = 9, staffTop = 18;
+  const noteX = W * 0.65;
+  const staffY = n.staffY;
+  // Przelicz staffY na piksele: staffY=0 to linia 1 od góry (każde 0.5 = pół sg)
+  const noteY = staffTop + (staffY * sg / 2);
+
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  s += `<rect width="${W}" height="${H}" rx="7" fill="rgba(2,6,2,0.75)" stroke="${c}" stroke-width="1.5"/>`;
+  // 5 linii pięciolinii
+  for (let i = 0; i < 5; i++) {
+    const ly = staffTop + i * sg;
+    s += `<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="0.9" opacity="0.6"/>`;
+  }
+  // Klucz
+  if (isB) {
+    s += `<text x="4" y="${staffTop+sg*2.5}" font-size="26" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">&#119074;</text>`;
+  } else {
+    s += `<text x="3" y="${staffTop+sg*4+2}" font-size="48" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;
+  }
+
+  // Linie pomocnicze — nad i pod pięciolinią
+  // Nad linią 5 (staffY >= 10): co 2 stopnie dodajemy linię
+  const topLine = staffTop;
+  const botLine = staffTop + 4 * sg;
+  // Linie DOLNE (noteY > botLine+sg/2)
+  if (noteY > botLine + sg * 0.5) {
+    let ledY = botLine + sg;
+    while (ledY <= noteY + sg * 0.3) {
+      s += `<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;
+      ledY += sg;
+    }
+  }
+  // Linie GÓRNE (noteY < topLine - sg/2)
+  if (noteY < topLine - sg * 0.5) {
+    let ledY = topLine - sg;
+    while (ledY >= noteY - sg * 0.3) {
+      s += `<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;
+      ledY -= sg;
+    }
+  }
+
+  // Główka nuty
+  s += `<ellipse cx="${noteX}" cy="${noteY}" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-15,${noteX},${noteY})"/>`;
+  // Laska
+  const stemUp = noteY > staffTop + sg * 2;
+  const sx = stemUp ? noteX + 6 : noteX - 6;
+  const sy2 = noteY + (stemUp ? -26 : 26);
+  s += `<line x1="${sx}" y1="${noteY}" x2="${sx}" y2="${sy2}" stroke="${c}" stroke-width="1.5"/>`;
+
+  // Etykieta
+  if (showLabel) {
+    s += `<text x="${W/2}" y="${H-4}" font-size="9" fill="${c}" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${n.name} ${ARR[dir]}</text>`;
+  }
+  s += '</svg>';
+  return s;
+}
 
 /* ══ BOARD SIZE STATE ══ */
 let boardShape='square';
@@ -630,7 +821,7 @@ function applyBoardSize(){
 }
 
 /* ══ STATE ══ */
-let controlMode='tiles',micGain=3.5,noteMargin=8,clefMode='G',transpose=0;
+let controlMode='tiles',micGain=3.5,noteMargin=8,transpose=0;
 let fogEnabled=true,showExitHint=false,hintsEnabled=false,noteLabels=false;
 let mAC=null,mAn=null,mGainNode=null,mReady=false,fH=[],dCD=0;
 const buf=new Float32Array(4096);
@@ -641,9 +832,8 @@ let cellTiles2={};
 let fogState=[],fogAlpha=[],fogTimers={};
 let tileOrder=['N','E','S','W'];
 let fogBlurPhase=0;
-let hintIdx={N:0,S:0,E:0,W:0};
 
-/* ══ FOG IMAGE — z GitHuba ══ */
+/* ══ FOG IMAGE ══ */
 const FOGIMG=new Image();
 FOGIMG.src = SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png';
 const DRZWIIMG=new Image();
@@ -699,13 +889,24 @@ function setMode(m){
   if(mic&&!mReady)startMic();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
 }
+
 function setClef(c){
   clefMode=c;
   document.getElementById('clefG').classList.toggle('on',c==='G');
+  document.getElementById('clefB').classList.toggle('on',c==='B');
   document.getElementById('clefGB').classList.toggle('on',c==='GB');
-  MN=c==='G'?NOTES_G.slice():[...NOTES_G,...NOTES_B];
+  buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
 }
+
+function setNoteRange(r){
+  noteRange=r;
+  document.getElementById('rangeSmall').classList.toggle('on',r==='small');
+  document.getElementById('rangeBig').classList.toggle('on',r==='big');
+  buildActiveNotes();
+  buildNoteTiles();refreshHzGrid();refreshSideBar();
+}
+
 function applyGain(v){
   micGain=parseFloat(v);
   const label=parseFloat(v).toFixed(1)+'\u00d7';
@@ -715,7 +916,7 @@ function applyGain(v){
 }
 function applyMargin(v){
   noteMargin=parseInt(v);
-  ['\u00b1marginV','marginValHUD'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='\u00b1'+noteMargin;});
+  ['marginV','marginValHUD'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='\u00b1'+noteMargin;});
   ['marginSlider','marginSliderHUD'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=v;});
   refreshHzGrid();
 }
@@ -735,42 +936,25 @@ function toggleHints(on){
   refreshSideBar();
 }
 function toggleNoteLabels(on){noteLabels=on;buildNoteTiles();}
+
 function refreshHzGrid(){
   const g=document.getElementById('hz-grid');if(!g)return;
-  const activeNotes=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
-  const notesToShow=activeNotes.length?activeNotes:MN;
-  g.innerHTML=notesToShow.map(n=>{
+  g.innerHTML=MN.map(n=>{
     const tf=transposedFreq(n.freq);
     return '<div class="hz-row"><b>'+n.name+' '+ARR[n.dir]+'</b> '+(tf-noteMargin).toFixed(1)+'\u2013'+(tf+noteMargin).toFixed(1)+' Hz</div>';
   }).join('');
 }
 
-/* ══ NOTE SVG ══ */
-function noteSVG(n,W,H,showLabel){
-  W=W||80;H=H||92;
-  const c=noteColor(n);
-  const isB=n.clef==='B';
-  const sg=9,staffTop=18,noteX=W*0.65;
-  const noteY=staffTop+(n.staffY*sg/2);
-  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-  s+=`<rect width="${W}" height="${H}" rx="7" fill="rgba(2,6,2,0.75)" stroke="${c}" stroke-width="1.5"/>`;
-  for(let i=0;i<5;i++){const ly=staffTop+i*sg;s+=`<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="0.9" opacity="0.6"/>`;}
-  if(isB){s+=`<text x="5" y="${staffTop+sg*2.5}" font-size="28" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">\uD834\uDD22</text>`;}
-  else{s+=`<text x="4" y="${staffTop+sg*4+2}" font-size="52" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">\uD834\uDD1E</text>`;}
-  if(!isB&&n.staffY>=10){const ledY=staffTop+5*sg;s+=`<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;}
-  if(isB&&n.staffY<0){const ledY=staffTop+n.staffY*sg/2;s+=`<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;}
-  s+=`<ellipse cx="${noteX}" cy="${noteY}" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-15,${noteX},${noteY})"/>`;
-  const stemUp=noteY>staffTop+sg*2;const sx=stemUp?noteX+6:noteX-6;const sy2=noteY+(stemUp?-26:26);
-  s+=`<line x1="${sx}" y1="${noteY}" x2="${sx}" y2="${sy2}" stroke="${c}" stroke-width="1.5"/>`;
-  if(showLabel){s+=`<text x="${W/2}" y="${H-4}" font-size="9" fill="${c}" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${n.name} ${ARR[n.dir]}</text>`;}
-  s+='</svg>';return s;
-}
-
 /* ══ NOTE TILES ══ */
 function shuffleTileOrder(){for(let i=tileOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tileOrder[i],tileOrder[j]]=[tileOrder[j],tileOrder[i]];}}
 function notesForDir(dir){return MN.filter(n=>n.dir===dir);}
-function currentHintNote(dir){const a=notesForDir(dir);return a.length?a[hintIdx[dir]%a.length]:null;}
-function advanceHint(dir){const a=notesForDir(dir);if(a.length)hintIdx[dir]=(hintIdx[dir]+1)%a.length;}
+
+// Po każdym ruchu przetasuj nuty (nowy losowy zestaw 4 nut z zakresu)
+function reshuffleNotes(){
+  buildActiveNotes();
+  buildNoteTiles();
+  refreshSideBar();
+}
 
 function buildNoteTiles(){
   const bar=document.getElementById('note-bar');
@@ -781,7 +965,7 @@ function buildNoteTiles(){
   const tileW=Math.min(80,Math.floor((barW-80)/4));
   const tileH=noteLabels?Math.min(100,tileW+12):Math.min(92,tileW+8);
   tileOrder.forEach(dir=>{
-    const n=currentHintNote(dir);if(!n)return;
+    const n=MN.find(x=>x.dir===dir);if(!n)return;
     const t=document.createElement('div');
     t.className='note-tile';t.dataset.dir=dir;
     t.innerHTML=noteSVG(n,tileW,tileH,noteLabels);
@@ -794,13 +978,14 @@ function buildNoteTiles(){
   });
   bar.className='note-bar show';
 }
+
 function startPress(dir,tile){
   if(won||!mazeData)return;
   if(controlMode==='mic')return;
   stopPress();activeTile=tile;tile.classList.add('pressing');
-  advanceHint(dir);shuffleTileOrder();buildNoteTiles();refreshSideBar();
   move(dir);
-  pressTimer=setInterval(()=>{if(!won&&mazeData)move(dir);else stopPress();},200);
+  reshuffleNotes();
+  pressTimer=setInterval(()=>{if(!won&&mazeData){move(dir);reshuffleNotes();}else stopPress();},200);
 }
 function stopPress(){clearInterval(pressTimer);pressTimer=null;if(activeTile){activeTile.classList.remove('pressing');activeTile=null;}}
 
@@ -814,18 +999,10 @@ function buildCtrlTable(container){
     <tr><td><span class="ctrl-key">\u2190/A</span></td><td>Lewo</td></tr>
     <tr><td><span class="ctrl-key">\u2192/D</span></td><td>Prawo</td></tr>
   </tbody></table></div>`;
-  if(clefMode==='G'||clefMode==='GB'){
-    h+='<div style="margin-bottom:4px;"><h5 style="font-size:.5rem;color:#7a6a3a;letter-spacing:.06em;margin-bottom:3px;">Wiolinowe</h5>';
-    h+=`<table class="ctrl-table"><thead><tr><th>Nuta</th><th>Kier.</th></tr></thead><tbody>`;
-    NOTES_G.forEach(n=>{const c=noteColor(n);h+=`<tr><td style="color:${c}">${n.name}</td><td>${ARR[n.dir]}</td></tr>`;});
-    h+='</tbody></table></div>';
-  }
-  if(clefMode==='GB'){
-    h+='<div><h5 style="font-size:.5rem;color:#7a6a3a;letter-spacing:.06em;margin-bottom:3px;">Basowe</h5>';
-    h+=`<table class="ctrl-table"><thead><tr><th>Nuta</th><th>Kier.</th></tr></thead><tbody>`;
-    NOTES_B.forEach(n=>{const c=noteColor(n);h+=`<tr><td style="color:${c}">${n.name}</td><td>${ARR[n.dir]}</td></tr>`;});
-    h+='</tbody></table></div>';
-  }
+  h+='<div><h5 style="font-size:.5rem;color:#7a6a3a;letter-spacing:.06em;margin-bottom:3px;">Nuty</h5>';
+  h+=`<table class="ctrl-table"><thead><tr><th>Nuta</th><th>Kier.</th></tr></thead><tbody>`;
+  MN.forEach(n=>{const col=coloredNotes?DIR_COLORS[n.dir]:NOTE_COLOR_DEFAULT;h+=`<tr><td style="color:${col}">${n.name}</td><td>${ARR[n.dir]}</td></tr>`;});
+  h+='</tbody></table></div>';
   container.innerHTML=h;
 }
 function refreshSideBar(){const sb=document.getElementById('side-content');if(!sb)return;buildCtrlTable(sb);}
@@ -834,20 +1011,11 @@ function refreshSideBar(){const sb=document.getElementById('side-content');if(!s
 function generateMaze(){
   const conn=Array.from({length:ROWS},()=>Array.from({length:COLS},()=>new Set()));
   const DIRS=[['N',-1,0,'S'],['S',1,0,'N'],['E',0,1,'W'],['W',0,-1,'E']];
-
-  // KROK 1: Zaznacz ~70% kafli jako "droga", reszta będzie filler
   const sc=1+Math.floor(Math.random()*(COLS-2));
   const isRoad=Array.from({length:ROWS},()=>Array(COLS).fill(false));
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      isRoad[r][c]=Math.random()<0.70;
-    }
-  }
-  // Start, kolumna startowa i obszar wokół startu — zawsze droga
-  for(let r=0;r<ROWS;r++) isRoad[r][sc]=true;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)isRoad[r][c]=Math.random()<0.70;
+  for(let r=0;r<ROWS;r++)isRoad[r][sc]=true;
   isRoad[0][sc]=true;
-
-  // KROK 2: DFS wyłącznie po polach isRoad
   const vis=Array.from({length:ROWS},()=>Array(COLS).fill(false));
   function dfs(r,c,fromDir){
     vis[r][c]=true;
@@ -867,8 +1035,6 @@ function generateMaze(){
     }
   }
   dfs(0,sc,null);
-
-  // KROK 3: Cel = najdalej osiągalny kafelek
   let best=0,gr=ROWS-1,gc=sc;
   for(let r=Math.floor(ROWS/2);r<ROWS;r++){
     for(let c=0;c<COLS;c++){
@@ -919,29 +1085,23 @@ function fitCanvas(){
   const wrap=document.getElementById('canvas-wrap');
   const W=wrap.clientWidth||window.innerWidth||600;
   const H=wrap.clientHeight||window.innerHeight||400;
-  // TILE dopasowany żeby cała plansza wypełniła obszar
   TILE=Math.max(16,Math.floor(Math.min(W/COLS,H/ROWS)));
   canvas.width=TILE*COLS;
   canvas.height=TILE*ROWS;
-  // Wyśrodkuj canvas w wrapperze przez margin
   canvas.style.margin='auto';
 }
-// Prawdopodobieństwo pojawienia się kafelka filler w pustej komórce (0..1)
-const FILLER_CHANCE = 0.55;
 
-function assignCellTile(r,c,op,isGoal){
+function assignCellTile(r,c,op){
   const k=`${r},${c}`;
   if(!cellTiles2[k]){
     if(op.size===0){
-      // Puste miejsce bez drogi — ZAWSZE filler
       cellTiles2[k] = TILES_BY_PATH['WALL'][Math.floor(Math.random()*TILES_BY_PATH['WALL'].length)];
     } else {
-      cellTiles2[k] = pickTileName(op,false);
+      cellTiles2[k] = pickTileName(op);
     }
   }
   return cellTiles2[k];
 }
-
 
 function drawMaze(){
   if(!mazeData)return;
@@ -951,8 +1111,7 @@ function drawMaze(){
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
       const x=c*TILE,y=r*TILE,op=conn[r][c],isGoal=(r===goalR&&c===goalC);
-      // Kafelek drogi lub dekoracji — cel dostaje normalny kafelek drogi
-      const tileName=assignCellTile(r,c,op,false);
+      const tileName=assignCellTile(r,c,op);
       const im=IMG[tileName];
       if(im&&im.complete&&im.naturalWidth>0){
         ctx.drawImage(im,x,y,TILE,TILE);
@@ -962,7 +1121,6 @@ function drawMaze(){
         ctx.strokeStyle='#2a3a2a';
         ctx.strokeRect(x+.5,y+.5,TILE-1,TILE-1);
       }
-      // Token drzwi nałożony na kafelek celu
       if(isGoal){
         const fa=fogEnabled?fogAlpha[r][c]:0;
         if(fa<0.5&&DRZWIIMG.complete&&DRZWIIMG.naturalWidth>0){
@@ -979,14 +1137,11 @@ function drawMaze(){
   }
   if(fogEnabled){
     updateFog();
-    fogBlurPhase += 0.008; // szybszy oddech
-    // Głębokość gradientu — oddycha mocniej: ±12% TILE
+    fogBlurPhase += 0.008;
     const R = TILE * (0.333 + 0.12 * Math.sin(fogBlurPhase));
-
     const fogOff = document.createElement('canvas');
     fogOff.width = canvas.width; fogOff.height = canvas.height;
     const fc = fogOff.getContext('2d');
-
     if(FOGIMG.complete && FOGIMG.naturalWidth > 0){
       const fw=FOGIMG.naturalWidth, fh=FOGIMG.naturalHeight;
       const scale=Math.max(canvas.width/fw, canvas.height/fh);
@@ -996,82 +1151,46 @@ function drawMaze(){
       fc.fillStyle='rgba(160,175,190,1)';
       fc.fillRect(0,0,canvas.width,canvas.height);
     }
-
     fc.globalCompositeOperation = 'destination-out';
-
     for(let r = 0; r < ROWS; r++){
       for(let c2 = 0; c2 < COLS; c2++){
         const fogA = fogAlpha[r][c2];
         const x0 = c2*TILE, y0 = r*TILE;
-
         if(fogA < 0.02){
           fc.globalAlpha = 1;
           fc.fillStyle = 'black';
           fc.fillRect(x0, y0, TILE, TILE);
           continue;
         }
-
-        // Pomocnicza funkcja: czy sąsiad jest odkryty
         function isOpen(dr, dc){
           const nr=r+dr, nc=c2+dc;
           if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return false;
           return fogAlpha[nr][nc] < 0.3;
         }
-
-        const oN = isOpen(-1, 0);
-        const oS = isOpen( 1, 0);
-        const oW = isOpen( 0,-1);
-        const oE = isOpen( 0, 1);
-
-        // ── Krawędzie proste (gradient liniowy na pełnej długości krawędzi) ──
-        if(oN){
-          const g = fc.createLinearGradient(0, y0, 0, y0+R);
-          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
-          fc.fillStyle=g; fc.fillRect(x0, y0, TILE, R);
-        }
-        if(oS){
-          const g = fc.createLinearGradient(0, y0+TILE, 0, y0+TILE-R);
-          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
-          fc.fillStyle=g; fc.fillRect(x0, y0+TILE-R, TILE, R);
-        }
-        if(oW){
-          const g = fc.createLinearGradient(x0, 0, x0+R, 0);
-          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
-          fc.fillStyle=g; fc.fillRect(x0, y0, R, TILE);
-        }
-        if(oE){
-          const g = fc.createLinearGradient(x0+TILE, 0, x0+TILE-R, 0);
-          g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
-          fc.fillStyle=g; fc.fillRect(x0+TILE-R, y0, R, TILE);
-        }
-
-        // ── Rogi po przekątnej: gradient radialny z narożnika ──
-        // Narożnik liczy się gdy oba sąsiedzi prostopadle LUB ukośnie są odkryci
-        const corners = [
-          { dr:-1,dc:-1, cx:x0,        cy:y0,       oA:oN||oW, oB:isOpen(-1,-1) },
-          { dr:-1,dc: 1, cx:x0+TILE,   cy:y0,       oA:oN||oE, oB:isOpen(-1, 1) },
-          { dr: 1,dc:-1, cx:x0,        cy:y0+TILE,  oA:oS||oW, oB:isOpen( 1,-1) },
-          { dr: 1,dc: 1, cx:x0+TILE,   cy:y0+TILE,  oA:oS||oE, oB:isOpen( 1, 1) },
+        const oN=isOpen(-1,0),oS=isOpen(1,0),oW=isOpen(0,-1),oE=isOpen(0,1);
+        if(oN){const g=fc.createLinearGradient(0,y0,0,y0+R);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=g;fc.fillRect(x0,y0,TILE,R);}
+        if(oS){const g=fc.createLinearGradient(0,y0+TILE,0,y0+TILE-R);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=g;fc.fillRect(x0,y0+TILE-R,TILE,R);}
+        if(oW){const g=fc.createLinearGradient(x0,0,x0+R,0);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=g;fc.fillRect(x0,y0,R,TILE);}
+        if(oE){const g=fc.createLinearGradient(x0+TILE,0,x0+TILE-R,0);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');fc.fillStyle=g;fc.fillRect(x0+TILE-R,y0,R,TILE);}
+        const corners=[
+          {dr:-1,dc:-1,cx:x0,cy:y0,oA:oN||oW,oB:isOpen(-1,-1)},
+          {dr:-1,dc:1,cx:x0+TILE,cy:y0,oA:oN||oE,oB:isOpen(-1,1)},
+          {dr:1,dc:-1,cx:x0,cy:y0+TILE,oA:oS||oW,oB:isOpen(1,-1)},
+          {dr:1,dc:1,cx:x0+TILE,cy:y0+TILE,oA:oS||oE,oB:isOpen(1,1)},
         ];
-
         for(const corner of corners){
-          if(!corner.oA && !corner.oB) continue; // żaden sąsiad nie odkryty
-          const g = fc.createRadialGradient(corner.cx, corner.cy, 0, corner.cx, corner.cy, R);
-          g.addColorStop(0,'rgba(0,0,0,1)');
-          g.addColorStop(1,'rgba(0,0,0,0)');
+          if(!corner.oA&&!corner.oB)continue;
+          const g=fc.createRadialGradient(corner.cx,corner.cy,0,corner.cx,corner.cy,R);
+          g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');
           fc.fillStyle=g;
-          // Ogranicz do ćwiartki kafla przy danym rogu
-          const rx = corner.dc < 0 ? x0     : x0+TILE-R;
-          const ry = corner.dr < 0 ? y0     : y0+TILE-R;
-          fc.fillRect(rx, ry, R, R);
+          const rx=corner.dc<0?x0:x0+TILE-R;
+          const ry=corner.dr<0?y0:y0+TILE-R;
+          fc.fillRect(rx,ry,R,R);
         }
       }
     }
-
-    fc.globalCompositeOperation = 'source-over';
-    fc.globalAlpha = 1;
-    ctx.drawImage(fogOff, 0, 0);
-
+    fc.globalCompositeOperation='source-over';fc.globalAlpha=1;
+    ctx.drawImage(fogOff,0,0);
     if(showExitHint){
       const{goalR,goalC}=mazeData;
       const alpha=fogAlpha[goalR][goalC];
@@ -1091,8 +1210,6 @@ function posEl(el,r,c){
 }
 function updatePlayer(){
   const plImg=document.getElementById('pl-img');
-  // Postać = 1.4 × TILE, żeby była proporcjonalna do kafli
-  // Postać: min 28px, max 72px, ~85% TILE
   const plSize=Math.max(20,Math.min(56,Math.round(TILE*0.65)));
   plImg.style.width=plSize+'px';
   posEl(document.getElementById('pl'),playerR,playerC);
@@ -1113,6 +1230,7 @@ function newMaze(){
   won=false;stopPress();cellTiles2={};
   document.getElementById('wo').classList.remove('show');
   mazeData=generateMaze();playerR=mazeData.startR;playerC=mazeData.startC;
+  buildActiveNotes();
   initFog();fitCanvas();updatePlayer();
   spawnCreatures();
   refreshCreatureSizes();
@@ -1134,14 +1252,17 @@ async function startMic(){
 function getRMS(){let s=0;for(let i=0;i<buf.length;i++)s+=buf[i]*buf[i];return Math.sqrt(s/buf.length);}
 function transposedFreq(baseFreq){return baseFreq*Math.pow(2,transpose/12);}
 function closestNote(freq){
-  const activeNotes=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
   let best=null,bd=1e9;
-  for(const n of activeNotes){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
+  for(const n of MN){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
   return(best&&bd<=noteMargin)?best:null;
 }
 function closestNoteDisplay(freq){
+  // Szukaj w pełnym zakresie wszystkich nut
+  const key=getRangeKey();
+  const ids=NOTE_RANGE_MAP[key]||[];
+  const pool=ids.map(id=>ALL_NOTE_DEFS.find(n=>n.id===id)).filter(Boolean);
   let best=null,bd=1e9;
-  for(const n of MN){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
+  for(const n of pool){const tf=transposedFreq(n.freq);const d=Math.abs(freq-tf);if(d<bd){bd=d;best=n;}}
   return best;
 }
 function micLoop(){
@@ -1162,12 +1283,11 @@ function micLoop(){
         const note=closestNote(freq);
         if(note&&dCD===0){
           const ok=fH.filter(f=>{
-            const an=['N','E','S','W'].map(dir=>currentHintNote(dir)).filter(Boolean);
             let bn=null,bd=1e9;
-            for(const n of an){const tf=transposedFreq(n.freq);const d=Math.abs(f-tf);if(d<bd){bd=d;bn=n;}}
+            for(const n of MN){const tf=transposedFreq(n.freq);const d=Math.abs(f-tf);if(d<bd){bd=d;bn=n;}}
             return bn&&bn.id===note.id&&bd<=noteMargin;
           }).length;
-          if(ok>=1){dCD=9;move(note.dir);advanceHint(note.dir);shuffleTileOrder();buildNoteTiles();refreshSideBar();}
+          if(ok>=1){dCD=9;move(note.dir);reshuffleNotes();}
         }
       }
     }
@@ -1191,7 +1311,9 @@ function acorr(buf,sr){
   if(mp<1)return-1;
   let T=mp;
   if(mp>0&&mp<L-1){const a=(c2[mp-1]+c2[mp+1]-2*c2[mp])/2,b=(c2[mp+1]-c2[mp-1])/2;if(a)T-=b/(2*a);}
-  const f=sr/T;return(f<80||f>600)?-1:f;
+  const f=sr/T;
+  // Rozszerzony zakres częstotliwości dla pełnego zestawu nut
+  return(f<55||f>1100)?-1:f;
 }
 
 /* ══ KEYBOARD ══ */
@@ -1199,10 +1321,10 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeMenu();return;}
   if(document.getElementById('menu-ov').classList.contains('show'))return;
   if(document.getElementById('tut-ov').classList.contains('show'))return;
-  if(['ArrowUp','w','W'].includes(e.key)){move('N');advanceHint('N');shuffleTileOrder();buildNoteTiles();refreshSideBar();}
-  else if(['ArrowDown','s','S'].includes(e.key)){move('S');advanceHint('S');shuffleTileOrder();buildNoteTiles();refreshSideBar();}
-  else if(['ArrowLeft','a','A'].includes(e.key)){move('W');advanceHint('W');shuffleTileOrder();buildNoteTiles();refreshSideBar();}
-  else if(['ArrowRight','d','D'].includes(e.key)){move('E');advanceHint('E');shuffleTileOrder();buildNoteTiles();refreshSideBar();}
+  if(['ArrowUp','w','W'].includes(e.key)){move('N');reshuffleNotes();}
+  else if(['ArrowDown','s','S'].includes(e.key)){move('S');reshuffleNotes();}
+  else if(['ArrowLeft','a','A'].includes(e.key)){move('W');reshuffleNotes();}
+  else if(['ArrowRight','d','D'].includes(e.key)){move('E');reshuffleNotes();}
 });
 window.addEventListener('resize',()=>{if(mazeData){fitCanvas();updatePlayer();}buildNoteTiles();});
 
@@ -1216,7 +1338,6 @@ function selectChar(id){
 function showTutorial(){
   if(!selectedChar)return;
   const ov=document.getElementById('tut-ov');
-  // Ustaw tło przez img (brak CORS) — używamy już załadowanego elementu lub tworzymy nowy
   if(!ov.querySelector('img.bg-img')){
     const bg=document.createElement('img');
     bg.className='bg-img';
@@ -1235,7 +1356,6 @@ function startGame(){
   document.getElementById('ga').style.display='flex';
   const hudExtra=document.getElementById('hud-mic-extra');
   if(hudExtra)hudExtra.style.display='none';
-  // Tło gry
   const cw=document.getElementById('canvas-wrap');
   if(!cw.querySelector('img.bg-img')){
     const cwBg=document.createElement('img');
@@ -1244,221 +1364,129 @@ function startGame(){
     cwBg.src=BG_GAME_SRC;
     cw.insertBefore(cwBg,cw.firstChild);
   }
+  buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
 }
 
-/* ══ CREATURES — PŁYNNY WĘŻYK ══ */
-
+/* ══ CREATURES ══ */
 const CREATURE_DEFS = [
-  { id: 'sowa',      name: 'Sowa',                img: CREATURE_IMGS.sowa },
-  { id: 'swinka',    name: '\u015awinka',          img: CREATURE_IMGS.swinka },
-  { id: 'szynszyla', name: 'Szynszyla',            img: CREATURE_IMGS.szynszyla },
-  { id: 'wiewiorka', name: 'Wiewi\u00f3rka',      img: CREATURE_IMGS.wiewiorka },
-  { id: 'winniczek', name: 'Winniczek',            img: CREATURE_IMGS.winniczek },
-  { id: 'wrobel',    name: 'Wr\u00f3bel',         img: CREATURE_IMGS.wrobel },
-  { id: 'zabka',     name: '\u017babka',           img: CREATURE_IMGS.zabka },
-  { id: 'zolw',      name: '\u017c\u00f3\u0142w', img: CREATURE_IMGS.zolw },
-  { id: 'biedronka', name: 'Biedronka',            img: CREATURE_IMGS.biedronka },
-  { id: 'chomik',    name: 'Chomik',               img: CREATURE_IMGS.chomik },
-  { id: 'dzdz',      name: 'D\u017cd\u017cownica', img: CREATURE_IMGS.dzdz },
-  { id: 'jaszczurka',name: 'Jaszczurka',           img: CREATURE_IMGS.jaszczurka },
-  { id: 'jez',       name: 'Je\u017c',             img: CREATURE_IMGS.jez },
-  { id: 'kameleon',  name: 'Kameleon',             img: CREATURE_IMGS.kameleon },
+  {id:'sowa',name:'Sowa',img:CREATURE_IMGS.sowa},
+  {id:'swinka',name:'\u015awinka',img:CREATURE_IMGS.swinka},
+  {id:'szynszyla',name:'Szynszyla',img:CREATURE_IMGS.szynszyla},
+  {id:'wiewiorka',name:'Wiewi\u00f3rka',img:CREATURE_IMGS.wiewiorka},
+  {id:'winniczek',name:'Winniczek',img:CREATURE_IMGS.winniczek},
+  {id:'wrobel',name:'Wr\u00f3bel',img:CREATURE_IMGS.wrobel},
+  {id:'zabka',name:'\u017cabka',img:CREATURE_IMGS.zabka},
+  {id:'zolw',name:'\u017c\u00f3\u0142w',img:CREATURE_IMGS.zolw},
+  {id:'biedronka',name:'Biedronka',img:CREATURE_IMGS.biedronka},
+  {id:'chomik',name:'Chomik',img:CREATURE_IMGS.chomik},
+  {id:'dzdz',name:'D\u017cd\u017cownica',img:CREATURE_IMGS.dzdz},
+  {id:'jaszczurka',name:'Jaszczurka',img:CREATURE_IMGS.jaszczurka},
+  {id:'jez',name:'Je\u017c',img:CREATURE_IMGS.jez},
+  {id:'kameleon',name:'Kameleon',img:CREATURE_IMGS.kameleon},
 ];
+let creaturesOnMap=[],creaturesFollowing=[],creaturePositions=[];
+const BASE_SPACING=20,HIST_FRAMES=900;
 
-let creaturesOnMap     = [];
-let creaturesFollowing = [];
-let creaturePositions  = []; // historia pikselowych pozycji gracza
-
-// CREATURE_SIZE jest obliczany dynamicznie z TILE w updateCreaturePositions
-const BASE_SPACING  = 20;    // px — bazowy odstęp między zwierzątkami
-const HIST_FRAMES   = 900;   // max długość historii
-
-// Pikselowa pozycja środka kafla gracza
-function playerPixelPos() {
-  if (!mazeData) return { x: 0, y: 0 };
-  const cr = canvas.getBoundingClientRect();
-  const ar = document.getElementById('canvas-wrap').getBoundingClientRect();
-  return {
-    x: cr.left - ar.left + playerC * TILE + TILE / 2,
-    y: cr.top  - ar.top  + playerR * TILE + TILE / 2,
-  };
+function playerPixelPos(){
+  if(!mazeData)return{x:0,y:0};
+  const cr=canvas.getBoundingClientRect();
+  const ar=document.getElementById('canvas-wrap').getBoundingClientRect();
+  return{x:cr.left-ar.left+playerC*TILE+TILE/2,y:cr.top-ar.top+playerR*TILE+TILE/2};
 }
-
-function spawnCreatures() {
-  [...creaturesOnMap, ...creaturesFollowing].forEach(c => {
-    if (c.imgEl && c.imgEl.parentNode) c.imgEl.parentNode.removeChild(c.imgEl);
-  });
-  creaturesOnMap     = [];
-  creaturesFollowing = [];
-  creaturePositions  = [];
-
-  if (!mazeData) return;
-
-  const { conn, startR, startC, goalR, goalC } = mazeData;
-  const available = [];
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      if (conn[r][c].size > 0 &&
-          !(r === startR && c === startC) &&
-          !(r === goalR  && c === goalC)) {
-        available.push({ r, c });
-      }
-    }
-  }
-  for (let i = available.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [available[i], available[j]] = [available[j], available[i]];
-  }
-
-  const wrap  = document.getElementById('canvas-wrap');
-  const count = Math.min(CREATURE_DEFS.length, available.length);
-
-  for (let i = 0; i < count; i++) {
-    const def   = CREATURE_DEFS[i];
-    const pos   = available[i];
-    const imgEl = document.createElement('img');
-    imgEl.src   = def.img;
-    // CSS transition na left/top dla płynnego ruchu
-    const cSz = Math.max(10,Math.min(36,Math.round(TILE * 0.40))); // zwierzątko = 55% kafla
-    imgEl.style.cssText =
-      'position:absolute;' +
-      'width:'  + cSz + 'px;' +
-      'height:' + cSz + 'px;' +
-      'image-rendering:pixelated;' +
-      'pointer-events:none;' +
-      'z-index:9;' +
-      'transform:translate(-50%,-50%);' +
-      'transition:left 0.18s linear, top 0.18s linear, opacity 0.3s;' +
-      'will-change:left,top;';
-    imgEl.dataset.cSz = cSz;
+function spawnCreatures(){
+  [...creaturesOnMap,...creaturesFollowing].forEach(c=>{if(c.imgEl&&c.imgEl.parentNode)c.imgEl.parentNode.removeChild(c.imgEl);});
+  creaturesOnMap=[];creaturesFollowing=[];creaturePositions=[];
+  if(!mazeData)return;
+  const{conn,startR,startC,goalR,goalC}=mazeData;
+  const available=[];
+  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(conn[r][c].size>0&&!(r===startR&&c===startC)&&!(r===goalR&&c===goalC))available.push({r,c});
+  for(let i=available.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[available[i],available[j]]=[available[j],available[i]];}
+  const wrap=document.getElementById('canvas-wrap');
+  const count=Math.min(CREATURE_DEFS.length,available.length);
+  for(let i=0;i<count;i++){
+    const def=CREATURE_DEFS[i];const pos=available[i];
+    const imgEl=document.createElement('img');imgEl.src=def.img;
+    const cSz=Math.max(10,Math.min(36,Math.round(TILE*0.40)));
+    imgEl.style.cssText='position:absolute;width:'+cSz+'px;height:'+cSz+'px;image-rendering:pixelated;pointer-events:none;z-index:9;transform:translate(-50%,-50%);transition:left 0.18s linear, top 0.18s linear, opacity 0.3s;will-change:left,top;';
+    imgEl.dataset.cSz=cSz;
     wrap.appendChild(imgEl);
-    creaturesOnMap.push({ ...def, r: pos.r, c: pos.c, imgEl });
+    creaturesOnMap.push({...def,r:pos.r,c:pos.c,imgEl});
   }
-
-  // Wypełnij historię bieżącą pozycją gracza
-  const pp = playerPixelPos();
-  for (let i = 0; i < HIST_FRAMES; i++) creaturePositions.push({ ...pp });
-
+  const pp=playerPixelPos();
+  for(let i=0;i<HIST_FRAMES;i++)creaturePositions.push({...pp});
   updateCreatureHUD();
   updateCreaturePositions();
 }
-
-// Dodaj bieżącą pozycję gracza do historii — wywoływana co klatkę w loop()
-function recordPlayerPos() {
-  if (!mazeData) return;
+function recordPlayerPos(){
+  if(!mazeData)return;
   creaturePositions.push(playerPixelPos());
-  // Ogranicz historię
-  const n = creaturesFollowing.length;
-  const spacing = computeSpacing(n);
-  const needed  = HIST_FRAMES + n * spacing + 60;
-  while (creaturePositions.length > needed) creaturePositions.shift();
+  const n=creaturesFollowing.length;
+  const spacing=computeSpacing(n);
+  const needed=HIST_FRAMES+n*spacing+60;
+  while(creaturePositions.length>needed)creaturePositions.shift();
 }
-
-function computeSpacing(n) {
-  // Im więcej zwierząt, tym mniejszy odstęp — min 10px
-  return Math.max(10, BASE_SPACING - Math.floor(n / 5) * 3);
-}
-
-// Ustaw pozycje DOM — wywoływana co klatkę w loop()
-function updateCreaturePositions() {
-  if (!mazeData) return;
-  const cr = canvas.getBoundingClientRect();
-  const ar = document.getElementById('canvas-wrap').getBoundingClientRect();
-  const ox = cr.left - ar.left;
-  const oy = cr.top  - ar.top;
-
-  // ── Zwierzątka na mapie (czekające) ──
-  creaturesOnMap.forEach(c => {
-    const px = ox + c.c * TILE + TILE / 2;
-    const py = oy + c.r * TILE + TILE / 2;
-    c.imgEl.style.left = px + 'px';
-    c.imgEl.style.top  = py + 'px';
-    const fa = fogEnabled ? (fogAlpha[c.r] ? fogAlpha[c.r][c.c] : 1) : 0;
-    c.imgEl.style.opacity = fogEnabled ? (fa < 0.7 ? '1' : '0') : '1';
+function computeSpacing(n){return Math.max(10,BASE_SPACING-Math.floor(n/5)*3);}
+function updateCreaturePositions(){
+  if(!mazeData)return;
+  const cr=canvas.getBoundingClientRect();
+  const ar=document.getElementById('canvas-wrap').getBoundingClientRect();
+  const ox=cr.left-ar.left,oy=cr.top-ar.top;
+  creaturesOnMap.forEach(c=>{
+    const px=ox+c.c*TILE+TILE/2,py=oy+c.r*TILE+TILE/2;
+    c.imgEl.style.left=px+'px';c.imgEl.style.top=py+'px';
+    const fa=fogEnabled?(fogAlpha[c.r]?fogAlpha[c.r][c.c]:1):0;
+    c.imgEl.style.opacity=fogEnabled?(fa<0.7?'1':'0'):'1';
   });
-
-  const n = creaturesFollowing.length;
-  if (n === 0) return;
-
-  const histLen = creaturePositions.length;
-  const spacing = computeSpacing(n);
-
-  // Wszystkie zwierzątka idą wężykiem po historii pozycji gracza.
-  // Pierwsze zwierzątko startuje od pozycji poprzedniego kafla gracza
-  // (= 1 krok wstecz w historii = TILE px).
-  const targetPositions = [];
-  creaturesFollowing.forEach((c, idx) => {
-    const delay   = Math.round(TILE) + (idx + 1) * spacing;
-    const histIdx = Math.max(0, histLen - 1 - delay);
-    const pos     = creaturePositions[histIdx];
-    targetPositions.push({ x: pos.x, y: pos.y });
+  const n=creaturesFollowing.length;if(!n)return;
+  const histLen=creaturePositions.length,spacing=computeSpacing(n);
+  const targetPositions=[];
+  creaturesFollowing.forEach((c,idx)=>{
+    const delay=Math.round(TILE)+(idx+1)*spacing;
+    const histIdx=Math.max(0,histLen-1-delay);
+    const pos=creaturePositions[histIdx];
+    targetPositions.push({x:pos.x,y:pos.y});
   });
-
-  // Rozsuń nakładające się zwierzątka
-  // Rozmiar zwierzątka z dataset (zapisany przy spawn)
-  const cSzNow = creaturesFollowing.length > 0
-    ? parseInt(creaturesFollowing[0].imgEl.dataset.cSz || Math.round(TILE*0.75))
-    : Math.round(TILE*0.75);
-  const minDist = cSzNow * 1.05;
-  for (let pass = 0; pass < 3; pass++) {
-    for (let i = 0; i < targetPositions.length; i++) {
-      for (let j = i + 1; j < targetPositions.length; j++) {
-        const dx = targetPositions[j].x - targetPositions[i].x;
-        const dy = targetPositions[j].y - targetPositions[i].y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < minDist && dist > 0.01) {
-          const push = (minDist - dist) / 2 + 1;
-          const nx = dx / dist, ny = dy / dist;
-          targetPositions[i].x -= nx * push;
-          targetPositions[i].y -= ny * push;
-          targetPositions[j].x += nx * push;
-          targetPositions[j].y += ny * push;
-        } else if (dist <= 0.01) {
-          // Identyczne pozycje — rozsuń w kółko
-          const angle = (j / targetPositions.length) * Math.PI * 2;
-          targetPositions[j].x += Math.cos(angle) * minDist;
-          targetPositions[j].y += Math.sin(angle) * minDist;
+  const cSzNow=creaturesFollowing.length>0?parseInt(creaturesFollowing[0].imgEl.dataset.cSz||Math.round(TILE*0.75)):Math.round(TILE*0.75);
+  const minDist=cSzNow*1.05;
+  for(let pass=0;pass<3;pass++){
+    for(let i=0;i<targetPositions.length;i++){
+      for(let j=i+1;j<targetPositions.length;j++){
+        const dx=targetPositions[j].x-targetPositions[i].x,dy=targetPositions[j].y-targetPositions[i].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<minDist&&dist>0.01){
+          const push=(minDist-dist)/2+1,nx=dx/dist,ny=dy/dist;
+          targetPositions[i].x-=nx*push;targetPositions[i].y-=ny*push;
+          targetPositions[j].x+=nx*push;targetPositions[j].y+=ny*push;
+        }else if(dist<=0.01){
+          const angle=(j/targetPositions.length)*Math.PI*2;
+          targetPositions[j].x+=Math.cos(angle)*minDist;
+          targetPositions[j].y+=Math.sin(angle)*minDist;
         }
       }
     }
   }
-
-  creaturesFollowing.forEach((c, idx) => {
-    c.imgEl.style.left    = targetPositions[idx].x + 'px';
-    c.imgEl.style.top     = targetPositions[idx].y + 'px';
-    c.imgEl.style.opacity = '1';
+  creaturesFollowing.forEach((c,idx)=>{
+    c.imgEl.style.left=targetPositions[idx].x+'px';
+    c.imgEl.style.top=targetPositions[idx].y+'px';
+    c.imgEl.style.opacity='1';
   });
 }
-
-function refreshCreatureSizes() {
-  // Aktualizuj rozmiar zwierzątek gdy TILE się zmienił (nowa plansza)
-  const cSz = Math.max(10,Math.min(36,Math.round(TILE * 0.40)));
-  const allC = [...creaturesOnMap, ...creaturesFollowing];
-  allC.forEach(c => {
-    c.imgEl.style.width  = cSz + 'px';
-    c.imgEl.style.height = cSz + 'px';
-    c.imgEl.dataset.cSz  = cSz;
-  });
+function refreshCreatureSizes(){
+  const cSz=Math.max(10,Math.min(36,Math.round(TILE*0.40)));
+  const allC=[...creaturesOnMap,...creaturesFollowing];
+  allC.forEach(c=>{c.imgEl.style.width=cSz+'px';c.imgEl.style.height=cSz+'px';c.imgEl.dataset.cSz=cSz;});
 }
-
-function checkCreaturePickup() {
-  const idx = creaturesOnMap.findIndex(c => c.r === playerR && c.c === playerC);
-  if (idx !== -1) {
-    const creature = creaturesOnMap.splice(idx, 1)[0];
-    creaturesFollowing.push(creature);
-    updateCreatureHUD();
-  }
+function checkCreaturePickup(){
+  const idx=creaturesOnMap.findIndex(c=>c.r===playerR&&c.c===playerC);
+  if(idx!==-1){const creature=creaturesOnMap.splice(idx,1)[0];creaturesFollowing.push(creature);updateCreatureHUD();}
 }
-
-function updateCreatureHUD() {
-  const el = document.getElementById('hud-creatures');
-  if (!el) return;
-  const total = creaturesOnMap.length + creaturesFollowing.length;
-  el.textContent = '\uD83D\uDC3E ' + creaturesFollowing.length + '/' + total;
+function updateCreatureHUD(){
+  const el=document.getElementById('hud-creatures');if(!el)return;
+  const total=creaturesOnMap.length+creaturesFollowing.length;
+  el.textContent='\uD83D\uDC3E '+creaturesFollowing.length+'/'+total;
 }
-
 </script>
 </body>
 </html>
