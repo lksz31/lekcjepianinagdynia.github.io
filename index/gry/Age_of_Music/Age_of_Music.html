@@ -4,414 +4,444 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Age of the Music</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;width:100%;overflow:hidden;background:#1a2a0e;font-family:'Cinzel',serif;}
-#hud{position:fixed;top:0;left:0;right:0;height:72px;background:rgba(10,16,6,0.97);border-bottom:2px solid #3a5a1a;display:flex;align-items:center;gap:16px;padding:0 18px;z-index:100;}
-.res{display:flex;align-items:center;gap:7px;font-size:13px;color:#c8b87a;letter-spacing:.05em;white-space:nowrap;}
-.res-icon{height:44px;width:auto;image-rendering:pixelated;}
-.res-val{font-weight:700;color:#f0d060;min-width:28px;font-size:15px;}
+html,body{height:100%;width:100%;overflow:hidden;background:#0d1a0d;font-family:'Cinzel',serif;}
+
+/* ═══ LOADING ═══ */
+#loading-screen{position:fixed;inset:0;z-index:9000;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#loading-screen.hidden{display:none;}
+#loading-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;}
+#loading-bar-wrap{position:absolute;bottom:40px;left:10%;right:10%;height:8px;background:rgba(0,0,0,.5);border-radius:4px;border:1px solid rgba(212,175,55,.3);overflow:hidden;}
+#loading-bar{height:100%;width:0%;background:linear-gradient(90deg,#5a4a10,#d4af37,#f0d060);border-radius:4px;transition:width .2s ease;}
+#loading-pct{position:absolute;bottom:55px;left:0;right:0;text-align:center;font-size:11px;color:#d4af37;letter-spacing:.1em;}
+
+/* ═══ TUTORIAL ═══ */
+#tutorial-screen{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:16px;}
+#tutorial-screen.show{display:flex;}
+.tut-panel{background:#030d03;border:2px solid #3a5a1a;border-radius:14px;padding:24px 28px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;color:#c8b87a;display:flex;flex-direction:column;gap:12px;}
+.tut-panel h2{font-size:.9rem;color:#d4af37;letter-spacing:.2em;text-align:center;border-bottom:1px solid #2a4a0a;padding-bottom:8px;}
+.tut-section h3{font-size:.65rem;color:#d4af37;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;}
+.tut-section p{font-family:'Crimson Text',serif;font-size:.82rem;color:#8a9a6a;line-height:1.6;}
+.tut-start{align-self:center;padding:10px 32px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
+.tut-start:hover{background:#d4af37;color:#040c04;}
+
+/* ═══ HUD ═══ */
+#hud{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(5,10,3,0.97);border-bottom:2px solid #2a4a0a;display:flex;align-items:center;gap:12px;padding:0 14px;z-index:100;}
+.res{display:flex;align-items:center;gap:5px;font-size:12px;color:#c8b87a;white-space:nowrap;}
+.res-icon{height:36px;width:auto;image-rendering:pixelated;}
+.res-val{font-weight:700;color:#f0d060;min-width:22px;font-size:13px;}
 #hud-sep{flex:1;}
-#sell-btn{padding:7px 16px;background:transparent;border:1px solid #4a6a1a;color:#7ab04a;font-family:'Cinzel',serif;font-size:11px;cursor:pointer;border-radius:4px;transition:.15s;letter-spacing:.07em;}
-#sell-btn:hover{border-color:#f0d060;color:#f0d060;}
-#hud-title{font-size:14px;color:#d4af37;letter-spacing:.18em;font-weight:700;white-space:nowrap;}
-#game-wrap{position:fixed;inset:72px 210px 0 0;overflow:hidden;background:#1a2a0e;}
-#map-canvas{display:block;}
-#sidebar{position:fixed;right:0;top:72px;bottom:0;width:210px;background:rgba(6,10,4,0.97);border-left:2px solid #2a4a0a;padding:10px 9px;overflow-y:auto;z-index:50;display:flex;flex-direction:column;gap:7px;}
-#sidebar h3{font-size:8px;color:#3a4a1a;letter-spacing:.15em;text-transform:uppercase;padding-bottom:4px;border-bottom:1px solid #1a2a0a;}
-.hex-info{font-family:'Crimson Text',serif;font-size:11.5px;color:#7a8a5a;line-height:1.6;}
+#hud-title{font-size:12px;color:#d4af37;letter-spacing:.15em;font-weight:700;white-space:nowrap;}
+.hud-btn{padding:5px 10px;background:transparent;border:1px solid #3a5a0a;color:#6a9a4a;font-family:'Cinzel',serif;font-size:9px;cursor:pointer;border-radius:3px;transition:.15s;}
+.hud-btn:hover{border-color:#f0d060;color:#f0d060;}
+
+/* ═══ LAYOUT ═══ */
+#game-wrap{position:fixed;inset:60px 200px 0 0;overflow:hidden;background:#0d1a0d;cursor:grab;}
+#game-wrap.panning{cursor:grabbing;}
+#map-canvas{display:block;position:absolute;top:0;left:0;}
+#sidebar{position:fixed;right:0;top:60px;bottom:0;width:200px;background:rgba(4,8,2,.97);border-left:1px solid #2a4a0a;padding:8px 7px;overflow-y:auto;z-index:50;display:flex;flex-direction:column;gap:5px;}
+#sidebar h3{font-size:7px;color:#3a4a1a;letter-spacing:.14em;text-transform:uppercase;padding-bottom:3px;border-bottom:1px solid #1a2a0a;}
+.hex-info{font-family:'Crimson Text',serif;font-size:11px;color:#7a8a5a;line-height:1.55;}
 .hex-info b{color:#b8a86a;font-family:'Cinzel',serif;font-size:9px;}
-.action-btn{width:100%;padding:6px 8px;background:transparent;border:1px solid #3a5a1a;color:#7a9a5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.04em;margin-top:3px;text-align:left;}
+
+/* ═══ ACTION POPUP ═══ */
+#action-popup{position:fixed;z-index:400;display:none;flex-direction:column;gap:4px;pointer-events:all;min-width:140px;}
+#action-popup.show{display:flex;}
+.ap-btn{padding:6px 10px;background:rgba(2,10,2,.95);border:1px solid #3a5a1a;color:#9aba7a;font-family:'Cinzel',serif;font-size:8.5px;cursor:pointer;border-radius:4px;transition:.15s;letter-spacing:.05em;white-space:nowrap;}
+.ap-btn:hover{border-color:#f0d060;color:#f0d060;}
+.ap-btn.danger{border-color:#5a2a0a;color:#aa5a3a;}
+.ap-btn.danger:hover{border-color:#e06020;color:#e06020;}
+
+/* ═══ ACTION BUTTONS (sidebar) ═══ */
+.action-btn{width:100%;padding:5px 7px;background:transparent;border:1px solid #3a5a1a;color:#7a9a5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.04em;margin-top:3px;text-align:left;display:flex;align-items:center;gap:6px;}
 .action-btn:hover:not(:disabled){border-color:#f0d060;color:#f0d060;}
-.action-btn:disabled{opacity:0.28;cursor:not-allowed;}
+.action-btn:disabled{opacity:.28;cursor:not-allowed;}
 .action-btn.danger{border-color:#5a2a0a;color:#9a5a2a;}
 .action-btn.danger:hover:not(:disabled){border-color:#e06020;color:#e06020;}
-.progress-wrap{margin-top:4px;height:3px;background:#1a2a0a;border-radius:2px;overflow:hidden;}
+.progress-wrap{margin-top:3px;height:3px;background:#1a2a0a;border-radius:2px;overflow:hidden;}
 .progress-bar{height:100%;background:linear-gradient(90deg,#2a7a10,#f0d060);border-radius:2px;}
-.prog-label{font-family:'Crimson Text',serif;font-size:9px;color:#4a5a2a;margin-top:2px;}
-/* Okno wydobycia — pływające przy kafelku, bez tła */
+.prog-label{font-family:'Crimson Text',serif;font-size:8px;color:#4a5a2a;margin-top:1px;}
+
+/* ═══ MUSIC MODAL ═══ */
 #music-modal{position:fixed;z-index:500;display:none;pointer-events:none;}
 #music-modal.show{display:block;pointer-events:all;}
-.music-panel{background:rgba(2,12,2,0.97);border:2px solid #3a5a1a;border-radius:12px;padding:14px 16px;width:290px;display:flex;flex-direction:column;gap:8px;color:#c8b87a;box-shadow:0 8px 32px rgba(0,0,0,0.7);}
-.music-panel h2{font-size:.75rem;color:#d4af37;letter-spacing:.14em;text-align:center;margin:0;}
-.music-task{font-family:'Crimson Text',serif;font-size:.9rem;text-align:center;color:#8a9a6a;margin:0;}
-.music-task b{font-size:1.3rem;color:#f0d060;font-family:'Cinzel',serif;}
+.music-panel{background:rgba(2,12,2,.97);border:2px solid #3a5a1a;border-radius:10px;padding:12px 14px;width:270px;display:flex;flex-direction:column;gap:7px;box-shadow:0 8px 32px rgba(0,0,0,.8);}
+.music-panel h2{font-size:.72rem;color:#d4af37;letter-spacing:.13em;text-align:center;margin:0;}
+.clef-switch{display:flex;gap:5px;justify-content:center;}
+.clef-btn{padding:3px 10px;background:transparent;border:1px solid #3a5a1a;color:#6a9a5a;font-family:'Cinzel',serif;font-size:.58rem;cursor:pointer;border-radius:3px;transition:.15s;}
+.clef-btn.on{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.08);}
+.music-task{font-family:'Crimson Text',serif;font-size:.88rem;text-align:center;color:#8a9a6a;}
+.music-task b{font-size:1.2rem;color:#f0d060;font-family:'Cinzel',serif;}
 .note-arrow-row{display:flex;justify-content:center;gap:10px;}
-.note-arr-btn{width:34px;height:34px;background:transparent;border:1px solid #3a5a1a;color:#d4af37;font-size:18px;cursor:pointer;border-radius:4px;transition:.15s;display:flex;align-items:center;justify-content:center;}
-.note-arr-btn:hover{background:rgba(212,175,55,.12);border-color:#d4af37;}
-.music-controls{display:flex;justify-content:flex-end;gap:8px;}
-.mus-btn{padding:5px 12px;background:transparent;border:1px solid #3a5a1a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:.58rem;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.08em;}
-.mus-btn:hover{border-color:#d4af37;color:#d4af37;}
-.music-result{text-align:center;font-family:'Crimson Text',serif;font-size:.8rem;min-height:16px;}
+.note-arr-btn{width:32px;height:32px;background:transparent;border:1px solid #3a5a1a;color:#d4af37;font-size:16px;cursor:pointer;border-radius:3px;transition:.15s;display:flex;align-items:center;justify-content:center;}
+.note-arr-btn:hover{background:rgba(212,175,55,.1);border-color:#d4af37;}
+.music-result{text-align:center;font-family:'Crimson Text',serif;font-size:.78rem;min-height:14px;}
 .music-result.ok{color:#60e870;}
 .music-result.fail{color:#e05050;}
-#harvest-icon{position:fixed;z-index:490;display:none;cursor:pointer;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.8));transition:transform .1s;}
-#harvest-icon:hover{transform:scale(1.15);}
+.music-controls{display:flex;justify-content:center;}
+.mus-btn{padding:5px 16px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.6rem;cursor:pointer;border-radius:3px;transition:.15s;}
+.mus-btn:hover{background:rgba(212,175,55,.12);}
+
+/* ═══ HARVEST ICON ═══ */
+#harvest-icon{position:fixed;z-index:490;display:none;cursor:pointer;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8));transition:transform .1s;}
+#harvest-icon:hover{transform:scale(1.1);}
 #harvest-icon.show{display:block;}
-/* Przełącznik klucza */
-.clef-switch{display:flex;gap:6px;justify-content:center;}
-.clef-btn{padding:4px 12px;background:transparent;border:1px solid #3a5a1a;color:#6a9a5a;font-family:'Cinzel',serif;font-size:.6rem;cursor:pointer;border-radius:3px;transition:.15s;letter-spacing:.06em;}
-.clef-btn.on{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.1);}
-.clef-btn:hover{border-color:#d4af37;color:#d4af37;}
-#tooltip{position:fixed;pointer-events:none;background:rgba(2,8,2,0.95);border:1px solid #3a5a1a;border-radius:6px;padding:5px 9px;font-family:'Crimson Text',serif;font-size:11.5px;color:#c8b87a;z-index:200;display:none;max-width:175px;line-height:1.5;}
-#win-screen{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);flex-direction:column;gap:16px;}
-#win-screen.show{display:flex;}
-#win-screen h1{font-size:2rem;color:#f0d060;letter-spacing:.15em;text-shadow:0 0 30px rgba(240,208,60,.6);}
-.win-btn{padding:10px 26px;background:transparent;border:2px solid #f0d060;color:#f0d060;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
-.win-btn:hover{background:#f0d060;color:#040c04;}
-@keyframes tokenPop{0%{opacity:0;transform:translateY(0) scale(0.7);}15%{opacity:1;transform:translateY(-8px) scale(1.1);}70%{opacity:1;transform:translateY(-28px) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(0.9);}}
-#sell-panel{position:fixed;right:220px;top:72px;background:#020a02;border:1px solid #3a5a1a;border-radius:8px;padding:12px 14px;z-index:150;display:none;min-width:165px;}
+
+/* ═══ SELL PANEL ═══ */
+#sell-panel{position:fixed;right:210px;top:60px;background:#020c02;border:1px solid #3a5a1a;border-radius:8px;padding:10px 12px;z-index:150;display:none;min-width:150px;}
 #sell-panel.show{display:block;}
-#sell-panel h4{font-size:.58rem;color:#5a6a2a;letter-spacing:.1em;margin-bottom:7px;text-transform:uppercase;}
+#sell-panel h4{font-size:.55rem;color:#5a6a2a;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase;}
 .sell-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;}
-.sell-row label{font-family:'Crimson Text',serif;font-size:.78rem;color:#8a9a6a;display:flex;align-items:center;gap:4px;}
-.sell-icon{height:32px;width:auto;image-rendering:pixelated;}
-.sell-row button{padding:3px 8px;background:transparent;border:1px solid #3a5a1a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;transition:.15s;}
+.sell-row label{font-family:'Crimson Text',serif;font-size:.76rem;color:#8a9a6a;display:flex;align-items:center;gap:3px;}
+.sell-icon{height:20px;image-rendering:pixelated;}
+.sell-row button{padding:2px 7px;background:transparent;border:1px solid #3a5a1a;color:#7aaa5a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:2px;}
 .sell-row button:hover{border-color:#f0d060;color:#f0d060;}
-.close-small{margin-top:5px;padding:3px 8px;background:transparent;border:1px solid #2a2a0a;color:#4a4a1a;font-family:'Cinzel',serif;font-size:8px;cursor:pointer;border-radius:3px;width:100%;}
-.close-small:hover{border-color:#6a6a2a;color:#8a8a4a;}
+.close-small{margin-top:4px;padding:2px 7px;background:transparent;border:1px solid #2a2a0a;color:#4a4a1a;font-family:'Cinzel',serif;font-size:7px;cursor:pointer;border-radius:2px;width:100%;}
+
+/* ═══ SETTINGS PANEL ═══ */
+#settings-panel{position:fixed;right:210px;top:60px;background:#020c02;border:1px solid #3a5a1a;border-radius:8px;padding:12px 14px;z-index:150;display:none;min-width:200px;}
+#settings-panel.show{display:block;}
+#settings-panel h4{font-size:.58rem;color:#5a6a2a;letter-spacing:.1em;margin-bottom:8px;text-transform:uppercase;}
+.set-row{margin-bottom:8px;}
+.set-row label{font-family:'Crimson Text',serif;font-size:.78rem;color:#8a9a6a;display:flex;align-items:center;gap:6px;cursor:pointer;}
+.set-row input[type=range]{width:100%;accent-color:#d4af37;cursor:pointer;margin-top:3px;}
+.set-row input[type=checkbox]{accent-color:#d4af37;width:13px;height:13px;cursor:pointer;}
+.set-lbl{font-size:.65rem;color:#6a7a3a;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:3px;}
+
+/* ═══ TOOLTIP ═══ */
+#tooltip{position:fixed;pointer-events:none;background:rgba(2,8,2,.95);border:1px solid #3a5a1a;border-radius:5px;padding:4px 8px;font-family:'Crimson Text',serif;font-size:11px;color:#c8b87a;z-index:200;display:none;max-width:160px;line-height:1.5;}
+
+/* ═══ WIN SCREEN ═══ */
+#win-screen{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.9);flex-direction:column;gap:14px;}
+#win-screen.show{display:flex;}
+#win-screen h1{font-size:1.8rem;color:#f0d060;letter-spacing:.15em;text-shadow:0 0 28px rgba(240,208,60,.6);}
+.win-btn{padding:9px 24px;background:transparent;border:2px solid #f0d060;color:#f0d060;font-family:'Cinzel',serif;font-size:.76rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
+.win-btn:hover{background:#f0d060;color:#040c04;}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes tokenPop{0%{opacity:0;transform:translateY(0) scale(.7);}15%{opacity:1;transform:translateY(-8px) scale(1.1);}70%{opacity:1;transform:translateY(-28px);}100%{opacity:0;transform:translateY(-48px) scale(.9);}}
+@keyframes hexIntro{from{opacity:0;transform:scale(0) rotate(120deg);}to{opacity:1;transform:scale(1) rotate(0deg);}}
 </style>
 </head>
 <body>
 
-<div id="hud">
-  <span id="hud-title">⚔ AGE OF THE MUSIC</span>
-  <div style="width:1px;height:24px;background:#2a3a0a;flex-shrink:0;"></div>
-  <div class="res"><img id="icon-gold"  class="res-icon" src=""><span>Złoto:</span><span class="res-val" id="hud-gold">50</span></div>
-  <div class="res"><img id="icon-wood"  class="res-icon" src=""><span>Drewno:</span><span class="res-val" id="hud-wood">10</span></div>
-  <div class="res"><img id="icon-stone" class="res-icon" src=""><span>Kamień:</span><span class="res-val" id="hud-stone">5</span></div>
-  <div id="hud-sep"></div>
-  <button id="sell-btn" onclick="toggleSellPanel()">💱 Sprzedaj</button>
+<!-- LOADING -->
+<div id="loading-screen">
+  <img id="loading-img" src="/index/gry/Age_of_Music/ilustracje/concept_art/miniatura_2.png" alt="">
+  <div id="loading-pct">0%</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
 </div>
 
+<!-- TUTORIAL -->
+<div id="tutorial-screen">
+  <div class="tut-panel">
+    <h2>⚔ Age of the Music — Jak grać</h2>
+    <div class="tut-section">
+      <h3>🗺 Mapa</h3>
+      <p>Poruszaj się po mapie przeciągając myszą. Kliknij kafelek by zobaczyć opcje. Dwukrotne kliknięcie własnego kafelka otwiera budowanie.</p>
+    </div>
+    <div class="tut-section">
+      <h3>🏰 Budowanie</h3>
+      <p><b>Tartak</b> (na leśnym polu) — kosztuje 7🪵, produkuje drewno.<br>
+      <b>Kamieniołom</b> (na kamiennym polu) — kosztuje 12🪨+5🪵, produkuje kamień.<br>
+      <b>Rynek</b> — budowany na dowolnym polu, generuje 0.2💰 co 10s.</p>
+    </div>
+    <div class="tut-section">
+      <h3>🎵 Wydobycie</h3>
+      <p>Kliknij tartak lub kamieniołom → wybierz Wydobądź. Zagraj nutę na pięciolinii strzałkami ▲▼ i zatwierdź. Każde trafienie daje +5% bonus do kolejnego wydobycia.</p>
+    </div>
+    <div class="tut-section">
+      <h3>⚔ Przejmowanie pól</h3>
+      <p>Możesz przejąć pola sąsiadujące z Twoimi. Wolne: 10💰, wrogie: 30💰. Przejęcie trwa 4 sekundy. Przejmując wrogie pole — przejmujesz też budynki. Możesz zdemontować budynek za 50% zwrotu kosztów.</p>
+    </div>
+    <div class="tut-section">
+      <h3>🏆 Cel</h3>
+      <p>Przejmij Ratusz wroga, by wygrać!</p>
+    </div>
+    <button class="tut-start" onclick="startGame()">▶ Zaczynamy!</button>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <span id="hud-title">⚔ AGE OF THE MUSIC</span>
+  <div style="width:1px;height:22px;background:#1a2a0a;flex-shrink:0;"></div>
+  <div class="res"><img id="icon-gold" class="res-icon" src=""><span>Złoto:</span><span class="res-val" id="hud-gold">50</span></div>
+  <div class="res"><img id="icon-wood" class="res-icon" src=""><span>Drewno:</span><span class="res-val" id="hud-wood">10</span></div>
+  <div class="res"><img id="icon-stone" class="res-icon" src=""><span>Kamień:</span><span class="res-val" id="hud-stone">5</span></div>
+  <div id="hud-sep"></div>
+  <button class="hud-btn" onclick="toggleSellPanel()">💱 Sprzedaj</button>
+  <button class="hud-btn" onclick="toggleSettings()">⚙ Opcje</button>
+</div>
+
+<!-- SELL -->
 <div id="sell-panel">
-  <h4>Sprzedaż surowców</h4>
-  <div class="sell-row">
-    <label><img class="sell-icon" id="sicon-wood" src=""> 10 → <img class="sell-icon" id="sicon-gold" src=""> 1</label>
-    <button onclick="sellRes('wood')">Sprzedaj</button>
-  </div>
-  <div class="sell-row">
-    <label><img class="sell-icon" id="sicon-stone" src=""> 10 → <img class="sell-icon" id="sicon-gold2" src=""> 3</label>
-    <button onclick="sellRes('stone')">Sprzedaj</button>
-  </div>
+  <h4>Sprzedaż</h4>
+  <div class="sell-row"><label><img class="sell-icon" id="sicon-wood" src="">10 → <img class="sell-icon" id="sicon-gold" src="">1</label><button onclick="sellRes('wood')">Sprzedaj</button></div>
+  <div class="sell-row"><label><img class="sell-icon" id="sicon-stone" src="">10 → <img class="sell-icon" id="sicon-gold2" src="">3</label><button onclick="sellRes('stone')">Sprzedaj</button></div>
   <button class="close-small" onclick="toggleSellPanel()">Zamknij</button>
 </div>
 
+<!-- SETTINGS -->
+<div id="settings-panel">
+  <h4>⚙ Opcje</h4>
+  <div class="set-row"><span class="set-lbl">Głośność kliknięcia</span><input type="range" id="set-vol" min="0" max="1" step="0.05" value="0.06" oninput="setClickVol(this.value)"></div>
+  <div class="set-row"><label><input type="checkbox" id="set-icons" checked onchange="toggleBuildIcons(this.checked)"> Ikonki surowców na polach</label></div>
+  <button class="close-small" onclick="toggleSettings()">Zamknij</button>
+</div>
+
+<!-- GAME -->
 <div id="game-wrap"><canvas id="map-canvas"></canvas></div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <h3>Zaznaczone pole</h3>
   <div id="hex-info-box" class="hex-info"><span style="color:#2a3a0a;font-style:italic;">Kliknij hex…</span></div>
   <div id="action-box"></div>
 </div>
 
+<!-- ACTION POPUP -->
+<div id="action-popup"></div>
+
+<!-- TOOLTIP -->
 <div id="tooltip"></div>
 
-<!-- Ikonka wydobycia przy kafelku -->
-<div id="harvest-icon" title="Wydobądź surowiec"></div>
+<!-- HARVEST ICON -->
+<div id="harvest-icon"></div>
 
-<!-- Okno pięciolinii — pływające, bez przyciemnienia -->
+<!-- MUSIC MODAL -->
 <div id="music-modal">
   <div class="music-panel">
-    <h2>🎵 <span id="music-modal-title">Wydobycie</span></h2>
+    <h2>🎵 Wydobycie</h2>
     <div class="clef-switch">
       <button class="clef-btn on" id="clef-treble" onclick="setClef('treble')">𝄞 Wiolinowy</button>
       <button class="clef-btn" id="clef-bass" onclick="setClef('bass')">𝄢 Basowy +20%</button>
     </div>
     <div class="music-task">Zagraj nutę: <b id="music-target-note">c</b></div>
-    <div style="margin:2px auto;overflow:hidden;">
-      <svg id="staff-svg" width="280" height="140" viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg"></svg>
-    </div>
+    <svg id="staff-svg" width="242" height="130" viewBox="0 0 242 130" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;"></svg>
     <div class="note-arrow-row">
-      <button class="note-arr-btn" id="note-up-btn" onclick="moveNote(1)">▲</button>
-      <button class="note-arr-btn" id="note-dn-btn" onclick="moveNote(-1)">▼</button>
+      <button class="note-arr-btn" onclick="moveNote(1)">▲</button>
+      <button class="note-arr-btn" onclick="moveNote(-1)">▼</button>
     </div>
     <div id="music-result" class="music-result"></div>
-    <div class="music-controls">
-      <button class="mus-btn primary" onclick="confirmNote()">✓ Zatwierdź</button>
-    </div>
+    <div class="music-controls"><button class="mus-btn" onclick="confirmNote()">✓ Zatwierdź</button></div>
   </div>
 </div>
 
+<!-- WIN -->
 <div id="win-screen">
   <h1>🏆 Zwycięstwo!</h1>
-  <p style="font-family:'Crimson Text',serif;font-size:1rem;color:#8a9a6a;">Przejąłeś ratusz wroga!</p>
+  <p style="font-family:'Crimson Text',serif;font-size:.95rem;color:#8a9a6a;">Przejąłeś ratusz wroga!</p>
   <button class="win-btn" onclick="location.reload()">🎲 Nowa gra</button>
 </div>
 
 <script>
 'use strict';
 
-/* ═══════════════════════════════════════
-   ŚCIEŻKA BAZOWA
-═══════════════════════════════════════ */
+/* ════════════════════════════════
+   PATHS
+════════════════════════════════ */
 const BASE = '/index/gry/Age_of_Music/ilustracje/tales/';
-
-/* ═══════════════════════════════════════
-   WSZYSTKIE OBRAZKI
-═══════════════════════════════════════ */
 const SRC = {
-  // Teren leśny (zielony) — losowany per hex
-  drewno: [1,2,3,4,5].map(i => BASE+'drewno_'+i+'.png'),
-  // Teren kamienny (szary) — losowany per hex
-  kamien: [1,2,3,4,5].map(i => BASE+'kamień_'+i+'.png'),
-  // Tartaki — losowany per hex przy budowie
-  tartak: [1,2,3,4,5,6].map(i => BASE+'tartak_'+i+'.png'),
-  // Kamieniołomy — losowany per hex przy budowie
-  kamieniolom: [1,2,3,4,5,6,7].map(i => BASE+'kamieniołom_'+i+'.png'),
-  // Ratusz gracza i wroga
-  ratusz_player: BASE+'ratusz_1.png',
-  ratusz_enemy:  BASE+'ratusz_2.png',
-  // Rynek (jeśli będzie potrzebny w przyszłości)
-  rynek: [1,2,3,4,5,6].map(i => BASE+'rynek_'+i+'.png'),
-  // Tokeny w HUD
-  token_drewno: BASE+'drewno_token_1.png',
-  token_kamien: BASE+'kamień_token_1.png',
-  token_moneta: BASE+'moneta_1.png',
+  drewno:      [1,2,3,4,5].map(i=>BASE+'drewno_'+i+'.png'),
+  kamien:      [1,2,3,4,5].map(i=>BASE+'kamień_'+i+'.png'),
+  tartak:      [1,2,3,4,5,6].map(i=>BASE+'tartak_'+i+'.png'),
+  kamieniolom: [1,2,3,4,5,6,7].map(i=>BASE+'kamieniołom_'+i+'.png'),
+  rynek:       [1,2,3,4,5,6].map(i=>BASE+'rynek_'+i+'.png'),
+  ratusz_p:    BASE+'ratusz_1.png',
+  ratusz_e:    BASE+'ratusz_2.png',
+  token_wood:  BASE+'drewno_token_1.png',
+  token_stone: BASE+'kamień_token_1.png',
+  token_gold:  BASE+'moneta_1.png',
 };
-
-// Cache załadowanych obrazków
 const IMGS = {};
-function loadImg(src){
-  if(!src) return null;
-  if(IMGS[src]) return IMGS[src];
-  const im = new Image();
-  im.src = src;
-  IMGS[src] = im;
-  return im;
-}
-// Preload wszystkiego
-[...SRC.drewno,...SRC.kamien,...SRC.tartak,...SRC.kamieniolom,...SRC.rynek,
- SRC.ratusz_player,SRC.ratusz_enemy,
- SRC.token_drewno,SRC.token_kamien,SRC.token_moneta
-].forEach(s=>loadImg(s));
-
-// Ustaw tokeny w HUD po załadowaniu
-window.addEventListener('load',()=>{
-  ['icon-gold','sicon-gold','sicon-gold2'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.src=SRC.token_moneta;
-  });
-  ['icon-wood','sicon-wood'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.src=SRC.token_drewno;
-  });
-  ['icon-stone','sicon-stone'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.src=SRC.token_kamien;
-  });
-});
-// Ustaw od razu (nie czekając na load)
-setTimeout(()=>{
-  ['icon-gold','sicon-gold','sicon-gold2'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_moneta;});
-  ['icon-wood','sicon-wood'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_drewno;});
-  ['icon-stone','sicon-stone'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_kamien;});
-},100);
-
+function loadImg(src){ if(!src)return null; if(IMGS[src])return IMGS[src]; const im=new Image(); im.src=src; IMGS[src]=im; return im; }
+function imgReady(im){ return im&&im.complete&&im.naturalWidth>0; }
 function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    CONFIG
-═══════════════════════════════════════ */
+════════════════════════════════ */
 const CFG = {
   startGold:50, startWood:10, startStone:5,
   claimTime:4000, buildTime:4000,
-  claimCostEmpty:10, claimCostEnemy:30,
-  claimCostBuilding:30, claimCostMarket:50,
-  buildSawmillWood:7,
-  buildQuarryStone:12, buildQuarryWood:5,
-  sellWoodRate:10, sellWoodGold:1,
-  sellStoneRate:10, sellStoneGold:3,
-  adjBonus:0.25,
-  // Rynek
-  marketInterval:10000,
-  marketBase:0.2,
-  marketGroupBonus:0.1,
-  // Ratusz
-  townhallInterval:15000,
-  townhallGold:3,
-  townhallWood:2,
-  townhallStone:2,
+  claimCostEmpty:10, claimCostEnemy:30, claimCostBuilding:30, claimCostTownhall:50,
+  buildSawmillWood:7, buildQuarryStone:12, buildQuarryWood:5, buildMarketGold:20,
+  sellWoodRate:10, sellWoodGold:1, sellStoneRate:10, sellStoneGold:3,
+  adjBonus:0.25, bassBonus:0.20, streakBonus:0.05,
+  marketInterval:10000, marketBase:0.2, marketGroupBonus:0.1,
+  townhallInterval:15000, townhallGold:3, townhallWood:2, townhallStone:2,
+  dismantleReturn:0.5,
 };
 
-/* ═══════════════════════════════════════
-   ISO HEX MATH
-═══════════════════════════════════════ */
-const HS    = 120;
-const DEPTH = 30;
+/* ════════════════════════════════
+   HEX MATH — pure 2D pointy-top
+════════════════════════════════ */
+const HS    = 100;   // circumradius
+const HEX_SY= 0.80;  // Y squish (tighter to match PNG)
+const DEPTH = 18;
 const SQRT3 = Math.sqrt(3);
+const GAP   = 0.97;  // tiles touch (< 1 = overlap slightly)
 
-// ══ CZYSTY 2D POINTY-TOP HEX ══
-// Wierzchołek na północy (góra), dolny na południu
-// Spłaszczony scale_y=0.745 żeby pasować do proporcji PNG (ratio ~1.16:1)
-const HEX_SY = 0.745; // spłaszczenie Y (1.0 = kółko, 0.745 = proporcje PNG)
-
-// Narożnik hexa w 2D (sx,sy = środek na ekranie)
-function hexCornerPt(sx, sy, i){
-  const a = -Math.PI/2 + Math.PI/3*i; // i=0 = górny wierzchołek (N), CW
-  return {x: sx + HS*Math.cos(a), y: sy + HS*Math.sin(a)*HEX_SY};
+function hexCornerPt(sx,sy,i){
+  const a = -Math.PI/2 + Math.PI/3*i;
+  return {x:sx+HS*Math.cos(a)*GAP, y:sy+HS*Math.sin(a)*HEX_SY*GAP};
 }
-
-// Axial -> ekran (pointy-top)
-// Odstęp między sąsiadami: horiz=SQRT3*HS, vert=1.5*HS*HEX_SY
 function axialToScreen(q,r,ox,oy){
-  const sx = SQRT3*HS*(q + r/2) + ox;
-  const sy = 1.5*HS*HEX_SY*r   + oy;
-  return {sx,sy};
+  return {sx: SQRT3*HS*GAP*(q+r/2)+ox, sy: 1.5*HS*HEX_SY*GAP*r+oy};
 }
-
-// Ekran -> axial (odwrotność)
 function screenToAxial(px,py,ox,oy){
   const x=px-ox, y=py-oy;
-  // Odwrotność: q=(x*2/3-y*2/(3*HEX_SY)) / (SQRT3*HS)... użyj kubicznego zaokrąglenia
-  const q = (x*(2/3) - y*(2/(3*HEX_SY*SQRT3))) / HS;
-  const r = y / (1.5*HS*HEX_SY);
+  const q=(x*(2/3))/(HS*SQRT3*GAP);
+  const r=(y-(x*SQRT3/3))/(1.5*HS*HEX_SY*GAP);
   return hexRound(q,r);
 }
-
 function hexRound(q,r){
-  const s=-q-r;
-  let rq=Math.round(q),rr=Math.round(r),rs=Math.round(s);
+  const s=-q-r; let rq=Math.round(q),rr=Math.round(r),rs=Math.round(s);
   const dq=Math.abs(rq-q),dr=Math.abs(rr-r),ds=Math.abs(rs-s);
-  if(dq>dr&&dq>ds) rq=-rr-rs; else if(dr>ds) rr=-rq-rs;
+  if(dq>dr&&dq>ds)rq=-rr-rs; else if(dr>ds)rr=-rq-rs;
   return {q:rq,r:rr};
 }
-
-// Narożniki górnej powierzchni hexa
-function isoHexTop(sx,sy){
-  const pts=[];
-  for(let i=0;i<6;i++) pts.push(hexCornerPt(sx,sy,i));
-  return pts;
-}
-
-// isoProject potrzebny tylko dla dotstanu właściciela — upraszczamy
-function isoProject(wx,wy){return{x:wx,y:wy*HEX_SY};}
-const HEX_DIRS=[{q:1,r:0},{q:0,r:-1},{q:-1,r:-1},{q:-1,r:0},{q:0,r:1},{q:1,r:1}]; // pointy-top
+function isoHexTop(sx,sy){ const pts=[]; for(let i=0;i<6;i++)pts.push(hexCornerPt(sx,sy,i)); return pts; }
+const HEX_DIRS=[{q:1,r:0},{q:0,r:-1},{q:-1,r:-1},{q:-1,r:0},{q:0,r:1},{q:1,r:1}];
 function hexKey(q,r){return q+','+r;}
 function getNeighbors(q,r){return HEX_DIRS.map(d=>({q:q+d.q,r:r+d.r}));}
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    STATE
-═══════════════════════════════════════ */
+════════════════════════════════ */
 let gold=CFG.startGold, wood=CFG.startWood, stone=CFG.startStone;
-let goldAccum=0; // akumulator ułamkowego złota z rynków
-let lastMarketTick=0, lastTownhallTick=0;
+let goldAccum=0, lastMarketTick=0, lastTownhallTick=0;
 let hexes={}, drawOrder=[], selected=null;
-let originX=0, originY=0;
+let originX=300, originY=200;
+let panX=0, panY=0; // camera offset
+let isPanning=false, panStartX=0, panStartY=0, panStartOX=0, panStartOY=0;
+let showBuildIcons=true;
+let clickVolume=0.06;
+let harvestStreak=0; // consecutive correct answers
+let introAnim=false, introStart=0;
+let gameStarted=false;
 
-/* ═══════════════════════════════════════
-   INIT
-═══════════════════════════════════════ */
+/* ════════════════════════════════
+   LOADING
+════════════════════════════════ */
+const ALL_IMGS_TO_LOAD = [
+  ...SRC.drewno,...SRC.kamien,...SRC.tartak,...SRC.kamieniolom,...SRC.rynek,
+  SRC.ratusz_p, SRC.ratusz_e, SRC.token_wood, SRC.token_stone, SRC.token_gold,
+];
+let loadedCount=0;
+const totalToLoad=ALL_IMGS_TO_LOAD.length;
+
+function preloadAll(cb){
+  if(totalToLoad===0){cb();return;}
+  ALL_IMGS_TO_LOAD.forEach(src=>{
+    const im=loadImg(src);
+    const check=()=>{
+      loadedCount++;
+      const pct=Math.round(loadedCount/totalToLoad*100);
+      document.getElementById('loading-bar').style.width=pct+'%';
+      document.getElementById('loading-pct').textContent=pct+'%';
+      if(loadedCount>=totalToLoad) cb();
+    };
+    if(im.complete)check();
+    else{im.onload=check;im.onerror=check;}
+  });
+}
+
+window.addEventListener('load',()=>{
+  // Set HUD token images
+  ['icon-gold','sicon-gold','sicon-gold2'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_gold;});
+  ['icon-wood','sicon-wood'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_wood;});
+  ['icon-stone','sicon-stone'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=SRC.token_stone;});
+  preloadAll(()=>{
+    setTimeout(()=>{
+      document.getElementById('loading-screen').classList.add('hidden');
+      document.getElementById('tutorial-screen').classList.add('show');
+    },400);
+  });
+});
+
+function startGame(){
+  document.getElementById('tutorial-screen').classList.remove('show');
+  initGame();
+  gameStarted=true;
+  requestAnimationFrame(gameLoop);
+}
+
+/* ════════════════════════════════
+   INIT MAP
+════════════════════════════════ */
 function initGame(){
   hexes={};
   const COLS=10, ROWS=10;
   for(let row=0;row<ROWS;row++){
     for(let col=0;col<COLS;col++){
-      // pointy-top offset: odd-r offset -> axial
       const q=col-Math.floor(row/2), r=row;
-      const key=hexKey(q,r);
       const terrain=Math.random()<0.55?'green':'gray';
-      hexes[key]={
+      hexes[hexKey(q,r)]={
         q,r,terrain,owner:null,building:null,
-        // Losuj PNG terenu raz na zawsze dla tego hexa
-        terrainSrc: terrain==='green'
-          ? randFrom(SRC.drewno)
-          : randFrom(SRC.kamien),
-        buildingSrc: null, // losowane przy budowie
+        terrainSrc:terrain==='green'?randFrom(SRC.drewno):randFrom(SRC.kamien),
+        prevTerrainSrc:null, buildingSrc:null,
         claimProg:null,claimStart:null,
-        buildProg:null,buildStart:null,buildType:null
+        buildProg:null,buildStart:null,buildType:null,
+        introDelay:Math.random()*1200,
       };
     }
   }
-
-  // Painter's algorithm: rysuj od tyłu do przodu
-  // W N-S pointy-top z widokiem z góry-przodu:
-  // hex z mniejszym r jest "dalej" (rysowany pierwszy)
-  // przy równym r: większe q jest "dalej na prawo" (rysuj pierwsze)
+  // Painter sort
   drawOrder=Object.keys(hexes).sort((a,b)=>{
     const ha=hexes[a],hb=hexes[b];
-    if(ha.r!==hb.r) return ha.r-hb.r;
-    return ha.q-hb.q;
+    return ha.r!==hb.r?ha.r-hb.r:ha.q-hb.q;
   });
-
-  // ── Gracz (środek lewego boku: row=5, col=0) ──
-  // offset axial: q=col-floor(row/2), r=row
-  const pStartR=5, pStartQ=0-Math.floor(5/2); // q=-2, r=5
-  const pStartKey=hexKey(pStartQ,pStartR);
-  // fallback jeśli hex nie istnieje
-  const pBase=hexes[pStartKey]?pStartKey:drawOrder[0];
-  let sawKey=pBase, quarryKey=null, townKey=null;
+  // Player start — middle-left
+  const pKeys=[...drawOrder];
+  const midLeft=pKeys[Math.floor(pKeys.length/4)];
+  let sawKey=midLeft, quarryKey=null, townKey=null;
   for(const nb of getNeighbors(hexes[sawKey].q,hexes[sawKey].r)){
-    const k=hexKey(nb.q,nb.r);
-    if(!hexes[k]) continue;
-    if(!quarryKey){quarryKey=k;continue;}
-    if(!townKey){townKey=k;break;}
+    const k=hexKey(nb.q,nb.r); if(!hexes[k])continue;
+    if(!quarryKey){quarryKey=k;continue;} if(!townKey){townKey=k;break;}
   }
-  quarryKey=quarryKey||drawOrder[1]||sawKey;
-  townKey  =townKey  ||drawOrder[2]||sawKey;
-
+  quarryKey=quarryKey||pKeys[1]; townKey=townKey||pKeys[2];
+  setBuilding(sawKey,'sawmill','player',true);
   hexes[sawKey].terrain='green';
-  hexes[sawKey].terrainSrc=randFrom(SRC.tartak);  // tartak JEST kafelkiem
-  hexes[sawKey].owner='player';
-  hexes[sawKey].building='sawmill';
-  hexes[sawKey].buildingSrc=null;
-
+  setBuilding(quarryKey,'quarry','player',true);
   hexes[quarryKey].terrain='gray';
-  hexes[quarryKey].terrainSrc=randFrom(SRC.kamieniolom);  // kamieniołom JEST kafelkiem
-  hexes[quarryKey].owner='player';
-  hexes[quarryKey].building='quarry';
-  hexes[quarryKey].buildingSrc=null;
-
-  hexes[townKey].owner='player';
-  hexes[townKey].building='townhall';
-  hexes[townKey].terrainSrc=SRC.ratusz_player;  // ratusz JEST kafelkiem
-  hexes[townKey].buildingSrc=null;
-
-  // ── Wróg (środek prawego boku: row=5, col=9) ──
-  const eStartR=5, eStartQ=9-Math.floor(5/2); // q=7, r=5
-  const eStartKey=hexKey(eStartQ,eStartR);
-  let eTown=hexes[eStartKey]?eStartKey:null;
-  // unikaj kolizji z graczem
-  if(!eTown||eTown===sawKey||eTown===quarryKey||eTown===townKey){
-    const eKeys=[...drawOrder].reverse();
-    for(const k of eKeys){
-      if(k===sawKey||k===quarryKey||k===townKey) continue;
-      eTown=k; break;
-    }
-  }
-  let eS=null,eQ=null;
+  setBuilding(townKey,'townhall','player',true);
+  // Enemy — middle-right
+  const eKeys=[...drawOrder].reverse();
+  let eTown=null,eS=null,eQ=null;
+  for(const k of eKeys){if(k===sawKey||k===quarryKey||k===townKey)continue;if(!eTown){eTown=k;break;}}
   if(eTown){
-    hexes[eTown].owner='enemy';
-    hexes[eTown].building='townhall';
-    hexes[eTown].terrainSrc=SRC.ratusz_enemy;  // ratusz JEST kafelkiem
-    hexes[eTown].buildingSrc=null;
-
     for(const nb of getNeighbors(hexes[eTown].q,hexes[eTown].r)){
-      const k=hexKey(nb.q,nb.r);
-      if(!hexes[k]||k===sawKey||k===quarryKey||k===townKey) continue;
-      if(!eS){eS=k;continue;}
-      if(!eQ){eQ=k;break;}
+      const k=hexKey(nb.q,nb.r);if(!hexes[k]||k===sawKey||k===quarryKey||k===townKey)continue;
+      if(!eS){eS=k;continue;} if(!eQ){eQ=k;break;}
     }
-    eS=eS||eKeys.find(k=>k!==eTown&&k!==sawKey&&k!==quarryKey&&k!==townKey)||eTown;
-    eQ=eQ||eKeys.find(k=>k!==eTown&&k!==eS&&k!==sawKey&&k!==quarryKey&&k!==townKey)||eTown;
-
-    hexes[eS].owner='enemy'; hexes[eS].terrain='green';
-    hexes[eS].terrainSrc=randFrom(SRC.tartak);  // tartak JEST kafelkiem
-    hexes[eS].building='sawmill';
-    hexes[eS].buildingSrc=null;
-
-    hexes[eQ].owner='enemy'; hexes[eQ].terrain='gray';
-    hexes[eQ].terrainSrc=randFrom(SRC.kamieniolom);  // kamieniołom JEST kafelkiem
-    hexes[eQ].building='quarry';
-    hexes[eQ].buildingSrc=null;
+    eS=eS||eKeys[1]; eQ=eQ||eKeys[2];
+    setBuilding(eTown,'townhall','enemy',true);
+    setBuilding(eS,'sawmill','enemy',true); hexes[eS].terrain='green';
+    setBuilding(eQ,'quarry','enemy',true);  hexes[eQ].terrain='gray';
   }
-
+  // Center camera
+  fitCanvas();
   lastMarketTick=Date.now(); lastTownhallTick=Date.now();
-  fitCanvas(); updateHUD();
-  requestAnimationFrame(gameLoop);
+  introAnim=true; introStart=Date.now();
+  updateHUD();
 }
 
-/* ═══════════════════════════════════════
+function setBuilding(key,type,owner,init){
+  const h=hexes[key]; if(!h)return;
+  h.owner=owner; h.building=type;
+  if(type==='sawmill')    {h.terrainSrc=randFrom(SRC.tartak);    h.terrain='green';}
+  else if(type==='quarry'){h.terrainSrc=randFrom(SRC.kamieniolom);h.terrain='gray';}
+  else if(type==='market'){h.terrainSrc=randFrom(SRC.rynek);}
+  else if(type==='townhall'){h.terrainSrc=owner==='player'?SRC.ratusz_p:SRC.ratusz_e;}
+}
+
+/* ════════════════════════════════
    CANVAS
-═══════════════════════════════════════ */
+════════════════════════════════ */
 const canvas=document.getElementById('map-canvas');
 const ctx=canvas.getContext('2d');
 
@@ -419,677 +449,533 @@ function fitCanvas(){
   const wrap=document.getElementById('game-wrap');
   const W=wrap.clientWidth, H=wrap.clientHeight;
   const dpr=window.devicePixelRatio||1;
-  // HiDPI: canvas pixel buffer = logical * dpr
-  canvas.width  = Math.round(W*dpr);
-  canvas.height = Math.round(H*dpr);
-  canvas.style.width  = W+'px';
-  canvas.style.height = H+'px';
-  // Scale context to match DPR - pixel art stays sharp
+  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr);
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
   ctx.setTransform(dpr,0,0,dpr,0,0);
-  // PIXEL ART: wyłącz anti-aliasing
   ctx.imageSmoothingEnabled=false;
-  // Wyśrodkuj mapę (w logicznych pikselach)
+  // Center map
   let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(const k of Object.keys(hexes)){
     const h=hexes[k],{sx,sy}=axialToScreen(h.q,h.r,0,0);
-    // Uwzględnij pełne rozmiary hexa (nie tylko środki)
     minX=Math.min(minX,sx-HS);maxX=Math.max(maxX,sx+HS);
     minY=Math.min(minY,sy-HS*HEX_SY);maxY=Math.max(maxY,sy+HS*HEX_SY+DEPTH);
   }
   originX=W/2-(minX+maxX)/2;
   originY=H/2-(minY+maxY)/2;
 }
+window.addEventListener('resize',()=>{fitCanvas();});
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    DRAW LOOP
-═══════════════════════════════════════ */
-function gameLoop(){ updateTimers(); draw(); requestAnimationFrame(gameLoop); }
-
-const BG_IMG = new Image();
-BG_IMG.src = '/index/gry/Age_of_Music/ilustracje/concept_art/tło_1.png';
+════════════════════════════════ */
+function gameLoop(){
+  updateTimers();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
 
 function draw(){
   const W=canvas.width/(window.devicePixelRatio||1);
   const H=canvas.height/(window.devicePixelRatio||1);
   ctx.imageSmoothingEnabled=false;
   ctx.clearRect(0,0,W,H);
-  if(BG_IMG.complete && BG_IMG.naturalWidth>0){
-    const iw=BG_IMG.naturalWidth, ih=BG_IMG.naturalHeight;
-    const scale=Math.max(W/iw, H/ih);
-    const dw=iw*scale, dh=ih*scale;
-    ctx.drawImage(BG_IMG,(W-dw)/2,(H-dh)/2,dw,dh);
-    ctx.fillStyle='rgba(0,0,0,0.38)';
-    ctx.fillRect(0,0,W,H);
-  } else {
-    const sky=ctx.createLinearGradient(0,0,0,H);
-    sky.addColorStop(0,'#2a4a18'); sky.addColorStop(1,'#0e1e08');
-    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
-  }
-  for(const k of drawOrder) drawIsoHex(k);
+  ctx.fillStyle='#0d1a0d'; ctx.fillRect(0,0,W,H);
+  const now=Date.now();
+  const ox=originX+panX, oy=originY+panY;
+  for(const k of drawOrder) drawHex(k,ox,oy,now);
 }
 
-/* ═══════════════════════════════════════
-   DRAW HEX
-═══════════════════════════════════════ */
-function imgReady(im){ return im&&im.complete&&im.naturalWidth>0; }
-
-function drawIsoHex(key){
+function drawHex(key,ox,oy,now){
   const h=hexes[key];
-  const {sx,sy}=axialToScreen(h.q,h.r,originX,originY);
+  const {sx,sy}=axialToScreen(h.q,h.r,ox,oy);
   const top=isoHexTop(sx,sy);
   const isSel=selected===key;
 
-  // ── Boki hexa: N=0,NE=1,SE=2,S=3,SW=4,NW=5 ──
-  // Widoczne dolne boki (3D look): SE(1→2), S(2→3), SW(3→4)
-  const sideBase = h.owner==='player'?'#1a3a10':h.owner==='enemy'?'#3a1010':'#1a1a10';
-  drawSide(top[1],top[2],darken(sideBase,0.50),isSel); // SE bok (jaśniejszy)
-  drawSide(top[2],top[3],darken(sideBase,0.35),isSel); // S  bok (środek)
-  drawSide(top[3],top[4],darken(sideBase,0.45),isSel); // SW bok
+  // Intro animation
+  let alpha=1, scl=1;
+  if(introAnim){
+    const elapsed=now-introStart-h.introDelay;
+    if(elapsed<0){return;} // not yet
+    const prog=Math.min(1,elapsed/500);
+    alpha=prog; scl=0.3+0.7*prog;
+  }
 
-  // ── Górna powierzchnia ──
-  ctx.beginPath();
-  top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
+  ctx.save();
+  if(scl<1){
+    const {sx:cx,sy:cy}=axialToScreen(h.q,h.r,ox,oy);
+    ctx.translate(cx,cy); ctx.scale(scl,scl); ctx.translate(-cx,-cy);
+  }
+  ctx.globalAlpha=alpha;
 
-  const terrainImg=loadImg(h.terrainSrc);
-  if(imgReady(terrainImg)){
-    const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
-    const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
-    const iw=terrainImg.naturalWidth, ih=terrainImg.naturalHeight;
-    // Skaluj PNG do SZEROKOŚCI hexa — PNG wystawia w górę (izometryczny look)
-    const sc=bw/iw;
-    const dw=iw*sc, dh=ih*sc;
-    const drawX=bx+(bw-dw)/2;
-    // Wyrównaj dół PNG do dołu hexa (+ grubość boku)
-    const drawY=by+bh-dh;
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(terrainImg, drawX, drawY, dw, dh);
-    // Nakładki właściciela (clip do hexa żeby tint był tylko na hexie)
-    if(h.owner==='enemy'||!h.owner||isSel){
-      ctx.save();
-      ctx.beginPath();
-      top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-      ctx.closePath(); ctx.clip();
-      if(h.owner==='enemy')    {ctx.fillStyle='rgba(80,0,0,0.28)';ctx.fillRect(bx,by,bw,bh);}
-      else if(!h.owner)        {ctx.fillStyle='rgba(0,0,0,0.18)'; ctx.fillRect(bx,by,bw,bh);}
-      if(isSel)                {ctx.fillStyle='rgba(240,208,60,0.12)';ctx.fillRect(bx,by,bw,bh);}
-      ctx.restore();
-    }
+  // Sides (depth)
+  const sideBase=h.owner==='player'?'#1a3810':h.owner==='enemy'?'#38100a':'#121810';
+  drawSide(ctx,top[1],top[2],darken(sideBase,.45),isSel);
+  drawSide(ctx,top[2],top[3],darken(sideBase,.30),isSel);
+  drawSide(ctx,top[3],top[4],darken(sideBase,.38),isSel);
+
+  // Top surface — terrain PNG
+  const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
+  const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
+  const tImg=loadImg(h.terrainSrc);
+  if(imgReady(tImg)){
+    const sc=bw/tImg.naturalWidth;
+    const dw=tImg.naturalWidth*sc, dh=tImg.naturalHeight*sc;
+    ctx.drawImage(tImg, bx+(bw-dw)/2, by+bh-dh, dw, dh);
   } else {
-    // Fallback kolor
-    let fc=h.terrain==='green'
-      ?(h.owner==='player'?'#2a6a20':h.owner==='enemy'?'#5a2510':'#1e4a14')
-      :(h.owner==='player'?'#3a3a6a':h.owner==='enemy'?'#4a1a3a':'#222230');
-    if(isSel) fc=blendHex(fc,'#f0d060',0.22);
-    ctx.fillStyle=fc; ctx.fill();
+    ctx.beginPath(); top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.closePath();
+    ctx.fillStyle=h.terrain==='green'?'#1e4a14':'#222230'; ctx.fill();
   }
 
-  // ── Obramowanie ──
-  ctx.beginPath();
-  top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
-  ctx.strokeStyle=isSel?'#f0d060':h.owner==='player'?'rgba(60,160,40,0.8)':h.owner==='enemy'?'rgba(160,40,20,0.8)':'rgba(40,60,20,0.35)';
-  ctx.lineWidth=isSel?2.5:1; ctx.stroke();
+  // Owner tint + selection
+  ctx.beginPath(); top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.closePath();
+  if(h.owner==='enemy'){ctx.fillStyle='rgba(80,0,0,0.22)';ctx.fill();}
+  else if(!h.owner){ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fill();}
+  if(isSel){ctx.fillStyle='rgba(240,208,60,0.14)';ctx.fill();}
+  ctx.strokeStyle=isSel?'#f0d060':h.owner==='player'?'rgba(50,140,30,.7)':h.owner==='enemy'?'rgba(140,30,10,.7)':'rgba(30,50,15,.4)';
+  ctx.lineWidth=isSel?2.2:0.8; ctx.stroke();
 
-  // ── Budynek PNG ──
-  if(h.building&&h.buildProg===null){
-    const bim=loadImg(h.buildingSrc);
-    if(imgReady(bim)){
-      const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
-      const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
-      const iw=bim.naturalWidth, ih=bim.naturalHeight;
-      // Skaluj do szerokości hexa, wycentruj, dół na dole hexa — wystawia w górę
-      const sc=bw/iw;
-      const dw=iw*sc, dh=ih*sc;
-      ctx.imageSmoothingEnabled=false;
-      ctx.drawImage(bim, bx+(bw-dw)/2, by+bh-dh, dw, dh);
-    } else {
-      // Fallback placeholder
-      drawBuildingPlaceholder(h,sx,sy);
+  // Build/resource icon (small, semi-transparent)
+  if(showBuildIcons && h.building && h.building!=='townhall' && h.building!=='sawmill' && h.building!=='quarry'){
+    // Market = gold icon
+    const iconSrc=h.building==='market'?SRC.token_gold:null;
+    if(iconSrc){
+      const im=loadImg(iconSrc);
+      if(imgReady(im)){
+        const is=Math.round(HS*0.4), ix=sx-is/2, iy=sy-is/2;
+        ctx.save(); ctx.globalAlpha=0.45*alpha; ctx.drawImage(im,ix,iy,is,is); ctx.restore();
+      }
     }
   }
 
-  // Fallback gdy budynek w trakcie budowania
-  if(h.building&&h.buildProg!==null) drawBuildingPlaceholder(h,sx,sy);
-
-  // ── Pierścień przejęcia ──
-  if(h.claimProg!==null){
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(sx,sy-4,HS*0.55,-Math.PI/2,-Math.PI/2+Math.PI*2*h.claimProg,false);
-    ctx.strokeStyle='rgba(240,208,60,0.9)'; ctx.lineWidth=3.5; ctx.stroke();
-    ctx.restore();
-  }
-  // ── Pierścień budowania ──
-  if(h.buildProg!==null){
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(sx,sy-4,HS*0.42,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
-    ctx.strokeStyle='rgba(80,220,80,0.85)'; ctx.lineWidth=3; ctx.stroke();
-    ctx.restore();
-  }
-
-  // ── Dot właściciela (prawy górny narożnik) ──
+  // Owner dot (NE corner)
   if(h.owner){
-    // NE narożnik hexa = top[1]
     const dotX=top[1].x-2, dotY=top[1].y+4;
-    ctx.beginPath(); ctx.arc(dotX,dotY,6,0,Math.PI*2);
-    ctx.fillStyle=h.owner==='player'?'#50e060':'#e04040';
-    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(dotX,dotY,5,0,Math.PI*2);
+    ctx.fillStyle=h.owner==='player'?'#48d058':'#d84040';
+    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=1.2; ctx.stroke();
   }
-  // ── Pierścień timera ratusza ──
+
+  // Claim ring
+  if(h.claimProg!==null){
+    ctx.beginPath(); ctx.arc(sx,sy,HS*.6,-Math.PI/2,-Math.PI/2+Math.PI*2*h.claimProg,false);
+    ctx.strokeStyle='rgba(240,208,60,.85)'; ctx.lineWidth=3; ctx.stroke();
+  }
+  // Build ring
+  if(h.buildProg!==null){
+    ctx.beginPath(); ctx.arc(sx,sy,HS*.45,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
+    ctx.strokeStyle='rgba(80,200,80,.8)'; ctx.lineWidth=2.5; ctx.stroke();
+  }
+  // Townhall timer ring
   if(h.building==='townhall'&&h.owner==='player'){
     const prog=Math.min(1,(Date.now()-lastTownhallTick)/CFG.townhallInterval);
-    const ringR=10;
-    // Środek-górna część hexa
-    const ringY=sy-HS*HEX_SY*0.5;
-    ctx.save();
-    ctx.beginPath(); ctx.arc(sx,ringY,ringR,0,Math.PI*2);
-    ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=3.5; ctx.stroke();
-    ctx.beginPath(); ctx.arc(sx,ringY,ringR,-Math.PI/2,-Math.PI/2+Math.PI*2*prog,false);
-    ctx.strokeStyle='rgba(212,175,55,0.95)'; ctx.lineWidth=3.5; ctx.stroke();
-    ctx.restore();
+    const ry=sy-HS*HEX_SY*.5;
+    ctx.beginPath(); ctx.arc(sx,ry,9,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=3; ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx,ry,9,-Math.PI/2,-Math.PI/2+Math.PI*2*prog,false);
+    ctx.strokeStyle='rgba(212,175,55,.9)'; ctx.lineWidth=3; ctx.stroke();
   }
+
+  ctx.restore();
 }
 
-function drawSide(a,b,color,isSel){
+function drawSide(ctx,a,b,color,isSel){
   const quad=[a,b,{x:b.x,y:b.y+DEPTH},{x:a.x,y:a.y+DEPTH}];
-  ctx.beginPath();
-  quad.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();
+  ctx.beginPath(); quad.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.closePath();
   ctx.fillStyle=color; ctx.fill();
-  if(isSel){ctx.strokeStyle='rgba(240,208,60,0.4)';ctx.lineWidth=0.8;ctx.stroke();}
+  if(isSel){ctx.strokeStyle='rgba(240,208,60,.35)';ctx.lineWidth=0.8;ctx.stroke();}
 }
 
-function drawBuildingPlaceholder(h,sx,sy){
-  const ph=HS*0.35,pw=HS*0.65;
-  const col=h.building==='townhall'
-    ?(h.owner==='enemy'?'rgba(160,40,40,0.8)':'rgba(40,80,160,0.8)')
-    :h.building==='sawmill'?'rgba(120,80,30,0.8)':'rgba(80,80,100,0.8)';
-  const bt=[
-    {x:sx,y:sy-ph*2},{x:sx+pw*0.6,y:sy-ph*1.5},
-    {x:sx,y:sy-ph},{x:sx-pw*0.6,y:sy-ph*1.5}
-  ];
-  ctx.beginPath();bt.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();ctx.fillStyle=col;ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=0.8;ctx.stroke();
-  const wr=[bt[1],bt[2],{x:bt[2].x,y:bt[2].y+ph},{x:bt[1].x,y:bt[1].y+ph}];
-  ctx.beginPath();wr.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();ctx.fillStyle=darken(col,0.55);ctx.fill();
-  const wl=[bt[2],bt[3],{x:bt[3].x,y:bt[3].y+ph},{x:bt[2].x,y:bt[2].y+ph}];
-  ctx.beginPath();wl.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.closePath();ctx.fillStyle=darken(col,0.42);ctx.fill();
-  const lbl={sawmill:'TARTAK',quarry:'KAMIENIOŁOM',townhall:'RATUSZ'}[h.building]||'';
-  ctx.font=`bold ${Math.round(HS*0.14)}px Cinzel,serif`;
-  ctx.fillStyle='rgba(255,240,180,0.9)';ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(lbl,sx,sy-ph*1.5-2);
-}
-
-/* ═══════════════════════════════════════
-   KOLOR HELPERS
-═══════════════════════════════════════ */
 function darken(hex,f){
-  const c=parseCol(hex);
-  return toCol(c[0]*f,c[1]*f,c[2]*f,c[3]);
-}
-function blendHex(a,b,t){
-  const ca=parseCol(a),cb=parseCol(b);
-  return toCol(ca[0]+(cb[0]-ca[0])*t,ca[1]+(cb[1]-ca[1])*t,ca[2]+(cb[2]-ca[2])*t,ca[3]);
-}
-function parseCol(h){
-  if(h.startsWith('rgba')){const m=h.match(/[\d.]+/g);return[+m[0],+m[1],+m[2],+m[3]];}
-  const s=h.replace('#','');
-  return[parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16),1];
-}
-function toCol(r,g,b,a){
-  const cl=v=>Math.max(0,Math.min(255,Math.round(v)));
-  if(a<1) return `rgba(${cl(r)},${cl(g)},${cl(b)},${a.toFixed(2)})`;
-  return '#'+[r,g,b].map(v=>cl(v).toString(16).padStart(2,'0')).join('');
+  const parse=h=>{const s=h.replace('#','');return[parseInt(s.slice(0,2),16),parseInt(s.slice(2,4),16),parseInt(s.slice(4,6),16)];};
+  const c=parse(hex);
+  return '#'+c.map(v=>Math.max(0,Math.min(255,Math.round(v*f))).toString(16).padStart(2,'0')).join('');
 }
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    TIMERS
-═══════════════════════════════════════ */
-/* ═══════════════════════════════════════
-   INCOME — RYNEK & RATUSZ
-═══════════════════════════════════════ */
-
-// Znajdź wszystkie grupy połączonych rynków gracza (flood-fill po sąsiadach)
-function getMarketGroups(){
-  const visited=new Set();
-  const groups=[];
-  for(const k of Object.keys(hexes)){
-    const h=hexes[k];
-    if(h.owner==='player'&&h.building==='market'&&!visited.has(k)){
-      // BFS
-      const group=[];
-      const queue=[k];
-      visited.add(k);
-      while(queue.length){
-        const cur=queue.shift();
-        group.push(cur);
-        for(const nb of getNeighbors(hexes[cur].q,hexes[cur].r)){
-          const nk=hexKey(nb.q,nb.r);
-          if(!visited.has(nk)&&hexes[nk]&&hexes[nk].owner==='player'&&hexes[nk].building==='market'){
-            visited.add(nk); queue.push(nk);
-          }
-        }
-      }
-      groups.push(group);
-    }
-  }
-  return groups;
-}
-
-function tickMarkets(){
-  // Dla każdej grupy rynków:
-  // każdy rynek w grupie generuje: bazowe + (rozmiar_grupy-1)*bonus
-  const groups=getMarketGroups();
-  let totalGold=0;
-  for(const group of groups){
-    const groupSize=group.length;
-    // premia = (groupSize-1) * 0.1 na każdy rynek w grupie
-    const perMarket=CFG.marketBase+(groupSize-1)*CFG.marketGroupBonus;
-    totalGold+=perMarket*groupSize;
-  }
-  if(totalGold>0){
-    goldAccum+=totalGold;
-    const whole=Math.floor(goldAccum);
-    if(whole>0){ gold+=whole; goldAccum-=whole; updateHUD(); }
-    showIncomeNotif('rynek','+'+totalGold.toFixed(2)+'💰');
-  }
-}
-
-function tickTownhall(){
-  let count=0;
-  let townKey=null;
-  for(const k of Object.keys(hexes)){
-    const h=hexes[k];
-    if(h.owner==='player'&&h.building==='townhall'){count++;townKey=k;}
-  }
-  if(count>0){
-    gold +=CFG.townhallGold *count;
-    wood +=CFG.townhallWood *count;
-    stone+=CFG.townhallStone*count;
-    updateHUD();
-    showIncomeNotif('ratusz','+'+CFG.townhallGold+'💰 +'+CFG.townhallWood+'🪵 +'+CFG.townhallStone+'🪨');
-    // Pokaż tokeny przy ratuszu
-    if(townKey) showTownhallTokens(townKey);
-  }
-}
-
-function showTownhallTokens(key){
-  const pos=getHexScreenPos(key);
-  const tokens=[
-    {src:SRC.token_moneta, val:'+'+CFG.townhallGold},
-    {src:SRC.token_drewno, val:'+'+CFG.townhallWood},
-    {src:SRC.token_kamien, val:'+'+CFG.townhallStone},
-  ];
-  tokens.forEach((t,i)=>{
-    const el=document.createElement('div');
-    el.style.cssText=`position:fixed;left:${pos.x-30+i*40}px;top:${pos.y-60}px;`
-      +'display:flex;flex-direction:column;align-items:center;gap:2px;'
-      +'pointer-events:none;z-index:400;'
-      +'animation:tokenPop 1.8s ease forwards;';
-    el.innerHTML=`<img src="${t.src}" style="height:28px;image-rendering:pixelated;">`
-      +`<span style="font-family:Cinzel,serif;font-size:10px;font-weight:700;color:#f0d060;text-shadow:0 1px 4px #000;">${t.val}</span>`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),1900);
-  });
-}
-
-// Pływające powiadomienie o dochodzie
-function showIncomeNotif(src,text){
-  const el=document.createElement('div');
-  el.style.cssText='position:fixed;left:50%;top:60px;transform:translateX(-50%);'
-    +'background:rgba(4,12,4,0.88);border:1px solid #3a5a1a;border-radius:6px;'
-    +'padding:4px 12px;font-family:Cinzel,serif;font-size:10px;color:#f0d060;'
-    +'z-index:300;pointer-events:none;letter-spacing:.08em;white-space:nowrap;'
-    +'animation:fadeup 1.8s ease forwards;';
-  el.textContent=src+': '+text;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1900);
-}
-
-// CSS dla animacji powiadomień
-if(!document.getElementById('notif-style')){
-  const st=document.createElement('style');
-  st.id='notif-style';
-  st.textContent='@keyframes fadeup{0%{opacity:0;top:60px;}15%{opacity:1;top:54px;}80%{opacity:1;}100%{opacity:0;top:38px;}}';
-  document.head.appendChild(st);
-}
-
+════════════════════════════════ */
 function updateTimers(){
+  if(!gameStarted)return;
   const now=Date.now();
+  if(introAnim&&now-introStart>2400) introAnim=false;
   for(const k of Object.keys(hexes)){
     const h=hexes[k];
     if(h.claimStart!==null){
       h.claimProg=Math.min(1,(now-h.claimStart)/CFG.claimTime);
-      if(h.claimProg>=1) completeClaim(k);
+      if(h.claimProg>=1)completeClaim(k);
     }
     if(h.buildStart!==null){
       h.buildProg=Math.min(1,(now-h.buildStart)/CFG.buildTime);
-      if(h.buildProg>=1) completeBuild(k);
+      if(h.buildProg>=1)completeBuild(k);
     }
   }
-  // Dochód z rynków (co 10s)
-  if(now-lastMarketTick>=CFG.marketInterval){
-    lastMarketTick=now;
-    tickMarkets();
-  }
-  // Dochód z ratusza (co 15s)
-  if(now-lastTownhallTick>=CFG.townhallInterval){
-    lastTownhallTick=now;
-    tickTownhall();
-  }
+  if(now-lastMarketTick>=CFG.marketInterval){lastMarketTick=now;tickMarkets();}
+  if(now-lastTownhallTick>=CFG.townhallInterval){lastTownhallTick=now;tickTownhall();}
 }
 
-/* ═══════════════════════════════════════
-   INPUT
-═══════════════════════════════════════ */
-let clickCount={},clickTimer={};
+/* ════════════════════════════════
+   INPUT — PAN + CLICK
+════════════════════════════════ */
+const wrap=document.getElementById('game-wrap');
+let mouseDownX=0,mouseDownY=0,didPan=false;
 
-canvas.addEventListener('click',e=>{
-  const rect=canvas.getBoundingClientRect();
-  const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX,originY);
-  const key=hexKey(q,r);
-  if(!hexes[key]) return;
-  if(selected!==key){selected=key;showHexInfo(key);return;}
-  clickCount[key]=(clickCount[key]||0)+1;
-  clearTimeout(clickTimer[key]);
-  if(clickCount[key]>=2){
-    clickCount[key]=0; handleDoubleClick(key);
-  } else {
-    clickTimer[key]=setTimeout(()=>{clickCount[key]=0;},450);
-  }
-  showHexInfo(key);
+wrap.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  isPanning=true; didPan=false;
+  mouseDownX=e.clientX; mouseDownY=e.clientY;
+  panStartX=panX; panStartY=panY;
+  wrap.classList.add('panning');
 });
+window.addEventListener('mousemove',e=>{
+  if(!isPanning)return;
+  const dx=e.clientX-mouseDownX, dy=e.clientY-mouseDownY;
+  if(Math.abs(dx)>5||Math.abs(dy)>5) didPan=true;
+  panX=panStartX+dx; panY=panStartY+dy;
+});
+window.addEventListener('mouseup',e=>{
+  if(!isPanning)return;
+  isPanning=false; wrap.classList.remove('panning');
+  if(!didPan) handleClick(e);
+});
+
+let lastClickKey=null, lastClickTime=0;
+function handleClick(e){
+  const rect=wrap.getBoundingClientRect();
+  const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX+panX,originY+panY);
+  const key=hexKey(q,r);
+  if(!hexes[key]){hideActionPopup();selected=null;return;}
+  const now=Date.now();
+  const isDbl=(key===lastClickKey&&now-lastClickTime<450);
+  lastClickKey=key; lastClickTime=now;
+  if(isDbl&&hexes[key].owner==='player'){
+    handleDblClick(key,e);
+  } else {
+    selected=key;
+    showActionPopup(key,e);
+    showHexInfo(key);
+  }
+}
 
 canvas.addEventListener('mousemove',e=>{
-  const rect=canvas.getBoundingClientRect();
-  const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX,originY);
+  if(isPanning)return;
+  const rect=wrap.getBoundingClientRect();
+  const {q,r}=screenToAxial(e.clientX-rect.left,e.clientY-rect.top,originX+panX,originY+panY);
   const key=hexKey(q,r);
   const tt=document.getElementById('tooltip');
-  if(hexes[key]){
+  if(hexes[key]&&hexes[key].building){
     const h=hexes[key];
-    const cost=getClaimCost(h);
-    let txt=`<b>${h.terrain==='green'?'🌿 Las':'🪨 Skały'}</b><br>`;
-    txt+=`Właściciel: ${ownerLabel(h.owner)}<br>`;
-    if(h.building) txt+=`Budynek: <b>${bName(h.building)}</b><br>`;
-    if(h.owner!=='player') txt+=`Przejęcie: <b>${cost}💰</b>`;
-    if(!h.owner&&!isAdjPlayer(h)) txt+=`<br><span style="color:#4a4a1a">Niedostępne</span>`;
-    tt.innerHTML=txt;tt.style.display='block';
-    tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-8)+'px';
-  } else {tt.style.display='none';}
+    const names={sawmill:'Tartak',quarry:'Kamieniołom',townhall:'Ratusz',market:'Rynek'};
+    let txt=`<b>${names[h.building]||h.building}</b><br>`;
+    txt+=`Właściciel: ${ownerLabel(h.owner)}`;
+    if(h.building==='market'&&h.owner==='player'){
+      const g=getMarketGroups();const mg=g.find(gr=>gr.includes(key))||[key];
+      txt+=`<br>💰 co 10s: +${(CFG.marketBase+(mg.length-1)*CFG.marketGroupBonus).toFixed(2)}`;
+    }
+    tt.innerHTML=txt; tt.style.display='block';
+    tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-8)+'px';
+  } else tt.style.display='none';
 });
-canvas.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none');
-window.addEventListener('resize',()=>{fitCanvas(); ctx.imageSmoothingEnabled=false;});
+wrap.addEventListener('mouseleave',()=>document.getElementById('tooltip').style.display='none');
 
-function handleDoubleClick(key){
-  const h=hexes[key];
-  if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null)
-    openMusicModal(key);
+/* ════════════════════════════════
+   ACTION POPUP
+════════════════════════════════ */
+function getHexScreenPos(key){
+  const h=hexes[key];if(!h)return{x:400,y:300};
+  const rect=wrap.getBoundingClientRect();
+  const {sx,sy}=axialToScreen(h.q,h.r,originX+panX,originY+panY);
+  return{x:rect.left+sx, y:rect.top+sy};
 }
 
-/* ═══════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════ */
+function showActionPopup(key,e){
+  const h=hexes[key];
+  const popup=document.getElementById('action-popup');
+  popup.innerHTML='';
+  const pos=getHexScreenPos(key);
+  const vw=window.innerWidth;
+  let left=pos.x+Math.round(HS*0.8), top=pos.y-60;
+  if(left+160>vw-10) left=pos.x-160;
+  if(top<70) top=70;
+  popup.style.left=left+'px'; popup.style.top=top+'px';
+
+  // Info button always
+  addAP(popup,'ℹ Informacje',()=>{showHexInfo(key);});
+
+  if(!h.owner&&isAdjPlayer(h)&&!h.claimProg){
+    addAP(popup,`🚩 Zajmij (${CFG.claimCostEmpty}💰)`,()=>startClaim(key),gold<CFG.claimCostEmpty);
+  }
+  if(h.owner==='enemy'&&isAdjPlayer(h)&&!h.claimProg){
+    const c=getClaimCost(h);
+    addAP(popup,`⚔ Przejmij (${c}💰)`,()=>startClaim(key),gold<c,'danger');
+  }
+  if(h.owner==='player'&&!h.building&&!h.buildProg){
+    if(h.terrain==='green') addAP(popup,`🏗 Tartak (${CFG.buildSawmillWood}🪵)`,()=>startBuild(key,'sawmill'),wood<CFG.buildSawmillWood);
+    else addAP(popup,`🏗 Kamieniołom`,()=>startBuild(key,'quarry'),stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood);
+    addAP(popup,`🏪 Rynek (${CFG.buildMarketGold}💰)`,()=>startBuild(key,'market'),gold<CFG.buildMarketGold);
+  }
+  if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&!h.buildProg){
+    addAP(popup,'🎵 Wydobądź',()=>openMusicModal(key));
+  }
+  if(h.owner==='player'&&h.building&&h.building!=='townhall'&&!h.buildProg){
+    addAP(popup,'🔨 Demontuj (50% zwrot)',()=>dismantleBuilding(key),'','danger');
+  }
+  popup.classList.add('show');
+}
+
+function handleDblClick(key,e){
+  const h=hexes[key];
+  if(!h.owner==='player')return;
+  if(h.building==='sawmill'||h.building==='quarry') openMusicModal(key);
+  else showActionPopup(key,e);
+}
+
+function addAP(parent,text,fn,disabled,cls=''){
+  const b=document.createElement('button');
+  b.className='ap-btn'+(cls?' '+cls:'');
+  b.textContent=text; b.disabled=!!disabled;
+  if(disabled) b.style.opacity='.35';
+  b.onclick=()=>{fn();hideActionPopup();};
+  parent.appendChild(b);
+}
+function hideActionPopup(){document.getElementById('action-popup').classList.remove('show');}
+document.addEventListener('mousedown',e=>{
+  const ap=document.getElementById('action-popup');
+  const mm=document.getElementById('music-modal');
+  if(ap.classList.contains('show')&&!ap.contains(e.target)) hideActionPopup();
+  if(mm.classList.contains('show')&&!mm.contains(e.target)&&!document.getElementById('harvest-icon').contains(e.target)) closeMusicModal();
+});
+
+/* ════════════════════════════════
+   SIDEBAR INFO
+════════════════════════════════ */
 function showHexInfo(key){
   const h=hexes[key];
   const ibox=document.getElementById('hex-info-box');
   const abox=document.getElementById('action-box');
   if(!h){ibox.innerHTML='';abox.innerHTML='';return;}
-
-  let info=`<b>Teren:</b> ${h.terrain==='green'?'🌿 Las':'🪨 Skały'}<br>`;
-  info+=`<b>Właściciel:</b> ${ownerLabel(h.owner)}<br>`;
+  const tName=h.terrain==='green'?'🌿 Las':'🪨 Skały';
+  let info=`<b>Teren:</b> ${tName}<br><b>Właściciel:</b> ${ownerLabel(h.owner)}<br>`;
   if(h.building) info+=`<b>Budynek:</b> ${bName(h.building)}<br>`;
-  if(h.building==='market'&&h.owner==='player'){
-    const groups=getMarketGroups();
-    const myGroup=groups.find(g=>g.includes(key))||[key];
-    const perMkt=CFG.marketBase+(myGroup.length-1)*CFG.marketGroupBonus;
-    info+=`<span style="color:#90b850;font-size:10px;">💰 co 10s: +${perMkt.toFixed(2)} (grupa: ${myGroup.length})</span><br>`;
-  }
-  if(h.building==='townhall'&&h.owner==='player'){
-    info+=`<span style="color:#90b850;font-size:10px;">co 15s: +${CFG.townhallGold}💰 +${CFG.townhallWood}🪵 +${CFG.townhallStone}🪨</span><br>`;
-  }
-  ibox.innerHTML=info;
-  abox.innerHTML='';
-
-  if(!h.owner&&isAdjPlayer(h)&&h.claimProg===null)
-    addBtn(abox,`🚩 Przejmij (${CFG.claimCostEmpty}💰)`,'',gold<CFG.claimCostEmpty,()=>startClaim(key));
-
-  if(!h.owner&&!isAdjPlayer(h)){
-    const d=document.createElement('div');d.className='hex-info';
-    d.style.cssText='color:#2a3a0a;font-size:10px;margin-top:4px;';
-    d.textContent='Nie sąsiaduje z Twoim terytorium.';abox.appendChild(d);
-  }
-
-  if(h.owner==='enemy'&&isAdjPlayer(h)&&h.claimProg===null){
-    const c=getClaimCost(h);
-    addBtn(abox,`⚔ Przejmij (${c}💰)`,'danger',gold<c,()=>startClaim(key));
-  }
-
-  if(h.owner==='player'&&!h.building&&h.buildProg===null){
-    if(h.terrain==='green')
-      addBtn(abox,`🏗 Tartak (${CFG.buildSawmillWood}🪵)`,'',wood<CFG.buildSawmillWood,()=>startBuild(key,'sawmill'));
-    else
-      addBtn(abox,`🏗 Kamieniołom (${CFG.buildQuarryStone}🪨+${CFG.buildQuarryWood}🪵)`,'',
-        stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood,()=>startBuild(key,'quarry'));
-  }
-
-  if(h.owner==='player'&&(h.building==='sawmill'||h.building==='quarry')&&h.buildProg===null){
-    const bonus=getAdjBonus(key);
-    const clefBonus=currentClef==='bass'?(1+BASS_BONUS):1;
-    const totalBonus=bonus*clefBonus;
-    const isSaw=h.building==='sawmill';
-    const hbtn=document.createElement('button');
-    hbtn.className='action-btn';
-    hbtn.style.cssText='display:flex;align-items:center;gap:7px;padding:8px 10px;';
-    hbtn.innerHTML=`<img src="${isSaw?SRC.token_drewno:SRC.token_kamien}" style="height:26px;image-rendering:pixelated;">`
-      +`<span>Wydobądź (×${totalBonus.toFixed(2)})</span>`;
-    hbtn.onclick=()=>openMusicModal(key);
-    abox.appendChild(hbtn);
-  }
-
+  if(h.claimProg!==null) info+=`<span style="color:#a09050">Przejmowanie…${Math.round(h.claimProg*100)}%</span><br>`;
+  if(h.buildProg!==null)  info+=`<span style="color:#50a050">Budowanie…${Math.round(h.buildProg*100)}%</span><br>`;
+  ibox.innerHTML=info; abox.innerHTML='';
   if(h.claimProg!==null) addProgress(abox,'pclaim-'+key,h.claimProg,'Przejmowanie…');
   if(h.buildProg!==null)  addProgress(abox,'pbuild-'+key,h.buildProg,'Budowanie…');
 }
-
-function addBtn(parent,text,cls,disabled,fn){
-  const b=document.createElement('button');
-  b.className='action-btn'+(cls?' '+cls:'');
-  b.textContent=text;b.disabled=disabled;b.onclick=fn;parent.appendChild(b);
-}
-function addProgress(parent,id,prog,label){
+function addProgress(p,id,prog,lbl){
   const pw=document.createElement('div');pw.className='progress-wrap';
-  const pb=document.createElement('div');pb.className='progress-bar';
-  pb.id=id;pb.style.width=(prog*100)+'%';pw.appendChild(pb);parent.appendChild(pw);
-  const lbl=document.createElement('div');lbl.className='prog-label';lbl.textContent=label;parent.appendChild(lbl);
+  const pb=document.createElement('div');pb.className='progress-bar';pb.style.width=(prog*100)+'%';pw.appendChild(pb);p.appendChild(pw);
+  const l=document.createElement('div');l.className='prog-label';l.textContent=lbl;p.appendChild(l);
 }
-function ownerLabel(o){
-  if(o==='player') return '<span style="color:#50e060">Twoje</span>';
-  if(o==='enemy')  return '<span style="color:#e04040">Wróg</span>';
-  return 'Wolne';
-}
-function bName(b){return{sawmill:'Tartak',quarry:'Kamieniołom',townhall:'Ratusz'}[b]||b;}
-function isAdjPlayer(h){
-  return getNeighbors(h.q,h.r).some(nb=>{const k=hexKey(nb.q,nb.r);return hexes[k]&&hexes[k].owner==='player';});
-}
+function ownerLabel(o){if(o==='player')return'<span style="color:#48d058">Twoje</span>';if(o==='enemy')return'<span style="color:#d84040">Wróg</span>';return'Wolne';}
+function bName(b){return{sawmill:'Tartak',quarry:'Kamieniołom',townhall:'Ratusz',market:'Rynek'}[b]||b;}
+function isAdjPlayer(h){return getNeighbors(h.q,h.r).some(nb=>{const k=hexKey(nb.q,nb.r);return hexes[k]&&hexes[k].owner==='player';});}
 function getClaimCost(h){
-  if(!h.owner) return CFG.claimCostEmpty;
-  if(h.owner==='enemy'){
-    if(h.building==='townhall') return CFG.claimCostMarket;
-    if(h.building) return CFG.claimCostBuilding;
-    return CFG.claimCostEnemy;
-  }
+  if(!h.owner)return CFG.claimCostEmpty;
+  if(h.owner==='enemy'){if(h.building==='townhall')return CFG.claimCostTownhall;if(h.building)return CFG.claimCostBuilding;return CFG.claimCostEnemy;}
   return CFG.claimCostEmpty;
 }
-function getAdjBonus(key){
-  const h=hexes[key];if(!h.building||h.building==='townhall') return 1;
-  let b=1;
-  for(const nb of getNeighbors(h.q,h.r)){
-    const k=hexKey(nb.q,nb.r);
-    if(hexes[k]&&hexes[k].owner==='player'&&hexes[k].building===h.building) b+=CFG.adjBonus;
-  }
-  return b;
-}
 
-/* ═══════════════════════════════════════
+/* ════════════════════════════════
    CLAIM & BUILD
-═══════════════════════════════════════ */
+════════════════════════════════ */
 function startClaim(key){
-  const h=hexes[key];if(h.claimProg!==null) return;
-  const cost=getClaimCost(h);if(gold<cost){alert('Za mało złota!');return;}
-  gold-=cost;h.claimStart=Date.now();h.claimProg=0;
-  updateHUD();showHexInfo(key);
+  const h=hexes[key];if(h.claimProg!==null)return;
+  const cost=getClaimCost(h);if(gold<cost){return;}
+  gold-=cost;h.claimStart=Date.now();h.claimProg=0;updateHUD();showHexInfo(key);
 }
 function completeClaim(key){
-  const h=hexes[key];if(h.claimProg===null) return;
+  const h=hexes[key];if(h.claimProg===null)return;
   const wasEnemyTown=h.owner==='enemy'&&h.building==='townhall';
-  const wasEnemy=h.owner==='enemy';
   h.owner='player';h.claimProg=null;h.claimStart=null;
-  if(wasEnemy&&!wasEnemyTown) h.building=null;
+  // Keep enemy buildings when claiming
   showHexInfo(key);updateHUD();
-  if(wasEnemyTown) document.getElementById('win-screen').classList.add('show');
+  if(wasEnemyTown)document.getElementById('win-screen').classList.add('show');
 }
 function startBuild(key,type){
   const h=hexes[key];
-  if(type==='sawmill'){if(wood<CFG.buildSawmillWood){alert('Za mało drewna!');return;}wood-=CFG.buildSawmillWood;}
-  else{if(stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood){alert('Za mało surowców!');return;}stone-=CFG.buildQuarryStone;wood-=CFG.buildQuarryWood;}
-  h.buildingSrc=type==='sawmill'?randFrom(SRC.tartak):randFrom(SRC.kamieniolom);
+  if(type==='sawmill'){if(wood<CFG.buildSawmillWood)return;wood-=CFG.buildSawmillWood;}
+  else if(type==='quarry'){if(stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood)return;stone-=CFG.buildQuarryStone;wood-=CFG.buildQuarryWood;}
+  else if(type==='market'){if(gold<CFG.buildMarketGold)return;gold-=CFG.buildMarketGold;}
+  h.prevTerrainSrc=h.terrainSrc;
   h.buildType=type;h.buildStart=Date.now();h.buildProg=0;
   updateHUD();showHexInfo(key);
 }
 function completeBuild(key){
-  const h=hexes[key];if(h.buildProg===null) return;
-  h.building=h.buildType;
-  h.buildProg=null;h.buildStart=null;
-  // Budynek ZASTĘPUJE kafelek terenu — terrainSrc staje się ilustracją budynku
-  // Ratusz, tartak i kamieniołom są kafelkami same w sobie, bez terenu pod spodem
-  h.terrainSrc=h.buildingSrc;  // ilustracja budynku jako kafelek
-  h.buildingSrc=null;           // nie rysujemy osobnego overlaya budynku
-  // Teren logiczny: tartak=green, kamieniołom=gray (dla zasad gry)
-  if(h.buildType==='sawmill')   h.terrain='green';
-  if(h.buildType==='quarry')    h.terrain='gray';
-  h.buildType=null;
+  const h=hexes[key];if(h.buildProg===null)return;
+  setBuilding(key,h.buildType,h.owner,false);
+  h.buildProg=null;h.buildStart=null;h.buildType=null;
   showHexInfo(key);
 }
+function dismantleBuilding(key){
+  const h=hexes[key];if(!h.building||h.building==='townhall')return;
+  // Return 50% cost
+  if(h.building==='sawmill') wood+=Math.floor(CFG.buildSawmillWood*CFG.dismantleReturn);
+  else if(h.building==='quarry'){stone+=Math.floor(CFG.buildQuarryStone*CFG.dismantleReturn);wood+=Math.floor(CFG.buildQuarryWood*CFG.dismantleReturn);}
+  else if(h.building==='market') gold+=Math.floor(CFG.buildMarketGold*CFG.dismantleReturn);
+  h.building=null;
+  h.terrainSrc=h.prevTerrainSrc||(h.terrain==='green'?randFrom(SRC.drewno):randFrom(SRC.kamien));
+  h.buildingSrc=null;
+  updateHUD();showHexInfo(key);
+}
 
-/* ═══════════════════════════════════════
-   MUSIC MODAL
-═══════════════════════════════════════ */
+/* ════════════════════════════════
+   ADJACENCY & MARKET
+════════════════════════════════ */
+function getAdjBonus(key){
+  const h=hexes[key];if(!h.building||h.building==='townhall')return 1;
+  let b=1;
+  for(const nb of getNeighbors(h.q,h.r)){const k=hexKey(nb.q,nb.r);if(hexes[k]&&hexes[k].owner==='player'&&hexes[k].building===h.building)b+=CFG.adjBonus;}
+  return b;
+}
+function getMarketGroups(){
+  const vis=new Set(),groups=[];
+  for(const k of Object.keys(hexes)){
+    const h=hexes[k];
+    if(h.owner==='player'&&h.building==='market'&&!vis.has(k)){
+      const g=[],q=[k];vis.add(k);
+      while(q.length){const cur=q.shift();g.push(cur);for(const nb of getNeighbors(hexes[cur].q,hexes[cur].r)){const nk=hexKey(nb.q,nb.r);if(!vis.has(nk)&&hexes[nk]&&hexes[nk].owner==='player'&&hexes[nk].building==='market'){vis.add(nk);q.push(nk);}}}
+      groups.push(g);
+    }
+  }
+  return groups;
+}
+function tickMarkets(){
+  const groups=getMarketGroups();let total=0;
+  for(const g of groups){const pm=CFG.marketBase+(g.length-1)*CFG.marketGroupBonus;total+=pm*g.length;}
+  if(total>0){goldAccum+=total;const w=Math.floor(goldAccum);if(w>0){gold+=w;goldAccum-=w;updateHUD();}}
+}
+function tickTownhall(){
+  let count=0,tk=null;
+  for(const k of Object.keys(hexes)){const h=hexes[k];if(h.owner==='player'&&h.building==='townhall'){count++;tk=k;}}
+  if(count>0){gold+=CFG.townhallGold*count;wood+=CFG.townhallWood*count;stone+=CFG.townhallStone*count;updateHUD();if(tk)showTownhallTokens(tk);}
+}
+function showTownhallTokens(key){
+  const pos=getHexScreenPos(key);
+  [{src:SRC.token_gold,val:'+'+CFG.townhallGold},{src:SRC.token_wood,val:'+'+CFG.townhallWood},{src:SRC.token_stone,val:'+'+CFG.townhallStone}].forEach((t,i)=>{
+    const el=document.createElement('div');
+    el.style.cssText=`position:fixed;left:${pos.x-30+i*38}px;top:${pos.y-60}px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;z-index:400;animation:tokenPop 1.8s ease forwards;`;
+    el.innerHTML=`<img src="${t.src}" style="height:24px;image-rendering:pixelated;"><span style="font-family:Cinzel,serif;font-size:9px;font-weight:700;color:#f0d060;text-shadow:0 1px 3px #000;">${t.val}</span>`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1900);
+  });
+}
 
-/* ═══════════════════════════════════════
-   NUTY — PEŁNY ZAKRES
-═══════════════════════════════════════ */
-const NOTES_TREBLE = [
-  {id:'g',  name:'g',  freq:196.00, staffPos:-3, ledgers:[-2,-3]},
-  {id:'a',  name:'a',  freq:220.00, staffPos:-2, ledgers:[-2]},
-  {id:'h',  name:'h',  freq:246.94, staffPos:-1, ledgers:[]},
-  {id:'c1', name:'c¹', freq:261.63, staffPos:-0.5,ledgers:[-0.5]},
-  {id:'d1', name:'d¹', freq:293.66, staffPos:0,  ledgers:[]},
-  {id:'e1', name:'e¹', freq:329.63, staffPos:1,  ledgers:[]},
-  {id:'f1', name:'f¹', freq:349.23, staffPos:2,  ledgers:[]},
-  {id:'g1', name:'g¹', freq:392.00, staffPos:3,  ledgers:[]},
-  {id:'a1', name:'a¹', freq:440.00, staffPos:4,  ledgers:[]},
-  {id:'h1', name:'h¹', freq:493.88, staffPos:5,  ledgers:[]},
-  {id:'c2', name:'c²', freq:523.25, staffPos:6,  ledgers:[]},
-  {id:'d2', name:'d²', freq:587.33, staffPos:7,  ledgers:[]},
-  {id:'e2', name:'e²', freq:659.25, staffPos:8,  ledgers:[]},
-  {id:'f2', name:'f²', freq:698.46, staffPos:9,  ledgers:[]},
-  {id:'g2', name:'g²', freq:783.99, staffPos:10, ledgers:[]},
-  {id:'a2', name:'a²', freq:880.00, staffPos:11, ledgers:[]},
-  {id:'h2', name:'h²', freq:987.77, staffPos:12, ledgers:[]},
-  {id:'c3', name:'c³', freq:1046.5, staffPos:13, ledgers:[13]},
-  {id:'d3', name:'d³', freq:1174.7, staffPos:14, ledgers:[13]},
-  {id:'e3', name:'e³', freq:1318.5, staffPos:15, ledgers:[13,15]},
+/* ════════════════════════════════
+   HUD & SELL
+════════════════════════════════ */
+function updateHUD(){
+  document.getElementById('hud-gold').textContent=gold;
+  document.getElementById('hud-wood').textContent=wood;
+  document.getElementById('hud-stone').textContent=stone;
+}
+let sellOpen=false,settingsOpen=false;
+function toggleSellPanel(){sellOpen=!sellOpen;document.getElementById('sell-panel').classList.toggle('show',sellOpen);}
+function toggleSettings(){settingsOpen=!settingsOpen;document.getElementById('settings-panel').classList.toggle('show',settingsOpen);}
+function sellRes(type){
+  if(type==='wood'){if(wood<CFG.sellWoodRate)return;wood-=CFG.sellWoodRate;gold+=CFG.sellWoodGold;}
+  else{if(stone<CFG.sellStoneRate)return;stone-=CFG.sellStoneRate;gold+=CFG.sellStoneGold;}
+  updateHUD();
+}
+function setClickVol(v){clickVolume=parseFloat(v);}
+function toggleBuildIcons(v){showBuildIcons=v;}
+
+/* ════════════════════════════════
+   MUSIC MODAL — FULL STAFF
+════════════════════════════════ */
+// Klucz wiolinowy: staffPos relative — 0 = linia 1 (E1)
+// e1=linia1, f1=nad1, g1=linia2, a1=nad2, h1=linia3, c2=nad3, d2=linia4, e2=nad4, f2=linia5
+// Poniżej: d1=pod linią1, c1=1.dod.dolna, h=pod1dod, a=2.dod.dolna, g=nad2dod
+// Powyżej: g2=nad5, a2, h2, c3=1.dod.górna, d3=nad1dodgórnej
+const NOTES_TREBLE=[
+  {id:'g',  name:'g',  staffPos:-5, ledgers:[-4],      freq:196.00}, // 2.dod.dolna
+  {id:'a',  name:'a',  staffPos:-4, ledgers:[-4],      freq:220.00}, // nad 2.dod.dolną
+  {id:'h',  name:'h',  staffPos:-3, ledgers:[-2],      freq:246.94}, // pod 1.dod.dolną
+  {id:'c1', name:'c¹', staffPos:-2, ledgers:[-2],      freq:261.63}, // 1.dod.dolna
+  {id:'d1', name:'d¹', staffPos:-1, ledgers:[],        freq:293.66}, // pod linią 1
+  {id:'e1', name:'e¹', staffPos: 0, ledgers:[],        freq:329.63}, // linia 1
+  {id:'f1', name:'f¹', staffPos: 1, ledgers:[],        freq:349.23},
+  {id:'g1', name:'g¹', staffPos: 2, ledgers:[],        freq:392.00}, // linia 2
+  {id:'a1', name:'a¹', staffPos: 3, ledgers:[],        freq:440.00},
+  {id:'h1', name:'h¹', staffPos: 4, ledgers:[],        freq:493.88}, // linia 3
+  {id:'c2', name:'c²', staffPos: 5, ledgers:[],        freq:523.25},
+  {id:'d2', name:'d²', staffPos: 6, ledgers:[],        freq:587.33}, // linia 4
+  {id:'e2', name:'e²', staffPos: 7, ledgers:[],        freq:659.25},
+  {id:'f2', name:'f²', staffPos: 8, ledgers:[],        freq:698.46}, // linia 5
+  {id:'g2', name:'g²', staffPos: 9, ledgers:[],        freq:783.99},
+  {id:'a2', name:'a²', staffPos:10, ledgers:[10],      freq:880.00}, // 1.dod.górna
+  {id:'h2', name:'h²', staffPos:11, ledgers:[10],      freq:987.77},
+  {id:'c3', name:'c³', staffPos:12, ledgers:[10,12],   freq:1046.5}, // 2.dod.górna
+  {id:'d3', name:'d³', staffPos:13, ledgers:[10,12],   freq:1174.7},
 ];
-// Klucz basowy: staffPos relatywny — linia 1=G wielkie=staffPos 0
-const NOTES_BASS = [
-  {id:'C',  name:'C',  freq:65.41,  staffPos:-3, ledgers:[-2,-3]},
-  {id:'D',  name:'D',  freq:73.42,  staffPos:-2, ledgers:[-2]},
-  {id:'E',  name:'E',  freq:82.41,  staffPos:-1, ledgers:[-1]},
-  {id:'F',  name:'F',  freq:87.31,  staffPos:-0.5,ledgers:[]},
-  {id:'G',  name:'G',  freq:98.00,  staffPos:0,  ledgers:[]},
-  {id:'A',  name:'A',  freq:110.00, staffPos:1,  ledgers:[]},
-  {id:'H',  name:'H',  freq:123.47, staffPos:2,  ledgers:[]},
-  {id:'c',  name:'c',  freq:130.81, staffPos:3,  ledgers:[]},
-  {id:'d',  name:'d',  freq:146.83, staffPos:4,  ledgers:[]},
-  {id:'e',  name:'e',  freq:164.81, staffPos:5,  ledgers:[]},
-  {id:'f',  name:'f',  freq:174.61, staffPos:6,  ledgers:[]},
-  {id:'g',  name:'g',  freq:196.00, staffPos:7,  ledgers:[]},
-  {id:'a',  name:'a',  freq:220.00, staffPos:8,  ledgers:[]},
-  {id:'h',  name:'h',  freq:246.94, staffPos:9,  ledgers:[]},
-  {id:'c1', name:'c¹', freq:261.63, staffPos:10, ledgers:[10]},
-  {id:'d1', name:'d¹', freq:293.66, staffPos:11, ledgers:[10]},
-  {id:'e1', name:'e¹', freq:329.63, staffPos:12, ledgers:[10,12]},
-  {id:'f1', name:'f¹', freq:349.23, staffPos:13, ledgers:[10,12]},
+const NOTES_BASS=[
+  {id:'C',  name:'C',  staffPos:-5, ledgers:[-4],      freq:65.41},
+  {id:'D',  name:'D',  staffPos:-4, ledgers:[-4],      freq:73.42},
+  {id:'E',  name:'E',  staffPos:-3, ledgers:[-2],      freq:82.41},
+  {id:'F',  name:'F',  staffPos:-2, ledgers:[],        freq:87.31},
+  {id:'G',  name:'G',  staffPos:-1, ledgers:[],        freq:98.00},
+  {id:'A',  name:'A',  staffPos: 0, ledgers:[],        freq:110.00},
+  {id:'H',  name:'H',  staffPos: 1, ledgers:[],        freq:123.47},
+  {id:'c',  name:'c',  staffPos: 2, ledgers:[],        freq:130.81},
+  {id:'d',  name:'d',  staffPos: 3, ledgers:[],        freq:146.83},
+  {id:'e',  name:'e',  staffPos: 4, ledgers:[],        freq:164.81},
+  {id:'f',  name:'f',  staffPos: 5, ledgers:[],        freq:174.61},
+  {id:'g',  name:'g',  staffPos: 6, ledgers:[],        freq:196.00},
+  {id:'a',  name:'a',  staffPos: 7, ledgers:[],        freq:220.00},
+  {id:'h',  name:'h',  staffPos: 8, ledgers:[],        freq:246.94},
+  {id:'c1', name:'c¹', staffPos: 9, ledgers:[10],      freq:261.63},
+  {id:'d1', name:'d¹', staffPos:10, ledgers:[10],      freq:293.66},
+  {id:'e1', name:'e¹', staffPos:11, ledgers:[10,12],   freq:329.63},
+  {id:'f1', name:'f¹', staffPos:12, ledgers:[10,12],   freq:349.23},
 ];
-const BASS_BONUS = 0.20; // +20% wydobycia za klucz basowy
 
-let currentClef='treble';
-let currentNotes=NOTES_TREBLE;
-let mCtx={key:null,target:null,noteIdx:0,hexScreenX:0,hexScreenY:0};
+let currentClef='treble', currentNotes=NOTES_TREBLE;
+let mCtx={key:null,target:null,noteIdx:0};
+let audioCtxM=null;
 
 function setClef(clef){
-  currentClef=clef;
-  currentNotes=clef==='treble'?NOTES_TREBLE:NOTES_BASS;
+  currentClef=clef;currentNotes=clef==='treble'?NOTES_TREBLE:NOTES_BASS;
   document.getElementById('clef-treble').classList.toggle('on',clef==='treble');
   document.getElementById('clef-bass').classList.toggle('on',clef==='bass');
-  // Jeśli okno otwarte — odśwież
-  if(document.getElementById('music-modal').classList.contains('show')){
-    pickNewNote();
-  }
+  if(document.getElementById('music-modal').classList.contains('show'))pickNewNote();
 }
-
-/* Dźwięk kliknięcia */
-let audioCtxM=null;
 function playClickSound(up){
   try{
-    if(!audioCtxM) audioCtxM=new(window.AudioContext||window.webkitAudioContext)();
-    if(audioCtxM.state==='suspended') audioCtxM.resume();
-    const osc=audioCtxM.createOscillator();
-    const gain=audioCtxM.createGain();
+    if(!audioCtxM)audioCtxM=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtxM.state==='suspended')audioCtxM.resume();
+    const osc=audioCtxM.createOscillator(),gain=audioCtxM.createGain();
     osc.connect(gain);gain.connect(audioCtxM.destination);
     osc.type='sine';
-    osc.frequency.value=up?880:660;
-    gain.gain.setValueAtTime(0.18,audioCtxM.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001,audioCtxM.currentTime+0.12);
-    osc.start();osc.stop(audioCtxM.currentTime+0.12);
+    // Wysokość zależna od pozycji nuty (ale cichy, krótki)
+    const noteRatio=mCtx.noteIdx/(currentNotes.length-1);
+    osc.frequency.value=400+noteRatio*200; // 400-600Hz, nie za wysoki
+    gain.gain.setValueAtTime(clickVolume,audioCtxM.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,audioCtxM.currentTime+0.08);
+    osc.start();osc.stop(audioCtxM.currentTime+0.08);
   }catch(e){}
-}
-
-function getHexScreenPos(key){
-  const h=hexes[key];
-  if(!h) return {x:400,y:300};
-  const {sx,sy}=axialToScreen(h.q,h.r,originX,originY);
-  const wrap=document.getElementById('game-wrap');
-  const rect=wrap.getBoundingClientRect();
-  return {x:rect.left+sx, y:rect.top+sy};
-}
-
-function positionModal(hx,hy){
-  const modal=document.getElementById('music-modal');
-  const W=290,H=360;
-  const vw=window.innerWidth,vh=window.innerHeight;
-  let left=hx+40, top=hy-H/2;
-  if(left+W>vw-10) left=hx-W-40;
-  if(top<72) top=72;
-  if(top+H>vh-10) top=vh-H-10;
-  modal.style.left=left+'px';
-  modal.style.top=top+'px';
 }
 
 function openMusicModal(key){
   mCtx.key=key;
-  const pos=getHexScreenPos(key);
-  mCtx.hexScreenX=pos.x; mCtx.hexScreenY=pos.y;
   pickNewNote();
-  positionModal(pos.x,pos.y);
+  positionMusicModal(key);
   document.getElementById('music-modal').classList.add('show');
   showHarvestIcon(key);
 }
-
+function closeMusicModal(){
+  document.getElementById('music-modal').classList.remove('show');
+  document.getElementById('harvest-icon').classList.remove('show');
+}
+function positionMusicModal(key){
+  const modal=document.getElementById('music-modal');
+  const pos=getHexScreenPos(key);
+  const W=280,H=340,vw=window.innerWidth,vh=window.innerHeight;
+  let left=pos.x+Math.round(HS*.9), top=pos.y-H/2;
+  if(left+W>vw-10) left=pos.x-W-10;
+  if(top<62) top=62;
+  if(top+H>vh-10) top=vh-H-10;
+  modal.style.left=left+'px'; modal.style.top=top+'px';
+}
 function pickNewNote(){
   const idx=Math.floor(Math.random()*currentNotes.length);
   mCtx.target=currentNotes[idx];
@@ -1099,149 +985,105 @@ function pickNewNote(){
   document.getElementById('music-result').className='music-result';
   renderStaff();
 }
-
-function closeMusicModal(){
-  document.getElementById('music-modal').classList.remove('show');
-  document.getElementById('harvest-icon').classList.remove('show');
-}
-
-document.addEventListener('mousedown',e=>{
-  const modal=document.getElementById('music-modal');
-  const icon=document.getElementById('harvest-icon');
-  if(modal.classList.contains('show')&&!modal.contains(e.target)&&!icon.contains(e.target)){
-    closeMusicModal();
-  }
-});
-
 function moveNote(dir){
-  // dir: +1=wyżej, -1=niżej
   mCtx.noteIdx=Math.max(0,Math.min(currentNotes.length-1,mCtx.noteIdx+dir));
   playClickSound(dir>0);
-  renderStaff();
   document.getElementById('music-result').textContent='';
   document.getElementById('music-result').className='music-result';
+  renderStaff();
 }
-
 function confirmNote(){
   const chosen=currentNotes[mCtx.noteIdx];
   const resEl=document.getElementById('music-result');
   if(chosen.id===mCtx.target.id){
-    // Oblicz wydobycie
-    const baseBonus=getAdjBonus(mCtx.key);
-    const clefBonus=currentClef==='bass'?(1+BASS_BONUS):1;
-    const amount=Math.max(1,Math.round(baseBonus*clefBonus));
+    harvestStreak++;
+    const adjB=getAdjBonus(mCtx.key);
+    const clefB=currentClef==='bass'?(1+CFG.bassBonus):1;
+    const streakB=1+harvestStreak*CFG.streakBonus;
+    const amount=Math.max(1,Math.round(adjB*clefB*streakB));
     const h=hexes[mCtx.key];
-    resEl.textContent='✓ +'+amount+(h.building==='sawmill'?' 🪵':' 🪨');
+    resEl.textContent='✓ +'+amount+(h.building==='sawmill'?' 🪵':' 🪨')+(harvestStreak>1?' (seria ×'+harvestStreak+')':'');
     resEl.className='music-result ok';
-    if(h.building==='sawmill') wood+=amount; else stone+=amount;
-    updateHUD();
-    if(selected===mCtx.key) showHexInfo(mCtx.key);
-    // Po chwili — nowa nuta
-    setTimeout(()=>{ pickNewNote(); },600);
+    if(h.building==='sawmill')wood+=amount; else stone+=amount;
+    updateHUD(); if(selected===mCtx.key)showHexInfo(mCtx.key);
+    setTimeout(()=>pickNewNote(),600);
   } else {
+    harvestStreak=0;
     resEl.textContent='✗ Zagrano: '+chosen.name+', cel: '+mCtx.target.name;
     resEl.className='music-result fail';
+    // Immediately randomize new note
+    setTimeout(()=>pickNewNote(),800);
   }
 }
-
 function showHarvestIcon(key){
-  const h=hexes[key];
-  if(!h) return;
+  const h=hexes[key];if(!h)return;
   const icon=document.getElementById('harvest-icon');
   const pos=getHexScreenPos(key);
-  icon.style.left=(pos.x-55)+'px';
-  icon.style.top=(pos.y-24)+'px';
-  icon.innerHTML=h.building==='sawmill'
-    ?`<img src="${SRC.token_drewno}" style="height:38px;image-rendering:pixelated;">`
-    :`<img src="${SRC.token_kamien}" style="height:38px;image-rendering:pixelated;">`;
+  icon.style.left=(pos.x-50)+'px'; icon.style.top=(pos.y-24)+'px';
+  icon.innerHTML=h.building==='sawmill'?`<img src="${SRC.token_wood}" style="height:36px;image-rendering:pixelated;">`:`<img src="${SRC.token_stone}" style="height:36px;image-rendering:pixelated;">`;
   icon.classList.add('show');
 }
 
-/* ═══════════════════════════════════════
-   RYSOWANIE PIĘCIOLINII
-═══════════════════════════════════════ */
+/* ════════════════════════════════
+   STAFF SVG RENDERER
+════════════════════════════════ */
 function renderStaff(){
   const svg=document.getElementById('staff-svg');
-  const W=280, H=140;
-  // Pięciolinia: 5 linii, STEP=12px między liniami
-  // Linia 1 (najniższa) na Y=staffBot, linia 5 na Y=staffBot-4*STEP
-  const STEP=12;   // odległość między liniami
-  const staffBot=H-28; // Y dolnej linii
-  const staffLeft=44, staffRight=W-12;
-  const noteX=staffLeft+125; // X nuty
+  const W=242, H=130;
+  const STEP=11;           // px between staff lines
+  // 5 staff lines. Line 1 (bottom) = staffPos 0.
+  // Y of staffPos p = staffMid - p*(STEP/2)
+  // We want staffPos 4 (middle of staff = 3rd line from bottom at staffPos 4) to be near center
+  // Lines are at staffPos 0,2,4,6,8
+  const staffMid = H - 20 - 4*(STEP/2); // y of staffPos 0 (bottom line)
 
-  // staffPos 0 = linia 1 (dolna), każdy +1 = jedno miejsce wyżej (pół kroku)
-  // Y pozycja nuty: staffBot - staffPos*(STEP/2)
-  function posToY(sp){ return staffBot - sp*(STEP/2); }
+  function posToY(p){ return staffMid - p*(STEP/2); }
 
-  const chosen=currentNotes[mCtx.noteIdx];
-  const target=mCtx.target;
+  const chosen = currentNotes[mCtx.noteIdx];
+  const target = mCtx.target;
 
-  let s='';
-  // Tło
-  s+=`<rect width="${W}" height="${H}" rx="8" fill="#020c02" stroke="#3a5a1a" stroke-width="1.5"/>`;
+  let s = '';
+  s += `<rect width="${W}" height="${H}" rx="7" fill="#020c02" stroke="#3a5a1a" stroke-width="1.5"/>`;
 
-  // 5 linii pięciolinii
+  const staffLeft=38, staffRight=W-10;
+
+  // 5 main staff lines (staffPos 0,2,4,6,8)
   for(let i=0;i<5;i++){
-    const ly=staffBot-i*STEP;
-    s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.9" opacity="0.7"/>`;
+    const ly=posToY(i*2);
+    s+=`<line x1="${staffLeft}" y1="${ly}" x2="${staffRight}" y2="${ly}" stroke="#c8b87a" stroke-width="0.85" opacity="0.65"/>`;
   }
 
-  // Klucz
-  if(currentClef==='treble'){
-    // Klucz wiolinowy
-    s+=`<text x="4" y="${staffBot+4}" font-size="60" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄞</text>`;
-  } else {
-    // Klucz basowy
-    s+=`<text x="6" y="${staffBot-STEP*1.5}" font-size="36" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄢</text>`;
-  }
-
-  // Dodane linie ledger dla WYBRANEJ nuty
-  const allLedgers = new Set(chosen.ledgers || []);
-  allLedgers.forEach(lp=>{
+  // Ledger lines for chosen note
+  const ledgersDone=new Set();
+  for(const lp of (chosen.ledgers||[])){
+    if(ledgersDone.has(lp))continue; ledgersDone.add(lp);
     const ly=posToY(lp);
-    s+=`<line x1="${noteX-11}" y1="${ly}" x2="${noteX+11}" y2="${ly}" stroke="#c8b87a" stroke-width="1.3"/>`;
-  });
+    s+=`<line x1="${W/2-14}" y1="${ly}" x2="${W/2+14}" y2="${ly}" stroke="#c8b87a" stroke-width="1.2"/>`;
+  }
 
-  // Nuta wybrana
-  const ny=posToY(chosen.staffPos);
-  const stemUp=chosen.staffPos<4.5; // poniżej środka pięciolinii => ogon w górę
-  const stemX=stemUp?noteX+7.5:noteX-7.5;
-  const stemY2=ny+(stemUp?-28:28);
-  s+=`<ellipse cx="${noteX}" cy="${ny}" rx="7.5" ry="5" fill="#f0d060" transform="rotate(-14,${noteX},${ny})"/>`;
-  s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${stemY2}" stroke="#f0d060" stroke-width="1.6"/>`;
+  // Clef symbol
+  if(currentClef==='treble'){
+    s+=`<text x="3" y="${posToY(0)+4}" font-size="54" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄞</text>`;
+  } else {
+    s+=`<text x="5" y="${posToY(4)+2}" font-size="32" font-family="Georgia,serif" fill="#d4af37" opacity="0.9">𝄢</text>`;
+  }
 
-  // Nazwa nuty docelowej — wyświetlana z boku (nie na pięciolinii)
+  // Target indicator — small arrow on right side at target Y
   const targetY=posToY(target.staffPos);
-  // Mały wskaźnik celu: strzałka po prawej stronie pięciolinii
-  s+=`<text x="${W-6}" y="${targetY+4}" font-size="9" fill="#5a8a4a" text-anchor="end" font-family="Cinzel,serif" opacity="0.8">← ${target.name}</text>`;
+  s+=`<text x="${W-4}" y="${Math.min(H-4,Math.max(10,targetY+4))}" font-size="9" fill="rgba(100,160,80,.7)" text-anchor="end" font-family="Cinzel,serif">◀ ${target.name}</text>`;
+
+  // Chosen note
+  const noteX=W/2;
+  const ny=posToY(chosen.staffPos);
+  const stemUp=chosen.staffPos<4;
+  const stemX=stemUp?noteX+7.5:noteX-7.5;
+  const stemY2=ny+(stemUp?-26:26);
+  s+=`<ellipse cx="${noteX}" cy="${ny}" rx="7" ry="4.8" fill="#f0d060" transform="rotate(-14,${noteX},${ny})"/>`;
+  s+=`<line x1="${stemX}" y1="${ny}" x2="${stemX}" y2="${stemY2}" stroke="#f0d060" stroke-width="1.5"/>`;
 
   svg.innerHTML=s;
 }
 
-/* ═══════════════════════════════════════
-   HUD & SELL
-═══════════════════════════════════════ */
-function updateHUD(){
-  document.getElementById('hud-gold').textContent=gold;
-  document.getElementById('hud-wood').textContent=wood;
-  document.getElementById('hud-stone').textContent=stone;
-}
-let sellOpen=false;
-function toggleSellPanel(){
-  sellOpen=!sellOpen;
-  document.getElementById('sell-panel').classList.toggle('show',sellOpen);
-}
-function sellRes(type){
-  if(type==='wood'){if(wood<CFG.sellWoodRate){alert('Potrzebujesz '+CFG.sellWoodRate+' drewna.');return;}wood-=CFG.sellWoodRate;gold+=CFG.sellWoodGold;}
-  else{if(stone<CFG.sellStoneRate){alert('Potrzebujesz '+CFG.sellStoneRate+' kamienia.');return;}stone-=CFG.sellStoneRate;gold+=CFG.sellStoneGold;}
-  updateHUD();
-}
-
-/* ═══════════════════════════════════════
-   START
-═══════════════════════════════════════ */
-initGame();
 </script>
 </body>
 </html>
