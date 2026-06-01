@@ -1,1197 +1,780 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Piano Learning Book — Interactive Course</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Asystent Ćwiczeń – Łukasz Ganczarek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{--gold:#d4af37;--navy:#1e3a8a;--green:#16a34a;--red:#dc2626;--border:#e2e8f0;--text:#334155;--bg:#f8fafc;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min-height:100vh;}
 
-  :root {
-    --ivory: #F8F4EC;
-    --cream: #EDE8DC;
-    --warm-black: #1A1410;
-    --brown: #6B4F3A;
-    --amber: #C8882A;
-    --amber-light: #F0C870;
-    --key-white: #FDF9F0;
-    --key-black: #1A1410;
-    --shadow: rgba(26,20,16,0.15);
-    --active-glow: #C8882A;
-    --correct: #2E7D52;
-    --wrong: #B03030;
-  }
+/* NAV */
+.site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
+.site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
+.site-nav a:hover{color:var(--gold);}
+.site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+@media(max-width:700px){.site-nav{display:none;}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+.mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+.mobile-nav a .mn-icon{font-size:1.15rem;}
+.mobile-nav a:hover,.mobile-nav a.active{color:var(--navy);}
+.mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+@media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
 
-  html { scroll-behavior: smooth; }
+/* LAYOUT */
+.app{max-width:1100px;margin:0 auto;padding:100px 16px 60px;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.screen{animation:fadeIn 0.35s ease;}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--ivory);
-    color: var(--warm-black);
-    line-height: 1.7;
-    min-height: 100vh;
-  }
+/* CARDS */
+.card{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.06);padding:28px;}
+.card-sm{background:white;border-radius:16px;border:1px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,0.05);padding:18px;}
 
-  /* ── COVER ── */
-  #cover {
-    min-height: 100vh;
-    background: var(--warm-black);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-  }
-  #cover::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 38px,
-      rgba(255,255,255,0.03) 38px,
-      rgba(255,255,255,0.03) 40px
-    );
-    pointer-events: none;
-  }
-  .cover-subtitle {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    font-size: 0.85rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--amber);
-    margin-bottom: 1.5rem;
-  }
-  .cover-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 8vw, 6rem);
-    font-weight: 700;
-    color: var(--key-white);
-    line-height: 1.05;
-    margin-bottom: 0.5rem;
-  }
-  .cover-title em {
-    font-style: italic;
-    color: var(--amber-light);
-  }
-  .cover-desc {
-    color: rgba(255,255,255,0.55);
-    font-size: 1.05rem;
-    max-width: 480px;
-    margin: 1.5rem auto 2.5rem;
-  }
-  .btn-primary {
-    background: var(--amber);
-    color: var(--warm-black);
-    border: none;
-    padding: 0.85rem 2.2rem;
-    border-radius: 2rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  .btn-primary:hover { background: var(--amber-light); transform: translateY(-2px); }
-  .cover-piano-hint {
-    margin-top: 3rem;
-    color: rgba(255,255,255,0.25);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-  }
+/* TYPOGRAPHY */
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--navy);margin-bottom:8px;}
+.page-sub{color:#64748b;font-size:0.95rem;line-height:1.7;max-width:600px;}
+.label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:6px;}
+.badge{display:inline-block;padding:4px 14px;border-radius:50px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;}
+.badge-gold{background:#fef9e7;color:#92710a;border:1px solid #fde68a;}
+.badge-navy{background:#eff6ff;color:var(--navy);border:1px solid #bfdbfe;}
+.badge-green{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+.badge-purple{background:#faf5ff;color:#7c3aed;border:1px solid #e9d5ff;}
 
-  /* ── NAV ── */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(248,244,236,0.92);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--cream);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    height: 56px;
-  }
-  .nav-logo {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    margin-right: auto;
-    color: var(--warm-black);
-  }
-  .nav-logo span { color: var(--amber); }
-  .nav-links { display: flex; gap: 0.25rem; }
-  .nav-link {
-    font-size: 0.85rem;
-    font-weight: 400;
-    color: var(--brown);
-    text-decoration: none;
-    padding: 0.35rem 0.75rem;
-    border-radius: 1rem;
-    transition: background 0.15s, color 0.15s;
-  }
-  .nav-link:hover, .nav-link.active { background: var(--cream); color: var(--warm-black); }
+/* BUTTONS */
+.btn{padding:12px 28px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.88rem;border:none;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary{background:var(--navy);color:white;}
+.btn-primary:hover{background:#1e40af;transform:translateY(-1px);}
+.btn-gold{background:var(--gold);color:#1a1a2e;}
+.btn-gold:hover{background:#c9a227;transform:translateY(-1px);}
+.btn-outline{background:white;color:var(--navy);border:2px solid var(--navy);}
+.btn-outline:hover{background:#f0f7ff;}
+.btn-ghost{background:transparent;color:#64748b;border:1px solid var(--border);}
+.btn-ghost:hover{background:#f8fafc;color:var(--navy);}
+.btn-green{background:#16a34a;color:white;}
+.btn-green:hover{background:#15803d;transform:translateY(-1px);}
+.btn-red{background:var(--red);color:white;}
+.btn-red:hover{background:#b91c1c;}
+.btn-big{padding:18px 40px;font-size:1rem;border-radius:60px;box-shadow:0 6px 24px rgba(30,58,138,0.25);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important;}
 
-  /* ── MAIN LAYOUT ── */
-  main { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr;}}
 
-  .chapter {
-    padding: 4rem 0 2rem;
-    border-bottom: 1px solid var(--cream);
-  }
-  .chapter-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--amber);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-  }
-  h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 4vw, 2.6rem);
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-  }
-  h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    font-weight: 400;
-    margin: 2rem 0 0.75rem;
-  }
-  p { color: #3D3028; margin-bottom: 1rem; }
-  .lead { font-size: 1.1rem; color: var(--brown); margin-bottom: 1.5rem; }
+/* OPTION TILE */
+.opt-tile{background:white;border:2px solid var(--border);border-radius:16px;padding:16px 20px;cursor:pointer;transition:all 0.2s;text-align:left;}
+.opt-tile:hover{border-color:var(--navy);background:#f0f7ff;}
+.opt-tile.selected{border-color:var(--navy);background:#f0f7ff;box-shadow:0 0 0 3px rgba(30,58,138,0.12);}
+.opt-tile h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;margin:4px 0 6px;}
+.opt-tile p{font-size:0.8rem;color:#64748b;line-height:1.5;}
 
-  /* ── INFO BOX ── */
-  .info-box {
-    background: var(--cream);
-    border-left: 3px solid var(--amber);
-    border-radius: 0 8px 8px 0;
-    padding: 1rem 1.25rem;
-    margin: 1.5rem 0;
-    font-size: 0.95rem;
-  }
-  .info-box strong { color: var(--amber); }
+/* PROGRESS BAR */
+.prog-bar-wrap{background:#e2e8f0;border-radius:20px;height:10px;overflow:hidden;margin:6px 0;}
+.prog-bar-fill{height:100%;border-radius:20px;transition:width 1s linear;}
 
-  /* ── PIANO KEYBOARD ── */
-  .piano-wrap {
-    margin: 2rem 0;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-  }
-  .piano {
-    position: relative;
-    display: flex;
-    height: 160px;
-    width: max-content;
-    margin: 0 auto;
-    user-select: none;
-  }
-  .key-w {
-    width: 48px;
-    height: 160px;
-    background: var(--key-white);
-    border: 1px solid #C8BEA8;
-    border-radius: 0 0 6px 6px;
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 8px;
-    font-size: 11px;
-    font-weight: 500;
-    color: #8C7A6A;
-    transition: background 0.08s;
-    box-shadow: 0 4px 8px var(--shadow);
-    flex-shrink: 0;
-  }
-  .key-w:hover { background: #FFF8EC; }
-  .key-w.active, .key-w.playing {
-    background: var(--amber-light) !important;
-    box-shadow: 0 2px 4px var(--shadow) inset;
-    color: var(--warm-black);
-  }
-  .key-w.highlight {
-    background: #FFF3D0;
-    border-color: var(--amber);
-  }
-  .key-w.correct { background: #C8ECD8 !important; }
-  .key-w.wrong { background: #F5C6C6 !important; }
+/* TIMER */
+.timer-ring-wrap{position:relative;width:120px;height:120px;flex-shrink:0;}
+.timer-ring-wrap svg{transform:rotate(-90deg);}
+.timer-ring-wrap .timer-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.timer-mm{font-size:1.6rem;font-weight:800;color:var(--navy);line-height:1;font-family:'Playfair Display',serif;}
+.timer-label{font-size:0.6rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;}
 
-  .key-b {
-    width: 30px;
-    height: 100px;
-    background: var(--key-black);
-    border-radius: 0 0 4px 4px;
-    position: absolute;
-    top: 0;
-    z-index: 2;
-    cursor: pointer;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 6px;
-    font-size: 9px;
-    color: rgba(255,255,255,0.4);
-    transition: background 0.08s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-  }
-  .key-b:hover { background: #3A3028; }
-  .key-b.active, .key-b.playing {
-    background: var(--brown) !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4) inset;
-  }
-  .key-b.correct { background: #2E7D52 !important; }
-  .key-b.wrong { background: var(--wrong) !important; }
+/* PHASE BAR */
+.phase-bar{display:flex;gap:6px;margin-bottom:24px;}
+.phase-seg{flex:1;height:6px;border-radius:10px;background:#e2e8f0;transition:background 0.4s;}
+.phase-seg.done{background:var(--green);}
+.phase-seg.active{background:var(--navy);}
 
-  .piano-label {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--brown);
-    margin-top: 0.5rem;
-  }
+/* SESSION HEADER */
+.sess-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.sess-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);}
+.sess-controls{display:flex;gap:8px;align-items:center;}
 
-  /* ── STAFF / SHEET MUSIC ── */
-  .staff-wrap { margin: 2rem 0; overflow-x: auto; }
-  .staff-svg { display: block; margin: 0 auto; max-width: 100%; }
+/* EXERCISE CARD */
+.ex-card{background:white;border-radius:20px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.07);padding:24px;margin-bottom:16px;}
+.ex-card .ex-type{font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:#94a3b8;margin-bottom:6px;}
+.ex-card .ex-title{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--navy);margin-bottom:8px;}
+.ex-card .ex-desc{font-size:0.9rem;color:#475569;line-height:1.7;}
+.ex-card .ex-repeat{display:inline-block;background:#fef9e7;color:#92710a;border:1px solid #fde68a;border-radius:50px;padding:5px 16px;font-size:0.78rem;font-weight:700;margin-top:10px;}
+.ex-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
 
-  /* ── NOTE CARDS ── */
-  .note-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-  }
-  .note-card {
-    background: white;
-    border: 1px solid var(--cream);
-    border-radius: 12px;
-    padding: 1rem 0.75rem;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
-  }
-  .note-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px var(--shadow); border-color: var(--amber); }
-  .note-card.playing { border-color: var(--amber); background: #FFF8EC; }
-  .note-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--warm-black);
-    line-height: 1;
-  }
-  .note-desc { font-size: 0.78rem; color: var(--brown); margin-top: 0.3rem; }
-  .note-keys { font-size: 0.75rem; color: #999; margin-top: 0.2rem; }
+/* IFRAME WRAP */
+.iframe-wrap{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.08);background:white;width:100%;height:600px;}
+.iframe-wrap iframe{width:100%;height:100%;border:none;display:block;}
 
-  /* ── QUIZ SECTION ── */
-  .quiz-box {
-    background: white;
-    border: 1px solid var(--cream);
-    border-radius: 16px;
-    padding: 2rem;
-    margin: 2rem 0;
-  }
-  .quiz-question {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    margin-bottom: 1.25rem;
-    text-align: center;
-  }
-  .quiz-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  .quiz-opt {
-    background: var(--ivory);
-    border: 1.5px solid var(--cream);
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    font-size: 0.95rem;
-    text-align: center;
-    transition: all 0.15s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .quiz-opt:hover { border-color: var(--amber); background: #FFF8EC; }
-  .quiz-opt.correct { background: #EAF7EF; border-color: var(--correct); color: var(--correct); }
-  .quiz-opt.wrong { background: #FAEAEA; border-color: var(--wrong); color: var(--wrong); }
-  .quiz-feedback {
-    text-align: center;
-    font-size: 0.95rem;
-    min-height: 1.5rem;
-    color: var(--brown);
-  }
-  .quiz-score {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: var(--brown);
-  }
-  .quiz-score strong { font-size: 1.3rem; color: var(--warm-black); display: block; text-align: center; }
+/* NEXT PHASE BUTTON */
+.next-phase-wrap{display:flex;justify-content:flex-end;margin-top:24px;}
+.next-phase-btn{padding:20px 48px;font-size:1.05rem;border-radius:60px;background:var(--navy);color:white;border:none;font-family:'Poppins',sans-serif;font-weight:800;cursor:pointer;transition:all 0.25s;box-shadow:0 8px 32px rgba(30,58,138,0.28);display:flex;align-items:center;gap:10px;animation:pulsebtn 2.5s infinite;}
+.next-phase-btn:hover{background:var(--gold);color:#1a1a2e;transform:translateY(-2px);}
+@keyframes pulsebtn{0%{box-shadow:0 0 0 0 rgba(30,58,138,0.4);}70%{box-shadow:0 0 0 14px rgba(30,58,138,0);}100%{box-shadow:0 0 0 0 rgba(30,58,138,0);}}
 
-  /* ── CHORD BUILDER ── */
-  .chord-builder {
-    background: white;
-    border: 1px solid var(--cream);
-    border-radius: 16px;
-    padding: 2rem;
-    margin: 2rem 0;
-  }
-  .chord-selector {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.25rem;
-  }
-  .chord-btn {
-    padding: 0.4rem 0.9rem;
-    border: 1.5px solid var(--cream);
-    border-radius: 2rem;
-    background: var(--ivory);
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-family: 'DM Sans', sans-serif;
-    transition: all 0.15s;
-  }
-  .chord-btn:hover { border-color: var(--amber); }
-  .chord-btn.active { background: var(--amber); border-color: var(--amber); color: white; font-weight: 500; }
+/* LOGIN INFO BANNER */
+.info-banner{background:linear-gradient(135deg,#0f172a,#1e3a8a);border-radius:20px;padding:22px 24px;color:white;display:flex;gap:16px;align-items:flex-start;margin-bottom:24px;}
+.info-banner .ib-icon{font-size:1.8rem;flex-shrink:0;margin-top:2px;}
+.info-banner h4{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--gold);margin-bottom:4px;}
+.info-banner p{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;}
 
-  .chord-info {
-    font-size: 0.9rem;
-    color: var(--brown);
-    margin-bottom: 1rem;
-    min-height: 2rem;
-  }
+/* TIME PICKER */
+.time-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.time-btn{padding:10px 20px;border-radius:50px;border:2px solid var(--border);background:white;color:var(--text);font-family:'Poppins',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:0.2s;}
+.time-btn.selected{border-color:var(--navy);background:var(--navy);color:white;}
+.time-custom{padding:10px 16px;border-radius:50px;border:2px solid var(--border);font-family:'Poppins',sans-serif;font-size:0.88rem;font-weight:700;width:120px;text-align:center;outline:none;}
+.time-custom:focus{border-color:var(--navy);}
 
-  /* ── RHYTHM TRAINER ── */
-  .rhythm-trainer {
-    background: white;
-    border: 1px solid var(--cream);
-    border-radius: 16px;
-    padding: 2rem;
-    margin: 2rem 0;
-  }
-  .beat-row {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
-    align-items: center;
-  }
-  .beat-label { font-size: 0.8rem; color: var(--brown); width: 60px; flex-shrink: 0; }
-  .beat {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    border: 1.5px solid var(--cream);
-    background: var(--ivory);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    transition: all 0.1s;
-    flex-shrink: 0;
-  }
-  .beat.on { background: var(--amber); border-color: var(--amber); }
-  .beat.playing-beat { transform: scale(1.18); background: var(--amber-light) !important; border-color: var(--amber-light) !important; }
-  .tempo-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 1rem 0;
-  }
-  .tempo-row label { font-size: 0.9rem; color: var(--brown); flex-shrink: 0; }
-  .tempo-row input[type=range] { flex: 1; }
-  #tempo-val { font-weight: 500; min-width: 48px; }
-  .rhythm-controls { display: flex; gap: 0.75rem; margin-top: 1rem; }
-  .btn-secondary {
-    padding: 0.55rem 1.2rem;
-    border: 1.5px solid var(--amber);
-    border-radius: 2rem;
-    background: transparent;
-    color: var(--amber);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .btn-secondary:hover { background: var(--amber); color: white; }
-  .btn-secondary.active-btn { background: var(--amber); color: white; }
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.toggle-sw{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle-sw input{opacity:0;width:0;height:0;}
+.toggle-sl{position:absolute;cursor:pointer;inset:0;background:#cbd5e1;border-radius:20px;transition:0.3s;}
+.toggle-sl:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+.toggle-sw input:checked+.toggle-sl{background:var(--navy);}
+.toggle-sw input:checked+.toggle-sl:before{transform:translateX(16px);}
+.toggle-lbl{font-size:0.82rem;font-weight:600;color:var(--text);}
 
-  /* ── PROGRESS ── */
-  .progress-track {
-    display: flex;
-    gap: 0;
-    margin: 2rem 0;
-    border-radius: 2rem;
-    overflow: hidden;
-    border: 1px solid var(--cream);
-  }
-  .progress-step {
-    flex: 1;
-    padding: 0.6rem 0.5rem;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--brown);
-    background: var(--ivory);
-    cursor: pointer;
-    transition: background 0.15s;
-    border-right: 1px solid var(--cream);
-  }
-  .progress-step:last-child { border-right: none; }
-  .progress-step.done { background: #EAF7EF; color: var(--correct); }
-  .progress-step.current { background: var(--amber); color: white; font-weight: 500; }
+/* SUMMARY */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0;}
+.summary-item{background:white;border-radius:14px;border:1px solid var(--border);padding:16px;text-align:center;}
+.summary-item .si-num{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--navy);}
+.summary-item .si-lbl{font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
 
-  /* ── SCALES SECTION ── */
-  .scale-diagram {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin: 1rem 0;
-    flex-wrap: wrap;
-  }
-  .scale-note {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 2px solid var(--cream);
-    background: var(--ivory);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 500;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.12s;
-    flex-shrink: 0;
-  }
-  .scale-note.root { background: var(--amber); border-color: var(--amber); color: white; }
-  .scale-note:hover { border-color: var(--amber); transform: scale(1.1); }
-  .scale-note.playing { background: var(--amber-light); border-color: var(--amber); }
-  .scale-arrow { color: var(--cream); font-size: 1.2rem; }
+/* PHASE LIST */
+.phase-list{list-style:none;padding:0;}
+.phase-list li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:0.88rem;color:#475569;}
+.phase-list li:last-child{border-bottom:none;}
+.phase-list .pl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 
-  /* ── FOOTER ── */
-  footer {
-    background: var(--warm-black);
-    color: rgba(255,255,255,0.45);
-    text-align: center;
-    padding: 2rem;
-    font-size: 0.85rem;
-  }
-  footer a { color: var(--amber); text-decoration: none; }
+/* RANGE INPUT */
+input[type=range]{accent-color:var(--navy);cursor:pointer;height:6px;}
 
-  @media (max-width: 600px) {
-    nav { padding: 0 1rem; }
-    .nav-links { display: none; }
-    .quiz-options { grid-template-columns: 1fr; }
-    h2 { font-size: 1.8rem; }
-  }
+/* CLEF PICKER */
+.clef-btn{padding:8px 18px;border-radius:50px;border:2px solid var(--border);background:white;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:0.2s;color:var(--text);}
+.clef-btn.sel{border-color:var(--navy);background:var(--navy);color:white;}
 </style>
 </head>
 <body>
 
-<!-- ══════════ COVER ══════════ -->
-<section id="cover">
-  <p class="cover-subtitle">Interactive Learning Book</p>
-  <h1 class="cover-title">The Art of<br><em>Piano</em></h1>
-  <p class="cover-desc">From your very first note to full chords and rhythms — a hands-on guide that plays alongside you.</p>
-  <a href="#chapter-1" class="btn-primary">Begin Learning</a>
-  <p class="cover-piano-hint">🎹 Click any key to hear it play</p>
-</section>
-
-<!-- ══════════ NAV ══════════ -->
-<nav>
-  <span class="nav-logo">Piano<span>Book</span></span>
-  <div class="nav-links">
-    <a class="nav-link" href="#chapter-1">The Keys</a>
-    <a class="nav-link" href="#chapter-2">Notes</a>
-    <a class="nav-link" href="#chapter-3">Chords</a>
-    <a class="nav-link" href="#chapter-4">Scales</a>
-    <a class="nav-link" href="#chapter-5">Rhythm</a>
-    <a class="nav-link" href="#chapter-6">Practice</a>
+<nav class="site-nav">
+  <a href="/index.html">Strona główna</a>
+  <a href="/index/fiszki.html">Fiszki</a>
+  <a href="/index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/podrecznik/podrecznik.html">Podręcznik</a>
+  <a href="/index.html#briefy">Materiały</a>
+</nav>
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="/index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="/index/fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
 
-<main>
-
-<!-- ══════════ CHAPTER 1: THE KEYS ══════════ -->
-<article class="chapter" id="chapter-1">
-  <p class="chapter-label">Chapter 1</p>
-  <h2>Meet the Keyboard</h2>
-  <p class="lead">The piano keyboard is your map. Every key has a name, a sound, and a place in music. Let's explore it together.</p>
-
-  <p>A standard piano has <strong>88 keys</strong> — 52 white and 36 black. The black keys are arranged in groups of 2 and 3, which is how you navigate the instrument without looking.</p>
-
-  <div class="info-box">
-    <strong>Tip:</strong> Find the group of <em>two black keys</em> in the middle of your keyboard. The white key just to the left of them is always <strong>C</strong> — your anchor note.
-  </div>
-
-  <h3>Interactive Keyboard — click any key to hear it</h3>
-  <div class="piano-wrap">
-    <div class="piano" id="piano-main"></div>
-  </div>
-  <p class="piano-label">One octave (C4 to C5) · Click or use keyboard keys A–K for white keys</p>
-
-  <h3>Key Names</h3>
-  <p>The white keys follow the musical alphabet: <strong>A B C D E F G</strong> — then it repeats. The black keys have two names each (like C# / D♭) because they sit between two white notes.</p>
-
-  <p>Notice the pattern: there's no black key between <strong>E and F</strong>, and none between <strong>B and C</strong>. This natural gap is what gives the piano its distinctive look.</p>
-</article>
-
-<!-- ══════════ CHAPTER 2: NOTES & READING ══════════ -->
-<article class="chapter" id="chapter-2">
-  <p class="chapter-label">Chapter 2</p>
-  <h2>Reading Notes</h2>
-  <p class="lead">Sheet music is a visual language. Once you know a few symbols, you can decode any piece of music ever written.</p>
-
-  <h3>The Staff</h3>
-  <p>Music is written on five horizontal lines called the <strong>staff</strong>. Notes sit on the lines or in the spaces between them. Their position tells you which pitch to play.</p>
-
-  <div class="staff-wrap">
-    <svg class="staff-svg" viewBox="0 0 740 140" width="740" height="140" xmlns="http://www.w3.org/2000/svg">
-      <!-- Staff lines -->
-      <line x1="60" y1="30" x2="720" y2="30" stroke="#C8BEA8" stroke-width="1.5"/>
-      <line x1="60" y1="50" x2="720" y2="50" stroke="#C8BEA8" stroke-width="1.5"/>
-      <line x1="60" y1="70" x2="720" y2="70" stroke="#C8BEA8" stroke-width="1.5"/>
-      <line x1="60" y1="90" x2="720" y2="90" stroke="#C8BEA8" stroke-width="1.5"/>
-      <line x1="60" y1="110" x2="720" y2="110" stroke="#C8BEA8" stroke-width="1.5"/>
-      <!-- Treble Clef Symbol -->
-      <text x="65" y="100" font-size="88" font-family="serif" fill="#6B4F3A" transform="scale(1,1)">𝄞</text>
-      <!-- Notes -->
-      <ellipse cx="200" cy="110" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="213" y1="110" x2="213" y2="50" stroke="#1A1410" stroke-width="2"/>
-      <text x="193" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">C</text>
-
-      <ellipse cx="280" cy="100" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="293" y1="100" x2="293" y2="40" stroke="#1A1410" stroke-width="2"/>
-      <text x="273" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">D</text>
-
-      <ellipse cx="360" cy="90" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="373" y1="90" x2="373" y2="30" stroke="#1A1410" stroke-width="2"/>
-      <text x="355" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">E</text>
-
-      <ellipse cx="440" cy="80" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="453" y1="80" x2="453" y2="20" stroke="#1A1410" stroke-width="2"/>
-      <text x="434" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">F</text>
-
-      <ellipse cx="520" cy="70" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="533" y1="70" x2="533" y2="10" stroke="#1A1410" stroke-width="2"/>
-      <text x="514" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">G</text>
-
-      <ellipse cx="600" cy="60" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="613" y1="60" x2="613" y2="0" stroke="#1A1410" stroke-width="2"/>
-      <text x="594" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">A</text>
-
-      <ellipse cx="680" cy="50" rx="13" ry="9" fill="#1A1410"/>
-      <line x1="693" y1="50" x2="693" y2="-10" stroke="#1A1410" stroke-width="2"/>
-      <text x="674" y="130" font-size="11" fill="#8C7A6A" font-family="DM Sans,sans-serif">B</text>
-
-      <!-- Ledger line for C -->
-      <line x1="185" y1="110" x2="225" y2="110" stroke="#C8BEA8" stroke-width="1.5"/>
-    </svg>
-  </div>
-
-  <h3>Click a note to hear it</h3>
-  <div class="note-grid" id="note-cards"></div>
-
-  <h3>Note Values</h3>
-  <p>Notes have different <em>durations</em> — how long they last. The most common are:</p>
-
-  <div class="note-grid">
-    <div class="note-card" style="cursor:default">
-      <div class="note-name">𝅝</div>
-      <div class="note-desc">Whole note</div>
-      <div class="note-keys">4 beats</div>
-    </div>
-    <div class="note-card" style="cursor:default">
-      <div class="note-name">𝅗𝅥</div>
-      <div class="note-desc">Half note</div>
-      <div class="note-keys">2 beats</div>
-    </div>
-    <div class="note-card" style="cursor:default">
-      <div class="note-name">♩</div>
-      <div class="note-desc">Quarter note</div>
-      <div class="note-keys">1 beat</div>
-    </div>
-    <div class="note-card" style="cursor:default">
-      <div class="note-name">♪</div>
-      <div class="note-desc">Eighth note</div>
-      <div class="note-keys">½ beat</div>
-    </div>
-  </div>
-
-  <div class="info-box">
-    <strong>Memory tip:</strong> "Every Good Boy Does Fine" — the first letter of each word (E G B D F) names the notes on the five staff <em>lines</em>. The spaces spell <strong>FACE</strong>.
-  </div>
-</article>
-
-<!-- ══════════ CHAPTER 3: CHORDS ══════════ -->
-<article class="chapter" id="chapter-3">
-  <p class="chapter-label">Chapter 3</p>
-  <h2>Building Chords</h2>
-  <p class="lead">A chord is three or more notes played at the same time. Chords give music its emotional colour — from joyful to melancholic.</p>
-
-  <p>Most chords are built by stacking notes in <strong>thirds</strong> — skipping every other note of the scale. The most important chords are <em>major</em> (bright, happy) and <em>minor</em> (darker, introspective).</p>
-
-  <div class="chord-builder" id="chord-builder">
-    <h3 style="margin-top:0; font-size:1.1rem; font-family:'DM Sans',sans-serif; font-weight:500">Chord Explorer</h3>
-    <div class="chord-selector" id="chord-selector"></div>
-    <p class="chord-info" id="chord-info">Select a chord above to see it on the keyboard.</p>
-    <div class="piano-wrap">
-      <div class="piano" id="piano-chord"></div>
-    </div>
-    <p class="piano-label">Highlighted keys form the selected chord · Click "Play" to hear it</p>
-    <div style="margin-top:1rem">
-      <button class="btn-secondary" id="btn-play-chord">▶ Play Chord</button>
-    </div>
-  </div>
-
-  <h3>Major vs Minor</h3>
-  <p>The difference between major and minor chords is just <strong>one note</strong>. In a C major chord you play C – E – G. Lower the E by one semitone (half-step) and you get C minor: C – E♭ – G. That tiny shift changes the entire mood.</p>
-</article>
-
-<!-- ══════════ CHAPTER 4: SCALES ══════════ -->
-<article class="chapter" id="chapter-4">
-  <p class="chapter-label">Chapter 4</p>
-  <h2>Scales & Patterns</h2>
-  <p class="lead">Scales are the building blocks of melody. Master a few scales and your fingers will naturally find the right notes.</p>
-
-  <h3>The C Major Scale</h3>
-  <p>The C major scale uses only white keys: C D E F G A B C. It follows a specific pattern of whole steps (W) and half steps (H): <strong>W W H W W W H</strong>.</p>
-
-  <div class="scale-diagram" id="scale-c-major"></div>
-
-  <p style="font-size:0.9rem; color:var(--brown)">Click any note to hear it · Click the root (C) to play the full scale</p>
-
-  <h3>The A Natural Minor Scale</h3>
-  <p>The natural minor scale has a darker quality. Starting on A: A B C D E F G A. It follows the pattern: <strong>W H W W H W W</strong>.</p>
-
-  <div class="scale-diagram" id="scale-a-minor"></div>
-
-  <h3>Why Practice Scales?</h3>
-  <p>Scales build finger independence, train your ear to recognise intervals, and give you a mental map of the keyboard. Even 5 minutes of scales per day creates noticeable progress within weeks.</p>
-
-  <div class="info-box">
-    <strong>Practice tip:</strong> Start slowly — much slower than you think necessary. Speed comes naturally once your fingers know the pattern. Use a metronome set to 60 BPM and increase by 4 each week.
-  </div>
-</article>
-
-<!-- ══════════ CHAPTER 5: RHYTHM ══════════ -->
-<article class="chapter" id="chapter-5">
-  <p class="chapter-label">Chapter 5</p>
-  <h2>Rhythm & Time</h2>
-  <p class="lead">Without rhythm, notes are just sounds. Rhythm is the heartbeat of music — it's what makes you tap your foot.</p>
-
-  <p>Most music is grouped into <strong>measures</strong> (or bars). A <em>4/4 time signature</em> means 4 beats per measure, with the quarter note getting one beat. This is the most common time signature in Western music.</p>
-
-  <div class="rhythm-trainer" id="rhythm-trainer">
-    <h3 style="margin-top:0; font-size:1.1rem; font-family:'DM Sans',sans-serif; font-weight:500">Beat Sequencer</h3>
-    <p style="font-size:0.9rem; color:var(--brown); margin-bottom:1rem">Toggle beats on/off, set your tempo, and press Play to hear your rhythm.</p>
-
-    <div id="beat-grid"></div>
-
-    <div class="tempo-row">
-      <label>Tempo</label>
-      <input type="range" id="tempo-slider" min="40" max="200" value="80">
-      <span id="tempo-val">80 BPM</span>
-    </div>
-    <div class="rhythm-controls">
-      <button class="btn-secondary" id="btn-play-rhythm">▶ Play</button>
-      <button class="btn-secondary" id="btn-clear-rhythm">Clear</button>
-      <button class="btn-secondary" id="btn-preset-1">Rock pattern</button>
-      <button class="btn-secondary" id="btn-preset-2">Waltz</button>
-    </div>
-  </div>
-</article>
-
-<!-- ══════════ CHAPTER 6: PRACTICE QUIZ ══════════ -->
-<article class="chapter" id="chapter-6">
-  <p class="chapter-label">Chapter 6</p>
-  <h2>Test Your Knowledge</h2>
-  <p class="lead">Let's see what you've learned! Answer each question and watch your score grow.</p>
-
-  <div class="progress-track" id="progress-track"></div>
-
-  <div class="quiz-box" id="quiz-box">
-    <p class="quiz-question" id="quiz-question">Loading quiz…</p>
-    <div class="quiz-options" id="quiz-options"></div>
-    <p class="quiz-feedback" id="quiz-feedback"></p>
-    <div class="quiz-score">
-      <div><strong id="score-correct">0</strong>Correct</div>
-      <div><strong id="score-total">0</strong>Answered</div>
-      <div><strong id="score-pct">—</strong>Score</div>
-    </div>
-  </div>
-
-  <div style="text-align:center; margin-top:1rem">
-    <button class="btn-secondary" onclick="restartQuiz()">↺ Restart Quiz</button>
-  </div>
-</article>
-
-</main>
-
-<footer>
-  <p>Piano Learning Book — Interactive HTML Edition</p>
-  <p style="margin-top:0.5rem">Built for GitHub Pages · No plugins required · All audio generated in the browser</p>
-</footer>
+<div class="app" id="app"></div>
 
 <script>
-// ══════════════════════════════════
-//  AUDIO ENGINE
-// ══════════════════════════════════
-const AC = new (window.AudioContext || window.webkitAudioContext)();
+const WEBHOOK_MATERIALS = "https://hook.eu1.make.com/q71o8tfhdg3pj1nwe21t16dbkhoms4ye";
+const WEBHOOK_PRACTICE  = "https://hook.eu1.make.com/PLACEHOLDER_PRACTICE_WEBHOOK";
 
-const NOTE_FREQ = {
-  'C4':261.63,'C#4':277.18,'D4':293.66,'D#4':311.13,'E4':329.63,
-  'F4':349.23,'F#4':369.99,'G4':392.00,'G#4':415.30,'A4':440.00,
-  'A#4':466.16,'B4':493.88,'C5':523.25,'C#5':554.37,'D5':587.33,
-  'D#5':622.25,'E5':659.25
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const S = {
+  mode: 'guest',       // 'guest' | 'student'
+  studentPhone: '',
+  studentName: '',
+
+  totalMin: 45,
+  hadWarmup: false,
+  focusMode: 'balanced', // 'piece' | 'reading' | 'balanced'
+  focusClef: 'both',   // 'treble' | 'bass' | 'both'
+
+  // phase durations in seconds (recalculated)
+  phases: [],          // [{id, label, color, durationSec, icon}]
+  currentPhase: 0,
+
+  // timer
+  timerSec: 0,
+  timerMax: 0,
+  timerRunning: false,
+  timerInterval: null,
+
+  // exercise
+  exSkipped: 0,
+  exDone: 0,
+  sessionStart: null,
+
+  // pause
+  pausedAt: null,
 };
 
-function playNote(noteName, duration=0.7, startTime=null) {
-  if(AC.state==='suspended') AC.resume();
-  const freq = NOTE_FREQ[noteName];
-  if(!freq) return;
-  const t = startTime || AC.currentTime;
-  const osc = AC.createOscillator();
-  const gain = AC.createGain();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(freq, t);
-  gain.gain.setValueAtTime(0, t);
-  gain.gain.linearRampToValueAtTime(0.35, t+0.01);
-  gain.gain.exponentialRampToValueAtTime(0.001, t+duration);
-  osc.connect(gain); gain.connect(AC.destination);
-  osc.start(t); osc.stop(t+duration+0.05);
-}
-
-function playChord(notes, duration=1.2) {
-  notes.forEach(n => playNote(n, duration));
-}
-
-function playSequence(notes, interval=0.35) {
-  notes.forEach((n,i) => playNote(n, 0.5, AC.currentTime + i*interval));
-}
-
-// ══════════════════════════════════
-//  KEYBOARD LAYOUT
-// ══════════════════════════════════
-const WHITE_KEYS = ['C4','D4','E4','F4','G4','A4','B4','C5'];
-const BLACK_KEYS = [
-  {note:'C#4', pos:1}, {note:'D#4', pos:2}, null,
-  {note:'F#4', pos:4}, {note:'G#4', pos:5}, {note:'A#4', pos:6}
-];
-const WHITE_LABELS = ['C','D','E','F','G','A','B','C'];
-const KB_MAP = {'a':'C4','s':'D4','d':'E4','f':'F4','g':'G4','h':'A4','j':'B4','k':'C5','w':'C#4','e':'D#4','t':'F#4','y':'G#4','u':'A#4'};
-
-function buildPiano(containerId, highlights=[]) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  const W = 48;
-  WHITE_KEYS.forEach((note,i) => {
-    const k = document.createElement('div');
-    k.className = 'key-w' + (highlights.includes(note)?' highlight':'');
-    k.dataset.note = note;
-    k.textContent = WHITE_LABELS[i];
-    k.style.marginLeft = i===0 ? '0' : '-1px';
-    k.addEventListener('mousedown', () => { playNote(note); k.classList.add('active'); });
-    k.addEventListener('mouseup', () => k.classList.remove('active'));
-    k.addEventListener('mouseleave', () => k.classList.remove('active'));
-    el.appendChild(k);
-  });
-
-  const bPositions = [1,2,null,4,5,6];
-  BLACK_KEYS.forEach((bk, idx) => {
-    if(!bk) return;
-    const k = document.createElement('div');
-    k.className = 'key-b' + (highlights.includes(bk.note)?' highlight':'');
-    k.dataset.note = bk.note;
-    k.textContent = bk.note.replace('4','').replace('#','♯');
-    const leftPos = bk.pos * W - 16;
-    k.style.left = leftPos + 'px';
-    k.addEventListener('mousedown', (e) => { e.stopPropagation(); playNote(bk.note); k.classList.add('active'); });
-    k.addEventListener('mouseup', () => k.classList.remove('active'));
-    el.appendChild(k);
-  });
-}
-
-function highlightPianoKeys(containerId, notes, cssClass='highlight') {
-  const el = document.getElementById(containerId);
-  el.querySelectorAll('.key-w,.key-b').forEach(k => {
-    k.classList.remove('highlight','playing-key');
-    if(notes.includes(k.dataset.note)) k.classList.add(cssClass);
-  });
-}
-
-// Build main piano
-buildPiano('piano-main');
-
-// Keyboard events
-document.addEventListener('keydown', e => {
-  if(e.repeat) return;
-  const note = KB_MAP[e.key.toLowerCase()];
-  if(!note) return;
-  playNote(note);
-  const piano = document.getElementById('piano-main');
-  piano.querySelectorAll(`[data-note="${note}"]`).forEach(k => k.classList.add('active'));
-});
-document.addEventListener('keyup', e => {
-  const note = KB_MAP[e.key.toLowerCase()];
-  if(!note) return;
-  const piano = document.getElementById('piano-main');
-  piano.querySelectorAll(`[data-note="${note}"]`).forEach(k => k.classList.remove('active'));
-});
-
-// ══════════════════════════════════
-//  NOTE CARDS (Chapter 2)
-// ══════════════════════════════════
-const noteData = [
-  {name:'C', note:'C4', desc:'Do — the anchor', keys:'White, before 2 black'},
-  {name:'D', note:'D4', desc:'Re — strong and clear', keys:'White, between 2 black'},
-  {name:'E', note:'E4', desc:'Mi — bright tone', keys:'White, after 2 black'},
-  {name:'F', note:'F4', desc:'Fa — warm & round', keys:'White, before 3 black'},
-  {name:'G', note:'G4', desc:'Sol — confident', keys:'White, in 3 black group'},
-  {name:'A', note:'A4', desc:'La — 440 Hz reference', keys:'White, in 3 black group'},
-  {name:'B', note:'B4', desc:'Ti — leading tone', keys:'White, after 3 black'},
+/* ═══════════════════════════════════════════
+   EXERCISES DATABASE
+═══════════════════════════════════════════ */
+const WARMUP_EXERCISES = [
+  {title:"Gamy w ruchu prostym",desc:"Zagraj gamę C-dur obiema rękami w ruchu prostym, wolnym tempem. Dbaj o równomierne uderzenia i luźne nadgarstki.",repeat:"Powtórz 3 razy w górę i w dół"},
+  {title:"Palcowanie 1-2-3-1-2-3-4-5",desc:"Ćwicz samo palcowanie bez klawiszy — kolejno na stole lub kolanie. Każdy palec ląduje pewnie i niezależnie.",repeat:"Powtórz 10 razy na każdą rękę"},
+  {title:"Ćwiczenie Hanona nr 1",desc:"Pierwsze ćwiczenie Hanona w tempie ♩=60. Skupiaj się na równości rytmicznej, nie na szybkości.",repeat:"Powtórz 4 razy"},
+  {title:"Glissando chromantyczne",desc:"Glissando od C do C przez wszystkie półtony, prawą ręką, pianissimo. Luźny nadgarstek, dotyk opuszki.",repeat:"Powtórz 5 razy"},
+  {title:"Rozciąganie interwałów",desc:"Graj tercje, kwarty, kwinty prawą ręką płynnie w górę i w dół w gamie C-dur. Nie napinaj dłoni.",repeat:"Powtórz 3 razy każdy interwał"},
+  {title:"Legato–staccato",desc:"Zagraj dowolną gamę — 4 nuty legato, 4 nuty staccato, naprzemiennie. Wyraźna różnica artykulacji.",repeat:"Powtórz 5 razy"},
+  {title:"Tryle na 2–3 i 3–4",desc:"Trel ćwierćnutowy na parze palców 2–3, potem 3–4 w miejscu. Równe, szybkie ruchy z nadgarstka.",repeat:"Po 30 sekund na każdą parę"},
+  {title:"Akord C–F–G–C",desc:"Zagraj akord w lewej ręce: C, F, G, C kolejno, spokojnym tempem. Słuchaj brzmienia każdego akordu.",repeat:"Powtórz 6 razy"},
+  {title:"Tremolo oktawowe",desc:"Tremolo lewą ręką między C i wyższym C, spokojnie i równo. Rozluźnij ramię.",repeat:"3 serie po 15 sekund"},
+  {title:"Ćwiczenie artykulacyjne z metronome",desc:"Ustaw metronom na 60. Graj ósemki prawą ręką — co 4 nuty zmiana artykulacji (legato → staccato → portato).",repeat:"Powtórz przez cały czas rozgrzewki"},
 ];
 
-const noteGrid = document.getElementById('note-cards');
-noteData.forEach(nd => {
-  const card = document.createElement('div');
-  card.className = 'note-card';
-  card.innerHTML = `<div class="note-name">${nd.name}</div><div class="note-desc">${nd.desc}</div><div class="note-keys">${nd.keys}</div>`;
-  card.addEventListener('click', () => {
-    playNote(nd.note);
-    card.classList.add('playing');
-    setTimeout(() => card.classList.remove('playing'), 700);
-  });
-  noteGrid.appendChild(card);
-});
-
-// ══════════════════════════════════
-//  CHORD BUILDER (Chapter 3)
-// ══════════════════════════════════
-const chords = [
-  {name:'C Major', notes:['C4','E4','G4'], info:'C–E–G · The most fundamental chord. Bright, open, stable.'},
-  {name:'C Minor', notes:['C4','D#4','G4'], info:'C–E♭–G · Lowers the third. Warmer, more introspective.'},
-  {name:'G Major', notes:['G4','B4','D5'], info:'G–B–D · Bold and full. Common in folk and pop.'},
-  {name:'A Minor', notes:['A4','C5','E5'], info:'A–C–E · Natural minor. Used in countless ballads.'},
-  {name:'F Major', notes:['F4','A4','C5'], info:'F–A–C · Warm and grounded. Completes the I–IV–V triad.'},
-  {name:'G7', notes:['G4','B4','D5','F5'], info:'G–B–D–F · Dominant 7th. Creates tension that wants to resolve to C.'},
+const AVISTA_EXERCISES = [
+  {title:"Melodia w kluczu wiolinowym",desc:"Na pięciolinii poniżej pojawi się krótki urywek melodyczny. Spróbuj zagrać go z pierwszego czytania, nie zatrzymując się.",repeat:"Zagraj 2 razy: raz powoli, raz w tempie"},
+  {title:"Rytm z nut całych i półnut",desc:"Graj przykład zawierający tylko nuty całe i półnuty. Zwróć uwagę na metrum i miejsce kresek taktowych.",repeat:"Powtórz 3 razy"},
+  {title:"Interwały melodyczne a vista",desc:"Rozpoznaj interwał między kolejnymi nutami zanim zagrasz — potem sprawdź grając.",repeat:"Zagraj wolno, rozpoznaj każdy interwał"},
+  {title:"Czytanie rytmu z ósemkami",desc:"Krótki urywek z ósemkami w metrum 4/4. Przed graniem wyklaskaj rytm.",repeat:"Wyklaskaj, potem zagraj 3 razy"},
+  {title:"A vista w kluczu basowym",desc:"Fragment melodyczny w kluczu basowym lewą ręką. Zidentyfikuj nuty zanim zagrasz.",repeat:"Zagraj 2 razy"},
+  {title:"Dwugłos a vista",desc:"Dwa głosy jednocześnie w kluczu wiolinowym. Graj prawą ręką, traktując je jako melodię i kontrapunkt.",repeat:"Raz powoli, raz w sugerowanym tempie"},
+  {title:"Fragment z znakami przypadkowymi",desc:"Melodia zawiera znaki chromatyczne — krzyżyki lub bemole. Najpierw je zidentyfikuj, potem zagraj.",repeat:"Powtórz 2 razy"},
 ];
 
-buildPiano('piano-chord');
-const chordSelector = document.getElementById('chord-selector');
-let currentChord = null;
+const PIECE_EXERCISES = [
+  {title:"Fragment techniczny — powolne tempo",desc:"Wybierz najtrudniejszy takt lub frazę z Twojego aktualnego utworu. Graj bardzo wolno — każda nuta musi być czysta.",repeat:"Powtórz 10 razy bez błędu"},
+  {title:"Ćwiczenie oddzielnych rąk",desc:"Zagraj trudny fragment najpierw samą prawą, potem samą lewą ręką. Upewnij się, że każda ręka zna swoją partię.",repeat:"5 razy każda ręka"},
+  {title:"Łączenie rąk — wolne tempo",desc:"Połącz obie ręce w trudnym miejscu w tempie o 30% wolniejszym od docelowego.",repeat:"Powtórz 6 razy"},
+  {title:"Praca nad frazowaniem",desc:"Zagraj całą frazę skupiając się wyłącznie na dynamice i frazowaniu — crescendo, decrescendo, kulminacja.",repeat:"3 razy z pełną uwagą na dynamikę"},
+  {title:"Pamięciowe granie fragmentu",desc:"Zagraj wybrany fragment z pamięci, bez nut. Jeśli się zgubisz — wróć o takt wcześniej.",repeat:"Powtórz do 3 razy bez zaglądania w nuty"},
+  {title:"Całość w wolnym tempie",desc:"Zagraj cały utwór od początku do końca w tempie o 50% wolniejszym. Nie zatrzymuj się przy błędach.",repeat:"Raz w wolnym tempie"},
+  {title:"Całość w docelowym tempie",desc:"Zagraj utwór w docelowym tempie. Skup się na muzycznym wyrazie, a nie na poprawności technicznej.",repeat:"Raz w pełnym tempie"},
+];
 
-chords.forEach(ch => {
-  const btn = document.createElement('button');
-  btn.className = 'chord-btn';
-  btn.textContent = ch.name;
-  btn.addEventListener('click', () => {
-    chordSelector.querySelectorAll('.chord-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentChord = ch;
-    document.getElementById('chord-info').textContent = ch.info;
-    highlightPianoKeys('piano-chord', ch.notes, 'highlight');
-  });
-  chordSelector.appendChild(btn);
-});
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+const app = document.getElementById('app');
+function render(html){ app.innerHTML = html; }
+function fmtTime(sec){
+  if(sec <= 0) return '0:00';
+  const m = Math.floor(sec/60), s = sec%60;
+  return m+':'+(s<10?'0':'')+s;
+}
+function fmtMin(sec){ return Math.round(sec/60)+' min'; }
+function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function pickExercise(pool, usedTitles){
+  const fresh = pool.filter(e=>!usedTitles.has(e.title));
+  if(fresh.length) return randFrom(fresh);
+  usedTitles.clear();
+  return randFrom(pool);
+}
 
-document.getElementById('btn-play-chord').addEventListener('click', () => {
-  if(currentChord) playChord(currentChord.notes.filter(n => NOTE_FREQ[n]));
-});
+/* ═══════════════════════════════════════════
+   PHASE CONFIG
+═══════════════════════════════════════════ */
+function buildPhases(){
+  const total = S.totalMin * 60;
+  let pcts;
+  if(S.hadWarmup){
+    // no warmup — redistribute 30% equally
+    if(S.focusMode==='piece')       pcts = {warmup:0, fiszki:15, avista:10, piece:75};
+    else if(S.focusMode==='reading') pcts = {warmup:0, fiszki:25, avista:30, piece:45};
+    else                             pcts = {warmup:0, fiszki:20, avista:20, piece:60};
+  } else {
+    if(S.focusMode==='piece')       pcts = {warmup:30, fiszki:10, avista:10, piece:50};
+    else if(S.focusMode==='reading') pcts = {warmup:30, fiszki:20, avista:25, piece:25};
+    else                             pcts = {warmup:30, fiszki:15, avista:15, piece:40};
+  }
+  S.phases = [
+    !S.hadWarmup && {id:'warmup',  label:'Rozgrzewka',     icon:'🎯', color:'#f59e0b', durationSec:Math.round(total*pcts.warmup/100)},
+    {id:'fiszki',  label:'Fiszki — nuty',     icon:'🎼', color:getComputedStyle(document.documentElement).getPropertyValue('--navy').trim()||'#1e3a8a', durationSec:Math.round(total*pcts.fiszki/100)},
+    {id:'avista',  label:'A vista',            icon:'👁', color:'#7c3aed', durationSec:Math.round(total*pcts.avista/100)},
+    {id:'piece',   label:'Utwór',              icon:'🎹', color:'#16a34a', durationSec:Math.round(total*pcts.piece/100)},
+  ].filter(Boolean);
+}
 
-// ══════════════════════════════════
-//  SCALES (Chapter 4)
-// ══════════════════════════════════
-function buildScale(containerId, notes, label) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  notes.forEach((n, i) => {
-    if(i > 0) {
-      const arr = document.createElement('span');
-      arr.className = 'scale-arrow';
-      arr.textContent = '›';
-      el.appendChild(arr);
+/* ═══════════════════════════════════════════
+   SCREEN 1 — LANDING
+═══════════════════════════════════════════ */
+function screenLanding(){
+  render(`
+  <div class="screen">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div class="badge badge-navy" style="margin-bottom:14px;">Asystent Ćwiczeń</div>
+      <h1 class="page-title" style="margin-bottom:12px;">Asystent ćwiczeń<br>na fortepian</h1>
+      <p class="page-sub" style="margin:0 auto;">Twój inteligentny plan każdej sesji — rozgrzewka, fiszki, czytanie a vista i praca nad utworem. Wszystko z timerem i spersonalizowanymi ćwiczeniami.</p>
+    </div>
+
+    <div class="info-banner" style="max-width:700px;margin:0 auto 32px;">
+      <div class="ib-icon">🔐</div>
+      <div>
+        <h4>Uczniowie Łukasza mają więcej możliwości</h4>
+        <p>Zalogowani uczniowie korzystają z systemu, który <strong style="color:white;">automatycznie zapisuje każdą sesję</strong> — zagrany repertuar, ćwiczone fragmenty, postępy w czytaniu nut. Możesz wrócić do dowolnego ćwiczenia, zobaczyć swój <strong style="color:white;">kalendarz ćwiczeń</strong> i dostawać sugestie oparte na tym, czego jeszcze nie grałeś. Asystent sam proponuje, co ćwiczyć, żeby się nie powtarzać. Kod dostępu otrzymasz od Łukasza.</p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="max-width:700px;margin:0 auto;gap:20px;">
+      <div class="opt-tile" onclick="chooseMode('guest')" id="tile-guest">
+        <div style="font-size:2rem;margin-bottom:8px;">👤</div>
+        <h4>Kontynuuj jako gość</h4>
+        <p>Pełny dostęp do asystenta bez logowania. Sesja nie jest zapisywana.</p>
+      </div>
+      <div class="opt-tile" onclick="chooseMode('student')" id="tile-student">
+        <div style="font-size:2rem;margin-bottom:8px;">🎓</div>
+        <h4>Zaloguj się jako uczeń</h4>
+        <p>Wpisz swój kod dostępu otrzymany od Łukasza, aby korzystać z pełnych funkcji asystenta.</p>
+      </div>
+    </div>
+
+    <div id="login-box" style="display:none;max-width:480px;margin:20px auto 0;" class="card-sm">
+      <div class="label">Kod dostępu ucznia</div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <input type="text" id="phone-input" autocomplete="off" placeholder="Wpisz swój kod" style="flex:1;padding:10px 16px;border-radius:50px;border:2px solid var(--border);font-family:'Poppins',sans-serif;font-size:0.9rem;outline:none;" onkeydown="if(event.key==='Enter')loginStudent()">
+        <button class="btn btn-primary" onclick="loginStudent()" id="login-btn">Zaloguj</button>
+      </div>
+      <div id="login-msg" style="font-size:0.82rem;color:#64748b;margin-top:8px;min-height:18px;"></div>
+    </div>
+
+    <div style="text-align:center;margin-top:28px;" id="start-btn-wrap" style="display:none;">
+      <button class="btn btn-gold btn-big" onclick="screenSetup()">Zacznij sesję ćwiczeń →</button>
+    </div>
+  </div>`);
+}
+
+function chooseMode(m){
+  document.querySelectorAll('.opt-tile').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('tile-'+m).classList.add('selected');
+  S.mode = m;
+  document.getElementById('login-box').style.display = m==='student' ? 'block' : 'none';
+  const wrap = document.getElementById('start-btn-wrap');
+  if(m==='guest'){ wrap.style.display='block'; }
+  else { wrap.style.display='none'; }
+}
+
+async function loginStudent(){
+  const input = document.getElementById('phone-input');
+  const msg = document.getElementById('login-msg');
+  const btn = document.getElementById('login-btn');
+  const cleaned = input.value.trim().replace(/\D/g,'');
+  let tel = cleaned;
+  if(cleaned.length===11&&cleaned.startsWith('48')) tel=cleaned.slice(2);
+  if(tel.length<3){ msg.textContent='Wpisz prawidłowy kod dostępu.'; msg.style.color='#dc2626'; return; }
+  btn.disabled=true; btn.textContent='...'; msg.textContent='Sprawdzam...'; msg.style.color='#64748b';
+  try{
+    const r = await fetch(WEBHOOK_MATERIALS,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon:tel})});
+    const d = await r.json();
+    if(d.status==='ok'){
+      S.mode='student'; S.studentPhone=tel;
+      S.studentName = d.name||'';
+      msg.textContent='✅ Witaj'+(S.studentName?' '+S.studentName:'')+'! Zalogowano.'; msg.style.color='#16a34a';
+      document.getElementById('start-btn-wrap').style.display='block';
+    } else {
+      msg.textContent='Nieprawidłowy kod. Korzystaj jako gość lub skontaktuj się z Łukaszem, aby otrzymać dostęp.'; msg.style.color='#dc2626';
+      btn.disabled=false; btn.textContent='Zaloguj';
     }
-    const nd = document.createElement('div');
-    nd.className = 'scale-note' + (i===0||i===notes.length-1?' root':'');
-    nd.textContent = n.replace('4','').replace('5','').replace('#','♯');
-    nd.title = n;
-    nd.addEventListener('click', () => {
-      if(i===0) {
-        // Play full scale
-        playSequence(notes.map(x => x+'4').filter(x => NOTE_FREQ[x] || NOTE_FREQ[x.replace('4','5')]));
-        playSequence(notes.map((x,j) => {
-          const raw = x.includes('4') ? x : x+'4';
-          return NOTE_FREQ[raw] ? raw : x+'5';
-        }));
-      } else {
-        const raw = n.includes('4') ? n : (n.includes('5') ? n : n+'4');
-        playNote(NOTE_FREQ[raw] ? raw : n+'5');
-      }
-      nd.classList.add('playing');
-      setTimeout(()=>nd.classList.remove('playing'),500);
-    });
-    el.appendChild(nd);
-  });
+  } catch(e){ msg.textContent='Błąd połączenia.'; msg.style.color='#dc2626'; btn.disabled=false; btn.textContent='Zaloguj'; }
 }
 
-const cMajorNotes = ['C4','D4','E4','F4','G4','A4','B4','C5'];
-const aMinorNotes = ['A4','B4','C5','D5','E5','F5','G5','A5'];
+/* ═══════════════════════════════════════════
+   SCREEN 2 — SETUP
+═══════════════════════════════════════════ */
+function screenSetup(){
+  render(`
+  <div class="screen">
+    <div style="margin-bottom:24px;">
+      <div class="badge badge-navy" style="margin-bottom:10px;">Konfiguracja sesji</div>
+      <h2 class="page-title">Zaplanuj sesję</h2>
+      <p class="page-sub">Odpowiedz na kilka pytań — asystent dobierze ćwiczenia i rozplanuje czas.</p>
+    </div>
 
-buildScale('scale-c-major', cMajorNotes, 'C Major');
-buildScale('scale-a-minor', aMinorNotes, 'A Natural Minor');
+    <!-- Czas -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="label">Ile czasu masz dziś na granie?</div>
+      <div class="time-grid" id="time-grid">
+        ${[15,30,45,60,90].map(m=>`<button class="time-btn${m===S.totalMin?' selected':''}" onclick="setTime(${m})">${m} min</button>`).join('')}
+        <input type="number" class="time-custom" id="time-custom" min="5" max="180" placeholder="inne" value="" oninput="setTimeCustom(this.value)">
+      </div>
+    </div>
 
-// ══════════════════════════════════
-//  RHYTHM TRAINER (Chapter 5)
-// ══════════════════════════════════
-const ROWS = [
-  {label:'Kick', beats:16, default:[0,4,8,12], sound:'kick'},
-  {label:'Snare', beats:16, default:[4,12], sound:'snare'},
-  {label:'Hi-hat', beats:16, default:[0,2,4,6,8,10,12,14], sound:'hihat'},
-  {label:'Melody', beats:16, default:[], sound:'note'},
-];
+    <!-- Rozgrzewka -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="label">Czy już się rozgrzałeś/aś?</div>
+      <p style="font-size:0.82rem;color:#64748b;margin:6px 0 12px;">Jeśli tak, czas rozgrzewki (30%) zostanie rozdzielony między pozostałe fazy.</p>
+      <div style="display:flex;gap:12px;">
+        <button class="time-btn${!S.hadWarmup?' selected':''}" onclick="setWarmup(false)" id="btn-warmup-no">Nie, zaczynam od zera</button>
+        <button class="time-btn${S.hadWarmup?' selected':''}" onclick="setWarmup(true)" id="btn-warmup-yes">Tak, już grałem rozgrzewkę</button>
+      </div>
+    </div>
 
-let beatGrid = {};
-let rhythmPlaying = false;
-let rhythmInterval = null;
-let currentBeat = 0;
+    <!-- Focus -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="label">Na czym chcesz się bardziej skupić?</div>
+      <div class="grid-3" style="margin-top:12px;">
+        <div class="opt-tile${S.focusMode==='balanced'?' selected':''}" onclick="setFocus('balanced')" id="focus-balanced">
+          <h4>⚖️ Zbalansowana</h4>
+          <p>Równomierny podział — trochę wszystkiego.</p>
+        </div>
+        <div class="opt-tile${S.focusMode==='piece'?' selected':''}" onclick="setFocus('piece')" id="focus-piece">
+          <h4>🎹 Skupiam się na utworze</h4>
+          <p>Więcej czasu na opracowanie repertuaru.</p>
+        </div>
+        <div class="opt-tile${S.focusMode==='reading'?' selected':''}" onclick="setFocus('reading')" id="focus-reading">
+          <h4>👁 Czytanie nut</h4>
+          <p>Więcej fiszek i ćwiczeń a vista.</p>
+        </div>
+      </div>
+    </div>
 
-ROWS.forEach(row => {
-  beatGrid[row.label] = new Array(row.beats).fill(false);
-  row.default.forEach(i => beatGrid[row.label][i] = true);
-});
+    <!-- Klucz -->
+    <div class="card" style="margin-bottom:24px;" id="clef-card">
+      <div class="label">Klucz do ćwiczeń fiszek i a vista</div>
+      <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;">
+        <button class="clef-btn${S.focusClef==='treble'?' sel':''}" onclick="setClef('treble')" id="clef-treble">𝄞 Wiolinowy</button>
+        <button class="clef-btn${S.focusClef==='bass'?' sel':''}" onclick="setClef('bass')" id="clef-bass">𝄢 Basowy</button>
+        <button class="clef-btn${S.focusClef==='both'?' sel':''}" onclick="setClef('both')" id="clef-both">𝄞+𝄢 Oba</button>
+      </div>
+    </div>
 
-function renderBeatGrid() {
-  const container = document.getElementById('beat-grid');
-  container.innerHTML = '';
-  ROWS.forEach(row => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'beat-row';
-    const lbl = document.createElement('span');
-    lbl.className = 'beat-label';
-    lbl.textContent = row.label;
-    rowEl.appendChild(lbl);
-    for(let i=0; i<row.beats; i++) {
-      const beat = document.createElement('div');
-      beat.className = 'beat' + (beatGrid[row.label][i]?' on':'');
-      beat.dataset.row = row.label;
-      beat.dataset.beat = i;
-      if(i===4||i===8||i===12) beat.style.marginLeft='8px';
-      beat.addEventListener('click', () => {
-        beatGrid[row.label][i] = !beatGrid[row.label][i];
-        beat.classList.toggle('on');
-      });
-      rowEl.appendChild(beat);
+    <!-- Preview -->
+    <div class="card" style="margin-bottom:24px;background:#f8fafc;">
+      <div class="label">Plan sesji (podgląd)</div>
+      <div id="plan-preview" style="margin-top:10px;"></div>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;">
+      <button class="btn btn-gold btn-big" onclick="startSession()">Zacznij sesję ▶</button>
+      <button class="btn btn-ghost" onclick="screenLanding()">← Wróć</button>
+    </div>
+  </div>`);
+  updatePlanPreview();
+}
+
+function setTime(m){ S.totalMin=m; document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('selected')); event.target.classList.add('selected'); document.getElementById('time-custom').value=''; updatePlanPreview(); }
+function setTimeCustom(v){ const m=parseInt(v); if(m>=5&&m<=180){ S.totalMin=m; document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('selected')); updatePlanPreview(); } }
+function setWarmup(v){ S.hadWarmup=v; document.getElementById('btn-warmup-no').classList.toggle('selected',!v); document.getElementById('btn-warmup-yes').classList.toggle('selected',v); updatePlanPreview(); }
+function setFocus(f){ S.focusMode=f; ['balanced','piece','reading'].forEach(id=>document.getElementById('focus-'+id).classList.toggle('selected',id===f)); updatePlanPreview(); }
+function setClef(c){ S.focusClef=c; ['treble','bass','both'].forEach(id=>document.getElementById('clef-'+id).classList.toggle('sel',id===c)); }
+
+const PHASE_COLORS = {warmup:'#f59e0b',fiszki:'#1e3a8a',avista:'#7c3aed',piece:'#16a34a'};
+
+function updatePlanPreview(){
+  buildPhases();
+  const total = S.totalMin*60;
+  const html = S.phases.map(p=>{
+    const pct = Math.round(p.durationSec/total*100);
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <span style="font-size:0.82rem;font-weight:700;color:#334155;">${p.icon} ${p.label}</span>
+        <span style="font-size:0.8rem;color:#64748b;">${fmtMin(p.durationSec)} (${pct}%)</span>
+      </div>
+      <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:${pct}%;background:${PHASE_COLORS[p.id]||'#1e3a8a'};"></div></div>
+    </div>`;
+  }).join('');
+  const el = document.getElementById('plan-preview');
+  if(el) el.innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════
+   SESSION START
+═══════════════════════════════════════════ */
+function startSession(){
+  buildPhases();
+  S.currentPhase = 0;
+  S.sessionStart = Date.now();
+  S.exDone = 0; S.exSkipped = 0;
+  if(S.mode==='student') saveSessionStart();
+  startPhase(0);
+}
+
+/* ═══════════════════════════════════════════
+   SCREEN 3 — PHASE
+═══════════════════════════════════════════ */
+const usedExercises = new Set();
+let currentEx = null;
+
+function startPhase(idx){
+  S.currentPhase = idx;
+  const phase = S.phases[idx];
+  S.timerSec = phase.durationSec;
+  S.timerMax = phase.durationSec;
+  S.timerRunning = false;
+  clearInterval(S.timerInterval);
+  usedExercises.clear();
+  renderPhaseScreen();
+  startTimer();
+}
+
+function renderPhaseScreen(){
+  const phase = S.phases[S.currentPhase];
+  const isLast = S.currentPhase >= S.phases.length-1;
+
+  // Phase bar
+  const phaseDots = S.phases.map((p,i)=>`
+    <div class="phase-seg ${i<S.currentPhase?'done':i===S.currentPhase?'active':''}" title="${p.label}"></div>
+  `).join('');
+
+  // Phase-specific content
+  let contentHtml = '';
+  if(phase.id==='warmup') contentHtml = warmupContent();
+  else if(phase.id==='fiszki') contentHtml = fiszkiContent();
+  else if(phase.id==='avista') contentHtml = avistaContent();
+  else if(phase.id==='piece') contentHtml = pieceContent();
+
+  render(`
+  <div class="screen">
+    <!-- Phase bar -->
+    <div class="phase-bar">${phaseDots}</div>
+
+    <!-- Session header -->
+    <div class="sess-header">
+      <div>
+        <div class="badge" style="background:${PHASE_COLORS[phase.id]||'#1e3a8a'}22;color:${PHASE_COLORS[phase.id]||'#1e3a8a'};border:1px solid ${PHASE_COLORS[phase.id]||'#1e3a8a'}44;margin-bottom:6px;">${phase.icon} ${phase.label}</div>
+        <div class="sess-title">${phase.label}</div>
+        <div style="font-size:0.8rem;color:#94a3b8;">Faza ${S.currentPhase+1} z ${S.phases.length} · ${fmtMin(S.timerMax)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <!-- Ring timer -->
+        <div class="timer-ring-wrap" id="timer-ring-wrap">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+            <circle cx="60" cy="60" r="52" fill="none" stroke="${PHASE_COLORS[phase.id]||'#1e3a8a'}" stroke-width="8"
+              stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52*(1 - S.timerSec/S.timerMax)}"
+              id="ring-fill" stroke-linecap="round" style="transition:stroke-dashoffset 1s linear;"/>
+          </svg>
+          <div class="timer-text">
+            <span class="timer-mm" id="timer-disp">${fmtTime(S.timerSec)}</span>
+            <span class="timer-label">pozostało</span>
+          </div>
+        </div>
+        <div class="sess-controls">
+          <button class="btn btn-ghost" id="pause-btn" onclick="togglePause()" style="padding:10px 18px;">⏸ Pauza</button>
+          <button class="btn btn-ghost" onclick="confirmEndPhase()" style="padding:10px 18px;font-size:0.78rem;">Pomiń fazę ⏭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div id="phase-content">${contentHtml}</div>
+
+    <!-- Next phase button (hidden until time up or manual skip) -->
+    <div class="next-phase-wrap" id="next-phase-wrap" style="display:none;">
+      <button class="next-phase-btn" onclick="nextPhase()">
+        ${isLast ? '🏁 Zakończ sesję' : 'Przejdź do: ' + (S.phases[S.currentPhase+1]?.label||'') + ' →'}
+      </button>
+    </div>
+  </div>`);
+
+  if(phase.id==='warmup'||phase.id==='avista'||phase.id==='piece') pickAndShowExercise();
+}
+
+function warmupContent(){
+  return `<div id="ex-area"></div>`;
+}
+function avistaContent(){
+  return `<div id="ex-area"></div>`;
+}
+function pieceContent(){
+  return `<div id="ex-area"></div>`;
+}
+function fiszkiContent(){
+  const clefParam = S.focusClef==='treble'?'treble':S.focusClef==='bass'?'bass':'both';
+  return `
+  <div style="margin-bottom:12px;">
+    <p style="font-size:0.88rem;color:#64748b;line-height:1.6;margin-bottom:8px;">
+      Ćwicz rozpoznawanie nut w kluczu <strong>${S.focusClef==='treble'?'wiolinowym':S.focusClef==='bass'?'basowym':'wiolinowym i basowym'}</strong>. Ustaw timer w fiszkach na krótkie rundy.
+    </p>
+  </div>
+  <div class="iframe-wrap" style="height:640px;">
+    <iframe src="/index/fiszki.html" title="Fiszki nutowe" loading="lazy"></iframe>
+  </div>`;
+}
+
+function pickAndShowExercise(){
+  const phase = S.phases[S.currentPhase];
+  let pool;
+  if(phase.id==='warmup') pool = WARMUP_EXERCISES;
+  else if(phase.id==='avista') pool = AVISTA_EXERCISES;
+  else pool = PIECE_EXERCISES;
+
+  currentEx = pickExercise(pool, usedExercises);
+  usedExercises.add(currentEx.title);
+
+  const area = document.getElementById('ex-area');
+  if(!area) return;
+  area.innerHTML = `
+  <div class="ex-card">
+    <div class="ex-type">${phase.icon} ${phase.label} — ćwiczenie</div>
+    <div class="ex-title">${currentEx.title}</div>
+    <div class="ex-desc">${currentEx.desc}</div>
+    <div class="ex-repeat">🔁 ${currentEx.repeat}</div>
+    <div class="ex-actions">
+      <button class="btn btn-green" onclick="markDone()">✓ Zrobione</button>
+      <button class="btn btn-ghost" onclick="skipExercise()">↩ Pomiń — daj inne</button>
+    </div>
+  </div>`;
+}
+
+function markDone(){
+  S.exDone++;
+  if(S.timerSec <= 0){ showNextPhaseBtn(); return; }
+  pickAndShowExercise();
+}
+
+function skipExercise(){
+  S.exSkipped++;
+  if(S.timerSec <= 0){ showNextPhaseBtn(); return; }
+  pickAndShowExercise();
+}
+
+/* ═══════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════ */
+function startTimer(){
+  S.timerRunning = true;
+  clearInterval(S.timerInterval);
+  S.timerInterval = setInterval(()=>{
+    if(!S.timerRunning) return;
+    S.timerSec--;
+    updateTimerUI();
+    if(S.timerSec <= 0){
+      clearInterval(S.timerInterval);
+      onPhaseTimeUp();
     }
-    container.appendChild(rowEl);
-  });
+  }, 1000);
 }
 
-renderBeatGrid();
+function updateTimerUI(){
+  const disp = document.getElementById('timer-disp');
+  const ring = document.getElementById('ring-fill');
+  if(disp) disp.textContent = fmtTime(S.timerSec);
+  if(ring){
+    const r = 52, circ = 2*Math.PI*r;
+    const pct = Math.max(0, S.timerSec / S.timerMax);
+    ring.style.strokeDashoffset = circ*(1-pct);
+    if(S.timerSec<=60) ring.style.stroke='#ef4444';
+  }
+  if(disp&&S.timerSec<=60) disp.style.color='#ef4444';
+}
 
-function playRhythmSound(type) {
-  if(AC.state==='suspended') AC.resume();
-  const now = AC.currentTime;
-  if(type==='kick') {
-    const o = AC.createOscillator(), g = AC.createGain();
-    o.frequency.setValueAtTime(150,now); o.frequency.exponentialRampToValueAtTime(30,now+0.15);
-    g.gain.setValueAtTime(1,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.2);
-    o.connect(g); g.connect(AC.destination); o.start(now); o.stop(now+0.2);
-  } else if(type==='snare') {
-    const buf = AC.createBuffer(1,AC.sampleRate*0.1,AC.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*0.5;
-    const src = AC.createBufferSource(), g = AC.createGain();
-    src.buffer = buf;
-    g.gain.setValueAtTime(0.8,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.12);
-    src.connect(g); g.connect(AC.destination); src.start(now);
-  } else if(type==='hihat') {
-    const buf = AC.createBuffer(1,AC.sampleRate*0.05,AC.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
-    const src = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter();
-    src.buffer = buf; f.type='highpass'; f.frequency.value=8000;
-    g.gain.setValueAtTime(0.4,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.06);
-    src.connect(f); f.connect(g); g.connect(AC.destination); src.start(now);
-  } else if(type==='note') {
-    playNote('C5', 0.2);
+function togglePause(){
+  S.timerRunning = !S.timerRunning;
+  const btn = document.getElementById('pause-btn');
+  if(btn) btn.textContent = S.timerRunning ? '⏸ Pauza' : '▶ Wznów';
+}
+
+function onPhaseTimeUp(){
+  showNextPhaseBtn();
+  // Flash end message
+  const area = document.getElementById('ex-area');
+  if(area){
+    const msg = document.createElement('div');
+    msg.style.cssText='background:#dcfce7;border:1px solid #86efac;border-radius:14px;padding:14px 20px;margin-bottom:12px;font-weight:700;color:#15803d;font-size:0.9rem;';
+    msg.textContent = '✅ Czas na tę fazę minął — możesz przejść dalej!';
+    area.prepend(msg);
   }
 }
 
-function tickRhythm() {
-  const allBeats = document.querySelectorAll('.beat');
-  allBeats.forEach(b => b.classList.remove('playing-beat'));
-
-  ROWS.forEach(row => {
-    if(beatGrid[row.label][currentBeat]) {
-      playRhythmSound(row.sound);
-      const el = document.querySelector(`.beat[data-row="${row.label}"][data-beat="${currentBeat}"]`);
-      if(el) el.classList.add('playing-beat');
-    }
-  });
-
-  currentBeat = (currentBeat + 1) % 16;
-  setTimeout(() => {
-    document.querySelectorAll('.beat').forEach(b => b.classList.remove('playing-beat'));
-  }, 80);
+function showNextPhaseBtn(){
+  const wrap = document.getElementById('next-phase-wrap');
+  if(wrap) wrap.style.display='flex';
+  clearInterval(S.timerInterval);
 }
 
-const tempoSlider = document.getElementById('tempo-slider');
-const tempoVal = document.getElementById('tempo-val');
-tempoSlider.addEventListener('input', () => {
-  tempoVal.textContent = tempoSlider.value + ' BPM';
-  if(rhythmPlaying) { stopRhythm(); startRhythm(); }
-});
-
-function startRhythm() {
-  const bpm = parseInt(tempoSlider.value);
-  const interval = (60/bpm/4)*1000;
-  rhythmInterval = setInterval(tickRhythm, interval);
-  rhythmPlaying = true;
-  document.getElementById('btn-play-rhythm').textContent = '⏹ Stop';
-  document.getElementById('btn-play-rhythm').classList.add('active-btn');
-}
-
-function stopRhythm() {
-  clearInterval(rhythmInterval);
-  rhythmPlaying = false;
-  currentBeat = 0;
-  document.querySelectorAll('.beat').forEach(b => b.classList.remove('playing-beat'));
-  document.getElementById('btn-play-rhythm').textContent = '▶ Play';
-  document.getElementById('btn-play-rhythm').classList.remove('active-btn');
-}
-
-document.getElementById('btn-play-rhythm').addEventListener('click', () => {
-  rhythmPlaying ? stopRhythm() : startRhythm();
-});
-
-document.getElementById('btn-clear-rhythm').addEventListener('click', () => {
-  ROWS.forEach(row => beatGrid[row.label].fill(false));
-  renderBeatGrid();
-});
-
-document.getElementById('btn-preset-1').addEventListener('click', () => {
-  ROWS.forEach(row => beatGrid[row.label].fill(false));
-  beatGrid['Kick'] = [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0].map(Boolean);
-  beatGrid['Snare'] = [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0].map(Boolean);
-  beatGrid['Hi-hat'] = [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0].map(Boolean);
-  renderBeatGrid();
-});
-
-document.getElementById('btn-preset-2').addEventListener('click', () => {
-  ROWS.forEach(row => beatGrid[row.label].fill(false));
-  beatGrid['Kick'] = [1,0,0,0,0,0, 0,0,0,0,0,0].concat([0,0,0,0]).map(Boolean);
-  beatGrid['Snare'] = [0,0,0,0, 1,0,0,0, 0,1,0,0, 0,0,0,0].map(Boolean);
-  beatGrid['Hi-hat'] = [1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0].map(Boolean);
-  renderBeatGrid();
-});
-
-// ══════════════════════════════════
-//  QUIZ (Chapter 6)
-// ══════════════════════════════════
-const questions = [
-  {q:'How many white keys does a standard piano have?', opts:['52','36','61','88'], ans:0, exp:'A standard 88-key piano has 52 white keys and 36 black keys.'},
-  {q:'What note is always to the left of the group of two black keys?', opts:['D','C','E','F'], ans:1, exp:'C is always immediately to the left of the two-black-key group.'},
-  {q:'How many beats does a whole note last in 4/4 time?', opts:['1','2','4','8'], ans:2, exp:'A whole note fills an entire 4/4 measure — 4 beats.'},
-  {q:'Which chord is C – E♭ – G?', opts:['C Major','C Minor','C7','C Diminished'], ans:1, exp:'Lowering the third (E to E♭) turns C Major into C Minor.'},
-  {q:'What pattern does the C Major scale follow?', opts:['W-H-W-W-H-W-W','W-W-H-W-W-W-H','H-W-W-H-W-W-W','W-W-W-H-W-W-H'], ans:1, exp:'W W H W W W H — whole whole half whole whole whole half.'},
-  {q:'What does "BPM" stand for?', opts:['Bass Per Measure','Beats Per Measure','Beats Per Minute','Bass Per Minute'], ans:2, exp:'BPM = Beats Per Minute. It measures the tempo of music.'},
-  {q:'The spaces on the treble clef staff spell which word?', opts:['BEAD','EGBDF','FACE','CAGE'], ans:2, exp:'From bottom to top, the spaces spell F-A-C-E.'},
-  {q:'What interval separates notes in a basic chord?', opts:['Seconds','Thirds','Fourths','Fifths'], ans:1, exp:'Basic chords are built by stacking thirds — every other note of the scale.'},
-];
-
-let qIdx = 0, scoreCorrect = 0, scoreTotal = 0, answered = false;
-
-function renderProgress() {
-  const track = document.getElementById('progress-track');
-  track.innerHTML = '';
-  questions.forEach((q,i) => {
-    const step = document.createElement('div');
-    step.className = 'progress-step' + (i < qIdx ? ' done' : (i===qIdx ? ' current' : ''));
-    step.textContent = i+1;
-    track.appendChild(step);
-  });
-}
-
-function renderQuestion() {
-  if(qIdx >= questions.length) {
-    document.getElementById('quiz-question').textContent = '🎉 Quiz Complete!';
-    document.getElementById('quiz-options').innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--brown); font-size:1.05rem">You scored ${scoreCorrect} out of ${questions.length}. ${scoreCorrect>=6 ? 'Excellent work!' : 'Keep practicing!'}</p>`;
-    document.getElementById('quiz-feedback').textContent = '';
-    return;
+function confirmEndPhase(){
+  if(S.timerSec > 30){
+    if(!confirm('Na pewno chcesz pominąć tę fazę? Zostało jeszcze '+fmtTime(S.timerSec)+'.')) return;
   }
-  const q = questions[qIdx];
-  answered = false;
-  document.getElementById('quiz-question').textContent = q.q;
-  document.getElementById('quiz-feedback').textContent = '';
-  const opts = document.getElementById('quiz-options');
-  opts.innerHTML = '';
-  q.opts.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'quiz-opt';
-    btn.textContent = opt;
-    btn.addEventListener('click', () => {
-      if(answered) return;
-      answered = true;
-      scoreTotal++;
-      const isCorrect = i===q.ans;
-      if(isCorrect) { scoreCorrect++; btn.classList.add('correct'); }
-      else { btn.classList.add('wrong'); opts.children[q.ans].classList.add('correct'); }
-      document.getElementById('quiz-feedback').textContent = (isCorrect ? '✓ ' : '✗ ') + q.exp;
-      updateScore();
-      setTimeout(() => { qIdx++; renderQuestion(); renderProgress(); }, 1800);
-    });
-    opts.appendChild(btn);
-  });
+  clearInterval(S.timerInterval);
+  showNextPhaseBtn();
 }
 
-function updateScore() {
-  document.getElementById('score-correct').textContent = scoreCorrect;
-  document.getElementById('score-total').textContent = scoreTotal;
-  const pct = scoreTotal > 0 ? Math.round(scoreCorrect/scoreTotal*100)+'%' : '—';
-  document.getElementById('score-pct').textContent = pct;
+function nextPhase(){
+  clearInterval(S.timerInterval);
+  const next = S.currentPhase+1;
+  if(next >= S.phases.length) screenSummary();
+  else startPhase(next);
 }
 
-function restartQuiz() {
-  qIdx = 0; scoreCorrect = 0; scoreTotal = 0; answered = false;
-  updateScore(); renderQuestion(); renderProgress();
+/* ═══════════════════════════════════════════
+   SCREEN 4 — SUMMARY
+═══════════════════════════════════════════ */
+function screenSummary(){
+  clearInterval(S.timerInterval);
+  const totalSec = Math.round((Date.now()-S.sessionStart)/1000);
+  if(S.mode==='student') saveSessionEnd(totalSec);
+
+  const phaseRows = S.phases.map(p=>`
+    <li>
+      <div class="pl-dot" style="background:${PHASE_COLORS[p.id]||'#1e3a8a'};"></div>
+      <span style="font-weight:700;min-width:130px;">${p.icon} ${p.label}</span>
+      <span style="color:#94a3b8;">${fmtMin(p.durationSec)}</span>
+    </li>`).join('');
+
+  render(`
+  <div class="screen" style="max-width:700px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="font-size:3rem;margin-bottom:12px;">🏆</div>
+      <div class="badge badge-green" style="margin-bottom:10px;">Sesja zakończona</div>
+      <h2 class="page-title">Świetna robota!</h2>
+      <p class="page-sub" style="margin:8px auto 0;">Ukończyłeś/aś dzisiejszą sesję ćwiczeń.</p>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-item"><div class="si-num">${fmtMin(totalSec)}</div><div class="si-lbl">Łączny czas</div></div>
+      <div class="summary-item"><div class="si-num">${S.phases.length}</div><div class="si-lbl">Fazy</div></div>
+      <div class="summary-item"><div class="si-num">${S.exDone}</div><div class="si-lbl">Ćwiczeń zrobionych</div></div>
+      <div class="summary-item"><div class="si-num">${S.exSkipped}</div><div class="si-lbl">Pominiętych</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="label" style="margin-bottom:10px;">Zrealizowane fazy</div>
+      <ul class="phase-list">${phaseRows}</ul>
+    </div>
+
+    ${S.mode==='student'?`
+    <div class="info-banner" style="margin-bottom:20px;">
+      <div class="ib-icon">💾</div>
+      <div>
+        <h4>Sesja zapisana!</h4>
+        <p>Twoja dzisiejsza sesja została zapisana. Łukasz może ją zobaczyć i zaproponować ćwiczenia na następną lekcję. Możesz też wrócić do tych ćwiczeń samodzielnie.</p>
+      </div>
+    </div>`:`
+    <div class="info-banner" style="margin-bottom:20px;">
+      <div class="ib-icon">💡</div>
+      <div>
+        <h4>Chcesz zapisywać swoje postępy?</h4>
+        <p>Zaloguj się jako uczeń, aby Twoje sesje były automatycznie zapisywane. Skontaktuj się z Łukaszem, żeby otrzymać dostęp.</p>
+      </div>
+    </div>`}
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-gold btn-big" onclick="screenSetup()">Nowa sesja</button>
+      <a href="/index.html" class="btn btn-ghost" style="text-decoration:none;">← Wróć na stronę główną</a>
+    </div>
+  </div>`);
 }
 
-renderQuestion();
-renderProgress();
+/* ═══════════════════════════════════════════
+   SAVE TO WEBHOOK (student only)
+═══════════════════════════════════════════ */
+function saveSessionStart(){
+  fetch(WEBHOOK_PRACTICE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    event:'session_start',telefon:S.studentPhone,totalMin:S.totalMin,
+    focusMode:S.focusMode,focusClef:S.focusClef,hadWarmup:S.hadWarmup,
+    timestamp:new Date().toISOString(),phases:S.phases.map(p=>({id:p.id,label:p.label,durationMin:Math.round(p.durationSec/60)}))
+  })}).catch(()=>{});
+}
+function saveSessionEnd(totalSec){
+  fetch(WEBHOOK_PRACTICE,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    event:'session_end',telefon:S.studentPhone,totalSec,
+    exDone:S.exDone,exSkipped:S.exSkipped,timestamp:new Date().toISOString()
+  })}).catch(()=>{});
+}
 
-// ══════════════════════════════════
-//  NAV ACTIVE STATE
-// ══════════════════════════════════
-const sections = document.querySelectorAll('.chapter');
-const navLinks = document.querySelectorAll('.nav-link');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if(e.isIntersecting) {
-      const id = e.target.id;
-      navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href')==='#'+id));
-    }
-  });
-}, {threshold:0.3});
-sections.forEach(s => observer.observe(s));
+/* ═══════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════ */
+screenLanding();
 </script>
 </body>
 </html>
