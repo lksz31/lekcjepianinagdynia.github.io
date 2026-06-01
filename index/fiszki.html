@@ -294,8 +294,8 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
     <div class="ctrl-row" id="row-place-hint" style="display:none;">
       <span class="ctrl-lbl">Podpowiedź</span>
       <div class="ctrl-btns">
-        <button class="cb active" id="cb-hint-en" onclick="setPlaceHint('en')">Angielska</button>
-        <button class="cb" id="cb-hint-pl" onclick="setPlaceHint('pl')">Polska</button>
+        <button class="cb active" id="cb-hint-pl" onclick="setPlaceHint('pl')">Polska</button>
+        <button class="cb" id="cb-hint-en" onclick="setPlaceHint('en')">Angielska</button>
         <button class="cb" id="cb-hint-sound" onclick="setPlaceHint('sound')">Tylko dźwięk</button>
       </div>
     </div>
@@ -654,7 +654,7 @@ let micTolerance=0.015,micGain=2.0,micTuneSteps=0;
 let noteCanvasPositions=[];
 
 // Stan trybu place
-let placeHint='en';
+let placeHint='pl';
 let placeTargetNote=null;
 let placeDragPos=null; // aktualnie przeciągana pozycja (stopień p)
 let placeConfirmed=false;
