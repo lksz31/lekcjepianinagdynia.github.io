@@ -3,499 +3,1601 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Łączenie akordów</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Kadencje – Łukasz Ganczarek</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--ivory:#F8F4EC;--cream:#EDE8DC;--warm-black:#1A1410;--brown:#6B4F3A;--amber:#C8882A;--amber-light:#F0C870;--shadow:rgba(26,20,16,0.12)}
+:root{
+  --ivory:#F8F4EC;--cream:#EDE8DC;--warm-black:#1A1410;--brown:#6B4F3A;
+  --amber:#C8882A;--amber-light:#F0C870;--shadow:rgba(26,20,16,0.12);
+  --navy:#1e3a8a;--gold:#d4af37;--border:#e2e8f0;--bg:#f8fafc;--text:#334155;
+}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--ivory);color:var(--warm-black);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem 4rem;gap:2rem}
-h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;text-align:center;letter-spacing:-0.01em}
-.sub{font-size:0.85rem;color:var(--brown);letter-spacing:0.15em;text-transform:uppercase;text-align:center;margin-top:0.3rem}
-.card{background:white;border:1px solid var(--cream);border-radius:20px;padding:2rem 2.5rem;box-shadow:0 4px 24px var(--shadow);max-width:960px;width:100%}
-.ctrl-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--brown);font-weight:500;margin-bottom:0.3rem;display:block}
-.controls-row{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end;margin-bottom:1.5rem}
-.ctrl-group{display:flex;flex-direction:column}
-select{padding:0.45rem 2rem 0.45rem 0.9rem;border:1.5px solid var(--cream);border-radius:2rem;background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B4F3A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.8rem center;font-family:'DM Sans',sans-serif;font-size:0.95rem;color:var(--warm-black);cursor:pointer;appearance:none;transition:border-color .15s}
-select:focus{border-color:var(--amber);outline:none}
-.func-btns{display:flex;gap:0.5rem;flex-wrap:wrap}
-.func-btn{padding:0.45rem 1.1rem;border:1.5px solid var(--cream);border-radius:2rem;background:white;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;color:var(--warm-black)}
-.func-btn.T{background:#FFF3E0;border-color:#C8882A;color:#C8882A}
-.func-btn.S{background:#E8F5E9;border-color:#2E7D52;color:#2E7D52}
-.func-btn.rm{background:#FDECEA;border-color:#C62828;color:#C62828;font-family:'DM Sans',sans-serif;font-size:0.85rem}
-.seq-display{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;min-height:2.5rem;margin-bottom:1.25rem;padding:0.6rem 0.8rem;background:var(--ivory);border-radius:12px;border:1px solid var(--cream)}
-.seq-chip{padding:0.3rem 0.8rem;border-radius:2rem;font-weight:700;font-size:0.95rem;font-family:'Playfair Display',serif}
-.seq-chip.T{background:#FFF3E0;color:#C8882A;border:1px solid #C8882A}
-.seq-chip.S{background:#E8F5E9;color:#2E7D52;border:1px solid #2E7D52}
-.seq-arrow{color:#C8BEA8;font-size:1.1rem}
-.seq-empty{color:#C0B0A0;font-size:0.9rem;font-style:italic}
-.action-row{display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap}
-.btn-go{padding:0.6rem 1.6rem;border-radius:2rem;border:none;background:var(--amber);color:white;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;cursor:pointer;transition:all .15s}
-.btn-go:hover{background:var(--amber-light);color:var(--warm-black)}
-.btn-cl{padding:0.6rem 1.2rem;border-radius:2rem;border:1.5px solid var(--cream);background:white;font-family:'DM Sans',sans-serif;font-size:0.95rem;cursor:pointer;color:var(--brown);transition:all .15s}
-.btn-cl:hover{border-color:var(--brown)}
-.svg-wrap{overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch}
-.legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;justify-content:center}
-.leg-item{display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:var(--brown)}
-.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.info{font-size:0.82rem;color:var(--brown);margin-top:0.75rem;font-style:italic;text-align:center;min-height:1.2rem;line-height:1.6}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+.site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 30px;display:flex;gap:25px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;white-space:nowrap;}
+.site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;}
+.site-nav a:hover{color:var(--gold);}
+.site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+.site-nav a.nav-highlight:hover{background:var(--gold);}
+@media(max-width:700px){.site-nav{display:none;}}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+.mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+.mobile-nav a .mn-icon{font-size:1.15rem;}
+.mobile-nav a:hover,.mobile-nav a.active{color:var(--navy);}
+.mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+@media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:100px 16px 60px;gap:16px;}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);color:var(--navy);text-align:center;}
+.page-title em{color:var(--gold);font-style:italic;}
+.page-sub{color:#64748b;font-size:0.88rem;text-align:center;max-width:600px;}
+.badge-prealpha{display:inline-block;background:#fdf2f8;color:#86198f;border:1px solid #f5d0fe;border-radius:50px;padding:4px 14px;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+
+/* PANEL */
+.ctrl-outer{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;max-width:1060px;overflow:hidden;}
+.ctrl-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.ctrl-topbar-title{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;}
+.ctrl-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.ctrl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.ctrl-lbl{font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;white-space:nowrap;min-width:80px;}
+.ctrl-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.cb{padding:5px 11px;border-radius:50px;border:2px solid var(--navy);background:white;color:var(--navy);font-weight:700;cursor:pointer;transition:0.2s;font-size:0.71rem;font-family:'Poppins',sans-serif;white-space:nowrap;}
+.cb.active{background:var(--navy);color:white;}
+.cb:hover:not(.active){background:#f0f7ff;}
+
+/* KEY GRID */
+.key-grid{display:flex;gap:6px;flex-wrap:wrap;}
+.key-btn{padding:6px 13px;border-radius:50px;border:2px solid var(--border);background:white;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;transition:0.2s;color:var(--text);white-space:nowrap;position:relative;overflow:hidden;}
+.key-btn::before{content:attr(data-count);position:absolute;left:4px;bottom:0px;font-size:1.5rem;font-weight:900;opacity:0.16;line-height:1;pointer-events:none;color:inherit;font-family:'Poppins',sans-serif;}
+.key-btn::after{content:attr(data-sign);position:absolute;right:3px;bottom:-2px;font-size:1.5rem;font-weight:900;opacity:0.16;line-height:1;pointer-events:none;color:inherit;font-family:'serif';}
+.key-btn:hover{border-color:var(--navy);background:#f0f7ff;}
+.key-btn.active{border-color:var(--navy);background:var(--navy);color:white;}
+.key-btn.active::before,.key-btn.active::after{opacity:0.14;color:white;}
+.key-btn.sharps{border-color:#c8882a;}
+.key-btn.sharps.active{background:#c8882a;border-color:#c8882a;color:white;}
+.key-btn.flats{border-color:#2e7d52;}
+.key-btn.flats.active{background:#2e7d32;border-color:#2e7d52;color:white;}
+/* Scrollbar ukryty */
+#key-grid-dur::-webkit-scrollbar,#key-grid-moll::-webkit-scrollbar{display:none;}
+#key-grid-dur,#key-grid-moll{scrollbar-width:none;-ms-overflow-style:none;cursor:grab;}
+#key-grid-dur:active,#key-grid-moll:active{cursor:grabbing;}
+
+/* FUNCTION BUILDER */
+.func-builder{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;max-width:1060px;overflow:hidden;}
+.func-topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.func-topbar-title{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;}
+.func-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.func-btns-row{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.fb{padding:8px 18px;border-radius:50px;border:2px solid;font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.fb.T{background:#FFF3E0;border-color:#C8882A;color:#C8882A;}
+.fb.T:hover{background:#C8882A;color:white;}
+.fb.S{background:#E8F5E9;border-color:#2E7D52;color:#2E7D52;}
+.fb.S:hover{background:#2E7D52;color:white;}
+.fb.D{background:#E8EAF6;border-color:#3949AB;color:#3949AB;}
+.fb.D:hover{background:#3949AB;color:white;}
+.fb.t{background:#FCE4EC;border-color:#880E4F;color:#880E4F;}
+.fb.t:hover{background:#880E4F;color:white;}
+.fb.s{background:#E0F2F1;border-color:#004D40;color:#004D40;}
+.fb.s:hover{background:#004D40;color:white;}
+.fb.d{background:#EDE7F6;border-color:#4527A0;color:#4527A0;}
+.fb.d:hover{background:#4527A0;color:white;}
+.fb.rm{background:#fdf2f8;border-color:#c026d3;color:#c026d3;font-family:'Poppins',sans-serif;font-size:0.78rem;}
+.fb.rm:hover{background:#c026d3;color:white;}
+.fb-sep{width:1px;height:28px;background:var(--border);margin:0 4px;}
+
+/* SEQUENCE DISPLAY */
+.seq-wrap{min-height:44px;background:#f8fafc;border-radius:12px;border:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.seq-chip{padding:5px 13px;border-radius:50px;font-weight:700;font-size:0.9rem;font-family:'Playfair Display',serif;cursor:pointer;transition:0.15s;}
+.seq-chip:hover{filter:brightness(0.9);}
+.seq-chip.T{background:#FFF3E0;color:#C8882A;border:1.5px solid #C8882A;}
+.seq-chip.S{background:#E8F5E9;color:#2E7D52;border:1.5px solid #2E7D52;}
+.seq-chip.D{background:#E8EAF6;color:#3949AB;border:1.5px solid #3949AB;}
+.seq-chip.t{background:#FCE4EC;color:#880E4F;border:1.5px solid #880E4F;}
+.seq-chip.s{background:#E0F2F1;color:#004D40;border:1.5px solid #004D40;}
+.seq-chip.d{background:#EDE7F6;color:#4527A0;border:1.5px solid #4527A0;}
+.seq-arrow{color:#94a3b8;font-size:1rem;}
+.seq-empty{color:#94a3b8;font-size:0.85rem;font-style:italic;}
+
+/* GENERATE BUTTON */
+.gen-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.btn-gen{padding:10px 28px;border-radius:50px;border:none;background:var(--navy);color:white;font-family:'Poppins',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:0.2s;box-shadow:0 4px 16px rgba(30,58,138,0.25);}
+.btn-gen:hover{background:var(--gold);color:#1a1a2e;transform:translateY(-1px);}
+.btn-clear{padding:10px 20px;border-radius:50px;border:1.5px solid var(--border);background:white;font-family:'Poppins',sans-serif;font-size:0.9rem;cursor:pointer;color:#64748b;transition:0.2s;}
+.btn-clear:hover{border-color:var(--navy);color:var(--navy);}
+
+/* STAFF CARD */
+.staff-card{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;max-width:1060px;padding:20px 16px;}
+.svg-scroll{overflow-x:auto;width:100%;-webkit-overflow-scrolling:touch;}
+#main-svg{display:block;width:100%;height:auto;max-width:100%;}
+.info-row{font-size:0.78rem;color:#64748b;margin-top:10px;min-height:1.2em;text-align:center;line-height:1.7;}
+.err-row{font-size:0.78rem;color:#dc2626;margin-top:4px;min-height:1.2em;text-align:center;}
+
+/* LEGEND */
+.legend-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
+.leg{display:flex;align-items:center;gap:5px;font-size:0.75rem;color:#64748b;}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+.seq-row{display:flex;gap:8px;align-items:stretch;width:100%;}
+.seq-main{flex:1;min-width:0;}
+.trash-zone{min-width:56px;width:56px;flex-shrink:0;border-radius:14px;border:2px dashed #f87171;background:#fff5f5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all 0.2s;font-size:1.3rem;padding:6px 2px;}
+.trash-zone.over{background:#fee2e2;border-color:#dc2626;transform:scale(1.04);}
+.trash-zone span{font-size:0.56rem;font-weight:700;color:#f87171;text-transform:uppercase;letter-spacing:0.05em;}
+.rand-btn{min-width:56px;width:56px;flex-shrink:0;border-radius:14px;border:2px solid var(--gold);background:#fef9e7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all 0.2s;font-size:1.3rem;padding:6px 2px;}
+.rand-btn:hover{background:var(--gold);}
+.rand-btn span{font-size:0.56rem;font-weight:700;color:#92710a;text-transform:uppercase;letter-spacing:0.05em;}
+.rand-btn:hover span{color:white;}
+.seq-chip[draggable]{cursor:grab;user-select:none;}
+.seq-chip[draggable]:active{cursor:grabbing;opacity:0.7;}
+.fb[draggable]{cursor:grab;}
+.moll-sup{font-size:0.65em;vertical-align:super;margin-right:1px;font-family:'Poppins',sans-serif;}
 </style>
 </head>
 <body>
- 
-<div>
-  <h1>Łączenie akordów</h1>
-  <p class="sub">Prowadzenie głosów SATB</p>
-</div>
- 
-<div class="card">
-  <div class="controls-row">
-    <div class="ctrl-group">
-      <span class="ctrl-label">Tonacja</span>
-      <select id="key-sel">
-        <option value="C">C dur</option>
-        <option value="G">G dur</option>
-        <option value="D">D dur</option>
-        <option value="A">A dur</option>
-        <option value="E">E dur</option>
-        <option value="F">F dur</option>
-        <option value="Bb">B dur</option>
-      </select>
+
+<nav class="site-nav">
+  <a href="/index.html">Strona główna</a>
+  <a href="/index/fiszki.html">Fiszki</a>
+  <a href="/index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/podrecznik/podrecznik.html">Podręcznik</a>
+  <a href="/index.html#briefy">Materiały</a>
+</nav>
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="/index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="/index/fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
+
+<main class="main">
+  <div style="text-align:center;">
+    <div class="badge-prealpha" style="margin-bottom:10px;">Pre-Alpha</div>
+    <h1 class="page-title">Pochody <em>funkcyjne</em></h1>
+    <p class="page-sub">Prowadzenie głosów SATB w układzie czterogłosowym</p>
+  </div>
+
+  <!-- Panel ustawień -->
+  <div class="ctrl-outer">
+    <div class="ctrl-topbar">
+      <span class="ctrl-topbar-title">🎵 Ustawienia</span>
     </div>
-    <div class="ctrl-group">
-      <span class="ctrl-label">Dodaj funkcję</span>
-      <div class="func-btns">
-        <button class="func-btn T" onclick="addF('T')">T</button>
-        <button class="func-btn S" onclick="addF('S')">S</button>
-        <button class="func-btn rm" onclick="removeF()">← Usuń</button>
+    <div class="ctrl-body">
+      <!-- Układ głosów — PIERWSZA OPCJA -->
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Układ</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-skupiony" onclick="setLayout('skupiony')">Skupiony</button>
+          <button class="cb" id="cb-rozlegly" onclick="setLayout('rozlegly')">Rozległy</button>
+        </div>
+      </div>
+      <!-- Nazwy nut — DRUGA OPCJA -->
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Nazwy nut</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-lang-pl" onclick="setNoteLang('pl')">Polska</button>
+          <button class="cb" id="cb-lang-en" onclick="setNoteLang('en')">Angielska</button>
+        </div>
+      </div>
+      <!-- Tonacja — koło kwintowe: bemole←  C  →krzyżyki -->
+      <div class="ctrl-row" style="align-items:flex-start;">
+        <span class="ctrl-lbl" style="padding-top:6px;">Tonacja</span>
+        <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">
+          <div style="font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;">Dur</div>
+          <div id="key-grid-dur" style="display:flex;gap:5px;flex-wrap:nowrap;align-items:center;overflow-x:auto;padding-bottom:2px;"></div>
+          <div style="font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-top:4px;">Moll</div>
+          <div id="key-grid-moll" style="display:flex;gap:5px;flex-wrap:nowrap;align-items:center;overflow-x:auto;padding-bottom:2px;"></div>
+        </div>
       </div>
     </div>
   </div>
- 
-  <span class="ctrl-label">Ciąg harmoniczny</span>
-  <div class="seq-display" id="seq-disp"><span class="seq-empty">Dodaj T lub S…</span></div>
- 
-  <div class="action-row">
-    <button class="btn-go" onclick="generate()">▶ Generuj prowadzenie głosów</button>
-    <button class="btn-cl" onclick="clearAll()">Wyczyść</button>
+
+  <!-- Budowanie pochodu -->
+  <div class="func-builder">
+    <div class="func-topbar">
+      <span class="func-topbar-title">🎼 Ciąg funkcyjny — <span id="topbar-key" style="color:var(--navy);font-style:italic;">C dur</span></span>
+      <span style="font-size:0.72rem;color:#94a3b8;" id="seq-count">0 / 10</span>
+    </div>
+    <div class="func-body">
+      <!-- Ciąg funkcyjny (T S D + moll) -->
+      <div id="func-seq-section">
+        <div style="font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:6px;">Ciąg funkcyjny</div>
+        <div class="func-btns-row" id="func-btns"></div>
+        <div class="seq-row" style="margin-top:8px;">
+          <div class="seq-main">
+            <div class="seq-wrap" id="seq-disp"
+          ondragover="event.preventDefault()"
+          ondrop="dropToFuncSeq(event)"><span class="seq-empty">Przeciągnij lub kliknij funkcje…</span></div>
+          </div>
+          <div class="trash-zone" id="func-trash"
+            onclick="seq=[];renderSeq();"
+            ondragover="event.preventDefault();this.classList.add('over')"
+            ondragleave="this.classList.remove('over')"
+            ondrop="dropToFuncTrash(event)" title="Kliknij by wyczyścić · Przeciągnij by usunąć jedną">🗑</div>
+          <div class="rand-btn" onclick="randomizeSeq()" title="Losuj ciąg funkcyjny">🎲<span>Losuj</span></div>
+        </div>
+      </div>
+      <!-- Separator -->
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:0.7rem;color:#94a3b8;font-weight:700;">lub</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+      <!-- Ciąg akordowy -->
+      <div id="chord-seq-section">
+        <div style="font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin-bottom:6px;">Ciąg akordowy (przeciągnij tonacje)</div>
+        <div class="seq-row">
+          <div class="seq-main">
+            <div id="chord-drop-zone" class="seq-wrap" ondragover="event.preventDefault()" ondrop="dropChord(event)" style="min-height:48px;border-style:dashed;">
+              <span class="seq-empty" id="chord-empty-msg">Przeciągnij tonacje z siatki powyżej…</span>
+            </div>
+          </div>
+          <div class="trash-zone" id="chord-trash"
+            onclick="chordSeq=[];renderChordSeq();"
+            ondragover="event.preventDefault();this.classList.add('over')"
+            ondragleave="this.classList.remove('over')"
+            ondrop="dropToChordTrash(event)" title="Kliknij by wyczyścić · Przeciągnij by usunąć jeden">🗑</div>
+          <div class="rand-btn" onclick="randomizeChordSeq()" title="Losuj ciąg akordowy">🎲<span>Losuj</span></div>
+        </div>
+      </div>
+      <div class="gen-row" style="margin-top:10px;">
+        <button class="btn-gen" onclick="generate()">▶ Generuj prowadzenie głosów</button>
+        <button class="btn-clear" onclick="clearAll()">Wyczyść wszystko</button>
+      </div>
+    </div>
   </div>
- 
-  <div class="svg-wrap">
-    <svg id="main-svg" style="display:none;overflow:visible"></svg>
+
+  <!-- Pięciolinia wynikowa -->
+  <div class="staff-card" id="staff-card" style="display:none;">
+    <div class="svg-scroll"><svg id="main-svg" style="overflow:visible;"></svg></div>
+    <div class="info-row" id="info-row"></div>
+    <div class="err-row" id="err-row"></div>
+    <div class="legend-row">
+      <div class="leg"><div class="leg-dot" style="background:#7B4F9A"></div>Sopran (↑ wiolinowy)</div>
+      <div class="leg"><div class="leg-dot" style="background:#C8882A"></div>Alt (↓ wiolinowy)</div>
+      <div class="leg"><div class="leg-dot" style="background:#2E7D52"></div>Tenor (↑ basowy)</div>
+      <div class="leg"><div class="leg-dot" style="background:#5B6FA6"></div>Bas (↓ basowy)</div>
+    </div>
   </div>
-  <div class="info" id="info-txt"></div>
-  <div class="legend" id="legend" style="display:none">
-    <div class="leg-item"><div class="leg-dot" style="background:#7B4F9A"></div>Sopran (klucz wiolinowy, ogonek ↑)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#C8882A"></div>Alt (klucz wiolinowy, ogonek ↓)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#2E7D52"></div>Tenor (klucz basowy, ogonek ↑)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#5B6FA6"></div>Bas (klucz basowy, ogonek ↓)</div>
-  </div>
-</div>
- 
+</main>
+
 <script>
-// ══════════════════════════════════════════════════
-//  TEORIA — pozycje diatoniczne
-//
-//  Klucz WIOLINOWY (Sopran + Alt):
-//    diaPos C4=0, D4=1, E4=2, F4=3, G4=4, A4=5, H4=6,
-//           C5=7, D5=8, E5=9, F5=10, G5=11
-//    Y = 130 - diaPos*10
-//    Linie: E4(2)=110, G4(4)=90, H4(6)=70, D5(8)=50, F5(10)=30
-//
-//  Klucz BASOWY (Tenor + Bas):
-//    Linia 1(top)=G3, L2=E3, L3=C3, L4=A2, L5=F2
-//    Mapowanie diaPos (C4=0):
-//      G3 = G oktawa3 → diaPos G=4, okt3: 4-7 = -3
-//      E3 = -5, C3 = -7, A2 = -9 (A=5, okt2: 5-14=-9), F2=-11 (F=3, okt2: 3-14=-11)
-//    bY = BTOP + (-3 - diaPos)*10   gdzie BTOP=195
-//    Linia 1(top,y=195): G3(diaPos=-3) ✓
-//    Linia 5(bot,y=275): A2(diaPos=-9)... (-3-(-9))*10=60 → 195+60=255 ≠ 275
-//    Poprawka: bY = BTOP + (-3 - diaPos)*10  → L5=195+60=255
-//    Ale chcemy L5 na y=BTOP+80=275 → potrzeba przeskalowania
-//    Linie co 20px: BTOP,BTOP+20,BTOP+40,BTOP+60,BTOP+80
-//    G3→y=BTOP, E3→BTOP+20, C3→BTOP+40, A2→BTOP+60, F2→BTOP+80
-//    G3 diaPos=-3, F2 diaPos=-11 → różnica 8 pozycji diat = 4 linie * 2 kroki
-//    Każda linia = 2 stopnie diat * 10px = 20px ✓
-//    bY(d) = BTOP + (-3 - d)*10
-//    G3(d=-3): BTOP+0=195 ✓
-//    E3(d=-5): BTOP+20 ✓  C3(d=-7): BTOP+40 ✓  A2(d=-9): BTOP+60 ✓  F2(d=-11): BTOP+80 ✓
-//
-//  Tenor w kluczu basowym — zakres: C3(-7) do H3(-1)
-//  Bas w kluczu basowym  — zakres: C2(-14) do H2(-8)  ... ale realnie F2(-11) do G3(-3)
-// ══════════════════════════════════════════════════
- 
-const BTOP = 195; // y górnej linii klucza basowego
- 
-function tY(d)  { return 130 - d*10; }         // klucz wiolinowy
-function bY(d)  { return BTOP + (-3 - d)*10; }  // klucz basowy
- 
-// Linie pięciolinii — pozycje diatoniczne
-const T_LINE_D = [2,4,6,8,10];   // E4,G4,H4,D5,F5
-const B_LINE_D = [-3,-5,-7,-9,-11]; // G3,E3,C3,A2,F2
-const T_LINE_Y = T_LINE_D.map(tY);  // [110,90,70,50,30]
-const B_LINE_Y = B_LINE_D.map(bY);  // [195,215,235,255,275]
- 
-// Chromatyka
-const ALL12 = ['C','Cs','D','Eb','E','F','Fs','G','Gs','A','Bb','H'];
-const NOTE_DIA = {C:0,Cs:0,D:1,Eb:2,E:2,F:3,Fs:3,G:4,Gs:4,A:5,Bb:6,H:6};
-const NOTE_NAME = {C:'C',Cs:'C#',D:'D',Eb:'Es',E:'E',F:'F',Fs:'F#',G:'G',Gs:'G#',A:'A',Bb:'B',H:'H'};
-const KEY_ROOT = {C:0,G:7,D:2,A:9,E:4,F:5,Bb:10};
- 
-// Zbuduj obiekt nuty: chroma(0-11), oktawa → {diaPos, name, chroma, octave}
-function mkNote(chroma, octave) {
-  const c = ((chroma%12)+12)%12;
-  const key = ALL12[c];
-  const dia = NOTE_DIA[key] + (octave-4)*7;
-  return {chroma:c, octave, diaPos:dia, name:NOTE_NAME[key], key};
+// ═══════════════════════════════════════════════════
+// TEORIA — SYSTEM NUT
+// Reprezentacja: diaPos = pozycja diatoniczna względem C4=0
+// C4=0, D4=1, E4=2, F4=3, G4=4, A4=5, H4=6
+// C5=7, D5=8, ...  C3=-7, D3=-6, ...
+// chromPos = pozycja chromatyczna (półtony od C0)
+// ═══════════════════════════════════════════════════
+
+// Diatoniczne nazwy stopni (indeks = stopień w gamie durowej: 0=C,1=D,2=E,3=F,4=G,5=A,6=H)
+const DIA_NAMES_PL = ['C','D','E','F','G','A','H'];
+// Enharmoniczne nazwy z krzyżykiem/bemolm
+const CHROMA_TO_NAME = {
+  0:'C', 1:'Cis', 2:'D', 3:'Es', 4:'E', 5:'F',
+  6:'Fis', 7:'G', 8:'Gis', 9:'A', 10:'Ais', 11:'H'
+};
+const CHROMA_TO_NAME_SHARP = {
+  0:'C',1:'Cis',2:'D',3:'Dis',4:'E',5:'F',
+  6:'Fis',7:'G',8:'Gis',9:'A',10:'Ais',11:'H'
+};
+// chroma → diaPos offset within octave (0-based)
+const CHROMA_TO_DIA_OFFSET = {
+  0:0,1:0,2:1,3:2,4:2,5:3,6:3,7:4,8:4,9:5,10:6,11:6
+};
+
+// Koło kwintowe — wszystkie tonacje
+const KEYS = [
+  // C
+  {name:'C', labelPl:'C',    labelEn:'C',    sharps:0,flats:0,type:'center'},
+  // Krzyżykowe
+  {name:'G',   labelPl:'G',   labelEn:'G',   sharps:1,flats:0,type:'sharp'},
+  {name:'D',   labelPl:'D',   labelEn:'D',   sharps:2,flats:0,type:'sharp'},
+  {name:'A',   labelPl:'A',   labelEn:'A',   sharps:3,flats:0,type:'sharp'},
+  {name:'E',   labelPl:'E',   labelEn:'E',   sharps:4,flats:0,type:'sharp'},
+  {name:'H',   labelPl:'H',   labelEn:'B',   sharps:5,flats:0,type:'sharp'},
+  {name:'Fis', labelPl:'Fis', labelEn:'F#',  sharps:6,flats:0,type:'sharp'},
+  {name:'Cis', labelPl:'Cis', labelEn:'C#',  sharps:7,flats:0,type:'sharp'},
+  // Bemolowe
+  {name:'F',   labelPl:'F',   labelEn:'F',   sharps:0,flats:1,type:'flat'},
+  {name:'B',   labelPl:'B',   labelEn:'Bb',  sharps:0,flats:2,type:'flat'},
+  {name:'Es',  labelPl:'Es',  labelEn:'Eb',  sharps:0,flats:3,type:'flat'},
+  {name:'As',  labelPl:'As',  labelEn:'Ab',  sharps:0,flats:4,type:'flat'},
+  {name:'Des', labelPl:'Des', labelEn:'Db',  sharps:0,flats:5,type:'flat'},
+  {name:'Ges', labelPl:'Ges', labelEn:'Gb',  sharps:0,flats:6,type:'flat'},
+  {name:'Ces', labelPl:'Ces', labelEn:'Cb',  sharps:0,flats:7,type:'flat'},
+  // Moll — równoległe do durowych (ta sama armatura)
+  {name:'am',  labelPl:'a',   labelEn:'Am',  sharps:0,flats:0,type:'center-moll',  isMoll:true, rootChroma:9},
+  {name:'em',  labelPl:'e',   labelEn:'Em',  sharps:1,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:4},
+  {name:'hm',  labelPl:'h',   labelEn:'Bm',  sharps:2,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:11},
+  {name:'fism',labelPl:'fis', labelEn:'F#m', sharps:3,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:6},
+  {name:'cism',labelPl:'cis', labelEn:'C#m', sharps:4,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:1},
+  {name:'gism',labelPl:'gis', labelEn:'G#m', sharps:5,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:8},
+  {name:'dism',labelPl:'dis', labelEn:'D#m', sharps:6,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:3},
+  {name:'aism',labelPl:'ais', labelEn:'A#m', sharps:7,flats:0,type:'sharp-moll',   isMoll:true, rootChroma:10},
+  {name:'dm',  labelPl:'d',   labelEn:'Dm',  sharps:0,flats:1,type:'flat-moll',    isMoll:true, rootChroma:2},
+  {name:'gm',  labelPl:'g',   labelEn:'Gm',  sharps:0,flats:2,type:'flat-moll',    isMoll:true, rootChroma:7},
+  {name:'cm',  labelPl:'c',   labelEn:'Cm',  sharps:0,flats:3,type:'flat-moll',    isMoll:true, rootChroma:0},
+  {name:'fm',  labelPl:'f',   labelEn:'Fm',  sharps:0,flats:4,type:'flat-moll',    isMoll:true, rootChroma:5},
+  {name:'bm',  labelPl:'b',   labelEn:'Bbm', sharps:0,flats:5,type:'flat-moll',    isMoll:true, rootChroma:10},
+  {name:'esm', labelPl:'es',  labelEn:'Ebm', sharps:0,flats:6,type:'flat-moll',    isMoll:true, rootChroma:3},
+  {name:'asm', labelPl:'as',  labelEn:'Abm', sharps:0,flats:7,type:'flat-moll',    isMoll:true, rootChroma:8},
+];
+function keyLabel(k){ return noteNameLang==='en' ? k.labelEn : k.labelPl; }
+
+const CHROMA_TO_NAME_EN = {
+  0:'C', 1:'C#', 2:'D', 3:'Eb', 4:'E', 5:'F',
+  6:'F#', 7:'G', 8:'G#', 9:'A', 10:'Bb', 11:'B'
+};
+// Chroma prymy dla każdej tonacji
+const KEY_CHROMA = {
+  C:0,G:7,D:2,A:9,E:4,H:11,Fis:6,Cis:1,
+  F:5,B:10,Es:3,As:8,Des:1,Ges:6,Ces:11
+};
+function getKeyChroma(keyName) {
+  const k = KEYS.find(k=>k.name===keyName);
+  if(k && k.isMoll && k.rootChroma!==undefined) return k.rootChroma;
+  return KEY_CHROMA[keyName] ?? 0;
 }
- 
-// Znajdź nutę o danym chroma, jak najbliżej targetDia, w zakresie [minD, maxD]
-function closest(chroma, targetDia, minD, maxD) {
-  let best=null, bd=9999;
-  for(let oct=0; oct<=7; oct++) {
-    const n=mkNote(chroma,oct);
-    if(n.diaPos<minD||n.diaPos>maxD) continue;
-    const d=Math.abs(n.diaPos-targetDia);
-    if(d<bd){bd=d;best=n;}
+
+// Interwały durowe (chroma od prymy): pryma=0, w2=2, w3=4, c4=5, c5=7, w6=9, w7=11
+// Tryb durowy: I=dur, II=moll, III=moll, IV=dur, V=dur, VI=moll, VII=zm
+// T = I stopień durowy, S = IV stopień durowy, D = V stopień durowy
+// t = I stopień mollowy, s = IV stopień mollowy, d = V stopień (dur w harmonicznym)
+
+// Buduj akord: {root_chroma, third_chroma, fifth_chroma, root_dia_name, label}
+function buildChord(keyName, func) {
+  const kr = getKeyChroma(keyName);
+  let rootC, thirdC, fifthC, isMaj, label;
+
+  if(func === 'T') {
+    rootC = kr; thirdC = (kr+4)%12; fifthC = (kr+7)%12; isMaj=true;
+    label = noteName(kr)+'';
+  } else if(func === 'S') {
+    rootC = (kr+5)%12; thirdC = (kr+9)%12; fifthC = (kr+0)%12; isMaj=true;
+    label = noteName((kr+5)%12)+'';
+  } else if(func === 'D') {
+    rootC = (kr+7)%12; thirdC = (kr+11)%12; fifthC = (kr+2)%12; isMaj=true;
+    label = noteName((kr+7)%12)+'';
+  } else if(func === 't') {
+    // moll tonika: m3 + w3
+    rootC = kr; thirdC = (kr+3)%12; fifthC = (kr+7)%12; isMaj=false;
+    label = noteName(kr)+'m';
+  } else if(func === 's') {
+    // moll subdominanta
+    rootC = (kr+5)%12; thirdC = (kr+8)%12; fifthC = (kr+0)%12; isMaj=false;
+    label = noteName((kr+5)%12)+'m';
+  } else if(func === 'd') {
+    // dominanta w moll — harmoniczna: dur (V stopień harmonicznego moll = dur)
+    rootC = (kr+7)%12; thirdC = (kr+11)%12; fifthC = (kr+2)%12; isMaj=true;
+    label = noteName((kr+7)%12)+'';
+  }
+  return {func, rootC, thirdC, fifthC, isMaj, label, chromas:[rootC, thirdC, fifthC]};
+}
+
+function noteName(c) {
+  return noteNameInKey(c, currentKey);
+}
+function noteNameInKey(c, keyName) {
+  const chroma = ((c%12)+12)%12;
+  const k = KEYS.find(k=>k.name===keyName);
+  if(noteNameLang==='en') {
+    // EN: krzyżykowe tonacje → sharp names, bemolowe → flat names
+    const useFlat = k && k.flats > 0;
+    const enSharp = {0:'C',1:'C#',2:'D',3:'D#',4:'E',5:'F',6:'F#',7:'G',8:'G#',9:'A',10:'A#',11:'B'};
+    const enFlat  = {0:'C',1:'Db',2:'D',3:'Eb',4:'E',5:'F',6:'Gb',7:'G',8:'Ab',9:'A',10:'Bb',11:'B'};
+    return (useFlat ? enFlat : enSharp)[chroma] || '?';
+  }
+  // PL: wybierz mapę zależnie od tonacji
+  const isSharpKey = k && k.sharps > 0;
+  const isFlatKey  = k && k.flats  > 0;
+  const sharpMap = {0:'C',1:'Cis',2:'D',3:'Dis',4:'E',5:'F',6:'Fis',7:'G',8:'Gis',9:'A',10:'Ais',11:'H'};
+  const flatMap  = {0:'C',1:'Des',2:'D',3:'Es', 4:'E',5:'F',6:'Ges',7:'G',8:'As', 9:'A',10:'B',  11:'H'};
+  const neutral  = {0:'C',1:'Cis',2:'D',3:'Es', 4:'E',5:'F',6:'Fis',7:'G',8:'Gis',9:'A',10:'Ais',11:'H'};
+  if(isFlatKey)  return flatMap[chroma]  || '?';
+  if(isSharpKey) return sharpMap[chroma] || '?';
+  return neutral[chroma] || '?';
+}
+
+// ═══════════════════════════════════════════════════
+// ZAKRESY GŁOSÓW (diaPos względem C4=0)
+// Sopran: h małe (H3) do a dwukreślne (A5)
+//   H3: diaPos = H=6, oktawa3 → 6-7=-1... 
+//   Przelicz: diaPos(H,oct) = 6 + (oct-4)*7
+//   H3 = 6 + (3-4)*7 = 6-7 = -1
+//   A5 = 5 + (5-4)*7 = 5+7 = 12
+// Alt: e małe (E3) do d dwukreślne (D6)
+//   E3 = 2 + (3-4)*7 = 2-7 = -5
+//   D6 = 1 + (6-4)*7 = 1+14 = 15
+// Tenor: c małe (C3) do a razkreślne (A4)
+//   C3 = 0 + (3-4)*7 = -7
+//   A4 = 5
+// Bas: E wielkie (E2) do d razkreślne (D5)
+//   E2 = 2 + (2-4)*7 = 2-14 = -12
+//   D5 = 1 + (5-4)*7 = 1+7 = 8
+// ═══════════════════════════════════════════════════
+const RANGES = {
+  sopran: {min:-1, max:12},   // H3..A5
+  alt:    {min:-5, max:15},   // E3..D6 (szeroki zakres)
+  tenor:  {min:-7, max:5},    // C3..A4
+  bass:   {min:-12, max:8},   // E2..D5
+};
+
+// Reguła: głosy nie mogą się krzyżować
+// sopran > alt > tenor > bass (diaPos)
+
+// ═══════════════════════════════════════════════════
+// PRZELICZANIE: chroma → diaPos w danej oktawie
+// ═══════════════════════════════════════════════════
+function chromaToDia(chroma, octave) {
+  const c = ((chroma%12)+12)%12;
+  return CHROMA_TO_DIA_OFFSET[c] + (octave-4)*7;
+}
+
+function diaToY_treble(d) { return 150 - d*10; }  // +20: nuty były 2 pozycje za wysoko
+function diaToY_bass(d)   {
+  // Linie basowe: G2(d=-10)=300, H2(d=-8)=280, d(d=-6)=260, f(d=-4)=240, a(d=-2)=220
+  // c1(d=0)=200 (L1 dod.górna), C2(d=-14)=340 (L2 dod.dolna)
+  return 306 - (d + 10) * 10;  // +30 odstęp od treble
+}
+
+// ═══════════════════════════════════════════════════
+// ZNAJDŹ NAJBLIŻSZY DŹWIĘK akordowy do targetDia
+// w danym zakresie
+// ═══════════════════════════════════════════════════
+function findClosest(chroma, targetDia, minD, maxD) {
+  const c = ((chroma%12)+12)%12;
+  let best = null, bd = 9999;
+  for(let oct = 0; oct <= 8; oct++) {
+    const d = chromaToDia(c, oct);
+    if(d < minD || d > maxD) continue;
+    const dist = Math.abs(d - targetDia);
+    if(dist < bd) { bd = dist; best = {chroma:c, dia:d, oct}; }
   }
   return best;
 }
- 
-// ══════════════════════════════════════════════════
-//  VOICING — SATB
-//  Sopran: klucz wiolinowy, zakres d=4..11 (G4..G5)
-//  Alt:    klucz wiolinowy, zakres d=2..8  (E4..D5)  < Sopran
-//  Tenor:  klucz basowy,   zakres d=-7..0  (C3..C4)  < Alt
-//  Bas:    klucz basowy,   zakres d=-14..-6 (C2..D3) < Tenor
-//
-//  Układ startowy T (C dur):
-//    Sopran = G4 (kwinta, d=4)
-//    Alt    = E4 (tercja, d=2)
-//    Tenor  = C4 (pryma,  d=0)  ← klucz basowy, d=0 = C4 na linii dodanej górnej
-//    Bas    = C3 (pryma,  d=-7) ← klucz basowy, L3
-//
-//  Układ startowy S (F dur, z C):
-//    Sopran = C5 (kwinta F, d=7)
-//    Alt    = A4 (tercja F, d=5)
-//    Tenor  = F3 (pryma F, d=-4) 
-//    Bas    = F2 (pryma F, d=-11)
-// ══════════════════════════════════════════════════
- 
-function firstVoicing(keyStr, func) {
-  const r = KEY_ROOT[keyStr]??0;
-  if(func==='T') {
-    const root=r, third=(r+4)%12, fifth=(r+7)%12;
-    return {
-      func:'T', keyStr,
-      sopran: mkNote(fifth, 4),    // G4
-      alt:    mkNote(third, 4),    // E4
-      tenor:  mkNote(root,  4),    // C4 (w kluczu basowym = linia dodana)
-      bass:   mkNote(root,  3),    // C3
-      root, third, fifth,
-      label: NOTE_NAME[ALL12[root]]+' dur'
-    };
+
+// ═══════════════════════════════════════════════════
+// UKŁAD: skupiony / rozległy
+// W układzie skupiony: sopran, alt, tenor mieszczą się w oktawie
+// W układzie rozległy: sopran i tenor są oddalone o oktawę+
+// ═══════════════════════════════════════════════════
+
+// Dla danego akordu i pozycji sopranu (która nuta: pryma/tercja/kwinta)
+// zbuduj voicing w danym układzie
+function buildVoicing(chord, layout, startPos) {
+  // startPos: 'pryma'|'tercja'|'kwinta' — co jest w soprani
+  const chromas = chord.chromas; // [rootC, thirdC, fifthC]
+  let sopChroma, altChroma, tenorChroma, bassChroma;
+  
+  // Bas zawsze pryma
+  bassChroma = chord.rootC;
+  
+  if(startPos === 'pryma') {
+    sopChroma = chord.rootC; altChroma = chord.fifthC; tenorChroma = chord.thirdC;
+  } else if(startPos === 'tercja') {
+    sopChroma = chord.thirdC; altChroma = chord.rootC; tenorChroma = chord.fifthC;
+  } else { // kwinta
+    sopChroma = chord.fifthC; altChroma = chord.thirdC; tenorChroma = chord.rootC;
   }
-  if(func==='S') {
-    const root=(r+5)%12, third=(r+9)%12, fifth=r;
-    return {
-      func:'S', keyStr,
-      sopran: mkNote(fifth, 5),    // C5 (kwinta F)
-      alt:    mkNote(third, 4),    // A4
-      tenor:  mkNote(root,  3),    // F3
-      bass:   mkNote(root,  2),    // F2
-      root, third, fifth,
-      label: NOTE_NAME[ALL12[root]]+' dur'
-    };
-  }
-}
- 
-// ══════════════════════════════════════════════════
-//  PROWADZENIE GŁOSÓW
-// ══════════════════════════════════════════════════
- 
-// T → S
-// Reguły (z zadania):
-//   Sopran (kwinta T) → tercja S
-//   Alt (tercja T) → pryma S
-//   Tenor (pryma T) → zostaje (= kwinta S, bo C jest kwintą F)
-//   Bas (pryma T) → skacze na prymę S
-function leadTS(prev, keyStr) {
-  const r=KEY_ROOT[keyStr]??0;
-  const sRoot=(r+5)%12, sThird=(r+9)%12, sFifth=r;
-  const label=NOTE_NAME[ALL12[sRoot]]+' dur';
- 
-  const newTenor = prev.tenor; // zostaje — będzie kwintą S
-  // Alt: tercja T → pryma S, jak najbliżej
-  const newAlt = closest(sRoot, prev.alt.diaPos, newTenor.diaPos+1, 9);
-  // Sopran: kwinta T → tercja S, musi być > alt
-  const newSopran = closest(sThird, prev.sopran.diaPos, (newAlt?.diaPos??0)+1, 12);
-  // Bas: pryma T → pryma S, skok
-  const newBass = closest(sRoot, prev.bass.diaPos, -14, newTenor.diaPos-1);
- 
-  return {func:'S',keyStr,root:sRoot,third:sThird,fifth:sFifth,label,
-    sopran:newSopran, alt:newAlt, tenor:newTenor, bass:newBass};
-}
- 
-// S → T
-// Reguły (z zadania):
-//   Tercja S → kwinta T
-//   Pryma S → tercja T
-//   Kwinta S → pryma T (zostaje, bo C jest prymą i kwintą...)
-//     "kwinta S zostaje na prymę T" — kwinta S=C (z F), pryma T=C → zostaje ✓
-//   Kwinta S w basie → skacze na prymę T
-function leadST(prev, keyStr) {
-  const r=KEY_ROOT[keyStr]??0;
-  const tRoot=r, tThird=(r+4)%12, tFifth=(r+7)%12;
-  const label=NOTE_NAME[ALL12[tRoot]]+' dur';
- 
-  // Tenor: kwinta S zostaje = pryma T (C = kwinta F = pryma C ✓)
-  const newTenor = prev.tenor; // zostaje
-  // Alt: pryma S → tercja T
-  const newAlt = closest(tThird, prev.alt.diaPos, newTenor.diaPos+1, 9);
-  // Sopran: tercja S → kwinta T
-  const newSopran = closest(tFifth, prev.sopran.diaPos, (newAlt?.diaPos??0)+1, 12);
-  // Bas: skacze na prymę T
-  const newBass = closest(tRoot, prev.bass.diaPos, -14, newTenor.diaPos-1);
- 
-  return {func:'T',keyStr,root:tRoot,third:tThird,fifth:tFifth,label,
-    sopran:newSopran, alt:newAlt, tenor:newTenor, bass:newBass};
-}
- 
-// T → T (lub S → S): trzy opcje, wybieramy najlepszą
-// Opcja 1: wszystkie głosy zostają
-// Opcja 2: bas zostaje, 3 górne idą w górę o tercję (pryma→tercja, tercja→kwinta, kwinta→pryma wyżej)
-// Opcja 3: 3 górne zostają, bas idzie o oktawę
-function leadSame(prev, keyStr, func) {
-  const r=KEY_ROOT[keyStr]??0;
-  let root,third,fifth,label;
-  if(func==='T'){root=r;third=(r+4)%12;fifth=(r+7)%12;}
-  else{root=(r+5)%12;third=(r+9)%12;fifth=r;}
-  label=NOTE_NAME[ALL12[root]]+' dur';
- 
-  // Opcja 1: wszystko zostaje
-  const opt1 = {...prev, label, prevOption:'zostają'};
- 
-  // Opcja 2: bas zostaje, reszta w górę o tercję (pryma→tercja→kwinta→pryma)
-  // kolejność głosów (tenor,alt,sopran) = (pryma,tercja,kwinta) dla T
-  // każdy idzie na następną nutę w górę: pryma→tercja, tercja→kwinta, kwinta→pryma(+oktawa)
-  const seqChroma = [root,third,fifth]; // po kolei od prymy
-  // Tenor (pryma) → tercja
-  const t2tenor = closest(third, prev.tenor.diaPos+1, prev.tenor.diaPos, 2);
-  // Alt (tercja) → kwinta
-  const t2alt = closest(fifth, prev.alt.diaPos+1, (t2tenor?.diaPos??0)+1, 10);
-  // Sopran (kwinta) → pryma (wyżej)
-  const t2sopran = closest(root, prev.sopran.diaPos+1, (t2alt?.diaPos??0)+1, 13);
-  const opt2 = {func,keyStr,root,third,fifth,label,
-    sopran:t2sopran, alt:t2alt, tenor:t2tenor, bass:prev.bass, prevOption:'ruch w górę'};
- 
-  // Opcja 3: trzy górne zostają, bas zmienia oktawę
-  const basDistToTenor = Math.abs(prev.bass.diaPos - prev.tenor.diaPos);
-  let newBass;
-  if(basDistToTenor < 7) {
-    // za blisko → bas w dół o oktawę
-    newBass = mkNote(prev.bass.chroma, prev.bass.octave-1);
+  
+  // Znajdź optymalne pozycje oktawowe
+  // Bas: zakres -12..8, preferujemy dolny rejestr
+  let bassNote = findInRange(bassChroma, RANGES.bass.min, RANGES.bass.max, -9); // C2 obszar
+  
+  // Tenor: powyżej basu, zakres -7..5
+  let tenorNote = findInRange(tenorChroma, Math.max(RANGES.tenor.min, bassNote.dia+1), RANGES.tenor.max, bassNote.dia+2);
+  
+  if(layout === 'skupiony') {
+    // Alt w oktawie tenoraZ
+    let altNote = findInRange(altChroma, tenorNote.dia+1, Math.min(tenorNote.dia+7, RANGES.alt.max), tenorNote.dia+2);
+    // Sopran powyżej alta, blisko
+    let sopNote = findInRange(sopChroma, altNote.dia+1, Math.min(altNote.dia+8, RANGES.sopran.max), altNote.dia+2);
+    return {sopran:sopNote, alt:altNote, tenor:tenorNote, bass:bassNote, chord};
   } else {
-    // za daleko → bas w górę o oktawę
-    newBass = mkNote(prev.bass.chroma, prev.bass.octave+1);
+    // Rozległy: alt i sopran wyżej o oktawę
+    let altNote = findInRange(altChroma, tenorNote.dia+4, Math.min(tenorNote.dia+11, RANGES.alt.max), tenorNote.dia+6);
+    let sopNote = findInRange(sopChroma, altNote.dia+1, Math.min(altNote.dia+8, RANGES.sopran.max), altNote.dia+3);
+    return {sopran:sopNote, alt:altNote, tenor:tenorNote, bass:bassNote, chord};
   }
-  // Upewnij bas jest poniżej tenoru
-  if(newBass.diaPos >= prev.tenor.diaPos) newBass = mkNote(prev.bass.chroma, prev.bass.octave-1);
-  const opt3 = {...prev, label, bass:newBass, prevOption:'bas zmienia oktawę'};
- 
-  // Wybierz opcję: preferuj opcję 1 (unison), przy powtórzeniach zalecaną jest opcja 2
-  // Dla pierwszego powtórzenia → opcja 2 (ruch głosów), następne → opcja 1
-  // Tu na stałe opcja 2 (bardziej edukacyjna)
-  return opt2;
 }
- 
-// ══════════════════════════════════════════════════
-//  SEKWENCJA UI
-// ══════════════════════════════════════════════════
-let seq=[];
-const MAX=8;
-function addF(f){if(seq.length>=MAX)return;seq.push(f);renderSeq();}
-function removeF(){seq.pop();renderSeq();}
-function clearAll(){seq=[];renderSeq();document.getElementById('main-svg').style.display='none';document.getElementById('info-txt').textContent='';document.getElementById('legend').style.display='none';}
-function renderSeq(){
-  const el=document.getElementById('seq-disp');
-  if(!seq.length){el.innerHTML='<span class="seq-empty">Dodaj T lub S…</span>';return;}
-  el.innerHTML=seq.map((f,i)=>`${i?'<span class="seq-arrow">→</span>':''}<span class="seq-chip ${f}">${f}</span>`).join('');
-}
- 
-// ══════════════════════════════════════════════════
-//  GENEROWANIE
-// ══════════════════════════════════════════════════
-function generate(){
-  if(seq.length<2){document.getElementById('info-txt').textContent='Dodaj co najmniej 2 funkcje.';return;}
-  const key=document.getElementById('key-sel').value;
-  const voicings=[];
-  for(let i=0;i<seq.length;i++){
-    if(i===0){voicings.push(firstVoicing(key,seq[0]));continue;}
-    const prev=voicings[i-1], cur=seq[i], prv=seq[i-1];
-    if(prv==='T'&&cur==='S') voicings.push(leadTS(prev,key));
-    else if(prv==='S'&&cur==='T') voicings.push(leadST(prev,key));
-    else voicings.push(leadSame(prev,key,cur));
+
+function findInRange(chroma, minD, maxD, prefD) {
+  const c = ((chroma%12)+12)%12;
+  // Znajdź wszystkie pozycje w zakresie
+  const candidates = [];
+  for(let oct=0; oct<=8; oct++) {
+    const d = chromaToDia(c, oct);
+    if(d >= minD && d <= maxD) candidates.push({chroma:c, dia:d, oct});
   }
-  drawStaff(voicings);
-  document.getElementById('legend').style.display='flex';
-  const infos=[];
-  for(let i=1;i<voicings.length;i++){
-    const a=voicings[i-1],b=voicings[i];
-    const mv=v=>v?v.name+(v.octave!==4?v.octave:''):'?';
-    infos.push(`${a.func}→${b.func}: S ${mv(a.sopran)}→${mv(b.sopran)}, A ${mv(a.alt)}→${mv(b.alt)}, T ${mv(a.tenor)}→${mv(b.tenor)}, B ${mv(a.bass)}→${mv(b.bass)}`);
+  if(!candidates.length) {
+    // Relaks zakresu
+    for(let oct=0; oct<=8; oct++) {
+      const d = chromaToDia(c, oct);
+      if(d >= minD-3 && d <= maxD+3) candidates.push({chroma:c, dia:d, oct});
+    }
   }
-  document.getElementById('info-txt').textContent=infos.join(' | ');
+  if(!candidates.length) return {chroma:c, dia:prefD, oct:4};
+  // Wybierz najbliższy do preferencji
+  return candidates.reduce((best,n) => Math.abs(n.dia-prefD) < Math.abs(best.dia-prefD) ? n : best);
 }
- 
-// ══════════════════════════════════════════════════
-//  RYSOWANIE SVG
-// ══════════════════════════════════════════════════
-const VC={sopran:'#7B4F9A',alt:'#C8882A',tenor:'#2E7D52',bass:'#5B6FA6'};
-const FC={T:'#C8882A',S:'#2E7D52'};
-const SL=18, CW=72, BW=150, GAP=14;
- 
-function drawStaff(voicings){
-  const n=voicings.length;
-  const W=SL+CW+n*BW+20;
-  const H=BTOP+100;
-  const SR=W-12;
-  const svg=document.getElementById('main-svg');
-  svg.style.display='block';
+
+// ═══════════════════════════════════════════════════
+// PROWADZENIE GŁOSÓW
+// ═══════════════════════════════════════════════════
+
+function leadVoices(prev, nextChord, layout) {
+  const pf = prev.chord.func;
+  const nf = nextChord.func;
+  
+  // Czy to samo połączenie akordów?
+  if(prev.chord.rootC === nextChord.rootC &&
+     prev.chord.thirdC === nextChord.thirdC &&
+     prev.chord.fifthC === nextChord.fifthC) {
+    return repeatChord(prev, nextChord, layout);
+  }
+  
+  // Sprawdź typ połączenia
+  // Połączenie kwintowe: T↔S, T↔D, D↔T, S↔T (i mollowe odpowiedniki)
+  const quintalPairs = [
+    ['T','S'],['T','D'],['D','T'],['S','T'],
+    ['t','s'],['t','d'],['d','t'],['s','t'],
+    ['T','s'],['t','S'],['T','d'],['t','D'],
+  ];
+  const secondalPairs = [
+    ['S','D'],['D','S'],['s','d'],['d','s'],
+    ['S','d'],['s','D'],['D','s'],['d','S'],
+  ];
+  
+  const isQuintal = quintalPairs.some(([a,b]) => a===pf && b===nf);
+  const isSecondal = secondalPairs.some(([a,b]) => a===pf && b===nf);
+  
+  if(isQuintal) return leadQuintal(prev, nextChord, layout);
+  if(isSecondal) return leadSecondal(prev, nextChord, layout);
+  
+  // Domyślnie: ruch krokami
+  return leadGeneral(prev, nextChord, layout);
+}
+
+// ŁĄCZENIE KWINTOWE
+function leadQuintal(prev, nextChord, layout) {
+  const nc = nextChord;
+  
+  // 1. Znajdź wspólny dźwięk (chroma)
+  const prevChromas = [prev.chord.rootC, prev.chord.thirdC, prev.chord.fifthC];
+  const nextChromas = [nc.rootC, nc.thirdC, nc.fifthC];
+  const commonChroma = prevChromas.find(c => nextChromas.includes(c));
+  
+  // 2. Bas skacze kwartem/kwintą na prymę następnego
+  const newBass = findInRange(nc.rootC, RANGES.bass.min, RANGES.bass.max, prev.bass.dia);
+  
+  // 3. Tenor
+  let newTenor;
+  if(commonChroma !== undefined) {
+    // Wspólny dźwięk w tenorze jeśli tam był
+    if(prev.tenor.chroma === commonChroma) {
+      newTenor = {...prev.tenor}; // zostaje
+    } else {
+      newTenor = findClosest(nc.rootC === commonChroma ? nc.thirdC : 
+                 nc.thirdC === commonChroma ? nc.rootC : nc.thirdC,
+                 prev.tenor.dia, 
+                 Math.max(RANGES.tenor.min, newBass.dia+1), RANGES.tenor.max);
+    }
+  } else {
+    newTenor = findClosest(nc.thirdC, prev.tenor.dia, Math.max(RANGES.tenor.min, newBass.dia+1), RANGES.tenor.max);
+  }
+  if(!newTenor) newTenor = findInRange(nc.thirdC, Math.max(RANGES.tenor.min,newBass.dia+1), RANGES.tenor.max, prev.tenor.dia);
+  
+  // 4. Alt — najbliższa droga
+  let altChroma;
+  const usedChromas = [nc.rootC, newBass.chroma, newTenor.chroma];
+  // Alt dostaje dźwięk którego brakuje
+  altChroma = nextChromas.find(c => !usedChromas.includes(c)) ?? nc.rootC;
+  if(prev.alt.chroma === commonChroma) altChroma = commonChroma;
+  let newAlt = findClosest(altChroma, prev.alt.dia, Math.max(RANGES.alt.min, newTenor.dia+1), RANGES.alt.max);
+  if(!newAlt) newAlt = findInRange(altChroma, Math.max(RANGES.alt.min,newTenor.dia+1), RANGES.alt.max, prev.alt.dia);
+  
+  // 5. Sopran — najbliższa droga
+  let sopChroma;
+  const usedAll = [newBass.chroma, newTenor.chroma, newAlt?.chroma];
+  sopChroma = nextChromas.find(c => !usedAll.includes(c)) ?? nc.fifthC;
+  if(prev.sopran.chroma === commonChroma) sopChroma = commonChroma;
+  let newSop = findClosest(sopChroma, prev.sopran.dia, Math.max(RANGES.sopran.min, (newAlt?.dia??0)+1), RANGES.sopran.max);
+  if(!newSop) newSop = findInRange(sopChroma, Math.max(RANGES.sopran.min,(newAlt?.dia??0)+1), RANGES.sopran.max, prev.sopran.dia);
+  
+  const result = {sopran:newSop, alt:newAlt, tenor:newTenor, bass:newBass, chord:nc};
+  return validate(result, prev) ? result : leadGeneral(prev, nextChord, layout);
+}
+
+// ŁĄCZENIE SEKUNDOWE
+function leadSecondal(prev, nextChord, layout) {
+  const nc = nextChord;
+  
+  // Bas idzie o sekundę (w górę lub dół)
+  const basMove = prev.bass.dia < findInRange(nc.rootC,RANGES.bass.min,RANGES.bass.max,prev.bass.dia).dia ? 1 : -1;
+  const newBass = findInRange(nc.rootC, RANGES.bass.min, RANGES.bass.max, prev.bass.dia + basMove);
+  
+  // Pozostałe głosy w ruchu przeciwnym do basu
+  const dir = -basMove;
+  const nextChromas = [nc.rootC, nc.thirdC, nc.fifthC];
+  
+  const newTenor = findClosest(
+    nc.thirdC !== newBass.chroma ? nc.thirdC : nc.rootC,
+    prev.tenor.dia + dir,
+    Math.max(RANGES.tenor.min, newBass.dia+1), RANGES.tenor.max
+  ) ?? findInRange(nc.rootC, Math.max(RANGES.tenor.min,newBass.dia+1), RANGES.tenor.max, prev.tenor.dia+dir);
+  
+  const newAlt = findClosest(
+    nc.fifthC,
+    prev.alt.dia + dir,
+    Math.max(RANGES.alt.min, (newTenor?.dia??-7)+1), RANGES.alt.max
+  ) ?? findInRange(nc.rootC, Math.max(RANGES.alt.min,(newTenor?.dia??-7)+1), RANGES.alt.max, prev.alt.dia+dir);
+  
+  const newSop = findClosest(
+    nc.rootC,
+    prev.sopran.dia + dir,
+    Math.max(RANGES.sopran.min, (newAlt?.dia??0)+1), RANGES.sopran.max
+  ) ?? findInRange(nc.fifthC, Math.max(RANGES.sopran.min,(newAlt?.dia??0)+1), RANGES.sopran.max, prev.sopran.dia+dir);
+  
+  const result = {sopran:newSop, alt:newAlt, tenor:newTenor, bass:newBass, chord:nc};
+  return validate(result, prev) ? result : leadGeneral(prev, nextChord, layout);
+}
+
+// POWTÓRZENIE AKORDU — losowy wybór spośród 3 wariantów
+function repeatChord(prev, nextChord, layout) {
+  // Wariant 0 (bez zmian) rzadziej: 10% szansy, 1 i 2 po 45%
+  const r=Math.random(); const variant = r<0.10 ? 0 : r<0.55 ? 1 : 2;
+  
+  if(variant === 0) {
+    // Wariant 1: bez zmiany — wszystko zostaje
+    return {
+      sopran:{...prev.sopran}, alt:{...prev.alt},
+      tenor:{...prev.tenor}, bass:{...prev.bass},
+      chord:nextChord
+    };
+  }
+  
+  if(variant === 1) {
+    // Wariant 2: zmiana układu — sopran zostaje, głosy środkowe zamieniają się
+    // skupiony → rozległy: alt i tenor skaczą w dół
+    // rozległy → skupiony: alt i tenor skaczą w górę
+    const chromas = [nextChord.rootC, nextChord.thirdC, nextChord.fifthC];
+    const isSkupiony = (prev.sopran.dia - prev.tenor.dia) <= 7;
+    const dir = isSkupiony ? -1 : 1; // skupiony→rozległy: w dół; rozległy→skupiony: w górę
+    
+    const newTenor = findInRange(prev.alt.chroma,
+      Math.max(RANGES.tenor.min, prev.bass.dia+1), RANGES.tenor.max,
+      prev.tenor.dia + dir*3);
+    const newAlt = findInRange(prev.tenor.chroma,
+      Math.max(RANGES.alt.min, (newTenor?.dia??-7)+1), RANGES.alt.max,
+      prev.alt.dia + dir*3);
+    
+    if(!newTenor || !newAlt || newAlt.dia <= newTenor.dia) {
+      return {sopran:{...prev.sopran}, alt:{...prev.alt}, tenor:{...prev.tenor}, bass:{...prev.bass}, chord:nextChord};
+    }
+    return {
+      sopran:{...prev.sopran}, alt:newAlt, tenor:newTenor,
+      bass:{...prev.bass}, chord:nextChord
+    };
+  }
+  
+  // Wariant 3: zmiana pozycji — trzy górne głosy przesuwają się razem o sekundę
+  const chromas = [nextChord.rootC, nextChord.thirdC, nextChord.fifthC];
+  const dir2 = Math.random() < 0.5 ? 1 : -1; // w górę lub w dół
+  
+  const newSop = findInRange(prev.sopran.chroma,
+    RANGES.sopran.min, RANGES.sopran.max, prev.sopran.dia + dir2);
+  const newAlt2 = findInRange(prev.alt.chroma,
+    Math.max(RANGES.alt.min, (newSop?.dia??0)-8), (newSop?.dia??12)-1, prev.alt.dia + dir2);
+  const newTen2 = findInRange(prev.tenor.chroma,
+    Math.max(RANGES.tenor.min, prev.bass.dia+1), Math.min(RANGES.tenor.max,(newAlt2?.dia??5)-1),
+    prev.tenor.dia + dir2);
+  
+  if(!newSop || !newAlt2 || !newTen2 || newSop.dia <= newAlt2.dia || newAlt2.dia <= newTen2.dia) {
+    return {sopran:{...prev.sopran}, alt:{...prev.alt}, tenor:{...prev.tenor}, bass:{...prev.bass}, chord:nextChord};
+  }
+  return {
+    sopran:newSop, alt:newAlt2, tenor:newTen2,
+    bass:{...prev.bass}, chord:nextChord
+  };
+}
+
+// OGÓLNE PROWADZENIE (fallback) z weryfikacją zasad
+function leadGeneral(prev, nextChord, layout) {
+  const nc = nextChord;
+
+  // Bas: ruch do najbliższej prymy
+  const newBass = findInRange(nc.rootC, RANGES.bass.min, RANGES.bass.max, prev.bass.dia);
+
+  // Wygeneruj kilka wariantów rozkładu górnych głosów i wybierz najlepszy
+  const chromas = [nc.rootC, nc.thirdC, nc.fifthC];
+  const upperPerms = [
+    [nc.rootC, nc.thirdC, nc.fifthC],
+    [nc.thirdC, nc.fifthC, nc.rootC],
+    [nc.fifthC, nc.rootC, nc.thirdC],
+    [nc.rootC, nc.fifthC, nc.thirdC],
+    [nc.thirdC, nc.rootC, nc.fifthC],
+    [nc.fifthC, nc.thirdC, nc.rootC],
+  ];
+
+  let best = null, bestScore = 9999;
+  for(const [tC, aC, sC] of upperPerms) {
+    const t = findClosest(tC, prev.tenor.dia, Math.max(RANGES.tenor.min,newBass.dia+1), RANGES.tenor.max);
+    if(!t) continue;
+    const a = findClosest(aC, prev.alt.dia, Math.max(RANGES.alt.min,t.dia+1), RANGES.alt.max);
+    if(!a) continue;
+    const s = findClosest(sC, prev.sopran.dia, Math.max(RANGES.sopran.min,a.dia+1), RANGES.sopran.max);
+    if(!s) continue;
+    const cand = {sopran:s, alt:a, tenor:t, bass:newBass, chord:nc};
+    if(!validate(cand, prev)) continue;
+    // Punktacja: im mniej problemów tym lepiej
+    let score = 0;
+    score += Math.abs(s.dia-prev.sopran.dia) + Math.abs(a.dia-prev.alt.dia) + Math.abs(t.dia-prev.tenor.dia);
+    if(hasParallels(prev, cand)) score += 50;
+    if(allSameDir(prev, cand)) score += 20;
+    if(hasAugmentedLeap(prev, cand)) score += 30;
+    if(score < bestScore) { bestScore=score; best=cand; }
+  }
+  return best ?? {sopran:prev.sopran, alt:prev.alt, tenor:prev.tenor, bass:newBass, chord:nc};
+}
+
+// ═══════════════════════════════════════════════════
+// WALIDACJA
+// ═══════════════════════════════════════════════════
+function validate(v, prev) {
+  if(!v.sopran||!v.alt||!v.tenor||!v.bass) return false;
+  if(v.sopran.dia <= v.alt.dia) return false;
+  if(v.alt.dia <= v.tenor.dia) return false;
+  if(v.tenor.dia <= v.bass.dia) return false;
+  return true;
+}
+
+// Sprawdź równoległe kwinty i oktawy między dwoma voicingami
+function hasParallels(prev, next) {
+  const voices = [
+    {n:'S', p:prev.sopran, nx:next.sopran},
+    {n:'A', p:prev.alt,    nx:next.alt},
+    {n:'T', p:prev.tenor,  nx:next.tenor},
+    {n:'B', p:prev.bass,   nx:next.bass},
+  ];
+  const pairs = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  for(const [i,j] of pairs) {
+    const a=voices[i], b=voices[j];
+    if(!a.p||!a.nx||!b.p||!b.nx) continue;
+    // Interwał chromatyczny (mod 12)
+    const iPrev = ((a.p.chroma  - b.p.chroma)  + 12)%12;
+    const iNext = ((a.nx.chroma - b.nx.chroma) + 12)%12;
+    // Ruch równoległy (oba w tym samym kierunku)
+    const movA = a.nx.dia - a.p.dia;
+    const movB = b.nx.dia - b.p.dia;
+    if(movA === 0 && movB === 0) continue; // unison ruchu — OK
+    const sameDir = (movA > 0 && movB > 0) || (movA < 0 && movB < 0);
+    if(!sameDir) continue;
+    if(iPrev === iNext && (iNext === 7 || iNext === 5 || iNext === 0)) return true; // kwinta lub oktawa
+  }
+  return false;
+}
+
+// Sprawdź czy wszystkie głosy idą w jednym kierunku
+function allSameDir(prev, next) {
+  const moves = [
+    next.sopran.dia - prev.sopran.dia,
+    next.alt.dia    - prev.alt.dia,
+    next.tenor.dia  - prev.tenor.dia,
+    next.bass.dia   - prev.bass.dia,
+  ];
+  const up   = moves.filter(m=>m>0).length;
+  const down = moves.filter(m=>m<0).length;
+  return up === 4 || down === 4;
+}
+
+// Sprawdź skoki zwiększone w melodii
+function hasAugmentedLeap(prev, next) {
+  const pairs = [
+    [prev.sopran, next.sopran],
+    [prev.alt,    next.alt],
+    [prev.tenor,  next.tenor],
+    [prev.bass,   next.bass],
+  ];
+  for(const [p,n] of pairs) {
+    if(!p||!n) continue;
+    const semis = Math.abs(n.chroma - p.chroma + 12*10) % 12;
+    const dias  = Math.abs(n.dia - p.dia);
+    // Augmented = dias * 2 < semis (np. zw3 = dias=2, semis=3 → 4<3 nie... zw4=dias=3,semis=6 → 6<6 nie)
+    // Zmniejszony: dias * 2 > semis (zm5=dias=4,semis=6 → 8>6 tak)
+    // Zwiększony interval: dla danej liczby kroków diatonicznych zbyt dużo półtonów
+    if(dias===1 && semis===3) return true; // sekunda zwiększona
+    if(dias===3 && semis===6) return true; // kwarta zwiększona (tryton diatoniczny)
+    if(dias===4 && semis===6) return true; // kwinta zmniejszona
+  }
+  return false;
+}
+
+function getTimeSig(n) {
+  if(n >= 4 && n % 4 === 0) return {num:4, den:4, every:4};
+  if(n >= 3 && n % 3 === 0) return {num:3, den:4, every:3};
+  if(n >= 2 && n % 2 === 0) return {num:2, den:2, every:2};
+  return null;
+}
+
+function drawTimeSig(svg, x, tY, bY_row, ts) {
+  const fs = '28';
+  const ff = 'Poppins,sans-serif';
+  const cx = x + 10;  // +10px w prawo
+  // Jedno metrum pośrodku między dolną linią treble a górną linią bass
+  const yTop    = tY(T_LINE_Y[0]);       // dolna linia wiolinowa
+  const yBottom = bY_row(B_LINE_Y[4]);   // górna linia basowa
+  const yMid    = (yTop + yBottom) / 2;
+  addText(svg, cx, String(Math.round(yMid - 8)),  fs, ff, '#9C8C7C', String(ts.num));
+  addText(svg, cx, String(Math.round(yMid + 16)), fs, ff, '#9C8C7C', String(ts.den));
+}
+
+function checkErrors(voicings) {
+  const errs = [];
+  for(let i=1; i<voicings.length; i++) {
+    const a = voicings[i-1], b = voicings[i];
+    const voices = ['sopran','alt','tenor','bass'];
+    voices.forEach(v => {
+      if(!a[v]||!b[v]) return;
+      const mv = Math.abs(b[v].dia - a[v].dia);
+      if(mv >= 6) errs.push(`Skok o septymę lub więcej: ${v} (${mv} stopni)`);
+    });
+    // Krzyżowanie głosów
+    if(b.sopran && b.alt && b.sopran.dia <= b.alt.dia) errs.push('Krzyżowanie: sopran-alt');
+    if(b.alt && b.tenor && b.alt.dia <= b.tenor.dia) errs.push('Krzyżowanie: alt-tenor');
+    if(b.tenor && b.bass && b.tenor.dia <= b.bass.dia) errs.push('Krzyżowanie: tenor-bas');
+  }
+  return [...new Set(errs)];
+}
+
+// ═══════════════════════════════════════════════════
+// GENEROWANIE VOICINGÓW
+// ═══════════════════════════════════════════════════
+function tryGenerateVoicings(key, lay, startPos) {
+  const chord0 = buildChord(key, seq[0]);
+  const voicings = [buildVoicing(chord0, lay, startPos)];
+  for(let i=1; i<seq.length; i++) {
+    const chord = buildChord(key, seq[i]);
+    voicings.push(leadVoices(voicings[i-1], chord, lay));
+  }
+  return voicings;
+}
+
+function generateVoicings() {
+  if(seq.length < 1) return [];
+  const key = currentKey;
+  const lay = currentLayout;
+  const startPositions = ['kwinta','tercja','pryma','kwinta','tercja'];
+  let best = null, bestErrors = 9999;
+  for(const sp of startPositions) {
+    const v = tryGenerateVoicings(key, lay, sp);
+    const errs = checkErrors(v).length + countParallelErrors(v);
+    if(errs < bestErrors) { bestErrors = errs; best = v; }
+    if(bestErrors === 0) break;
+  }
+  return best || tryGenerateVoicings(key, lay, 'kwinta');
+}
+
+function countParallelErrors(voicings) {
+  let count = 0;
+  for(let i=1; i<voicings.length; i++) {
+    if(hasParallels(voicings[i-1], voicings[i])) count++;
+    if(allSameDir(voicings[i-1], voicings[i])) count++;
+    if(hasAugmentedLeap(voicings[i-1], voicings[i])) count++;
+  }
+  return count;
+}
+
+// ═══════════════════════════════════════════════════
+// RYSOWANIE SVG
+// ═══════════════════════════════════════════════════
+const BTOP = 200;
+const T_LINE_Y = [0,1,2,3,4].map(i => 130 - i*2*10); // [130,110,90,70,50]  d=0,2,4,6,8 → 130,110,90,70,50
+const B_LINE_Y = [-10,-8,-6,-4,-2].map(d => 306-(d+10)*10); // G2=306,H2=286,d=266,f=246,a=226
+
+// Pozycje diatoniczne znaków przykluczowych
+const SHARPS_TREBLE_DIA = [10, 7, 11, 8, 5, 9, 6];  // Fis,Cis,Gis,Dis,Ais,Eis,His
+const FLATS_TREBLE_DIA  = [6, 9, 5, 8, 4, 7, 3];    // B,Es,As,Des,Ges,Ces,Fes
+const SHARPS_BASS_DIA   = [-4, -7, -3, -6, -9, -5, -8];  // Fis(F3),Cis(C3),Gis(G3↑),Dis(D3),Ais(A2),Eis(E3),His(H2)
+const FLATS_BASS_DIA    = [-8, -5, -9, -6, -10, -7, -11];  // B(H2),Es(E3),As(A2),Des(D3),Ges(G2),Ces(C3),Fes(F2↓)
+const VC = {sopran:'#7B4F9A', alt:'#C8882A', tenor:'#2E7D52', bass:'#5B6FA6'};
+const FC = {T:'#C8882A',S:'#2E7D52',D:'#3949AB',t:'#880E4F',s:'#004D40',d:'#4527A0'};
+
+// ═══════════════════════════════════════════════════
+// STAŁE LAYOUTU — jedyne miejsce gdzie definiujemy wymiary
+// ═══════════════════════════════════════════════════
+const ROW_H    = 368;  // +30 odstęp treble-bass
+const ROW_GAP  = 50;          // odstęp między systemami
+
+
+// ═══════════════════════════════════════════════════
+// ZNAKI CHROMATYCZNE PRZY NUTACH
+// ═══════════════════════════════════════════════════
+
+// Oblicz 7 dźwięków gamy durowej lub harmonicznej moll od korzenia
+function getScaleChromas(keyName) {
+  const k = KEYS.find(k=>k.name===keyName);
+  const root = k && k.isMoll ? k.rootChroma : (KEY_CHROMA[keyName]??0);
+  const isMoll = k && k.isMoll;
+  // Dur: W W H W W W H = 0,2,4,5,7,9,11
+  // Moll harmoniczny: W H W W H A H = 0,2,3,5,7,8,11
+  const durIntervals  = [0,2,4,5,7,9,11];
+  const mollIntervals = [0,2,3,5,7,8,11];
+  const intervals = isMoll ? mollIntervals : durIntervals;
+  return new Set(intervals.map(i => ((root+i)%12)));
+}
+
+// Dla danej nuty i tonacji określ jaki znak chromatyczny narysować
+// Zwraca: '#' | 'b' | 'n' (kasownik) | null (brak znaku)
+function getNoteAccidental(note, keyName) {
+  const scaleChromas = getScaleChromas(keyName);
+  const keyData = KEYS.find(k=>k.name===keyName)||{sharps:0,flats:0};
+  const chroma = note.chroma;
+  
+  if(scaleChromas.has(chroma)) {
+    // Nuta jest w gamie — sprawdź czy armatura już ją "obsługuje"
+    // Jeśli nuta jest naturalna (np. E w Es dur) a armatura ma Es → kasownik
+    const diaOffset = CHROMA_TO_DIA_OFFSET[chroma];
+    // Sprawdź czy ta "litera" nuty jest alterowana w armacie
+    const nSharps = keyData.sharps||0;
+    const nFlats  = keyData.flats||0;
+    
+    // Nuty alterowane przez armatę
+    const sharpOrder = [6,1,8,3,10,5,0]; // F C G D A E H (chroma krzyżyków)
+    const flatOrder  = [10,3,8,1,6,11,4]; // B E A D G C F (chroma bemoli)
+    
+    const alteredByKey = new Set();
+    for(let i=0;i<nSharps;i++) alteredByKey.add(sharpOrder[i]);
+    for(let i=0;i<nFlats;i++)  alteredByKey.add(flatOrder[i]);
+    
+    // Naturalna wersja tej "litery" (bez alteracji) → jej chroma
+    // diaOffset daje nam indeks litery, z której pochodzi nuta
+    // Sprawdź czy litera tej nuty jest w armacie
+    // Dla uproszczenia: jeśli chroma nuty jest w gamie i jednocześnie
+    // ta sama "litera" (diaOffset) jest alterowana przez armatę → brak znaku
+    // Jeśli nie jest alterowana przez armatę → brak znaku (naturalna gama)
+    return null; // w gamie = brak znaku (armatura obsługuje)
+  } else {
+    // Nuta NIE jest w gamie → potrzebuje znaku
+    // Sprawdź czy to podwyższenie (#) czy obniżenie (b)
+    const aboveInScale = scaleChromas.has((chroma+1)%12);
+    const belowInScale = scaleChromas.has((chroma-1+12)%12);
+    
+    if(belowInScale) return '#'; // nuta jest o pół tonu wyżej niż skalarna
+    if(aboveInScale) return 'b'; // nuta jest o pół tonu niżej niż skalarna
+    return '#'; // domyślnie
+  }
+}
+
+// Narysuj znak chromatyczny przed nutą
+function drawNoteAccidental(svg, nx, ny, accType, color) {
+  const ACC_SYMBOLS = {'#':'♯', 'b':'♭', 'n':'♮'};
+  const sym = ACC_SYMBOLS[accType];
+  if(!sym) return;
+  const t = addEl(svg,'text',{
+    x: nx-16,
+    y: ny+4,
+    'font-size': accType==='n' ? '13' : '12',
+    'font-family':'serif',
+    fill: color||'#555',
+    'text-anchor':'middle',
+    'font-weight':'700'
+  });
+  t.textContent = sym;
+}
+
+function drawResult(voicings) {
+  const n = voicings.length;
+  const keyData = KEYS.find(k=>k.name===currentKey)||{sharps:0,flats:0};
+  const nAccidentals = keyData.sharps||keyData.flats||0;
+  const SL=20, CW=76+nAccidentals*20, BW=120, RMARGIN=20;
+
+  // Oblicz ile akordów mieści się w jednym wierszu
+  // Szerokość kontenera SVG = szerokość elementu .svg-scroll
+  const container = document.querySelector('.svg-scroll');
+  const availW = container ? container.clientWidth || 800 : 800;
+  // Ile nut mieści się na wiersz (co najmniej 1)
+  const maxPerRow = Math.max(1, Math.floor((availW - SL - CW - RMARGIN) / BW));
+
+  // Podziel voicings na wiersze
+  const rows = [];
+  for(let i=0; i<n; i+=maxPerRow) rows.push(voicings.slice(i, i+maxPerRow));
+  const nRows = rows.length;
+
+  const W = SL + CW + maxPerRow*BW + RMARGIN;
+  const H = nRows * ROW_H + (nRows-1) * ROW_GAP + 24; // +24 na etykiety funkcji na górze
+
+  const svg = document.getElementById('main-svg');
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  svg.setAttribute('width',String(W));
-  svg.setAttribute('height',String(H));
-  svg.innerHTML='';
- 
-  const noteXs=voicings.map((_,i)=>SL+CW+i*BW+BW/2);
- 
-  // Zbierz trafione linie pięciolinii
-  const tHits={}, bHits={};
-  T_LINE_Y.forEach(y=>tHits[y]=new Set());
-  B_LINE_Y.forEach(y=>bHits[y]=new Set());
-  voicings.forEach((v,i)=>{
-    const nx=noteXs[i];
-    [v.sopran,v.alt].forEach(ni=>{
-      if(!ni) return;
-      const y=tY(ni.diaPos);
-      T_LINE_Y.forEach(ly=>{if(Math.abs(ly-y)<1)tHits[ly].add(nx);});
-    });
-    [v.tenor,v.bass].forEach(ni=>{
-      if(!ni) return;
-      const y=bY(ni.diaPos);
-      B_LINE_Y.forEach(ly=>{if(Math.abs(ly-y)<1)bHits[ly].add(nx);});
+  svg.setAttribute('preserveAspectRatio','xMinYMin meet');
+  svg.style.width  = '100%';
+  svg.style.height = 'auto';
+  svg.innerHTML = '';
+
+  // Rysuj każdy wiersz
+  rows.forEach((rowVoicings, rowIdx) => {
+    const rn = rowVoicings.length;
+    const offsetY = rowIdx * (ROW_H + ROW_GAP);
+    const SR = SL + CW + rn*BW;
+
+    // Funkcja przesunięcia Y dla tego wiersza
+    const tY = y => y + offsetY;
+    const bY_row = y => y + offsetY;
+
+    // Pięciolinie wiolinowe
+    T_LINE_Y.forEach(y => drawLine(svg, SL, SR, tY(y), '#C8BEA8', '1.5'));
+    // Pięciolinie basowe
+    B_LINE_Y.forEach(y => drawLine(svg, SL, SR, bY_row(y), '#C8BEA8', '1.5'));
+
+    // Łącznik pionowy (akolada) — od góry treble do dołu bass
+    addEl(svg,'line',{x1:SL, y1:tY(T_LINE_Y[4]), x2:SL, y2:bY_row(B_LINE_Y[0]), stroke:'#C8BEA8', 'stroke-width':'2'});
+
+    // Kreski taktowe — co 'every' akordów lub na końcu
+    const timeSigLocal = getTimeSig(n);
+    const barEvery = timeSigLocal ? timeSigLocal.every : 0;
+    // Oblicz globalny indeks pierwszego akordu w tym wierszu
+    const rowStart = rowIdx * maxPerRow;
+    for(let i=1;i<=rn;i++){
+      const globalIdx = rowStart + i; // globalny indeks po i-tym akordzie
+      const isLast = i === rn;
+      const isBarLine = isLast || (barEvery > 0 && globalIdx % barEvery === 0);
+      if(!isBarLine) continue;
+      const bx = isLast ? SR : SL+CW+i*BW;
+      addEl(svg,'line',{x1:bx,y1:tY(T_LINE_Y[4]),x2:bx,y2:tY(T_LINE_Y[0]),stroke:'#C8BEA8','stroke-width':'1.3'});
+      addEl(svg,'line',{x1:bx,y1:bY_row(B_LINE_Y[0]),x2:bx,y2:bY_row(B_LINE_Y[4]),stroke:'#C8BEA8','stroke-width':'1.3'});
+    }
+
+    // Klucze
+    addText(svg, SL+2, String(tY(T_LINE_Y[0]-8)), '88', 'serif', '#6B4F3A', '𝄞');
+    addText(svg, SL+3, String(bY_row(B_LINE_Y[4]+58)), '88', 'serif', '#6B4F3A', '𝄢');
+
+    // Znaki przykluczowe
+    drawKeySignatureAt(svg, keyData, SL, offsetY);
+
+    // Metrum — ustal na podstawie liczby wszystkich akordów
+    const timeSig = getTimeSig(n);
+    if(timeSig) drawTimeSig(svg, SL+CW-22, tY, bY_row, timeSig);
+
+    // X pozycje nut w tym wierszu
+    const noteXs = rowVoicings.map((_,i) => SL+CW+i*BW+BW/2);
+
+    // Linie prowadzenia głosów
+    for(let i=1;i<rn;i++){
+      const a=rowVoicings[i-1], b=rowVoicings[i];
+      const x1=noteXs[i-1], x2=noteXs[i];
+      if(a.sopran&&b.sopran) drawTie(svg,x1,tY(diaToY_treble(a.sopran.dia)),x2,tY(diaToY_treble(b.sopran.dia)),VC.sopran,a.sopran.dia===b.sopran.dia);
+      if(a.alt&&b.alt)       drawTie(svg,x1,tY(diaToY_treble(a.alt.dia)),   x2,tY(diaToY_treble(b.alt.dia)),   VC.alt,   a.alt.dia===b.alt.dia);
+      if(a.tenor&&b.tenor)   drawTie(svg,x1,bY_row(diaToY_bass(a.tenor.dia)),x2,bY_row(diaToY_bass(b.tenor.dia)),VC.tenor,a.tenor.dia===b.tenor.dia);
+      if(a.bass&&b.bass)     drawTie(svg,x1,bY_row(diaToY_bass(a.bass.dia)), x2,bY_row(diaToY_bass(b.bass.dia)), VC.bass, a.bass.dia===b.bass.dia);
+    }
+
+    // Nuty
+    const labelY = tY(T_LINE_Y[4]) - 8; // etykieta funkcji nad górną linią
+    rowVoicings.forEach((v,i) => {
+      const nx = noteXs[i];
+
+      // Etykieta funkcji
+      const fl = addEl(svg,'text',{x:nx,y:labelY,'font-size':'12','font-family':'Playfair Display,serif','font-weight':'700','text-anchor':'middle',fill:FC[v.chord.func]||'#888'});
+      fl.textContent = v.chord.func;
+
+      if(v.sopran){
+        drawLedgersAt(svg,v.sopran.dia,nx,'treble',offsetY);
+        const _acc_sopran = getNoteAccidental(v.sopran, currentKey);
+        if(_acc_sopran) drawNoteAccidental(svg, nx, tY(diaToY_treble(v.sopran.dia)), _acc_sopran, VC.sopran);
+        drawHead(svg,nx,tY(diaToY_treble(v.sopran.dia)),VC.sopran,noteNameFromDia(v.sopran));
+        const sy=tY(diaToY_treble(v.sopran.dia));
+        addEl(svg,'line',{x1:nx+11,y1:sy,x2:nx+11,y2:Math.min(sy-42,tY(T_LINE_Y[4])+4),stroke:'#555','stroke-width':'1.7'});
+      }
+      if(v.alt){
+        drawLedgersAt(svg,v.alt.dia,nx,'treble',offsetY);
+        const _acc_alt = getNoteAccidental(v.alt, currentKey);
+        if(_acc_alt) drawNoteAccidental(svg, nx, tY(diaToY_treble(v.alt.dia)), _acc_alt, VC.alt);
+        drawHead(svg,nx,tY(diaToY_treble(v.alt.dia)),VC.alt,noteNameFromDia(v.alt));
+        const ay=tY(diaToY_treble(v.alt.dia));
+        addEl(svg,'line',{x1:nx-11,y1:ay,x2:nx-11,y2:Math.max(ay+42,tY(T_LINE_Y[0])+4),stroke:'#555','stroke-width':'1.7'});
+      }
+      if(v.tenor){
+        drawLedgersAt(svg,v.tenor.dia,nx,'bass',offsetY);
+        const _acc_tenor = getNoteAccidental(v.tenor, currentKey);
+        if(_acc_tenor) drawNoteAccidental(svg, nx, bY_row(diaToY_bass(v.tenor.dia)), _acc_tenor, VC.tenor);
+        drawHead(svg,nx,bY_row(diaToY_bass(v.tenor.dia)),VC.tenor,noteNameFromDia(v.tenor));
+        const ty=bY_row(diaToY_bass(v.tenor.dia));
+        addEl(svg,'line',{x1:nx+11,y1:ty,x2:nx+11,y2:Math.min(ty-42,bY_row(B_LINE_Y[0])-4),stroke:'#555','stroke-width':'1.7'});
+      }
+      if(v.bass){
+        drawLedgersAt(svg,v.bass.dia,nx,'bass',offsetY);
+        const _acc_bass = getNoteAccidental(v.bass, currentKey);
+        if(_acc_bass) drawNoteAccidental(svg, nx, bY_row(diaToY_bass(v.bass.dia)), _acc_bass, VC.bass);
+        drawHead(svg,nx,bY_row(diaToY_bass(v.bass.dia)),VC.bass,noteNameFromDia(v.bass));
+        const by=bY_row(diaToY_bass(v.bass.dia));
+        addEl(svg,'line',{x1:nx-11,y1:by,x2:nx-11,y2:Math.max(by+42,bY_row(B_LINE_Y[4])+4),stroke:'#555','stroke-width':'1.7'});
+      }
+
+      // Etykieta akordu pod pięciolinią basową
+      const al = addEl(svg,'text',{x:nx,y:bY_row(B_LINE_Y[4])+16,'font-size':'10','font-family':'Poppins,sans-serif','text-anchor':'middle',fill:'#9C8C7C'});
+      al.textContent = v.chord.label||'';
     });
   });
- 
-  // Linie pięciolinii
-  T_LINE_Y.forEach(ly=>{const hx=[...tHits[ly]].sort((a,b)=>a-b);drawGapLine(svg,SL,SR,ly,hx,GAP,'#C8BEA8','1.5');});
-  B_LINE_Y.forEach(ly=>{const hx=[...bHits[ly]].sort((a,b)=>a-b);drawGapLine(svg,SL,SR,ly,hx,GAP,'#C8BEA8','1.5');});
- 
-  // Łącznik pionowy
-  se(svg,'line',{x1:SL,y1:T_LINE_Y[0],x2:SL,y2:B_LINE_Y[4],stroke:'#C8BEA8','stroke-width':'2'});
- 
-  // Kreski taktowe
-  for(let i=1;i<=n;i++){
-    const bx=i===n?SR:SL+CW+i*BW;
-    se(svg,'line',{x1:bx,y1:T_LINE_Y[0],x2:bx,y2:T_LINE_Y[4],stroke:'#C8BEA8','stroke-width':'1.5'});
-    se(svg,'line',{x1:bx,y1:B_LINE_Y[0],x2:bx,y2:B_LINE_Y[4],stroke:'#C8BEA8','stroke-width':'1.5'});
-  }
- 
-  // Klucze (po liniach → na wierzchu)
-  st(svg,SL+2,'108','90','serif','#6B4F3A','𝄞');
-  st(svg,SL+2,String(BTOP+48),'90','serif','#6B4F3A','𝄢');
- 
-  // Linie prowadzenia głosów
-  for(let i=1;i<voicings.length;i++){
-    const a=voicings[i-1],b=voicings[i];
-    const x1=noteXs[i-1],x2=noteXs[i];
-    tie(svg,x1,tY(a.sopran.diaPos),x2,tY(b.sopran.diaPos),VC.sopran,a.sopran.diaPos===b.sopran.diaPos);
-    tie(svg,x1,tY(a.alt.diaPos),   x2,tY(b.alt.diaPos),   VC.alt,   a.alt.diaPos===b.alt.diaPos);
-    tie(svg,x1,bY(a.tenor.diaPos), x2,bY(b.tenor.diaPos), VC.tenor, a.tenor.diaPos===b.tenor.diaPos);
-    tie(svg,x1,bY(a.bass.diaPos),  x2,bY(b.bass.diaPos),  VC.bass,  a.bass.diaPos===b.bass.diaPos);
-  }
- 
-  // Nuty, linie ledgerowe, ogonki
-  voicings.forEach((v,i)=>{
-    const nx=noteXs[i];
- 
-    // Etykieta funkcji
-    const fl=se(svg,'text',{x:nx,y:14,'font-size':'13','font-family':'Playfair Display,serif','font-weight':'700','text-anchor':'middle',fill:FC[v.func]||'#888'});fl.textContent=v.func;
- 
-    // Linie ledgerowe klucza wiolinowego
-    ledger(svg,v.sopran,nx,tY,'treble');
-    ledger(svg,v.alt,   nx,tY,'treble');
-    // Linie ledgerowe klucza basowego
-    ledger(svg,v.tenor, nx,bY,'bass');
-    ledger(svg,v.bass,  nx,bY,'bass');
- 
-    // Nuty wiolinowe
-    drawHead(svg,nx,tY(v.sopran.diaPos),VC.sopran,v.sopran.name);
-    drawHead(svg,nx,tY(v.alt.diaPos),   VC.alt,   v.alt.name);
- 
-    // Ogonki wiolinowe: sopran ↑, alt ↓
-    const sy=tY(v.sopran.diaPos), ay=tY(v.alt.diaPos);
-    se(svg,'line',{x1:nx+11,y1:sy,x2:nx+11,y2:Math.min(sy-42,8),stroke:'#555','stroke-width':'1.8'});
-    se(svg,'line',{x1:nx-11,y1:ay,x2:nx-11,y2:Math.max(ay+42,T_LINE_Y[4]+8),stroke:'#555','stroke-width':'1.8'});
- 
-    // Nuty basowe
-    drawHead(svg,nx,bY(v.tenor.diaPos),VC.tenor,v.tenor.name);
-    drawHead(svg,nx,bY(v.bass.diaPos), VC.bass, v.bass.name);
- 
-    // Ogonki basowe: tenor ↑, bas ↓
-    const ty2=bY(v.tenor.diaPos), by2=bY(v.bass.diaPos);
-    se(svg,'line',{x1:nx+11,y1:ty2,x2:nx+11,y2:Math.min(ty2-42,BTOP+8),stroke:'#555','stroke-width':'1.8'});
-    se(svg,'line',{x1:nx-11,y1:by2,x2:nx-11,y2:Math.max(by2+42,B_LINE_Y[4]+8),stroke:'#555','stroke-width':'1.8'});
- 
-    // Etykieta akordu
-    const al=se(svg,'text',{x:nx,y:H-6,'font-size':'11','font-family':'DM Sans,sans-serif','text-anchor':'middle',fill:'#9C8C7C'});al.textContent=v.label||'';
-  });
+
+  document.getElementById('staff-card').style.display='block';
 }
- 
-// Linia ledgerowa jeśli nuta jest poza pięciolinią
-function ledger(svg, ni, nx, yFn, clef) {
-  if(!ni) return;
-  const d=ni.diaPos;
-  if(clef==='treble') {
-    // Linia dodana dolna C4 (d=0), B3(d=-1), A3(d=-2)...
-    if(d<=0) {
-      for(let ld=0;ld>=d;ld-=2) se(svg,'line',{x1:nx-18,y1:tY(ld),x2:nx+18,y2:tY(ld),stroke:'#AAA','stroke-width':'1.5'});
+
+function noteNameFromDia(n) {
+  if(!n) return '?';
+  return noteNameInKey(n.chroma, currentKey);
+}
+
+// Rysuje znaki przykluczowe po kluczu — z offsetY dla wielowierszowego systemu
+function drawKeySignatureAt(svg, keyData, SL, offsetY) {
+  const nSharps = keyData.sharps || 0;
+  const nFlats  = keyData.flats  || 0;
+  const ACC_W = 20;
+  const KX = SL + 76;
+
+  if(nSharps > 0) {
+    for(let i=0; i<nSharps; i++) {
+      addAcc(svg, KX+i*ACC_W, diaToY_treble(SHARPS_TREBLE_DIA[i]) - 1  + offsetY, '#', '#6B4F3A');
+      addAcc(svg, KX+i*ACC_W, diaToY_bass(SHARPS_BASS_DIA[i]) - 1 + offsetY, '#', '#6B4F3A');
     }
-    // Linia dodana górna G5(d=11), A5...
-    if(d>=11) {
-      for(let ld=11;ld<=d;ld+=2) se(svg,'line',{x1:nx-18,y1:tY(ld),x2:nx+18,y2:tY(ld),stroke:'#AAA','stroke-width':'1.5'});
+  }
+  if(nFlats > 0) {
+    for(let i=0; i<nFlats; i++) {
+      addAcc(svg, KX+i*ACC_W, diaToY_treble(FLATS_TREBLE_DIA[i]) - 10 + offsetY, 'b', '#6B4F3A');
+      addAcc(svg, KX+i*ACC_W, diaToY_bass(FLATS_BASS_DIA[i]) - 29 + offsetY, 'b', '#6B4F3A');
     }
-    // Linia dodana środkowa C5(d=7) — nie potrzeba, C5 jest w przestrzeni między L1 a L2
+  }
+}
+// Stara wersja jako alias
+function drawKeySignature(svg, keyData, SL) { drawKeySignatureAt(svg, keyData, SL, 0); }
+
+// Rysuje pojedynczy znak chromatyczny (# lub b) w danym miejscu
+function addAcc(svg, x, y, type, color) {
+  const t = addEl(svg, 'text', {
+    x, y: type==='#' ? y+10 : y+14,
+    'font-size': type==='#' ? '29' : '32',
+    'font-family': 'serif',
+    fill: color,
+    'text-anchor': 'middle',
+    'font-weight': '400'
+  });
+  t.textContent = type === '#' ? '♯' : '♭';
+}
+
+function drawLedgersAt(svg, dia, nx, clef, offsetY) {
+  if(clef === 'treble') {
+    if(dia <= 0) {
+      for(let d=0; d>=dia; d-=2) {
+        const y = diaToY_treble(d)+offsetY;
+        addEl(svg,'line',{x1:nx-17,y1:y,x2:nx+17,y2:y,stroke:'#AAA','stroke-width':'1.4'});
+      }
+    }
+    if(dia >= 11) {
+      for(let d=11; d<=dia; d+=2) {
+        const y = diaToY_treble(d)+offsetY;
+        addEl(svg,'line',{x1:nx-17,y1:y,x2:nx+17,y2:y,stroke:'#AAA','stroke-width':'1.4'});
+      }
+    }
   } else {
-    // Bass: G3=top line(d=-3), poniżej F2(d=-11)=bottom line
-    // Linia dodana górna: A3(d=-2), H3(d=-1), C4(d=0)...
-    if(d>=-2) {
-      for(let ld=-1;ld<=d;ld+=2) se(svg,'line',{x1:nx-18,y1:bY(ld),x2:nx+18,y2:bY(ld),stroke:'#AAA','stroke-width':'1.5'});
-      // Też d=-2 jeśli nuta jest powyżej G3
-      if(d>=-2&&d<=-2) se(svg,'line',{x1:nx-18,y1:bY(-1),x2:nx+18,y2:bY(-1),stroke:'#AAA','stroke-width':'1.5'});
+    // Linie dodane górne: c1(d=0), e1(d=2), g1(d=4)...
+    if(dia >= 0) {
+      for(let d=0; d<=dia; d+=2) {
+        const y = diaToY_bass(d)+offsetY;
+        addEl(svg,'line',{x1:nx-17,y1:y,x2:nx+17,y2:y,stroke:'#AAA','stroke-width':'1.4'});
+      }
     }
-    // Linia dodana dolna: E2(d=-12), D2(d=-13)...
-    if(d<=-12) {
-      for(let ld=-13;ld>=d;ld-=2) se(svg,'line',{x1:nx-18,y1:bY(ld),x2:nx+18,y2:bY(ld),stroke:'#AAA','stroke-width':'1.5'});
+    // Linie dodane dolne: E2(d=-12), C2(d=-14)...
+    if(dia <= -12) {
+      for(let d=-12; d>=dia; d-=2) {
+        const y = diaToY_bass(d)+offsetY;
+        addEl(svg,'line',{x1:nx-17,y1:y,x2:nx+17,y2:y,stroke:'#AAA','stroke-width':'1.4'});
+      }
     }
   }
 }
- 
-function drawHead(svg,cx,cy,color,label){
-  se(svg,'ellipse',{cx,cy,rx:'11',ry:'8',fill:color});
-  const lb=se(svg,'text',{x:cx,y:cy+4,'font-size':'8.5','font-family':'DM Sans,sans-serif',fill:'white','text-anchor':'middle','font-weight':'500'});
-  lb.textContent=label.replace(/[0-9#b]/g,'');
+function drawLedgers(svg, dia, nx, clef) { drawLedgersAt(svg, dia, nx, clef, 0); }
+
+function drawHead(svg, cx, cy, color, label) {
+  addEl(svg,'ellipse',{cx,cy,rx:'11',ry:'8',fill:color});
+  const t = addEl(svg,'text',{x:cx,y:cy+4,'font-size':'8','font-family':'Poppins,sans-serif',fill:'white','text-anchor':'middle','font-weight':'600'});
+  t.textContent = (label||'').replace(/[0-9]/g,'');
 }
-function drawGapLine(svg,x1,x2,y,hits,gap,col,sw){
-  if(!hits.length){se(svg,'line',{x1,y1:y,x2,y2:y,stroke:col,'stroke-width':sw});return;}
-  let cur=x1;
-  hits.forEach(hx=>{if(cur<hx-gap)se(svg,'line',{x1:cur,y1:y,x2:hx-gap,y2:y,stroke:col,'stroke-width':sw});cur=hx+gap;});
-  if(cur<x2)se(svg,'line',{x1:cur,y1:y,x2,y2:y,stroke:col,'stroke-width':sw});
+function drawLine(svg,x1,x2,y,col,sw) {
+  addEl(svg,'line',{x1,y1:y,x2,y2:y,stroke:col,'stroke-width':sw});
 }
-function tie(svg,x1,y1,x2,y2,col,same){
-  se(svg,'line',{x1:x1+12,y1,x2:x2-12,y2,stroke:col,'stroke-width':same?'1':'1.5','stroke-dasharray':same?'4,3':'none','opacity':same?'0.45':'0.8'});
+function drawTie(svg,x1,y1,x2,y2,col,same) {
+  addEl(svg,'line',{x1:x1+12,y1,x2:x2-12,y2,stroke:col,'stroke-width':same?'1':'1.5','stroke-dasharray':same?'4,3':'none','opacity':same?'0.4':'0.85'});
 }
-function se(svg,tag,attrs){const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,String(v)));svg.appendChild(e);return e;}
-function st(svg,x,y,fs,ff,fill,txt){const e=se(svg,'text',{x,y,'font-size':fs,'font-family':ff,fill});e.textContent=txt;return e;}
+function addEl(svg,tag,attrs) {
+  const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,String(v)));
+  svg.appendChild(e); return e;
+}
+function addText(svg,x,y,fs,ff,fill,txt) {
+  const e=addEl(svg,'text',{x,y,'font-size':fs,'font-family':ff,fill});
+  e.textContent=txt; return e;
+}
+
+// ═══════════════════════════════════════════════════
+// UI STATE
+// ═══════════════════════════════════════════════════
+let currentKey = 'C';
+let currentMode2 = 'dur';  // dur / moll
+let currentLayout = 'skupiony';
+let noteNameLang = 'pl';  // 'pl' | 'en'
+let seq = [];          // ciąg funkcyjny (T,S,D,t,s,d)
+let chordSeq = [];     // ciąg akordowy (nazwy tonacji)
+const MAX_SEQ = 10;
+
+// Blokada wzajemna
+function canAddFunc()  { return chordSeq.length === 0; }
+function canAddChord() { return seq.length === 0; }
+
+function dropChord(event) {
+  event.preventDefault();
+  if(!canAddChord()) return;
+  const keyName = event.dataTransfer.getData('keyName');
+  if(!keyName || chordSeq.length >= MAX_SEQ) return;
+  chordSeq.push(keyName);
+  renderChordSeq();
+}
+
+// Drop na ciąg funkcyjny — z przycisków
+function dropToFuncSeq(event) {
+  event.preventDefault();
+  const ft = event.dataTransfer.getData('funcType');
+  if(ft && canAddFunc() && seq.length < MAX_SEQ) {
+    seq.push(ft);
+    renderSeq();
+    renderChordSeq();
+  }
+}
+
+// Śmietniczek funkcyjny
+function dropToFuncTrash(event) {
+  event.preventDefault();
+  document.getElementById('func-trash').classList.remove('over');
+  const idxStr = event.dataTransfer.getData('funcIdx');
+  if(idxStr !== '') {
+    const idx = parseInt(idxStr);
+    if(!isNaN(idx) && idx >= 0 && idx < seq.length) { seq.splice(idx,1); renderSeq(); }
+  } else {
+    // Wyczyść cały ciąg
+    seq = []; renderSeq();
+  }
+}
+
+// Śmietniczek akordowy
+function dropToChordTrash(event) {
+  event.preventDefault();
+  document.getElementById('chord-trash').classList.remove('over');
+  const idxStr = event.dataTransfer.getData('chordIdx');
+  if(idxStr !== '') {
+    const idx = parseInt(idxStr);
+    if(!isNaN(idx) && idx >= 0 && idx < chordSeq.length) { chordSeq.splice(idx,1); renderChordSeq(); }
+  } else {
+    chordSeq = []; renderChordSeq();
+  }
+}
+
+function removeChordAt(i) { chordSeq.splice(i,1); renderChordSeq(); }
+
+function renderChordSeq() {
+  const zone = document.getElementById('chord-drop-zone');
+  const emptyMsg = document.getElementById('chord-empty-msg');
+  const funcSection = document.getElementById('func-seq-section');
+  const chordSection = document.getElementById('chord-seq-section');
+
+  // Blokada wizualna
+  if(funcSection)  funcSection.style.opacity = canAddFunc()  ? '1' : '0.4';
+  if(chordSection) chordSection.style.opacity = canAddChord() ? '1' : '0.4';
+  if(emptyMsg) emptyMsg.style.display = chordSeq.length ? 'none' : '';
+
+  // Renderuj chipy akordowe (bez funkcji — to są nazwy tonacji)
+  const chips = chordSeq.map((kn,i) => {
+    const k = KEYS.find(k=>k.name===kn);
+    const lbl = k ? keyLabel(k) : kn;
+    const isMoll = k && k.isMoll;
+    return `${i?'<span class="seq-arrow">→</span>':''}<span class="seq-chip" draggable="true"
+      style="background:${isMoll?'#FCE4EC':'#FFF3E0'};color:${isMoll?'#880E4F':'#C8882A'};border:1.5px solid ${isMoll?'#880E4F':'#C8882A'};cursor:grab;"
+      ondragstart="event.dataTransfer.setData('chordIdx','${i}')"
+      onclick="removeChordAt(${i})" title="Kliknij by usunąć lub przeciągnij do kosza">${lbl}</span>`;
+  }).join('');
+
+  // Zachowaj empty placeholder jako element, nie innerHTML
+  const existing = zone.querySelectorAll('.seq-chip,.seq-arrow');
+  existing.forEach(e=>e.remove());
+  if(chordSeq.length) {
+    const tmp = document.createElement('div');
+    tmp.style.display='contents';
+    tmp.innerHTML = chips;
+    zone.appendChild(tmp);
+  }
+}
+
+// Zbuduj siatki tonacji: dur i moll, C centrum, krzyżyki prawo, bemole lewo
+function buildKeyGrid() {
+  buildOneKeyGrid('key-grid-dur',  false);
+  buildOneKeyGrid('key-grid-moll', true);
+  // Zaktualizuj etykietę w topbarze
+  const k = KEYS.find(k=>k.name===currentKey);
+  if(k) {
+    const isMoll = !!k.isMoll;
+    const lbl = keyLabel(k) + (isMoll?' moll':' dur');
+    const el = document.getElementById('topbar-key');
+    if(el) el.textContent = lbl;
+  }
+}
+
+function buildOneKeyGrid(containerId, isMollGrid) {
+  const grid = document.getElementById(containerId);
+  if(!grid) return;
+  grid.innerHTML = '';
+
+  // Filtruj klucze: dur lub moll
+  const subset = KEYS.filter(k => isMollGrid ? !!k.isMoll : !k.isMoll);
+  // Posortuj: bemole od największej liczby do 0, C w środku, krzyżyki od 1 do 7
+  const flats  = subset.filter(k=>k.flats>0).sort((a,b)=>b.flats-a.flats);
+  const center = subset.filter(k=>k.flats===0&&k.sharps===0);
+  const sharps = subset.filter(k=>k.sharps>0).sort((a,b)=>a.sharps-b.sharps);
+  const ordered = [...flats, ...center, ...sharps];
+
+  ordered.forEach(k => {
+    const btn = document.createElement('button');
+    const typeClass = k.type.includes('sharp')?' sharps':k.type.includes('flat')?' flats':'';
+    btn.className = 'key-btn'+typeClass + (k.name===currentKey?' active':'');
+    btn.style.flexShrink = '0';
+    const lbl = keyLabel(k);
+    btn.textContent = lbl;
+    if(k.sharps>0) {
+      btn.setAttribute('data-count', String(k.sharps));
+      btn.setAttribute('data-sign', '♯');
+    } else if(k.flats>0) {
+      btn.setAttribute('data-count', String(k.flats));
+      btn.setAttribute('data-sign', '♭');
+    }
+    // Drag — pozwala przeciągać tonację do ciągu akordowego
+    btn.draggable = true;
+    btn.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('keyName', k.name);
+    });
+    btn.onclick = () => {
+      currentKey=k.name;
+      buildKeyGrid();
+    };
+    grid.appendChild(btn);
+  });
+  // Przeciąganie siatki myszką/palcem (scroll horizontal)
+  let isDown=false, startX, scrollLeft;
+  grid.addEventListener('mousedown', e=>{isDown=true;startX=e.pageX-grid.offsetLeft;scrollLeft=grid.scrollLeft;});
+  grid.addEventListener('mouseleave', ()=>isDown=false);
+  grid.addEventListener('mouseup', ()=>isDown=false);
+  grid.addEventListener('mousemove', e=>{if(!isDown)return;e.preventDefault();const x=e.pageX-grid.offsetLeft;const walk=(x-startX)*1.5;grid.scrollLeft=scrollLeft-walk;});
+}
+
+// Etykiety funkcji — mollowe jako duże litery ze stopniem
+// Funkcja zwraca HTML etykiety zależnie od języka
+function getFuncHTML(f) {
+  if(noteNameLang === 'en') {
+    // Angielski: i (tonic minor), iv (subdominant minor), v (dominant minor)
+    const enMap = {
+      T:'T', S:'S', D:'D',
+      t:'<small style="font-size:0.62em;font-style:italic;">i</small>T',
+      s:'<small style="font-size:0.62em;font-style:italic;">iv</small>S',
+      d:'<small style="font-size:0.62em;font-style:italic;">v</small>D'
+    };
+    return enMap[f]||f;
+  }
+  // Polski: T S D (dur), °T °S °D (moll)
+  const plMap = {
+    T:'T', S:'S', D:'D',
+    t:'<span style="font-size:1.25em;vertical-align:middle;line-height:1;">°</span>T',
+    s:'<span style="font-size:1.25em;vertical-align:middle;line-height:1;">°</span>S',
+    d:'<span style="font-size:1.25em;vertical-align:middle;line-height:1;">°</span>D'
+  };
+  return plMap[f]||f;
+}
+const FUNC_HTML = {
+  T:'T', S:'S', D:'D',
+  get t(){ return getFuncHTML('t'); },
+  get s(){ return getFuncHTML('s'); },
+  get d(){ return getFuncHTML('d'); }
+};
+const FUNC_TITLES = {
+  T:'Tonika (I dur)', S:'Subdominanta (IV dur)', D:'Dominanta (V dur)',
+  t:'Tonika moll (I moll)', s:'Subdominanta moll (IV moll)', d:'Dominanta moll (V)'
+};
+
+function funcChipHTML(f, idx) {
+  const arrow = idx > 0 ? '<span class="seq-arrow">→</span>' : '';
+  return `${arrow}<span class="seq-chip ${f}" draggable="true"
+    ondragstart="event.dataTransfer.setData('funcIdx','${idx}')"
+    ondragend="this.style.opacity='1'"
+    onclick="removeAt(${idx})" title="Kliknij by usunąć lub przeciągnij do kosza">${getFuncHTML(f)}</span>`;
+}
+
+// Zbuduj przyciski funkcji
+function buildFuncBtns() {
+  const row = document.getElementById('func-btns');
+  row.innerHTML = '';
+  const allFuncs = ['T','S','D','sep','t','s','d'];
+  allFuncs.forEach(f => {
+    if(f==='sep') { const s=document.createElement('div'); s.className='fb-sep'; row.appendChild(s); return; }
+    const btn = document.createElement('button');
+    btn.className='fb '+f;
+    btn.draggable = true;
+    btn.innerHTML = getFuncHTML(f);
+    btn.title = FUNC_TITLES[f]||f;
+    btn.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('funcType', f);
+    });
+    btn.onclick = () => addFunc(f);
+    row.appendChild(btn);
+  });
+  // Usuń ostatnią
+  const rm = document.createElement('button');
+  rm.className='fb rm'; rm.textContent='← Usuń';
+  rm.onclick = removeFunc;
+  row.appendChild(rm);
+}
+
+function addFunc(f) {
+  if(!canAddFunc()) { alert('Wyczyść ciąg akordowy najpierw.'); return; }
+  if(seq.length >= MAX_SEQ) return;
+  seq.push(f);
+  renderSeq();
+  renderChordSeq(); // odśwież blokadę
+}
+function removeFunc() { seq.pop(); renderSeq(); }
+function clearAll() {
+  seq=[]; chordSeq=[];
+  renderSeq(); renderChordSeq();
+  document.getElementById('staff-card').style.display='none';
+  document.getElementById('info-row').textContent='';
+  document.getElementById('err-row').textContent='';
+}
+
+function renderSeq() {
+  const el = document.getElementById('seq-disp');
+  document.getElementById('seq-count').textContent = (seq.length||chordSeq.length)+' / '+MAX_SEQ;
+  if(!seq.length){ el.innerHTML='<span class="seq-empty">Przeciągnij lub kliknij funkcje…</span>'; renderChordSeq(); return; }
+  el.innerHTML = seq.map((f,i) => funcChipHTML(f,i)).join('');
+  renderChordSeq();
+}
+function removeAt(i) { seq.splice(i,1); renderSeq(); renderChordSeq(); }
+
+function setMode2(m) {
+  currentMode2=m;
+  document.getElementById('cb-dur').classList.toggle('active',m==='dur');
+  document.getElementById('cb-moll').classList.toggle('active',m==='moll');
+}
+function setLayout(l) {
+  currentLayout=l;
+  document.getElementById('cb-skupiony').classList.toggle('active',l==='skupiony');
+  document.getElementById('cb-rozlegly').classList.toggle('active',l==='rozlegly');
+}
+
+function randomizeChordSeq() {
+  if(!canAddChord()) { alert('Wyczyść ciąg funkcyjny najpierw.'); return; }
+  // Wybierz losowe tonacje z aktualnego zestawu (dur lub moll)
+  const allKeys = KEYS.filter(k => !k.isMoll); // domyślnie dur
+  const n = 3 + Math.floor(Math.random()*4);
+  chordSeq = [];
+  // Zawsze zacznij od aktualnej tonacji
+  chordSeq.push(currentKey);
+  for(let i=1;i<n;i++){
+    const prev = chordSeq[chordSeq.length-1];
+    const candidates = allKeys.filter(k=>k.name!==prev);
+    chordSeq.push(candidates[Math.floor(Math.random()*candidates.length)].name);
+  }
+  renderChordSeq();
+}
+
+function randomizeSeq() {
+  if(!canAddFunc()) { alert('Wyczyść ciąg akordowy najpierw.'); return; }
+  const funcs = ['T','S','D','t','s','d'];
+  // Logiczne sekwencje startujące od T lub t
+  const starts = ['T','t'];
+  const n = 3 + Math.floor(Math.random()*4); // 3-6 funkcji
+  seq = [];
+  // Zawsze zacznij od T lub t
+  seq.push(starts[Math.floor(Math.random()*starts.length)]);
+  const isMollStart = seq[0]==='t';
+  // Dobieraj kolejne — preferuj sensowne następstwa
+  const durSeq  = ['T','S','D','T','D','S','T','D','T'];
+  const mollSeq = ['t','s','d','t','d','s','t','d','t'];
+  const pool = isMollStart ? mollSeq : durSeq;
+  for(let i=1;i<n;i++) {
+    const candidates = pool.filter(f=>f!==seq[seq.length-1]);
+    seq.push(candidates[Math.floor(Math.random()*candidates.length)]);
+  }
+  // Zakończ T lub t
+  if(seq[seq.length-1]!=='T' && seq[seq.length-1]!=='t') {
+    seq.push(isMollStart?'t':'T');
+  }
+  renderSeq();
+}
+function setNoteLang(l) {
+  noteNameLang=l;
+  document.getElementById('cb-lang-pl').classList.toggle('active',l==='pl');
+  document.getElementById('cb-lang-en').classList.toggle('active',l==='en');
+  buildKeyGrid();
+  buildFuncBtns();  // odśwież etykiety T°/t
+  renderSeq();      // odśwież chipy
+  if(_lastVoicings && _lastVoicings.length) drawResult(_lastVoicings);
+}
+
+function generate() {
+  const useChord = chordSeq.length > 0;
+  const useFunc  = seq.length > 0;
+  if(!useChord && !useFunc) { document.getElementById('info-row').textContent='Dodaj funkcje lub przeciągnij tonacje.'; return; }
+  
+  const voicings = useChord ? generateChordSeqVoicings() : generateVoicings();
+  if(!voicings.length) { document.getElementById('info-row').textContent='Nie udało się wygenerować.'; return; }
+  
+  drawResult(voicings);
+  
+  const infos = [];
+  for(let i=1;i<voicings.length;i++){
+    const a=voicings[i-1], b=voicings[i];
+    infos.push(useChord ?
+      (()=>{ const ka=KEYS.find(k=>k.name===a.chord._keyName); const kb=KEYS.find(k=>k.name===b.chord._keyName); return (ka?keyLabel(ka):'?')+'→'+(kb?keyLabel(kb):'?'); })() :
+      `${a.chord.func}→${b.chord.func}`);
+  }
+  _lastVoicings = voicings;
+  document.getElementById('info-row').textContent = 'Pochód: ' + infos.join(' ');
+  
+  const errs = checkErrors(voicings);
+  document.getElementById('err-row').textContent = errs.length ? '⚠ ' + errs.join(' | ') : '';
+}
+
+// Generuj voicings dla ciągu akordowego — z retry
+function generateChordSeqVoicings() {
+  if(!chordSeq.length) return [];
+  const lay = currentLayout;
+  const startPositions = ['kwinta','tercja','pryma','kwinta','tercja'];
+  let best = null, bestErrors = 9999;
+  for(const sp of startPositions) {
+    const chord0 = buildChordFromKey(chordSeq[0]);
+    const voicings = [buildVoicing(chord0, lay, sp)];
+    for(let i=1;i<chordSeq.length;i++){
+      const chord = buildChordFromKey(chordSeq[i]);
+      voicings.push(leadVoices(voicings[i-1], chord, lay));
+    }
+    const errs = checkErrors(voicings).length + countParallelErrors(voicings);
+    if(errs < bestErrors) { bestErrors = errs; best = voicings; }
+    if(bestErrors === 0) break;
+  }
+  return best || [];
+}
+
+// Buduj akord toniki z nazwy klucza (dur lub moll)
+function buildChordFromKey(keyName) {
+  const k = KEYS.find(k=>k.name===keyName);
+  const isMoll = k && k.isMoll;
+  const func = isMoll ? 't' : 'T';
+  const chord = buildChord(keyName, func);
+  chord._keyName = keyName;
+  return chord;
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+buildKeyGrid();
+buildFuncBtns();
+renderSeq();
+
+// Przerysuj przy zmianie rozmiaru okna
+let _lastVoicings = null;
+const _resizeObs = new ResizeObserver(() => {
+  if(_lastVoicings && _lastVoicings.length) drawResult(_lastVoicings);
+});
+_resizeObs.observe(document.querySelector('.svg-scroll') || document.body);
 </script>
 </body>
 </html>
