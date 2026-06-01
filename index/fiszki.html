@@ -290,6 +290,16 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
         <button class="cb" id="cb-t30" onclick="setTimer(30)">30s</button>
       </div>
     </div>
+    <!-- Format nazw nut — widoczny w reveal i choice -->
+    <div class="ctrl-row" id="row-name-format">
+      <span class="ctrl-lbl">Nazwy nut</span>
+      <div class="ctrl-btns">
+        <button class="cb active" id="cb-nf-pl" onclick="setNameFormat('pl')">Polska</button>
+        <button class="cb" id="cb-nf-en" onclick="setNameFormat('en')">Angielska</button>
+        <button class="cb" id="cb-nf-both" onclick="setNameFormat('both')">Obie</button>
+        <button class="cb" id="cb-nf-sound" onclick="setNameFormat('sound')" style="display:none;">Tylko dźwięk</button>
+      </div>
+    </div>
     <!-- Widok podpowiedzi dla trybu place -->
     <div class="ctrl-row" id="row-place-hint" style="display:none;">
       <span class="ctrl-lbl">Podpowiedź</span>
@@ -413,6 +423,7 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
       <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:8px;flex-wrap:wrap;">
         <button class="play-btn" id="playBtnChoiceEl" onclick="playCurrentGuess()">▶ Odtwórz</button>
       </div>
+      <div id="choice-sound-hint" style="display:none;font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:6px;">🎵 Najedź na przycisk lub dotknij, żeby usłyszeć dźwięk</div>
       <div class="choice-grid" id="choiceGrid"></div>
     </div>
   </div>
@@ -434,7 +445,8 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
         <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
       </div>
     </div>
-    <!-- Zatwierdź - pod pięciolinią, wycentrowany -->
+    <!-- Wskazówka + Zatwierdź - pod pięciolinią, wycentrowane -->
+    <div id="place-hint-text" style="font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:2px;">👆 Kliknij lub przeciągnij nutę na właściwą pozycję</div>
     <button class="confirm-btn" id="confirmBtn" onclick="confirmPlace()" style="width:200px;padding:12px 24px;font-size:0.8rem;">Zatwierdź</button>
   </div>
 </div>
@@ -639,7 +651,7 @@ function noteEN(n){
 // ══════════════════════════════════════════════════════════
 // STAN
 // ══════════════════════════════════════════════════════════
-let clef='treble',range='small',acc=false;
+let clef='treble',range='small',acc=false,nameFormat='pl';
 let mode='reveal',noteCount=1;
 let notes=[],seqIdx=0,guessIdx=0;
 let revealState=false,cnt=0,ok=0;
@@ -827,6 +839,7 @@ cvP.addEventListener('touchstart',startDragTouch,{passive:false});
 function startDrag(e){
   e.preventDefault();
   isDragging=true;placeConfirmed=false;
+  const hint=document.getElementById('place-hint-text');if(hint)hint.style.display='none';
   const p=clampP(canvasYtoP(e.clientY));
   placeCurrentP=p;
   renderPlace(p);
@@ -834,6 +847,7 @@ function startDrag(e){
 function startDragTouch(e){
   e.preventDefault();
   isDragging=true;placeConfirmed=false;
+  const hint=document.getElementById('place-hint-text');if(hint)hint.style.display='none';
   const t=e.touches[0];
   const p=clampP(canvasYtoP(t.clientY));
   placeCurrentP=p;
@@ -1108,6 +1122,7 @@ function buildPlaceNote(){
   placeCurrentP=null;
   renderPlace();
   updatePlaceHintUI();
+  const ph=document.getElementById('place-hint-text');if(ph)ph.style.display='block';
   startTimer();anim();
 }
 
@@ -1147,7 +1162,7 @@ function toggleReveal(){
   const children=document.getElementById('namesRow').children;
   notes.forEach((it,i)=>{
     const b=children[i];if(!b)return;
-    if(revealState){b.classList.remove('hidden');b.textContent=it.n.l;if(it.n.kontra)b.classList.add('kontra');}
+    if(revealState){b.classList.remove('hidden');b.textContent=formatNoteName(it.n);if(it.n.kontra)b.classList.add('kontra');}
     else{b.classList.add('hidden');b.textContent='?';b.className='nb hidden';}
   });
 }
@@ -1241,6 +1256,9 @@ function buildChoiceUI(){
     const b=document.createElement('div');b.className='nb'+(i===0?' guess-cur':'');
     b.id='nc-'+i;b.textContent='?';namesRowC.appendChild(b);
   });
+  // Hint dla sound mode
+  const hintEl=document.getElementById('choice-sound-hint');
+  if(hintEl)hintEl.style.display=(nameFormat==='sound')?'block':'none';
   guessIdx=0;render(notes,0,'#d4af37');buildChoiceButtons();
 }
 
@@ -1253,9 +1271,19 @@ function buildChoiceButtons(){
     const c=p[rnd(p.length)];if(!used.has(c.l)){used.add(c.l);wrong.push(c);}
   }
   const opts=shuffle([it.n,...wrong]);
-  opts.forEach(n=>{
+  opts.forEach((n,idx)=>{
     const btn=document.createElement('button');
-    btn.className='ch-btn'+(n.kontra?' kontra':'');btn.textContent=n.l;
+    btn.className='ch-btn'+(n.kontra?' kontra':'');
+    if(nameFormat==='sound'){
+      btn.innerHTML='<span style="font-size:1.6rem;">♪</span><br><span style="font-size:0.65rem;opacity:0.6;">'+(idx+1)+'</span>';
+      btn.title=n.l;
+      // Dodaj odtwarzanie po najechaniu/dotknięciu
+      btn.onmouseenter=()=>playFreq(n.f,getACtx().currentTime,0.4);
+      btn.ontouchstart=(e)=>{e.preventDefault();playFreq(n.f,getACtx().currentTime,0.4);};
+    } else {
+      btn.textContent=formatNoteName(n);
+    }
+    btn.dataset.noteL=n.l;
     btn.onclick=()=>handleChoice(n,it.n);grid.appendChild(btn);
   });
 }
@@ -1265,8 +1293,8 @@ function handleChoice(chosen,correct){
   const allBtns=document.querySelectorAll('.ch-btn');
   const nb=document.getElementById('nc-'+guessIdx);
   if(chosen.l===correct.l){
-    allBtns.forEach(b=>{if(b.textContent.startsWith(correct.l))b.classList.add('ok');});
-    if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=correct.l;if(correct.kontra)nb.classList.add('kontra');}
+    allBtns.forEach(b=>{if(b.dataset.noteL===correct.l||b.textContent===formatNoteName(correct))b.classList.add('ok');});
+    if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=formatNoteName(correct);if(correct.kontra)nb.classList.add('kontra');}
     render(notes,guessIdx,'#16a34a');
     if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);
     flyNoteAnimation(document.getElementById('C'),allBtns[0]);
@@ -1278,8 +1306,8 @@ function handleChoice(chosen,correct){
     }
   }else{
     if(document.getElementById('toggleFeedbackSound').checked)playPyk(false);
-    allBtns.forEach(b=>{if(b.textContent.startsWith(correct.l))b.classList.add('ok');});
-    document.querySelectorAll('.ch-btn').forEach(b=>{if(b.textContent.startsWith(chosen.l)&&!b.classList.contains('ok'))b.classList.add('bad');});
+    allBtns.forEach(b=>{if(b.dataset.noteL===correct.l||b.textContent===formatNoteName(correct))b.classList.add('ok');});
+    document.querySelectorAll('.ch-btn').forEach(b=>{if((b.dataset.noteL===chosen.l||b.textContent===formatNoteName(chosen))&&!b.classList.contains('ok'))b.classList.add('bad');});
     if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-bad');nb.textContent='✗';}
     render(notes,guessIdx,'#dc2626');
     setTimeout(()=>{
@@ -1342,6 +1370,19 @@ function setClef(c){
 }
 function setRange(r){range=r;document.getElementById('cb-small').classList.toggle('active',r==='small');document.getElementById('cb-full').classList.toggle('active',r==='full');}
 function setAcc(){acc=!acc;const btn=document.getElementById('cb-acc');btn.classList.toggle('active',acc);btn.textContent=acc?'Chromatyczne':'Diatoniczne';}
+function setNameFormat(f){
+  nameFormat=f;
+  ['pl','en','both','sound'].forEach(id=>{const el=document.getElementById('cb-nf-'+id);if(el)el.classList.toggle('active',id===f);});
+  // Przebuduj przyciski choice jeśli jesteśmy w tym trybie
+  if(mode==='choice'&&notes.length>0)buildChoiceButtons();
+}
+function formatNoteName(note){
+  const pl=note.l;
+  const en=noteEN(note);
+  if(nameFormat==='pl')return pl;
+  if(nameFormat==='en')return en;
+  return pl+' / '+en;
+}
 function setN(n){noteCount=n;}
 function setMode(m){
   mode=m;cnt=0;ok=0;selfCheckActive=false;
@@ -1360,6 +1401,12 @@ function setMode(m){
   document.getElementById('placeModeWrap').style.display=isPlace?'flex':'none';
   document.getElementById('micSettingsOuter').style.display=isPlace?'none':'block';
   document.getElementById('row-acc').style.display=isPlace?'none':'flex';
+  document.getElementById('row-name-format').style.display=isPlace?'none':'flex';
+  // "Tylko dźwięk" tylko w choice mode
+  const soundBtn=document.getElementById('cb-nf-sound');
+  if(soundBtn)soundBtn.style.display=(m==='choice')?'':'none';
+  // Jeśli przełączamy z choice gdzie było 'sound' na reveal - reset do 'pl'
+  if(m!=='choice'&&nameFormat==='sound'){setNameFormat('pl');}
   document.getElementById('row-notecount').style.display=isPlace?'none':'flex';
   document.getElementById('row-place-hint').style.display=isPlace?'flex':'none';
 
