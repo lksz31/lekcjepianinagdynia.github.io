@@ -1019,30 +1019,26 @@ function drawNote(ctx,st,n,nx,stemUp,col,accSign,isBasClef){
   else{ctx.beginPath();ctx.moveTo(nx-rx+1,nyv);ctx.lineTo(nx-rx+1,nyv+sl);ctx.stroke();}
 }
 
-function drawTreble(st){
-  ctx2d.save();ctx2d.fillStyle='#1e3a8a';
-  const H2=4*STEP+STEP*1.5;
-  ctx2d.font=(H2*0.92)+'px NotoMusic,Times New Roman,serif';
-  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D11E}',LX+3,st-H2*0.04-STEP*0.15);ctx2d.restore();
-}
-function drawBass(st){
-  ctx2d.save();ctx2d.fillStyle='#1e3a8a';
-  const H2=STEP*4.2;
-  ctx2d.font=(H2*1.1)+'px NotoMusic,Times New Roman,serif';
-  ctx2d.textBaseline='top';ctx2d.fillText('\u{1D122}',LX+2,st-STEP*0.45-STEP*0.05);ctx2d.restore();
-}
-function drawTrebleTo(ctx,st){
+// Klucze rysowane relatywnie do st i STEP
+function _drawClef(ctx,which,st){
   ctx.save();ctx.fillStyle='#1e3a8a';
-  const H2=4*STEP+STEP*1.5;
-  ctx.font=(H2*0.92)+'px NotoMusic,Times New Roman,serif';
-  ctx.textBaseline='top';ctx.fillText('\u{1D11E}',LX+3,st-H2*0.04-STEP*0.15);ctx.restore();
+  if(which==='treble'){
+    const H2=STEP*5.5;
+    ctx.font=(H2*0.92)+'px NotoMusic,Times New Roman,serif';
+    ctx.textBaseline='top';
+    ctx.fillText(String.fromCodePoint(0x1D11E),LX+3,st-STEP*0.37);
+  } else {
+    const H2=STEP*4.2;
+    ctx.font=(H2*1.1)+'px NotoMusic,Times New Roman,serif';
+    ctx.textBaseline='top';
+    ctx.fillText(String.fromCodePoint(0x1D122),LX+2,st-STEP*0.50);
+  }
+  ctx.restore();
 }
-function drawBassTo(ctx,st){
-  ctx.save();ctx.fillStyle='#1e3a8a';
-  const H2=STEP*4.2;
-  ctx.font=(H2*1.1)+'px NotoMusic,Times New Roman,serif';
-  ctx.textBaseline='top';ctx.fillText('\u{1D122}',LX+2,st-STEP*0.45-STEP*0.05);ctx.restore();
-}
+function drawTreble(st){_drawClef(ctx2d,'treble',st);}
+function drawBass(st){_drawClef(ctx2d,'bass',st);}
+function drawTrebleTo(ctx,st){_drawClef(ctx,'treble',st);}
+function drawBassTo(ctx,st){_drawClef(ctx,'bass',st);}
 
 // ══════════════════════════════════════════════════════════
 // PULA NUT
