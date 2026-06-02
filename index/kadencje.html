@@ -134,6 +134,7 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
 .seq-chip[draggable]:active{cursor:grabbing;opacity:0.7;}
 .fb[draggable]{cursor:grab;}
 .moll-sup{font-size:0.65em;vertical-align:super;margin-right:1px;font-family:'Poppins',sans-serif;}
+.key-drop-over{background:#e0f2fe!important;border-color:var(--navy)!important;transform:scale(1.04);}
 </style>
 </head>
 <body>
@@ -200,7 +201,18 @@ body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min
   <!-- Budowanie pochodu -->
   <div class="func-builder">
     <div class="func-topbar">
-      <span class="func-topbar-title">🎼 Ciąg funkcyjny — <span id="topbar-key" style="color:var(--navy);font-style:italic;">C dur</span></span>
+      <span class="func-topbar-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        🎼 Ciąg funkcyjny —
+        <span id="key-drop-zone"
+          ondragover="event.preventDefault();this.classList.add('key-drop-over')"
+          ondragleave="this.classList.remove('key-drop-over')"
+          ondrop="dropKeyToChangeKey(event)"
+          title="Przeciągnij tonację tutaj by zmienić tonację"
+          style="display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:8px;padding:3px 10px;cursor:copy;min-width:80px;transition:all 0.2s;">
+          <span style="font-size:0.7rem;color:#94a3b8;">🎵</span>
+          <span id="topbar-key" style="color:var(--navy);font-style:italic;font-size:0.85rem;">C dur</span>
+        </span>
+      </span>
       <span style="font-size:0.72rem;color:#94a3b8;" id="seq-count">0 / 10</span>
     </div>
     <div class="func-body">
@@ -286,10 +298,19 @@ const CHROMA_TO_NAME_SHARP = {
   0:'C',1:'Cis',2:'D',3:'Dis',4:'E',5:'F',
   6:'Fis',7:'G',8:'Gis',9:'A',10:'Ais',11:'H'
 };
-// chroma → diaPos offset within octave (0-based)
+// chroma → diaPos offset within octave (0-based) — KRZYŻYKOWA enharmonia
 const CHROMA_TO_DIA_OFFSET = {
-  0:0,1:0,2:1,3:2,4:2,5:3,6:3,7:4,8:4,9:5,10:6,11:6
+  0:0,1:0,2:1,3:1,4:2,5:3,6:3,7:4,8:4,9:5,10:5,11:6
 };
+// chroma → diaPos offset — BEMOLOWA enharmonia (Ges=4, Des=1, As=5, Es=2, B=6)
+const CHROMA_TO_DIA_OFFSET_FLAT = {
+  0:0,1:1,2:1,3:2,4:2,5:3,6:4,7:4,8:5,9:5,10:6,11:6
+};
+
+function getDiaOffsetMap(keyName) {
+  const k = KEYS.find(k=>k.name===keyName);
+  return (k && k.flats > 0) ? CHROMA_TO_DIA_OFFSET_FLAT : CHROMA_TO_DIA_OFFSET;
+}
 
 // Koło kwintowe — wszystkie tonacje
 const KEYS = [
@@ -434,9 +455,10 @@ const RANGES = {
 // ═══════════════════════════════════════════════════
 // PRZELICZANIE: chroma → diaPos w danej oktawie
 // ═══════════════════════════════════════════════════
-function chromaToDia(chroma, octave) {
+function chromaToDia(chroma, octave, keyName) {
   const c = ((chroma%12)+12)%12;
-  return CHROMA_TO_DIA_OFFSET[c] + (octave-4)*7;
+  const map = keyName ? getDiaOffsetMap(keyName) : CHROMA_TO_DIA_OFFSET;
+  return map[c] + (octave-4)*7;
 }
 
 function diaToY_treble(d) { return 150 - d*10; }  // +20: nuty były 2 pozycje za wysoko
@@ -454,7 +476,7 @@ function findClosest(chroma, targetDia, minD, maxD) {
   const c = ((chroma%12)+12)%12;
   let best = null, bd = 9999;
   for(let oct = 0; oct <= 8; oct++) {
-    const d = chromaToDia(c, oct);
+    const d = chromaToDia(c, oct, currentKey);
     if(d < minD || d > maxD) continue;
     const dist = Math.abs(d - targetDia);
     if(dist < bd) { bd = dist; best = {chroma:c, dia:d, oct}; }
@@ -472,18 +494,31 @@ function findClosest(chroma, targetDia, minD, maxD) {
 // zbuduj voicing w danym układzie
 function buildVoicing(chord, layout, startPos) {
   // startPos: 'pryma'|'tercja'|'kwinta' — co jest w soprani
-  const chromas = chord.chromas; // [rootC, thirdC, fifthC]
+  const chromas = chord.chromas;
   let sopChroma, altChroma, tenorChroma, bassChroma;
   
   // Bas zawsze pryma
   bassChroma = chord.rootC;
-  
-  if(startPos === 'pryma') {
-    sopChroma = chord.rootC; altChroma = chord.fifthC; tenorChroma = chord.thirdC;
-  } else if(startPos === 'tercja') {
-    sopChroma = chord.thirdC; altChroma = chord.rootC; tenorChroma = chord.fifthC;
-  } else { // kwinta
-    sopChroma = chord.fifthC; altChroma = chord.thirdC; tenorChroma = chord.rootC;
+
+  // Subdominanta (S/s): zdwojona PRYMA — bas + tenor = pryma, alt = tercja
+  const isSubdom = chord.func === 'S' || chord.func === 's';
+  if(isSubdom) {
+    // Tenor: pryma (zdwojenie z basem)
+    tenorChroma = chord.rootC;
+    // Alt: tercja
+    altChroma = chord.thirdC;
+    // Sopran: zależnie od startPos
+    if(startPos === 'pryma')        sopChroma = chord.rootC;
+    else if(startPos === 'tercja')  sopChroma = chord.thirdC;
+    else                            sopChroma = chord.fifthC; // kwinta
+  } else {
+    if(startPos === 'pryma') {
+      sopChroma = chord.rootC; altChroma = chord.fifthC; tenorChroma = chord.thirdC;
+    } else if(startPos === 'tercja') {
+      sopChroma = chord.thirdC; altChroma = chord.rootC; tenorChroma = chord.fifthC;
+    } else { // kwinta
+      sopChroma = chord.fifthC; altChroma = chord.thirdC; tenorChroma = chord.rootC;
+    }
   }
   
   // Znajdź optymalne pozycje oktawowe
@@ -512,7 +547,7 @@ function findInRange(chroma, minD, maxD, prefD) {
   // Znajdź wszystkie pozycje w zakresie
   const candidates = [];
   for(let oct=0; oct<=8; oct++) {
-    const d = chromaToDia(c, oct);
+    const d = chromaToDia(c, oct, currentKey);
     if(d >= minD && d <= maxD) candidates.push({chroma:c, dia:d, oct});
   }
   if(!candidates.length) {
@@ -594,19 +629,32 @@ function leadQuintal(prev, nextChord, layout) {
   if(!newTenor) newTenor = findInRange(nc.thirdC, Math.max(RANGES.tenor.min,newBass.dia+1), RANGES.tenor.max, prev.tenor.dia);
   
   // 4. Alt — najbliższa droga
+  // Subdominanta wymaga zdwojenia prymy: alt → pryma S
+  const nextIsSubdom = nc.func === 'S' || nc.func === 's';
   let altChroma;
-  const usedChromas = [nc.rootC, newBass.chroma, newTenor.chroma];
-  // Alt dostaje dźwięk którego brakuje
-  altChroma = nextChromas.find(c => !usedChromas.includes(c)) ?? nc.rootC;
-  if(prev.alt.chroma === commonChroma) altChroma = commonChroma;
+  if(nextIsSubdom) {
+    // Zdwojona pryma — alt idzie na prymę S (chyba że to wspólny dźwięk)
+    altChroma = (prev.alt.chroma === commonChroma) ? commonChroma : nc.rootC;
+  } else {
+    const usedChromas = [nc.rootC, newBass.chroma, newTenor.chroma];
+    altChroma = nextChromas.find(c => !usedChromas.includes(c)) ?? nc.rootC;
+    if(prev.alt.chroma === commonChroma) altChroma = commonChroma;
+  }
   let newAlt = findClosest(altChroma, prev.alt.dia, Math.max(RANGES.alt.min, newTenor.dia+1), RANGES.alt.max);
   if(!newAlt) newAlt = findInRange(altChroma, Math.max(RANGES.alt.min,newTenor.dia+1), RANGES.alt.max, prev.alt.dia);
   
   // 5. Sopran — najbliższa droga
   let sopChroma;
-  const usedAll = [newBass.chroma, newTenor.chroma, newAlt?.chroma];
-  sopChroma = nextChromas.find(c => !usedAll.includes(c)) ?? nc.fifthC;
-  if(prev.sopran.chroma === commonChroma) sopChroma = commonChroma;
+  if(nextIsSubdom) {
+    // S zdwojona pryma: sopran może być prymą, tercją lub kwintą
+    const usedAll2 = [newBass.chroma, newTenor.chroma, newAlt?.chroma];
+    sopChroma = nextChromas.find(c => !usedAll2.includes(c)) ?? nc.fifthC;
+    if(prev.sopran.chroma === commonChroma) sopChroma = commonChroma;
+  } else {
+    const usedAll = [newBass.chroma, newTenor.chroma, newAlt?.chroma];
+    sopChroma = nextChromas.find(c => !usedAll.includes(c)) ?? nc.fifthC;
+    if(prev.sopran.chroma === commonChroma) sopChroma = commonChroma;
+  }
   let newSop = findClosest(sopChroma, prev.sopran.dia, Math.max(RANGES.sopran.min, (newAlt?.dia??0)+1), RANGES.sopran.max);
   if(!newSop) newSop = findInRange(sopChroma, Math.max(RANGES.sopran.min,(newAlt?.dia??0)+1), RANGES.sopran.max, prev.sopran.dia);
   
@@ -932,46 +980,77 @@ function getScaleChromas(keyName) {
   return new Set(intervals.map(i => ((root+i)%12)));
 }
 
+// Stan alteracji w bieżącym takcie: dia → ostatnio użyte chroma
+// Resetowane na początku każdego taktu
+let _barAccState = {}; // key: diaPos, value: chroma użyte w tym takcie
+
+function resetBarAccState() { _barAccState = {}; }
+
 // Dla danej nuty i tonacji określ jaki znak chromatyczny narysować
 // Zwraca: '#' | 'b' | 'n' (kasownik) | null (brak znaku)
 function getNoteAccidental(note, keyName) {
   const scaleChromas = getScaleChromas(keyName);
   const keyData = KEYS.find(k=>k.name===keyName)||{sharps:0,flats:0};
   const chroma = note.chroma;
-  
-  if(scaleChromas.has(chroma)) {
-    // Nuta jest w gamie — sprawdź czy armatura już ją "obsługuje"
-    // Jeśli nuta jest naturalna (np. E w Es dur) a armatura ma Es → kasownik
-    const diaOffset = CHROMA_TO_DIA_OFFSET[chroma];
-    // Sprawdź czy ta "litera" nuty jest alterowana w armacie
-    const nSharps = keyData.sharps||0;
-    const nFlats  = keyData.flats||0;
-    
-    // Nuty alterowane przez armatę
-    const sharpOrder = [6,1,8,3,10,5,0]; // F C G D A E H (chroma krzyżyków)
-    const flatOrder  = [10,3,8,1,6,11,4]; // B E A D G C F (chroma bemoli)
-    
-    const alteredByKey = new Set();
-    for(let i=0;i<nSharps;i++) alteredByKey.add(sharpOrder[i]);
-    for(let i=0;i<nFlats;i++)  alteredByKey.add(flatOrder[i]);
-    
-    // Naturalna wersja tej "litery" (bez alteracji) → jej chroma
-    // diaOffset daje nam indeks litery, z której pochodzi nuta
-    // Sprawdź czy litera tej nuty jest w armacie
-    // Dla uproszczenia: jeśli chroma nuty jest w gamie i jednocześnie
-    // ta sama "litera" (diaOffset) jest alterowana przez armatę → brak znaku
-    // Jeśli nie jest alterowana przez armatę → brak znaku (naturalna gama)
-    return null; // w gamie = brak znaku (armatura obsługuje)
+  const dia = note.dia;
+
+  // Chroma "domyślne" dla tej pozycji diatonicznej wg armatura
+  const nSharps = keyData.sharps||0;
+  const nFlats  = keyData.flats||0;
+  const sharpOrder = [6,1,8,3,10,5,0];  // F C G D A E H
+  const flatOrder  = [10,3,8,1,6,11,4]; // B E A D G C F
+  const alteredByKey = new Map(); // chroma → 'sharp'|'flat'
+  for(let i=0;i<nSharps;i++) alteredByKey.set(sharpOrder[i],'sharp');
+  for(let i=0;i<nFlats;i++)  alteredByKey.set(flatOrder[i],'flat');
+
+  // "Litera" nuty — diaPos mod 7 daje stopień (0=C,1=D,...,6=H)
+  const letterDia = ((dia % 7) + 7) % 7;
+  // Naturalna chroma dla tej litery (C-dur, bez alteracji)
+  const naturalChromaForLetter = [0,2,4,5,7,9,11][letterDia];
+  // Chroma oczekiwane wg armaturę (z alteracją jeśli trzeba)
+  // Chroma alterowane armatą dla tej litery
+  const keyChromaForLetter = alteredByKey.has(chroma) ? chroma :
+    (alteredByKey.has(naturalChromaForLetter) ? 
+      naturalChromaForLetter + (alteredByKey.get(naturalChromaForLetter)==='sharp'?1:-1) :
+      naturalChromaForLetter);
+
+  // Chroma oczekiwane dla tej nuty wg armatura
+  let expectedChroma = naturalChromaForLetter;
+  if(alteredByKey.has((naturalChromaForLetter+1)%12)) expectedChroma = (naturalChromaForLetter+1)%12;
+  else if(alteredByKey.has((naturalChromaForLetter-1+12)%12)) expectedChroma = (naturalChromaForLetter-1+12)%12;
+
+  // Sprawdź stan z poprzednich nut w tym takcie
+  const prevInBar = _barAccState[dia]; // chroma poprzedniej nuty na tej pozycji w takcie
+
+  let result = null;
+
+  if(chroma === expectedChroma) {
+    // Nuta zgodna z armatą — czy poprzednia nuta w tym takcie była inna?
+    if(prevInBar !== undefined && prevInBar !== chroma) {
+      result = 'n'; // kasownik — poprzednia była alterowana
+    }
+    // else: brak znaku
   } else {
-    // Nuta NIE jest w gamie → potrzebuje znaku
-    // Sprawdź czy to podwyższenie (#) czy obniżenie (b)
-    const aboveInScale = scaleChromas.has((chroma+1)%12);
-    const belowInScale = scaleChromas.has((chroma-1+12)%12);
-    
-    if(belowInScale) return '#'; // nuta jest o pół tonu wyżej niż skalarna
-    if(aboveInScale) return 'b'; // nuta jest o pół tonu niżej niż skalarna
-    return '#'; // domyślnie
+    // Nuta niezgodna z armatą
+    if(prevInBar === chroma) {
+      result = null; // ta sama alteracja już była w takcie — brak znaku
+    } else {
+      // Potrzebuje znaku
+      if(chroma === naturalChromaForLetter) {
+        result = 'n'; // naturalna, ale armatura alteruje → kasownik
+      } else if(chroma === (naturalChromaForLetter+1)%12) {
+        result = '#';
+      } else if(chroma === (naturalChromaForLetter-1+12)%12) {
+        result = 'b';
+      } else {
+        result = scaleChromas.has(chroma) ? null : '#';
+      }
+    }
   }
+
+  // Zaktualizuj stan taktu
+  _barAccState[dia] = chroma;
+  return result;
 }
 
 // Narysuj znak chromatyczny przed nutą
@@ -980,9 +1059,9 @@ function drawNoteAccidental(svg, nx, ny, accType, color) {
   const sym = ACC_SYMBOLS[accType];
   if(!sym) return;
   const t = addEl(svg,'text',{
-    x: nx-16,
-    y: ny+4,
-    'font-size': accType==='n' ? '13' : '12',
+    x: nx-20,
+    y: ny+6,
+    'font-size': accType==='n' ? '26' : '24',
     'font-family':'serif',
     fill: color||'#555',
     'text-anchor':'middle',
@@ -998,15 +1077,30 @@ function drawResult(voicings) {
   const SL=20, CW=76+nAccidentals*20, BW=120, RMARGIN=20;
 
   // Oblicz ile akordów mieści się w jednym wierszu
-  // Szerokość kontenera SVG = szerokość elementu .svg-scroll
   const container = document.querySelector('.svg-scroll');
   const availW = container ? container.clientWidth || 800 : 800;
-  // Ile nut mieści się na wiersz (co najmniej 1)
   const maxPerRow = Math.max(1, Math.floor((availW - SL - CW - RMARGIN) / BW));
 
-  // Podziel voicings na wiersze
+  // Metrum — określ rozmiar taktu
+  const timeSig = getTimeSig(n);
+  const barSize = timeSig ? timeSig.every : 0;
+
+  // Podziel voicings na wiersze — CAŁE TAKTY nie mogą być rozbite
   const rows = [];
-  for(let i=0; i<n; i+=maxPerRow) rows.push(voicings.slice(i, i+maxPerRow));
+  let i = 0;
+  while(i < n) {
+    // Ile akordów zmieści się w tym wierszu?
+    let count = Math.min(maxPerRow, n - i);
+    if(barSize > 1) {
+      // Przytnij do pełnych taktów
+      const fullBars = Math.floor(count / barSize);
+      if(fullBars > 0) count = fullBars * barSize;
+      else count = barSize; // co najmniej jeden takt
+      count = Math.min(count, n - i);
+    }
+    rows.push(voicings.slice(i, i + count));
+    i += count;
+  }
   const nRows = rows.length;
 
   const W = SL + CW + maxPerRow*BW + RMARGIN;
@@ -1041,12 +1135,15 @@ function drawResult(voicings) {
     const timeSigLocal = getTimeSig(n);
     const barEvery = timeSigLocal ? timeSigLocal.every : 0;
     // Oblicz globalny indeks pierwszego akordu w tym wierszu
-    const rowStart = rowIdx * maxPerRow;
+    const rowStart = rows.slice(0,rowIdx).reduce((s,r)=>s+r.length,0);
+    // Zapamiętaj pozycje kresek taktowych (do resetu stanu)
+    const barLinePositions = new Set();
     for(let i=1;i<=rn;i++){
-      const globalIdx = rowStart + i; // globalny indeks po i-tym akordzie
+      const globalIdx = rowStart + i;
       const isLast = i === rn;
       const isBarLine = isLast || (barEvery > 0 && globalIdx % barEvery === 0);
       if(!isBarLine) continue;
+      barLinePositions.add(i);
       const bx = isLast ? SR : SL+CW+i*BW;
       addEl(svg,'line',{x1:bx,y1:tY(T_LINE_Y[4]),x2:bx,y2:tY(T_LINE_Y[0]),stroke:'#C8BEA8','stroke-width':'1.3'});
       addEl(svg,'line',{x1:bx,y1:bY_row(B_LINE_Y[0]),x2:bx,y2:bY_row(B_LINE_Y[4]),stroke:'#C8BEA8','stroke-width':'1.3'});
@@ -1076,10 +1173,13 @@ function drawResult(voicings) {
       if(a.bass&&b.bass)     drawTie(svg,x1,bY_row(diaToY_bass(a.bass.dia)), x2,bY_row(diaToY_bass(b.bass.dia)), VC.bass, a.bass.dia===b.bass.dia);
     }
 
-    // Nuty
+    // Nuty — reset stanu alteracji na początku wiersza
+    resetBarAccState();
     const labelY = tY(T_LINE_Y[4]) - 8; // etykieta funkcji nad górną linią
     rowVoicings.forEach((v,i) => {
       const nx = noteXs[i];
+      // Reset stanu alteracji przy kresce taktowej
+      if(i > 0 && barLinePositions.has(i)) resetBarAccState();
 
       // Etykieta funkcji
       const fl = addEl(svg,'text',{x:nx,y:labelY,'font-size':'12','font-family':'Playfair Display,serif','font-weight':'700','text-anchor':'middle',fill:FC[v.chord.func]||'#888'});
@@ -1148,7 +1248,7 @@ function drawKeySignatureAt(svg, keyData, SL, offsetY) {
   if(nFlats > 0) {
     for(let i=0; i<nFlats; i++) {
       addAcc(svg, KX+i*ACC_W, diaToY_treble(FLATS_TREBLE_DIA[i]) - 10 + offsetY, 'b', '#6B4F3A');
-      addAcc(svg, KX+i*ACC_W, diaToY_bass(FLATS_BASS_DIA[i]) - 29 + offsetY, 'b', '#6B4F3A');
+      addAcc(svg, KX+i*ACC_W, diaToY_bass(FLATS_BASS_DIA[i]) - 9 + offsetY, 'b', '#6B4F3A');
     }
   }
 }
@@ -1246,7 +1346,7 @@ function dropChord(event) {
   renderChordSeq();
 }
 
-// Drop na ciąg funkcyjny — z przycisków
+// Drop na ciąg funkcyjny — tylko funkcje (T S D itd.)
 function dropToFuncSeq(event) {
   event.preventDefault();
   const ft = event.dataTransfer.getData('funcType');
@@ -1254,6 +1354,17 @@ function dropToFuncSeq(event) {
     seq.push(ft);
     renderSeq();
     renderChordSeq();
+  }
+}
+
+// Drop tonacji na kwadracik zmiany tonacji
+function dropKeyToChangeKey(event) {
+  event.preventDefault();
+  document.getElementById('key-drop-zone').classList.remove('key-drop-over');
+  const kn = event.dataTransfer.getData('keyName');
+  if(kn) {
+    currentKey = kn;
+    buildKeyGrid();
   }
 }
 
@@ -1366,8 +1477,18 @@ function buildOneKeyGrid(containerId, isMollGrid) {
       e.dataTransfer.setData('keyName', k.name);
     });
     btn.onclick = () => {
-      currentKey=k.name;
-      buildKeyGrid();
+      // Kliknięcie tonacji:
+      // - jeśli ciąg akordowy aktywny (seq pusty) → dodaj do ciągu akordowego
+      // - jeśli ciąg funkcyjny aktywny (chordSeq pusty) → zmień tonację główną
+      // - jeśli oba puste → dodaj do ciągu akordowego
+      if(seq.length > 0) {
+        // Ciąg funkcyjny aktywny — kliknięcie zmienia tonację
+        currentKey = k.name;
+        buildKeyGrid();
+      } else if(chordSeq.length < MAX_SEQ) {
+        chordSeq.push(k.name);
+        renderChordSeq();
+      }
     };
     grid.appendChild(btn);
   });
