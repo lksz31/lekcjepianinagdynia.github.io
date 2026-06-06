@@ -14,68 +14,73 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 #loading-screen{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:8vh;background:#000;transition:opacity 0.8s ease;overflow:hidden;}
 #loading-screen.fade-out{opacity:0;pointer-events:none;}
 #loading-bg{position:absolute;inset:0;overflow:hidden;}
-#loading-content{position:relative;width:min(520px,88vw);display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 20px;background:rgba(0,0,0,0.45);border-radius:10px;backdrop-filter:blur(4px);}
-#loading-title{font-family:'Cinzel',serif;font-size:clamp(1.1rem,4vw,1.9rem);font-weight:900;color:#d4af37;letter-spacing:.22em;text-shadow:0 0 40px rgba(212,175,55,.9),0 2px 12px rgba(0,0,0,1);text-align:center;}
-#loading-sub{font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;letter-spacing:.12em;text-align:center;}
-#loading-bar-wrap{width:100%;height:6px;background:rgba(0,0,0,.55);border-radius:3px;border:1px solid rgba(212,175,55,.2);overflow:hidden;}
-#loading-bar{height:100%;width:0%;background:linear-gradient(90deg,#5a4a10,#d4af37,#f0d060,#d4af37);background-size:200% 100%;border-radius:3px;transition:width .25s ease;animation:shimmer 1.8s linear infinite;}
+#loading-content{position:relative;width:min(560px,90vw);display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 28px;background:rgba(0,0,0,0.55);border-radius:12px;backdrop-filter:blur(4px);}
+#loading-title{font-family:'Cinzel',serif;font-size:clamp(1.4rem,5vw,2.4rem);font-weight:900;color:#d4af37;letter-spacing:.22em;text-shadow:0 0 40px rgba(212,175,55,.9),0 2px 12px rgba(0,0,0,1);text-align:center;}
+#loading-sub{font-family:'Crimson Text',serif;font-size:1rem;color:#9aaa7a;letter-spacing:.12em;text-align:center;}
+#loading-bar-wrap{width:100%;height:8px;background:rgba(0,0,0,.55);border-radius:4px;border:1px solid rgba(212,175,55,.2);overflow:hidden;}
+#loading-bar{height:100%;width:0%;background:linear-gradient(90deg,#5a4a10,#d4af37,#f0d060,#d4af37);background-size:200% 100%;border-radius:4px;transition:width .25s ease;animation:shimmer 1.8s linear infinite;}
 @keyframes shimmer{0%{background-position:200% center;}100%{background-position:-200% center;}}
-#loading-count{font-family:'Cinzel',serif;font-size:.6rem;color:#5a6a3a;letter-spacing:.1em;}
-#loading-tip{font-family:'Crimson Text',serif;font-size:.75rem;color:#4a5a3a;letter-spacing:.06em;text-align:center;font-style:italic;min-height:1.2em;transition:opacity .4s;}
+#loading-count{font-family:'Cinzel',serif;font-size:.75rem;color:#6a7a4a;letter-spacing:.1em;}
+#loading-tip{font-family:'Crimson Text',serif;font-size:.9rem;color:#5a6a3a;letter-spacing:.06em;text-align:center;font-style:italic;min-height:1.4em;transition:opacity .4s;}
 
-#char-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow-y:auto;}
+/* ══ CHAR SCREEN ══ */
+#char-screen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;overflow-y:auto;}
 #char-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0.35;pointer-events:none;transition:opacity 0.8s;}
-#char-screen h1{position:relative;font-size:clamp(1rem,3.5vw,2rem);font-weight:900;color:#d4af37;letter-spacing:.2em;text-shadow:0 0 20px rgba(212,175,55,.6);text-align:center;}
-.subtitle{position:relative;font-family:'Crimson Text',serif;font-size:.85rem;color:#6a7a4a;letter-spacing:.12em;}
-.char-grid{position:relative;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-.char-card{width:clamp(90px,18vw,130px);cursor:pointer;background:rgba(0,0,0,.55);border:2px solid #2a3a1a;border-radius:8px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s;}
+#char-screen h1{position:relative;font-size:clamp(1.3rem,4.5vw,2.4rem);font-weight:900;color:#d4af37;letter-spacing:.2em;text-shadow:0 0 20px rgba(212,175,55,.6);text-align:center;}
+.subtitle{position:relative;font-family:'Crimson Text',serif;font-size:1rem;color:#8a9a6a;letter-spacing:.12em;}
+.char-grid{position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.char-card{width:clamp(100px,19vw,145px);cursor:pointer;background:rgba(0,0,0,.6);border:2px solid #2a3a1a;border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;transition:all .2s;}
 .char-card:hover,.char-card:active{border-color:#d4af37;box-shadow:0 0 24px rgba(212,175,55,.35);transform:translateY(-3px);}
 .char-card.selected{border-color:#d4af37;box-shadow:0 0 32px rgba(212,175,55,.5);}
-.char-img-box{width:clamp(50px,10vw,70px);height:clamp(60px,12vw,90px);display:flex;align-items:center;justify-content:center;}
+.char-img-box{width:clamp(56px,11vw,78px);height:clamp(66px,13vw,98px);display:flex;align-items:center;justify-content:center;}
 .char-img-box img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
-.char-name{font-size:.6rem;font-weight:700;color:#c8b87a;letter-spacing:.06em;text-align:center;}
-.start-btn{position:relative;padding:10px 32px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;letter-spacing:.2em;cursor:pointer;border-radius:3px;transition:.2s;opacity:0;pointer-events:none;}
+.char-name{font-size:.72rem;font-weight:700;color:#d4c88a;letter-spacing:.06em;text-align:center;}
+.start-btn{position:relative;padding:12px 38px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.95rem;font-weight:700;letter-spacing:.2em;cursor:pointer;border-radius:4px;transition:.2s;opacity:0;pointer-events:none;}
 .start-btn.active{opacity:1;pointer-events:all;}
 .start-btn:hover{background:#d4af37;color:#050a05;}
-.ornament{position:relative;color:#3a4a2a;font-size:.9rem;letter-spacing:.4em;}
+.ornament{position:relative;color:#4a5a3a;font-size:1rem;letter-spacing:.4em;}
 
+/* ══ TUTORIAL OVERLAY ══ */
 #tut-ov{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0);align-items:center;justify-content:center;padding:16px;}
 #tut-ov.show{display:flex;}
-.tut-panel{background:rgba(4,10,4,0.88);border:2px solid #3a5a2a;border-radius:14px;padding:24px 28px;max-width:520px;width:100%;max-height:90dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;color:#c8b87a;font-family:'Cinzel',serif;backdrop-filter:blur(6px);}
-.tut-panel h2{font-size:1rem;color:#d4af37;letter-spacing:.2em;text-align:center;padding-bottom:10px;border-bottom:1px solid #2a3a1a;}
-.tut-section{background:rgba(0,0,0,.35);border:1px solid #2a3a1a;border-radius:8px;padding:12px 14px;}
-.tut-section h3{font-size:.7rem;color:#d4af37;letter-spacing:.15em;margin-bottom:8px;text-transform:uppercase;}
-.tut-row{display:flex;align-items:center;gap:10px;margin-bottom:5px;font-family:'Crimson Text',serif;font-size:.82rem;color:#8a9a6a;}
-.tut-row b{color:#c8b87a;font-family:'Cinzel',serif;font-size:.65rem;}
-.tut-arrow{font-size:1.1rem;color:#d4af37;min-width:20px;text-align:center;}
-.tut-alpha{background:rgba(212,175,55,.07);border:1px solid #3a3010;border-radius:8px;padding:10px 14px;}
-.tut-alpha h3{font-size:.65rem;color:#a08030;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase;}
-.tut-alpha p{font-family:'Crimson Text',serif;font-size:.8rem;color:#6a6030;line-height:1.55;}
-.tut-alpha .alpha-badge{display:inline-block;background:rgba(212,175,55,.15);border:1px solid #604a10;border-radius:3px;padding:1px 7px;font-size:.6rem;color:#a08030;letter-spacing:.1em;margin-bottom:6px;}
-.tut-start-btn{align-self:center;padding:10px 36px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.8rem;font-weight:700;letter-spacing:.2em;cursor:pointer;border-radius:3px;transition:.2s;}
+.tut-panel{background:rgba(4,10,4,0.92);border:2px solid #3a5a2a;border-radius:14px;padding:26px 32px;max-width:540px;width:100%;max-height:90dvh;overflow-y:auto;display:flex;flex-direction:column;gap:14px;color:#d4c88a;font-family:'Cinzel',serif;backdrop-filter:blur(6px);}
+.tut-panel h2{font-size:1.15rem;color:#d4af37;letter-spacing:.2em;text-align:center;padding-bottom:10px;border-bottom:1px solid #2a3a1a;}
+.tut-section{background:rgba(0,0,0,.35);border:1px solid #2a3a1a;border-radius:8px;padding:14px 16px;}
+.tut-section h3{font-size:.8rem;color:#d4af37;letter-spacing:.15em;margin-bottom:8px;text-transform:uppercase;}
+.tut-row{display:flex;align-items:center;gap:10px;margin-bottom:5px;font-family:'Crimson Text',serif;font-size:.92rem;color:#9aaa7a;}
+.tut-row b{color:#d4c88a;font-family:'Cinzel',serif;font-size:.72rem;}
+.tut-arrow{font-size:1.2rem;color:#d4af37;min-width:22px;text-align:center;}
+.tut-alpha{background:rgba(212,175,55,.07);border:1px solid #3a3010;border-radius:8px;padding:12px 16px;}
+.tut-alpha h3{font-size:.72rem;color:#b09040;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase;}
+.tut-alpha p{font-family:'Crimson Text',serif;font-size:.88rem;color:#7a7040;line-height:1.6;}
+.tut-alpha .alpha-badge{display:inline-block;background:rgba(212,175,55,.15);border:1px solid #604a10;border-radius:3px;padding:2px 8px;font-size:.68rem;color:#b09040;letter-spacing:.1em;margin-bottom:6px;}
+.tut-start-btn{align-self:center;padding:12px 42px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.92rem;font-weight:700;letter-spacing:.2em;cursor:pointer;border-radius:4px;transition:.2s;}
 .tut-start-btn:hover{background:#d4af37;color:#050a05;}
 
-/* ══ HUD — większy ══ */
-#hdr{display:none;align-items:center;gap:10px;padding:0 14px;height:56px;background:rgba(0,0,0,0.92);border-bottom:2px solid #1a2a0a;flex-shrink:0;flex-wrap:nowrap;overflow:hidden;}
-#hdr-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
-#hdr-right{display:flex;align-items:center;gap:10px;flex:1;overflow:hidden;min-width:0;}
-.hud-sep{color:#333;flex-shrink:0;font-size:16px;}
-.hud-mic-row{display:flex;align-items:center;gap:8px;}
-.hud-mdot{width:10px;height:10px;border-radius:50%;background:#222;flex-shrink:0;}
-.hud-mdot.on{background:#0f0;box-shadow:0 0 8px #0f0;}
+/* ══ HUD ══ */
+#hdr{display:none;align-items:center;gap:12px;padding:0 16px;height:68px;background:rgba(0,0,0,0.95);border-bottom:2px solid #2a4a1a;flex-shrink:0;flex-wrap:nowrap;overflow:hidden;}
+#hdr-left{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+#hdr-right{display:flex;align-items:center;gap:12px;flex:1;overflow:hidden;min-width:0;}
+.hud-sep{color:#445;flex-shrink:0;font-size:18px;}
+.hud-mic-row{display:flex;align-items:center;gap:9px;}
+.hud-mdot{width:12px;height:12px;border-radius:50%;background:#222;flex-shrink:0;}
+.hud-mdot.on{background:#2f2;box-shadow:0 0 10px #2f2;}
 .hud-mdot.q{background:#225522;}
-#hud-note{color:#d4af37;font-size:15px;font-weight:bold;min-width:34px;}
-.vu{width:70px;height:5px;background:#111;border-radius:2px;overflow:hidden;flex-shrink:0;}
+#hud-note{color:#d4af37;font-size:18px;font-weight:bold;min-width:40px;}
+.vu{width:80px;height:6px;background:#111;border-radius:3px;overflow:hidden;flex-shrink:0;}
 .vuf{height:100%;width:0;background:linear-gradient(90deg,#2a6,#ff0,#f40);transition:width .05s;}
-.hud-label{font-size:10px;color:#4a5a3a;letter-spacing:1px;flex-shrink:0;}
-.hud-val{color:#88cc66;font-size:12px;min-width:24px;flex-shrink:0;}
-.hud-slider{-webkit-appearance:none;appearance:none;width:60px;height:5px;background:#1a2a0a;border-radius:2px;outline:none;cursor:pointer;flex-shrink:0;}
-.hud-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#88cc66;border-radius:50%;cursor:pointer;}
-#hud-menu-btn{background:none;border:1px solid #2a3a1a;color:#4a6a3a;font:12px 'Cinzel',serif;padding:6px 14px;border-radius:3px;cursor:pointer;letter-spacing:1px;transition:.15s;flex-shrink:0;}
-#hud-menu-btn:hover{border-color:#d4af37;color:#d4af37;}
-#hud-creatures{font-size:13px;color:#d4af37;letter-spacing:.08em;font-family:'Cinzel',serif;flex-shrink:0;}
-@media(max-width:600px){#hud-mic-extra{display:none!important;}}
+.hud-label{font-size:11px;color:#6a8a5a;letter-spacing:1.5px;flex-shrink:0;text-transform:uppercase;}
+.hud-val{color:#99dd77;font-size:13px;min-width:28px;flex-shrink:0;font-weight:700;}
+.hud-slider{-webkit-appearance:none;appearance:none;width:68px;height:6px;background:#1a2a0a;border-radius:3px;outline:none;cursor:pointer;flex-shrink:0;}
+.hud-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:#99dd77;border-radius:50%;cursor:pointer;}
+#hud-menu-btn{background:none;border:2px solid #3a5a2a;color:#99dd77;font:'Cinzel',serif;font-size:13px;padding:7px 18px;border-radius:4px;cursor:pointer;letter-spacing:1.5px;transition:.15s;flex-shrink:0;font-family:'Cinzel',serif;font-weight:700;}
+#hud-menu-btn:hover{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.08);}
+#hud-creatures{font-size:15px;color:#d4af37;letter-spacing:.08em;font-family:'Cinzel',serif;flex-shrink:0;font-weight:700;}
+#hud-music-btn{background:none;border:1px solid #3a5a2a;color:#6a9a5a;font-size:16px;width:34px;height:34px;border-radius:4px;cursor:pointer;transition:.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+#hud-music-btn:hover{border-color:#d4af37;color:#d4af37;}
+@media(max-width:640px){#hud-mic-extra{display:none!important;}}
 
+/* ══ GAME ══ */
 #ga{display:none;flex:1;overflow:hidden;flex-direction:column;min-height:0;}
 #game-row{flex:1;display:flex;flex-direction:row;overflow:hidden;min-height:0;}
 #canvas-wrap{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#080f08;background-size:cover;background-position:center;}
@@ -85,70 +90,80 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 @keyframes pg{0%,100%{filter:drop-shadow(0 2px 8px rgba(0,0,0,.9)) drop-shadow(0 0 8px rgba(255,200,50,.25));}50%{filter:drop-shadow(0 2px 8px rgba(0,0,0,.9)) drop-shadow(0 0 20px rgba(255,200,50,.8));}}
 #pl img{animation:pg 1.8s ease-in-out infinite;}
 
-#side-bar{width:0;overflow:hidden;background:rgba(0,0,0,.88);border-left:2px solid #2a1a0a;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;transition:width .3s,padding .3s;flex-shrink:0;}
-#side-bar.show{width:140px;padding:8px 5px;}
-#side-bar h4{font-size:.55rem;color:#6a5a3a;letter-spacing:.08em;text-transform:uppercase;text-align:center;width:100%;border-bottom:1px solid #1a1a0a;padding-bottom:4px;}
+#side-bar{width:0;overflow:hidden;background:rgba(0,0,0,.92);border-left:2px solid #2a1a0a;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0;transition:width .3s,padding .3s;flex-shrink:0;}
+#side-bar.show{width:155px;padding:10px 6px;}
+#side-bar h4{font-size:.62rem;color:#8a7a5a;letter-spacing:.08em;text-transform:uppercase;text-align:center;width:100%;border-bottom:1px solid #2a2a1a;padding-bottom:5px;}
 .ctrl-table{width:100%;border-collapse:collapse;}
-.ctrl-table th{font-size:.52rem;color:#6a5030;letter-spacing:.06em;padding:3px;border-bottom:1px solid #1a1a0a;text-align:left;}
-.ctrl-table td{font-size:.65rem;font-family:'Crimson Text',serif;color:#5a6a3a;padding:3px 3px;}
+.ctrl-table th{font-size:.58rem;color:#7a6040;letter-spacing:.06em;padding:3px;border-bottom:1px solid #1a1a0a;text-align:left;}
+.ctrl-table td{font-size:.72rem;font-family:'Crimson Text',serif;color:#7a8a5a;padding:3px 3px;}
 .ctrl-table tr:nth-child(even) td{background:rgba(0,0,0,.2);}
-.ctrl-key{background:rgba(212,175,55,.1);border:1px solid #3a3a1a;border-radius:2px;padding:1px 5px;color:#a09850;font-family:'Cinzel',serif;font-size:.52rem;}
+.ctrl-key{background:rgba(212,175,55,.12);border:1px solid #3a3a1a;border-radius:2px;padding:1px 6px;color:#c0a860;font-family:'Cinzel',serif;font-size:.58rem;}
 
-#note-bar{flex-shrink:0;background:rgba(0,0,0,.72);border-top:1px solid #2a3a1a;padding:6px 8px 8px;display:none;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+/* ══ NOTE BAR ══ */
+#note-bar{flex-shrink:0;background:rgba(0,0,0,.78);border-top:1px solid #2a3a1a;padding:7px 10px 10px;display:none;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
 #note-bar.show{display:flex;}
-.note-tile{cursor:pointer;border:2px solid #3a4a2a;border-radius:8px;background:rgba(3,8,3,.65);padding:3px 3px 2px;transition:all .12s;user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:1px;}
-.note-tile:hover{border-color:#d4af37;box-shadow:0 0 12px rgba(212,175,55,.45);transform:translateY(-2px);}
+.note-tile{cursor:pointer;border:2px solid #3a4a2a;border-radius:9px;background:rgba(3,8,3,.7);padding:3px 3px 2px;transition:all .12s;user-select:none;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:1px;}
+.note-tile:hover{border-color:#d4af37;box-shadow:0 0 14px rgba(212,175,55,.5);transform:translateY(-2px);}
 .note-tile.mic-only{cursor:default;opacity:0.6;}
 .note-tile.mic-only:hover{border-color:#3a4a2a;box-shadow:none;transform:none;}
-.note-tile.pressing,.note-tile:active{border-color:#d4af37;box-shadow:0 0 20px rgba(212,175,55,.6);transform:scale(.94);background:rgba(212,175,55,.1);}
+.note-tile.pressing,.note-tile:active{border-color:#d4af37;box-shadow:0 0 20px rgba(212,175,55,.65);transform:scale(.93);background:rgba(212,175,55,.12);}
 
-#wo{display:none;position:absolute;inset:0;background:rgba(0,0,0,.83);align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:50;backdrop-filter:blur(4px);}
+/* ══ WIN OVERLAY ══ */
+#wo{display:none;position:absolute;inset:0;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;flex-direction:column;gap:0;z-index:50;backdrop-filter:blur(5px);overflow-y:auto;padding:20px;}
 #wo.show{display:flex;}
-#wo h2{font-size:1.5rem;font-weight:900;color:#d4af37;text-shadow:0 0 28px rgba(212,175,55,.8);letter-spacing:.1em;text-align:center;}
-.wb{padding:8px 22px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;cursor:pointer;border-radius:2px;transition:.2s;}
+#wo-inner{width:100%;max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;}
+#wo h2{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:900;color:#d4af37;text-shadow:0 0 32px rgba(212,175,55,.8);letter-spacing:.12em;text-align:center;}
+#wo-summary{font-family:'Crimson Text',serif;font-size:1rem;color:#9aaa7a;letter-spacing:.06em;text-align:center;}
+#wo-creatures-title{font-size:.8rem;color:#a09060;letter-spacing:.15em;text-transform:uppercase;}
+#wo-creatures-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:520px;}
+.wo-creature-card{display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(0,0,0,.5);border:1px solid #3a4a2a;border-radius:8px;padding:8px 10px;min-width:70px;}
+.wo-creature-card img{width:40px;height:40px;image-rendering:pixelated;object-fit:contain;}
+.wo-creature-card span{font-size:.6rem;color:#a09060;font-family:'Cinzel',serif;letter-spacing:.04em;text-align:center;}
+#wo-empty{font-family:'Crimson Text',serif;font-size:.9rem;color:#5a6a4a;font-style:italic;}
+.wb{padding:10px 28px;background:transparent;border:2px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.85rem;font-weight:700;letter-spacing:.12em;cursor:pointer;border-radius:3px;transition:.2s;}
 .wb:hover{background:#d4af37;color:#050a05;}
+#wo-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
 
-/* ══ MENU — większy ══ */
-.ov{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:12px;}
+/* ══ MENU OVERLAY ══ */
+.ov{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:14px;}
 .ov.show{display:flex;}
 #menu-ov{flex-direction:column;gap:0;}
-.menu-wrap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(440px,95vw);max-height:92dvh;overflow-y:auto;}
-.menu-title{color:#d4af37;font-size:1.05rem;letter-spacing:.25em;text-align:center;margin-bottom:16px;}
-.menu-list{display:flex;flex-direction:column;gap:8px;width:100%;}
-.menu-item{background:#0a150a;border:2px solid #2a3a1a;border-radius:10px;padding:15px 22px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .18s;width:100%;}
-.menu-item:hover{border-color:#d4af37;box-shadow:0 0 14px rgba(212,175,55,.2);}
-.menu-item-icon{font-size:1.4rem;width:30px;text-align:center;flex-shrink:0;}
-.menu-item-label{font-size:.82rem;color:#c8b87a;letter-spacing:.1em;}
-.menu-back-btn{margin-top:12px;padding:8px 24px;background:transparent;border:1px solid #3a3a1a;color:#6a6a3a;font-family:'Cinzel',serif;font-size:.68rem;cursor:pointer;border-radius:3px;transition:.2s;align-self:center;}
+.menu-wrap{display:flex;flex-direction:column;align-items:center;gap:0;width:min(480px,96vw);max-height:92dvh;overflow-y:auto;}
+.menu-title{color:#d4af37;font-size:1.2rem;letter-spacing:.25em;text-align:center;margin-bottom:18px;text-shadow:0 0 18px rgba(212,175,55,.4);}
+.menu-list{display:flex;flex-direction:column;gap:10px;width:100%;}
+.menu-item{background:#0c180c;border:2px solid #2a3a1a;border-radius:12px;padding:18px 24px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .18s;width:100%;}
+.menu-item:hover{border-color:#d4af37;box-shadow:0 0 18px rgba(212,175,55,.22);background:#101e10;}
+.menu-item-icon{font-size:1.6rem;width:34px;text-align:center;flex-shrink:0;}
+.menu-item-label{font-size:.95rem;color:#d4c88a;letter-spacing:.12em;}
+.menu-back-btn{margin-top:14px;padding:10px 28px;background:transparent;border:1px solid #4a4a2a;color:#8a8a5a;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;align-self:center;}
 .menu-back-btn:hover{border-color:#d4af37;color:#d4af37;}
-.subpanel{width:min(520px,95vw);background:#09140a;border:2px solid #2a3a1a;border-radius:12px;padding:20px 26px;color:#c8b87a;max-height:88dvh;overflow-y:auto;}
-.subpanel h3{font-size:.9rem;color:#d4af37;letter-spacing:.18em;margin-bottom:14px;text-align:center;padding-bottom:8px;border-bottom:1px solid #1a2a0a;}
-.srow{margin-bottom:14px;}
-.srow>label{display:block;font-size:.65rem;color:#7a6a3a;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px;}
+.subpanel{width:min(560px,96vw);background:#0a160a;border:2px solid #2a3a1a;border-radius:14px;padding:22px 28px;color:#d4c88a;max-height:88dvh;overflow-y:auto;}
+.subpanel h3{font-size:1rem;color:#d4af37;letter-spacing:.18em;margin-bottom:16px;text-align:center;padding-bottom:10px;border-bottom:1px solid #2a3a1a;}
+.srow{margin-bottom:16px;}
+.srow>label{display:block;font-size:.72rem;color:#9a8a5a;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
 .sval{color:#d4af37;font-weight:700;}
-.srow input[type=range]{width:100%;cursor:pointer;accent-color:#d4af37;margin-top:2px;}
-.srow input[type=checkbox]{accent-color:#d4af37;width:16px;height:16px;cursor:pointer;vertical-align:middle;margin-right:6px;}
-.sinfo{font-family:'Crimson Text',serif;font-size:.75rem;color:#4a5a3a;line-height:1.5;margin-top:3px;}
-.mgrp{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
-.mmode{padding:6px 13px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.srow input[type=range]{width:100%;cursor:pointer;accent-color:#d4af37;margin-top:3px;}
+.srow input[type=checkbox]{accent-color:#d4af37;width:18px;height:18px;cursor:pointer;vertical-align:middle;margin-right:8px;}
+.sinfo{font-family:'Crimson Text',serif;font-size:.82rem;color:#5a6a3a;line-height:1.55;margin-top:4px;}
+.mgrp{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px;}
+.mmode{padding:7px 15px;background:transparent;border:1px solid #2a3a1a;color:#7a7a4a;font-family:'Cinzel',serif;font-size:.7rem;cursor:pointer;border-radius:5px;transition:.2s;}
 .mmode:hover,.mmode.on{border-color:#d4af37;color:#d4af37;}
-.mmode.on{background:rgba(212,175,55,.1);}
-.hz-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;margin-top:6px;}
-.hz-row{font-family:'Crimson Text',serif;font-size:.68rem;color:#5a6a3a;}
-.hz-row b{color:#8a8040;}
-.subclose{display:block;margin:14px auto 0;padding:7px 22px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.68rem;cursor:pointer;border-radius:3px;transition:.2s;letter-spacing:.1em;}
+.mmode.on{background:rgba(212,175,55,.12);}
+.hz-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px;margin-top:7px;}
+.hz-row{font-family:'Crimson Text',serif;font-size:.75rem;color:#6a7a5a;}
+.hz-row b{color:#9a9050;}
+.subclose{display:block;margin:16px auto 0;padding:9px 26px;background:transparent;border:1px solid #d4af37;color:#d4af37;font-family:'Cinzel',serif;font-size:.78rem;cursor:pointer;border-radius:4px;transition:.2s;letter-spacing:.12em;}
 .subclose:hover{background:#d4af37;color:#050a05;}
-.exit-logo{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.exit-logo-text{font-size:.65rem;color:#5a6a3a;letter-spacing:.12em;}
-.size-shape-row{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;}
-.size-shape-btn{padding:6px 16px;background:transparent;border:1px solid #2a3a1a;color:#5a5a2a;font-family:'Cinzel',serif;font-size:.62rem;cursor:pointer;border-radius:4px;transition:.2s;}
+.exit-logo{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.exit-logo-text{font-size:.72rem;color:#6a7a5a;letter-spacing:.14em;}
+.size-shape-row{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap;}
+.size-shape-btn{padding:7px 18px;background:transparent;border:1px solid #2a3a1a;color:#7a7a4a;font-family:'Cinzel',serif;font-size:.7rem;cursor:pointer;border-radius:5px;transition:.2s;}
 .size-shape-btn:hover,.size-shape-btn.on{border-color:#d4af37;color:#d4af37;background:rgba(212,175,55,.1);}
-.size-sub-row{margin-top:8px;}
-.size-sub-row>label{display:block;font-size:.6rem;color:#7a6a3a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;}
-
-/* Zakres nut — specjalny styl */
-.range-info{font-family:'Crimson Text',serif;font-size:.72rem;color:#6a5a3a;line-height:1.5;margin-top:6px;background:rgba(0,0,0,.3);border:1px solid #2a2a1a;border-radius:6px;padding:8px 10px;}
-.range-info b{color:#a09050;}
+.size-sub-row{margin-top:10px;}
+.size-sub-row>label{display:block;font-size:.67rem;color:#8a7a5a;letter-spacing:.07em;text-transform:uppercase;margin-bottom:3px;}
+.range-info{font-family:'Crimson Text',serif;font-size:.8rem;color:#7a6a4a;line-height:1.55;margin-top:7px;background:rgba(0,0,0,.35);border:1px solid #2a2a1a;border-radius:6px;padding:9px 12px;}
+.range-info b{color:#b0a060;}
+.section-sep{height:1px;background:#1a2a1a;margin:10px 0;}
 </style>
 </head>
 <body>
@@ -191,22 +206,26 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     </div>
     <div class="tut-section">
       <h3>🎵 Jak się poruszać</h3>
-      <div class="tut-row"><div class="tut-arrow">↑</div><b>Nuta c¹ / g (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;margin-left:4px;">— idź w górę</span></div>
-      <div class="tut-row"><div class="tut-arrow">↓</div><b>Nuta g¹ / c (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;margin-left:4px;">— idź w dół</span></div>
-      <div class="tut-row"><div class="tut-arrow">→</div><b>Nuta e¹ / e (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;margin-left:4px;">— idź w prawo</span></div>
-      <div class="tut-row"><div class="tut-arrow">←</div><b>Nuta h¹ / h (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;margin-left:4px;">— idź w lewo</span></div>
-      <div style="font-family:'Crimson Text',serif;font-size:.75rem;color:#5a6a3a;margin-top:6px;">Możesz też używać klawiszy strzałek lub W/A/S/D na klawiaturze, albo klikać kafelki nut na ekranie.</div>
+      <div class="tut-row"><div class="tut-arrow">↑</div><b>Nuta c¹ / g (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;margin-left:4px;">— idź w górę</span></div>
+      <div class="tut-row"><div class="tut-arrow">↓</div><b>Nuta g¹ / c (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;margin-left:4px;">— idź w dół</span></div>
+      <div class="tut-row"><div class="tut-arrow">→</div><b>Nuta e¹ / e (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;margin-left:4px;">— idź w prawo</span></div>
+      <div class="tut-row"><div class="tut-arrow">←</div><b>Nuta h¹ / h (bas)</b><span style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;margin-left:4px;">— idź w lewo</span></div>
+      <div style="font-family:'Crimson Text',serif;font-size:.88rem;color:#6a7a5a;margin-top:7px;">Możesz też używać klawiszy strzałek lub W/A/S/D na klawiaturze, albo klikać kafelki nut na ekranie.</div>
     </div>
     <div class="tut-section">
       <h3>🌫️ Mgła</h3>
-      <div style="font-family:'Crimson Text',serif;font-size:.8rem;color:#8a9a6a;line-height:1.55;">Labirynt jest spowity mgłą — widzisz tylko najbliższe korytarze. Mgła znika gdy się zbliżasz. Możesz włączyć podgląd wyjścia w ustawieniach.</div>
+      <div style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;line-height:1.6;">Labirynt jest spowity mgłą — widzisz tylko najbliższe korytarze. Mgła znika gdy się zbliżasz. Możesz włączyć podgląd wyjścia w ustawieniach.</div>
+    </div>
+    <div class="tut-section">
+      <h3>🐾 Zwierzątka</h3>
+      <div style="font-family:'Crimson Text',serif;font-size:.9rem;color:#9aaa7a;line-height:1.6;">Po drodze natkniesz się na zwierzątka — każde wydaje swój unikalny dźwięk gdy je zbierzesz! Zbieraj je wszystkie i sprawdź na ekranie zwycięstwa.</div>
     </div>
     <div class="tut-alpha">
       <span class="alpha-badge">⚗ WERSJA ALPHA</span>
       <p>Ta gra jest w fazie wczesnego dostępu. W kolejnych wersjach planujemy:<br>
-      • <b style="color:#a08030;">Łączenie nut</b> — akordy otwierające tajne przejścia<br>
-      • <b style="color:#a08030;">Umiejętności postaci</b> — każdy bohater będzie miał unikalną zdolność muzyczną<br>
-      • <b style="color:#a08030;">Nowe labirynty</b> — tematyczne muzyczne światy<br>
+      • <b style="color:#b09040;">Łączenie nut</b> — akordy otwierające tajne przejścia<br>
+      • <b style="color:#b09040;">Umiejętności postaci</b> — każdy bohater będzie miał unikalną zdolność muzyczną<br>
+      • <b style="color:#b09040;">Nowe labirynty</b> — tematyczne muzyczne światy<br>
       Dziękujemy za wsparcie i czekamy na Wasze opinie! 🎹</p>
     </div>
     <button class="tut-start-btn" onclick="startGame()">▶ Zaczynamy!</button>
@@ -218,6 +237,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   <div id="hdr-left">
     <button id="hud-menu-btn" onclick="openMenu()">☰ Menu</button>
     <span id="hud-creatures">🐾 0/0</span>
+    <button id="hud-music-btn" onclick="toggleMusicBtn()" title="Muzyka">🎵</button>
     <div class="hud-sep">|</div>
     <div class="hud-mic-row">
       <div class="hud-mdot" id="mdot"></div>
@@ -227,7 +247,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
   </div>
   <div class="hud-sep">|</div>
   <div id="hdr-right">
-    <div id="hud-mic-extra" style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow:hidden;">
+    <div id="hud-mic-extra" style="display:flex;align-items:center;gap:9px;flex-wrap:nowrap;overflow:hidden;">
       <span class="hud-label">CZUŁOŚĆ</span>
       <span class="hud-val" id="gainValHUD">3.5×</span>
       <input type="range" class="hud-slider" id="gainSliderHUD" min="1" max="10" step="0.5" value="3.5" oninput="applyGain(this.value)">
@@ -250,9 +270,17 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
       <canvas id="mc"></canvas>
       <div id="pl"><img id="pl-img" src="" alt="" style="height:auto;"></div>
       <div id="wo">
-        <h2>🏆 Dotarłeś<br>do celu!</h2>
-        <button class="wb" onclick="newMaze()">🎲 Nowy labirynt</button>
-        <button class="wb" onclick="openMenu()">☰ Menu</button>
+        <div id="wo-inner">
+          <h2>🏆 Dotarłeś do celu!</h2>
+          <div id="wo-summary"></div>
+          <div id="wo-creatures-title">Zebrane zwierzątka:</div>
+          <div id="wo-creatures-grid"></div>
+          <div id="wo-empty" style="display:none;">Nie zebrałeś żadnych zwierzątek tym razem…</div>
+          <div id="wo-btns">
+            <button class="wb" onclick="newMaze()">🎲 Nowy labirynt</button>
+            <button class="wb" onclick="openMenu()">☰ Menu</button>
+          </div>
+        </div>
       </div>
     </div>
     <div id="side-bar">
@@ -269,7 +297,8 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     <div class="menu-title" id="menu-title-txt">☰ MENU</div>
     <div id="menu-main" class="menu-list">
       <div class="menu-item" onclick="menuGoTo('settings')"><div class="menu-item-icon">⚙</div><div class="menu-item-label">Ustawienia</div></div>
-      <div class="menu-item" onclick="menuGoTo('ctrl')"><div class="menu-item-icon">🎵</div><div class="menu-item-label">Sterowanie</div></div>
+      <div class="menu-item" onclick="menuGoTo('audio')"><div class="menu-item-icon">🎼</div><div class="menu-item-label">Dźwięk i muzyka</div></div>
+      <div class="menu-item" onclick="menuGoTo('ctrl')"><div class="menu-item-icon">🎹</div><div class="menu-item-label">Sterowanie</div></div>
       <div class="menu-item" onclick="menuGoTo('char')"><div class="menu-item-icon">👤</div><div class="menu-item-label">Zmień postać</div></div>
       <div class="menu-item" onclick="closeMenu();newMaze();"><div class="menu-item-icon">🎲</div><div class="menu-item-label">Losuj labirynt</div></div>
       <div class="menu-item" onclick="menuGoTo('exit')"><div class="menu-item-icon">🚪</div><div class="menu-item-label">Wyjdź z gry</div></div>
@@ -345,8 +374,39 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
         </div>
         <button class="subclose" onclick="menuBack()">← Wróć do menu</button>
       </div>
+
+      <!-- AUDIO PANEL -->
+      <div id="sub-audio" class="subpanel" style="display:none;">
+        <h3>🎵 Dźwięk i muzyka</h3>
+        <div class="srow">
+          <label>Muzyka w tle &nbsp;<span class="sval" id="musicToggleVal">Włączona</span></label>
+          <div class="mgrp">
+            <button class="mmode on" id="musicOn" onclick="setMusicEnabled(true)">▶ Włącz</button>
+            <button class="mmode" id="musicOff" onclick="setMusicEnabled(false)">⏹ Wyłącz</button>
+          </div>
+        </div>
+        <div class="srow">
+          <label>Głośność muzyki &nbsp;<span class="sval" id="musicVolVal">8%</span></label>
+          <input type="range" id="musicVolSlider" min="0" max="100" step="5" value="8" oninput="applyMusicVol(this.value)">
+        </div>
+        <div class="section-sep"></div>
+        <div class="srow">
+          <label>Dźwięki zwierzątek &nbsp;<span class="sval" id="sfxToggleVal">Włączone</span></label>
+          <div class="mgrp">
+            <button class="mmode on" id="sfxOn" onclick="setSfxEnabled(true)">▶ Włącz</button>
+            <button class="mmode" id="sfxOff" onclick="setSfxEnabled(false)">⏹ Wyłącz</button>
+          </div>
+        </div>
+        <div class="srow">
+          <label>Głośność dźwięków &nbsp;<span class="sval" id="sfxVolVal">80%</span></label>
+          <input type="range" id="sfxVolSlider" min="0" max="100" step="5" value="80" oninput="applySfxVol(this.value)">
+        </div>
+        <div class="sinfo" style="margin-top:4px;">Muzyka impresjonistyczna — harmoniki Messiaena, arabeski Debussy'ego, bez pulsu.</div>
+        <button class="subclose" onclick="menuBack()">← Wróć do menu</button>
+      </div>
+
       <div id="sub-ctrl" class="subpanel" style="display:none;">
-        <h3>🎵 Sterowanie</h3>
+        <h3>🎹 Sterowanie</h3>
         <div id="ctrl-content-sub"></div>
         <button class="subclose" onclick="menuBack()">← Wróć do menu</button>
       </div>
@@ -363,11 +423,11 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
       <div id="sub-exit" class="subpanel" style="display:none;text-align:center;">
         <h3>🚪 Wyjdź z gry</h3>
         <div class="exit-logo">
-          <div style="font-size:2.2rem;">🎹</div>
+          <div style="font-size:2.4rem;">🎹</div>
           <div class="exit-logo-text">LEKCJE PIANINA GDYNIA</div>
         </div>
-        <p style="font-family:'Crimson Text',serif;font-size:.8rem;color:#5a6a3a;margin:12px 0;">Przejdź do strony lekcji pianina.</p>
-        <button class="wb" onclick="window.location.href='https://lekcjepianinagdynia.pl'" style="margin-bottom:8px;">Wyjdź →</button>
+        <p style="font-family:'Crimson Text',serif;font-size:.9rem;color:#6a7a5a;margin:14px 0;">Przejdź do strony lekcji pianina.</p>
+        <button class="wb" onclick="window.location.href='https://lekcjepianinagdynia.pl'" style="margin-bottom:10px;">Wyjdź →</button>
         <div><button class="subclose" onclick="menuBack()">← Wróć do menu</button></div>
       </div>
     </div>
@@ -463,20 +523,25 @@ const CREATURE_IMGS = {
 /* ══ LOADING SCREEN ══ */
 (function(){
   const bgEl = document.getElementById('loading-bg');
-  const bgSrc = BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png';
-  const bgImgEl = document.createElement('img');
-  bgImgEl.crossOrigin = 'anonymous';
-  bgImgEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.6s;';
-  bgImgEl.onload = () => { bgImgEl.style.opacity = '1'; };
-  bgImgEl.onerror = () => {
-    const bgFallback = document.createElement('img');
-    bgFallback.style.cssText = bgImgEl.style.cssText;
-    bgFallback.onload = () => { bgFallback.style.opacity = '1'; };
-    bgFallback.src = bgSrc + '?v=' + Date.now();
-    bgEl.appendChild(bgFallback);
-  };
-  bgImgEl.src = bgSrc;
-  bgEl.appendChild(bgImgEl);
+  // gradient fallback so screen is never pure black even if image fails
+  bgEl.style.background = 'radial-gradient(ellipse at 50% 40%, #1a2a0a 0%, #0a120a 60%, #050a05 100%)';
+
+  // Try same-origin path first (served from site), then raw github
+  const bgSrcs = [
+    SITE_BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
+    BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
+  ];
+  const imgStyle = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.8s;';
+
+  function tryLoadBg(idx) {
+    if (idx >= bgSrcs.length) return;
+    const im = document.createElement('img');
+    im.style.cssText = imgStyle;
+    im.onload = () => { bgEl.appendChild(im); im.style.opacity = '1'; };
+    im.onerror = () => tryLoadBg(idx + 1);
+    im.src = bgSrcs[idx];
+  }
+  tryLoadBg(0);
 
   const allUrls = [];
   Object.values(TILE_SRCS).forEach(u => allUrls.push(u));
@@ -584,25 +649,12 @@ function preloadAll(cb){
 }
 
 /* ══════════════════════════════════════════════════
-   NOTY — pełen zakres z pozycjami na pięciolinii
-   staffY_G: pozycja w kluczu wiolinowym (10=c¹ na dodanej dolnej)
-   staffY_B: pozycja w kluczu basowym (7=c na linii dolnej)
-   Kolory — jeden zestaw 4 kolorów (kierunek = kolor)
+   NOTY
    ══════════════════════════════════════════════════ */
 const DIR_COLORS = { N:'#e8c040', E:'#f06868', S:'#50a8f0', W:'#60d870' };
 const NOTE_COLOR_DEFAULT = '#c8b87a';
 
-// Definicje WSZYSTKICH nut w pełnym zakresie
-// Nuty wielkie: C D E F G A H (65–123 Hz)
-// Nuty małe: c d e f g a h (130–246 Hz)
-// Nuty razkreślne: c1 d1 e1 f1 g1 a1 h1 (261–493 Hz)
-// Nuty dwukreślne: c2 d2 e2 f2 g2 a2 h2 (523–987 Hz)
-
-// staffY_G: im wyżej na pięciolinii wiolinowej, tym niższy (0 = górna przerwa nad V linią)
-// staffY_B: pozycja na basowej
-
 const ALL_NOTE_DEFS = [
-  // Wielkie (klucz basowy, poniżej c)
   {id:'C',  freq:65.41,  name:'C',  clef:'B', staffY_G:null, staffY_B:14},
   {id:'D',  freq:73.42,  name:'D',  clef:'B', staffY_G:null, staffY_B:13},
   {id:'E',  freq:82.41,  name:'E',  clef:'B', staffY_G:null, staffY_B:12},
@@ -610,7 +662,6 @@ const ALL_NOTE_DEFS = [
   {id:'G',  freq:98.00,  name:'G',  clef:'B', staffY_G:null, staffY_B:10},
   {id:'A',  freq:110.00, name:'A',  clef:'B', staffY_G:null, staffY_B:9},
   {id:'H',  freq:123.47, name:'H',  clef:'B', staffY_G:null, staffY_B:8},
-  // Małe (klucz basowy)
   {id:'c',  freq:130.81, name:'c',  clef:'B', staffY_G:null, staffY_B:7},
   {id:'d',  freq:146.83, name:'d',  clef:'B', staffY_G:null, staffY_B:6},
   {id:'e',  freq:164.81, name:'e',  clef:'B', staffY_G:null, staffY_B:5},
@@ -618,7 +669,6 @@ const ALL_NOTE_DEFS = [
   {id:'g',  freq:196.00, name:'g',  clef:'B', staffY_G:null, staffY_B:3},
   {id:'a',  freq:220.00, name:'a',  clef:'B', staffY_G:null, staffY_B:2},
   {id:'h',  freq:246.94, name:'h',  clef:'B', staffY_G:null, staffY_B:1},
-  // c1 — przełomowe: basowy staffY_B=0, wiolinowy staffY_G=10
   {id:'c1', freq:261.63, name:'c\u00b9', clef:'G', staffY_G:10, staffY_B:0},
   {id:'d1', freq:293.66, name:'d\u00b9', clef:'G', staffY_G:9,  staffY_B:-1},
   {id:'e1', freq:329.63, name:'e\u00b9', clef:'G', staffY_G:8,  staffY_B:-2},
@@ -626,7 +676,6 @@ const ALL_NOTE_DEFS = [
   {id:'g1', freq:392.00, name:'g\u00b9', clef:'G', staffY_G:6,  staffY_B:-4},
   {id:'a1', freq:440.00, name:'a\u00b9', clef:'G', staffY_G:5,  staffY_B:-5},
   {id:'h1', freq:493.88, name:'h\u00b9', clef:'G', staffY_G:4,  staffY_B:-6},
-  // Dwukreślne (klucz wiolinowy)
   {id:'c2', freq:523.25, name:'c\u00b2', clef:'G', staffY_G:3,  staffY_B:-7},
   {id:'d2', freq:587.33, name:'d\u00b2', clef:'G', staffY_G:2,  staffY_B:-8},
   {id:'e2', freq:659.25, name:'e\u00b2', clef:'G', staffY_G:1,  staffY_B:-9},
@@ -636,7 +685,6 @@ const ALL_NOTE_DEFS = [
   {id:'h2', freq:987.77, name:'h\u00b2', clef:'G', staffY_G:-3, staffY_B:-13},
 ];
 
-// Grupy zakresów (ID nut wg kombinacji klucz+zakres)
 const NOTE_RANGE_MAP = {
   'G_small':  ['c1','d1','e1','f1','g1','a1','h1'],
   'G_big':    ['c1','d1','e1','f1','g1','a1','h1','c2','d2','e2','f2','g2','a2','h2'],
@@ -646,7 +694,6 @@ const NOTE_RANGE_MAP = {
   'GB_big':   ['C','D','E','F','G','A','H','c','d','e','f','g','a','h','c1','d1','e1','f1','g1','a1','h1','c2','d2','e2','f2','g2','a2','h2'],
 };
 
-// Opis zakresu do wyświetlenia
 const NOTE_RANGE_LABELS = {
   'G_small':  'c\u00b9 \u2014 h\u00b9',
   'G_big':    'c\u00b9 \u2014 h\u00b2',
@@ -660,18 +707,12 @@ const ARR={N:'\u2191',S:'\u2193',W:'\u2190',E:'\u2192'};
 let coloredNotes=false;
 function noteColor(n,dir){return coloredNotes?DIR_COLORS[dir]||NOTE_COLOR_DEFAULT:NOTE_COLOR_DEFAULT;}
 
-/* ══ STAN NUT AKTYWNYCH ══ */
-// MN = aktywne nuty, każda z {id, freq, name, dir, clef, staffY (wg klucza wyświetlanego)}
 let MN = [];
 let clefMode = 'G';
-let noteRange = 'small'; // 'small' lub 'big'
+let noteRange = 'small';
 
-function getRangeKey() {
-  return clefMode + '_' + noteRange;
-}
+function getRangeKey() { return clefMode + '_' + noteRange; }
 
-// Stały kierunek wg nazwy nuty (niezależnie od oktawy):
-// C, D → N (góra)   E, F → E (prawo)   G, A → S (dół)   H → W (lewo)
 const DIR_BY_NOTE_BASE = {
   'C':'N','D':'N',
   'E':'E','F':'E',
@@ -679,10 +720,7 @@ const DIR_BY_NOTE_BASE = {
   'H':'W',
 };
 
-function getNoteBase(id) {
-  // 'c1' -> 'C', 'h2' -> 'H', 'C' -> 'C'
-  return id.replace(/[0-9]/g, '').toUpperCase();
-}
+function getNoteBase(id) { return id.replace(/[0-9]/g, '').toUpperCase(); }
 
 function resolveDisplayProps(n) {
   let displayClef = n.clef;
@@ -692,22 +730,16 @@ function resolveDisplayProps(n) {
   return { displayClef, staffY };
 }
 
-// Buduje MN: dla każdego kierunku losuje JEDNĄ nutę z aktywnego zakresu
-// przypisaną temu kierunkowi przez nazwę (C/D→N, E/F→E, G/A→S, H→W)
 function buildActiveNotes() {
   const key = getRangeKey();
   const ids = NOTE_RANGE_MAP[key] || NOTE_RANGE_MAP['G_small'];
   const pool = ids.map(id => ALL_NOTE_DEFS.find(n => n.id === id)).filter(Boolean);
   if (!pool.length) return;
-
-  // Podziel pulę na grupy wg kierunku
   const groups = { N:[], E:[], S:[], W:[] };
   pool.forEach(n => {
     const dir = DIR_BY_NOTE_BASE[getNoteBase(n.id)];
     if (dir) groups[dir].push(n);
   });
-
-  // Dla każdego kierunku losuj jedną nutę z jego grupy
   MN = ['N','E','S','W'].map(dir => {
     const g = groups[dir];
     if (!g || !g.length) return null;
@@ -715,7 +747,6 @@ function buildActiveNotes() {
     const { displayClef, staffY } = resolveDisplayProps(n);
     return { ...n, dir, displayClef, staffY };
   }).filter(Boolean);
-
   updateRangeInfoBox();
 }
 
@@ -725,64 +756,62 @@ function updateRangeInfoBox() {
   if (el) el.textContent = NOTE_RANGE_LABELS[key] || '';
 }
 
-/* ══ NOTE SVG — obsługuje duży zakres ══ */
+/* ══ NOTE SVG ══ */
 function noteSVG(n, W, H, showLabel) {
   W = W||80; H = H||92;
   const dir = n.dir;
   const c = noteColor(n, dir);
   const isB = n.displayClef === 'B';
-  const sg = 9, staffTop = 18;
+  // Scale staff spacing and everything with the tile width
+  // At W=80 we want sg=9; scale linearly so clef stays proportional
+  const scale = W / 80;
+  const sg = Math.round(9 * scale);
+  const staffTop = Math.round(18 * scale);
   const noteX = W * 0.65;
   const staffY = n.staffY;
-  // Przelicz staffY na piksele: staffY=0 to linia 1 od góry (każde 0.5 = pół sg)
   const noteY = staffTop + (staffY * sg / 2);
-
+  // Clef font sizes scale with tile — treble needs ~0.6×W, bass ~0.33×W
+  const trebleFS = Math.max(20, Math.round(W * 0.60));
+  const bassFS   = Math.max(14, Math.round(W * 0.33));
   let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s += `<rect width="${W}" height="${H}" rx="7" fill="rgba(2,6,2,0.75)" stroke="${c}" stroke-width="1.5"/>`;
-  // 5 linii pięciolinii
   for (let i = 0; i < 5; i++) {
     const ly = staffTop + i * sg;
-    s += `<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="0.9" opacity="0.6"/>`;
+    s += `<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="${Math.max(0.7, 0.9*scale)}" opacity="0.6"/>`;
   }
-  // Klucz
   if (isB) {
-    s += `<text x="4" y="${staffTop+sg*2.5}" font-size="26" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">&#119074;</text>`;
+    s += `<text x="4" y="${staffTop + sg * 2.5}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">&#119074;</text>`;
   } else {
-    s += `<text x="3" y="${staffTop+sg*4+2}" font-size="48" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;
+    s += `<text x="3" y="${staffTop + sg * 4 + Math.round(2*scale)}" font-size="${trebleFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;
   }
-
-  // Linie pomocnicze — nad i pod pięciolinią
-  // Nad linią 5 (staffY >= 10): co 2 stopnie dodajemy linię
   const topLine = staffTop;
   const botLine = staffTop + 4 * sg;
-  // Linie DOLNE (noteY > botLine+sg/2)
+  const ledW = Math.max(6, Math.round(9 * scale));
   if (noteY > botLine + sg * 0.5) {
     let ledY = botLine + sg;
     while (ledY <= noteY + sg * 0.3) {
-      s += `<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;
+      s += `<line x1="${noteX-ledW}" y1="${ledY}" x2="${noteX+ledW}" y2="${ledY}" stroke="${c}" stroke-width="${Math.max(0.8, 1.2*scale)}"/>`;
       ledY += sg;
     }
   }
-  // Linie GÓRNE (noteY < topLine - sg/2)
   if (noteY < topLine - sg * 0.5) {
     let ledY = topLine - sg;
     while (ledY >= noteY - sg * 0.3) {
-      s += `<line x1="${noteX-9}" y1="${ledY}" x2="${noteX+9}" y2="${ledY}" stroke="${c}" stroke-width="1.2"/>`;
+      s += `<line x1="${noteX-ledW}" y1="${ledY}" x2="${noteX+ledW}" y2="${ledY}" stroke="${c}" stroke-width="${Math.max(0.8, 1.2*scale)}"/>`;
       ledY -= sg;
     }
   }
-
-  // Główka nuty
-  s += `<ellipse cx="${noteX}" cy="${noteY}" rx="6.5" ry="4.5" fill="${c}" transform="rotate(-15,${noteX},${noteY})"/>`;
-  // Laska
+  const nrx = Math.max(4, Math.round(6.5 * scale));
+  const nry = Math.max(3, Math.round(4.5 * scale));
+  s += `<ellipse cx="${noteX}" cy="${noteY}" rx="${nrx}" ry="${nry}" fill="${c}" transform="rotate(-15,${noteX},${noteY})"/>`;
   const stemUp = noteY > staffTop + sg * 2;
-  const sx = stemUp ? noteX + 6 : noteX - 6;
-  const sy2 = noteY + (stemUp ? -26 : 26);
-  s += `<line x1="${sx}" y1="${noteY}" x2="${sx}" y2="${sy2}" stroke="${c}" stroke-width="1.5"/>`;
-
-  // Etykieta
+  const sx = stemUp ? noteX + nrx * 0.9 : noteX - nrx * 0.9;
+  const stemLen = Math.max(18, Math.round(26 * scale));
+  const sy2 = noteY + (stemUp ? -stemLen : stemLen);
+  s += `<line x1="${sx}" y1="${noteY}" x2="${sx}" y2="${sy2}" stroke="${c}" stroke-width="${Math.max(1, 1.5*scale)}"/>`;
   if (showLabel) {
-    s += `<text x="${W/2}" y="${H-4}" font-size="9" fill="${c}" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${n.name} ${ARR[dir]}</text>`;
+    const lblSz = Math.max(7, Math.round(9 * scale));
+    s += `<text x="${W/2}" y="${H-4}" font-size="${lblSz}" fill="${c}" text-anchor="middle" font-family="Cinzel,serif" font-weight="700">${n.name} ${ARR[dir]}</text>`;
   }
   s += '</svg>';
   return s;
@@ -841,6 +870,720 @@ const POLOWINADRZWIIMG=new Image();
 if(IMGS.drzwi)DRZWIIMG.src=IMGS.drzwi;
 if(IMGS.polowaDrzwi)POLOWINADRZWIIMG.src=IMGS.polowaDrzwi;
 
+/* ══════════════════════════════════════════════════════════════
+   IMPRESSIONIST AUDIO ENGINE
+   Debussy atmospheres through Messiaen's modal harmonics:
+   — Modes of limited transposition (2, 3, 6) for colour harmony
+   — Free-floating tempo (no percussion, no pulse)
+   — Four independent asynchronous layers:
+       1. Bass pedal (deep resonant sine, long decay, vibrato)
+       2. Harmonic clusters (Messiaen chords, slow breath)
+       3. Melodic arabesque (modal, ornamented, with echo)
+       4. Upper shimmer (tremolo oscillators, very soft)
+   — Reverb simulation via all-pass delay network
+   ══════════════════════════════════════════════════════════════ */
+let audioCtx = null;
+let musicEnabled = true;
+let sfxEnabled = true;
+let musicVol = 0.08;
+let sfxVol = 0.70;
+let musicMasterGain = null;
+let sfxMasterGain = null;
+let technoRunning = false;
+let technoScheduler = null;
+let technoNextBeat = 0;   // kept for API compat
+let technoStep16 = 0;     // kept for API compat
+
+/* ── Reverb: a simple Schroeder all-pass network ── */
+let reverbNode = null;
+function buildReverb(ac) {
+  // Build an impulse-response reverb from shaped noise
+  const sr = ac.sampleRate;
+  const len = Math.floor(sr * 3.2); // 3.2 s tail
+  const buf = ac.createBuffer(2, len, sr);
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < len; i++) {
+      // Exponential decay + pink-ish noise
+      const env = Math.pow(1 - i / len, 2.2);
+      d[i] = (Math.random() * 2 - 1) * env * (ch === 0 ? 1 : 0.97);
+    }
+  }
+  const conv = ac.createConvolver();
+  conv.buffer = buf;
+  return conv;
+}
+
+function ensureAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Reverb send/return
+    reverbNode = buildReverb(audioCtx);
+    const reverbGain = audioCtx.createGain();
+    reverbGain.gain.value = 0.12;
+    reverbNode.connect(reverbGain);
+    reverbGain.connect(audioCtx.destination);
+
+    musicMasterGain = audioCtx.createGain();
+    musicMasterGain.gain.value = musicEnabled ? musicVol : 0;
+    musicMasterGain.connect(audioCtx.destination);
+    musicMasterGain.connect(reverbNode); // dry + wet
+
+    sfxMasterGain = audioCtx.createGain();
+    sfxMasterGain.gain.value = sfxEnabled ? sfxVol : 0;
+    sfxMasterGain.connect(audioCtx.destination);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+/* ── MODAL PITCH SETS ──────────────────────────────────────────
+   All frequencies in Hz, built from Messiaen's modes.
+
+   MODE 2 (Octatonic, half–whole): C C# Eb E F# G A Bb
+   Rooted on D (293.66 Hz) for a darker, more ambiguous colour.
+
+   MODE 3: C D Eb E F# Ab A  (rooted on Eb)
+
+   MODE 6: C D Eb E F# G Ab A B  (whole-tone inflected)
+
+   Arabesque: pentatonic subset drawn from mode 2
+   Pedal:    root & fifth of mode 2 (D and A)
+   Cluster:  stacked 3rds / tritones from mode 2 & 3
+   Shimmer:  high overtones of mode 6
+*/
+const M2_D = [ // Mode 2 transposition on D — Hz values
+  293.66, 311.13, 349.23, 369.99, 415.30, 440.00, 493.88, 523.25,
+  587.33, 622.25, 698.46, 739.99, 830.61, 880.00, 987.77, 1046.50,
+];
+const M3_Eb = [ // Mode 3 on Eb
+  311.13, 349.23, 369.99, 392.00, 466.16, 523.25, 554.37, 587.33,
+  698.46, 739.99, 783.99, 932.33, 1046.50, 1108.73,
+];
+const M6_C = [ // Mode 6 on C — whole-tone + chromatic colour
+  261.63, 293.66, 311.13, 329.63, 369.99, 392.00, 415.30, 440.00,
+  493.88, 523.25, 587.33, 622.25, 659.26, 739.99, 783.99, 880.00,
+];
+
+// Arabesque melody — a lyrical modal phrase from M2_D (mid-register)
+const ARABESQUE = [
+  M2_D[0], M2_D[2], M2_D[4], M2_D[3], M2_D[5], M2_D[4],   // ascent
+  M2_D[6], M2_D[5], M2_D[7], M2_D[6], M2_D[4], M2_D[2],   // descent
+  M2_D[1], M2_D[3], M2_D[2], M2_D[0],                      // resolve
+  M3_Eb[2], M3_Eb[4], M3_Eb[3], M3_Eb[5], M3_Eb[4],       // colour shift
+  M6_C[3],  M6_C[5],  M6_C[4],  M6_C[2],  M6_C[0],        // whole-tone dissolution
+];
+
+// Harmonic clusters — Messiaen-style stacked intervals (M2 + M3 superimposition)
+const CLUSTERS = [
+  // Each entry: [bass, mid1, mid2, mid3, upper]
+  [M2_D[0], M2_D[2], M3_Eb[0], M2_D[4], M3_Eb[2]],  // dense tonic colour
+  [M2_D[1], M2_D[3], M3_Eb[1], M2_D[5], M3_Eb[3]],  // parallel shift
+  [M2_D[4], M2_D[6], M3_Eb[4], M2_D[0]*2, M3_Eb[0]*2], // tritone cloud
+  [M3_Eb[0], M3_Eb[2], M6_C[2], M3_Eb[4], M6_C[4]], // mode 3/6 overlap
+  [M6_C[0], M6_C[2], M6_C[4], M6_C[6], M6_C[1]],    // whole-tone stacking
+  [M2_D[3], M2_D[5], M3_Eb[3], M2_D[7], M3_Eb[5]],  // upper register spread
+];
+
+// Shimmer notes — very high, from mode 6 upper octave
+const SHIMMER_NOTES = [
+  M6_C[8], M6_C[10], M6_C[12], M6_C[14], M6_C[9], M6_C[11], M6_C[13],
+];
+
+/* ── LAYER TIMERS (all free-tempo, independent) ── */
+let arabIdx = 0;
+let clusterIdx = 0;
+let shimmerIdx = 0;
+let pedalPhase = 0;
+
+// Timing parameters (seconds) — deliberately irregular, like rubato
+const ARAB_MIN = 0.55, ARAB_MAX = 1.80;   // note durations
+const CLUSTER_DUR = [11, 14, 9, 16, 12, 10]; // cluster breath durations
+const CLUSTER_FADE = 2.8;
+const PEDAL_DUR = 22;
+const SHIMMER_INTERVAL = [2.1, 2.9, 1.8, 3.4, 2.5];
+
+let arabTimer = null, clusterTimer = null, shimmerTimer = null, pedalTimer = null;
+
+/* ── UTILITY: sine oscillator with slow vibrato ── */
+function makeVibSine(ac, freq, vibRate, vibDepth, dest) {
+  const osc = ac.createOscillator();
+  const vib = ac.createOscillator();
+  const vibG = ac.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  vib.type = 'sine';
+  vib.frequency.value = vibRate;
+  vibG.gain.value = vibDepth;
+  vib.connect(vibG); vibG.connect(osc.frequency);
+  osc.connect(dest);
+  vib.start(); osc.start();
+  return { osc, vib };
+}
+
+/* ── LAYER 1: BASS PEDAL ──
+   A deep resonant tone with slow vibrato and very long decay.
+   Alternates between D2 (146.83) and A2 (220) — root and fifth of mode 2.
+*/
+function schedulePedal() {
+  if (!audioCtx || !musicEnabled) return;
+  const ac = audioCtx;
+  const t = ac.currentTime + 0.05;
+  const freqs = [146.83, 110.00, 165.00, 130.81]; // D2, A1, E2, C2
+  const f = freqs[pedalPhase % freqs.length];
+  pedalPhase++;
+
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.18, t + 3.5);
+  g.gain.setValueAtTime(0.18, t + PEDAL_DUR - 4);
+  g.gain.linearRampToValueAtTime(0, t + PEDAL_DUR);
+  g.connect(musicMasterGain);
+
+  // Fundamental + octave for richness
+  [f, f * 2].forEach((freq, i) => {
+    const { osc, vib } = makeVibSine(ac, freq, 4.5 - i * 0.5, freq * 0.003, g);
+    osc.stop(t + PEDAL_DUR + 0.1);
+    vib.stop(t + PEDAL_DUR + 0.1);
+  });
+
+  // Schedule next pedal with overlap
+  pedalTimer = setTimeout(schedulePedal, (PEDAL_DUR - 4) * 1000);
+}
+
+/* ── LAYER 2: HARMONIC CLUSTERS ──
+   Messiaen-style chord clusters that breathe slowly in and out.
+   Each voice has slight detuning for a "shimmer" effect.
+   Voices enter staggered (like organ registration).
+*/
+function scheduleCluster() {
+  if (!audioCtx || !musicEnabled) return;
+  const ac = audioCtx;
+  const t = ac.currentTime + 0.1;
+  const voices = CLUSTERS[clusterIdx % CLUSTERS.length];
+  clusterIdx++;
+  const dur = CLUSTER_DUR[clusterIdx % CLUSTER_DUR.length];
+  const fade = CLUSTER_FADE;
+
+  voices.forEach((freq, i) => {
+    const stagger = i * 0.35; // enter one by one, like a chorale
+    const detune = (Math.random() - 0.5) * freq * 0.0015; // micro-detuning
+
+    // Each voice: two slightly detuned sines for chorusing
+    for (let d = 0; d < 2; d++) {
+      const osc = ac.createOscillator();
+      const g = ac.createGain();
+      const lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 1800 - i * 120;
+      osc.type = 'sine';
+      osc.frequency.value = freq + detune + (d ? freq * 0.0008 : 0);
+
+      // Gain: fade in staggered, sustain, fade out together
+      const vol = (0.055 - i * 0.006) * (1 - d * 0.3);
+      g.gain.setValueAtTime(0, t + stagger);
+      g.gain.linearRampToValueAtTime(vol, t + stagger + fade);
+      g.gain.setValueAtTime(vol, t + dur - fade);
+      g.gain.linearRampToValueAtTime(0, t + dur);
+
+      osc.connect(lp); lp.connect(g); g.connect(musicMasterGain);
+      osc.start(t + stagger);
+      osc.stop(t + dur + 0.2);
+    }
+  });
+
+  // Schedule next cluster with overlap (crossfade)
+  const nextIn = (dur - fade - 0.5) * 1000;
+  clusterTimer = setTimeout(scheduleCluster, nextIn);
+}
+
+/* ── LAYER 3: MELODIC ARABESQUE ──
+   A flowing single-note melody using modal notes.
+   Duration of each note varies (rubato), with a gentle echo delay.
+   The melody traces the modal contours like Debussy's Arabesques.
+*/
+let arabEchoDelay = null;
+
+function scheduleArabNote() {
+  if (!audioCtx || !musicEnabled) return;
+  const ac = audioCtx;
+  const t = ac.currentTime + 0.02;
+  const freq = ARABESQUE[arabIdx % ARABESQUE.length];
+  arabIdx++;
+
+  // Duration: rubato — weighted towards longer values
+  const noteDur = ARAB_MIN + Math.random() * Math.random() * (ARAB_MAX - ARAB_MIN);
+  const attackT = Math.min(0.18, noteDur * 0.2);
+  const releaseT = Math.min(noteDur * 0.7, 0.9);
+
+  // Melody voice: triangle wave (flute-like) with gentle vibrato
+  const osc = ac.createOscillator();
+  const vibM = ac.createOscillator();
+  const vibMG = ac.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  vibM.type = 'sine';
+  vibM.frequency.value = 5.2;
+  vibMG.gain.value = freq * 0.004; // vibrato depth proportional to pitch
+  vibM.connect(vibMG); vibMG.connect(osc.frequency);
+
+  // Ensure echo delay node exists
+  if (!arabEchoDelay) {
+    arabEchoDelay = ac.createDelay(2.0);
+    arabEchoDelay.delayTime.value = 0.52;
+    const echoFB = ac.createGain(); echoFB.gain.value = 0.28;
+    const echoOut = ac.createGain(); echoOut.gain.value = 0.22;
+    arabEchoDelay.connect(echoFB); echoFB.connect(arabEchoDelay);
+    arabEchoDelay.connect(echoOut); echoOut.connect(musicMasterGain);
+  }
+
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.12, t + attackT);
+  g.gain.setValueAtTime(0.12, t + noteDur - releaseT);
+  g.gain.exponentialRampToValueAtTime(0.001, t + noteDur);
+
+  osc.connect(g);
+  g.connect(musicMasterGain);
+  g.connect(arabEchoDelay); // send to echo
+
+  vibM.start(t); osc.start(t);
+  vibM.stop(t + noteDur + 0.1); osc.stop(t + noteDur + 0.1);
+
+  // Ornament: occasional grace note before some melody notes (Debussy-style)
+  if (Math.random() < 0.28 && arabIdx % 3 === 0) {
+    const graceFreq = ARABESQUE[(arabIdx + 2) % ARABESQUE.length];
+    const gosc = ac.createOscillator();
+    const gg = ac.createGain();
+    gosc.type = 'triangle';
+    gosc.frequency.value = graceFreq;
+    gg.gain.setValueAtTime(0.06, t - 0.07);
+    gg.gain.exponentialRampToValueAtTime(0.001, t);
+    gosc.connect(gg); gg.connect(musicMasterGain);
+    gosc.start(Math.max(0, t - 0.08));
+    gosc.stop(t + 0.02);
+  }
+
+  // Next note: small gap between notes for breathing
+  const gap = noteDur * 0.88 + Math.random() * 0.15;
+  arabTimer = setTimeout(scheduleArabNote, gap * 1000);
+}
+
+/* ── LAYER 4: UPPER SHIMMER ──
+   Very high, soft sine tones from Mode 6, appearing
+   irregularly like light catching water — Debussy's tremolo effect.
+   Each shimmer is a pair of slightly detuned sines (like harmonics).
+*/
+function scheduleShimmer() {
+  if (!audioCtx || !musicEnabled) return;
+  const ac = audioCtx;
+  const t = ac.currentTime + 0.05;
+  const freq = SHIMMER_NOTES[shimmerIdx % SHIMMER_NOTES.length];
+  shimmerIdx++;
+
+  const dur = 1.2 + Math.random() * 2.8;
+
+  for (let i = 0; i < 3; i++) {
+    const detune = (i - 1) * freq * 0.0012;
+    const osc = ac.createOscillator();
+    const g = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq + detune;
+
+    // Tremolo effect via LFO on gain
+    const lfo = ac.createOscillator();
+    const lfoG = ac.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 6 + i * 0.7 + Math.random() * 1.5;
+    lfoG.gain.value = 0.012;
+    lfo.connect(lfoG); lfoG.connect(g.gain);
+
+    const baseVol = 0.028 - i * 0.006;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(baseVol, t + 0.25);
+    g.gain.setValueAtTime(baseVol, t + dur - 0.4);
+    g.gain.linearRampToValueAtTime(0, t + dur);
+
+    osc.connect(g); g.connect(musicMasterGain);
+    lfo.start(t); osc.start(t);
+    lfo.stop(t + dur + 0.1); osc.stop(t + dur + 0.1);
+  }
+
+  const nextIn = (SHIMMER_INTERVAL[shimmerIdx % SHIMMER_INTERVAL.length] + Math.random() * 0.8) * 1000;
+  shimmerTimer = setTimeout(scheduleShimmer, nextIn);
+}
+
+/* ── ENGINE START / STOP ── */
+function startTechno() {
+  if (technoRunning) return;
+  ensureAudioCtx();
+  technoRunning = true;
+  arabIdx = 0; clusterIdx = 0; shimmerIdx = 0; pedalPhase = 0;
+  arabEchoDelay = null;
+
+  // Stagger layer starts for a natural emergence
+  schedulePedal();
+  setTimeout(scheduleCluster, 800);
+  setTimeout(scheduleArabNote, 2200);
+  setTimeout(scheduleShimmer, 1400);
+
+  // Dummy scheduler kept for API compat
+  technoScheduler = setInterval(() => {}, 5000);
+}
+
+function stopTechno() {
+  technoRunning = false;
+  if (technoScheduler) { clearInterval(technoScheduler); technoScheduler = null; }
+  [arabTimer, clusterTimer, shimmerTimer, pedalTimer].forEach(t => t && clearTimeout(t));
+  arabTimer = clusterTimer = shimmerTimer = pedalTimer = null;
+  arabEchoDelay = null;
+}
+
+function setMusicEnabled(on) {
+  musicEnabled = on;
+  document.getElementById('musicOn').classList.toggle('on', on);
+  document.getElementById('musicOff').classList.toggle('on', !on);
+  document.getElementById('musicToggleVal').textContent = on ? 'Włączona' : 'Wyłączona';
+  if (musicMasterGain) musicMasterGain.gain.setTargetAtTime(on ? musicVol : 0, audioCtx.currentTime, 0.1);
+  if (on && !technoRunning) startTechno();
+  updateMusicBtn();
+}
+
+function setSfxEnabled(on) {
+  sfxEnabled = on;
+  document.getElementById('sfxOn').classList.toggle('on', on);
+  document.getElementById('sfxOff').classList.toggle('on', !on);
+  document.getElementById('sfxToggleVal').textContent = on ? 'Włączone' : 'Wyłączone';
+  if (sfxMasterGain) sfxMasterGain.gain.setTargetAtTime(on ? sfxVol : 0, audioCtx.currentTime, 0.05);
+}
+
+function applyMusicVol(v) {
+  musicVol = parseInt(v) / 100;
+  document.getElementById('musicVolVal').textContent = v + '%';
+  document.getElementById('musicVolSlider').value = v;
+  if (musicMasterGain && musicEnabled) musicMasterGain.gain.setTargetAtTime(musicVol, audioCtx.currentTime, 0.05);
+}
+
+function applySfxVol(v) {
+  sfxVol = parseInt(v) / 100;
+  document.getElementById('sfxVolVal').textContent = v + '%';
+  document.getElementById('sfxVolSlider').value = v;
+  if (sfxMasterGain && sfxEnabled) sfxMasterGain.gain.setTargetAtTime(sfxVol, audioCtx.currentTime, 0.05);
+}
+
+function toggleMusicBtn() {
+  setMusicEnabled(!musicEnabled);
+}
+
+function updateMusicBtn() {
+  const btn = document.getElementById('hud-music-btn');
+  if (btn) btn.textContent = musicEnabled ? '🎵' : '🔇';
+}
+
+/* ══ CREATURE SOUNDS ══
+   Each creature has a unique animal-like sound synthesized via Web Audio API.
+*/
+
+function playCreatureSound(creatureId) {
+  if (!sfxEnabled) return;
+  ensureAudioCtx();
+  const ac = audioCtx;
+  const t = ac.currentTime;
+
+  // Helper: FM synth — carrier modulated by modulator for organic tone
+  function fm(carrFreq, modFreq, modDepth, dur, gainPeak, oscType='sine') {
+    const mod = ac.createOscillator();
+    const modGain = ac.createGain();
+    const car = ac.createOscillator();
+    const g = ac.createGain();
+    mod.frequency.value = modFreq;
+    modGain.gain.value = modDepth;
+    car.type = oscType;
+    car.frequency.value = carrFreq;
+    mod.connect(modGain); modGain.connect(car.frequency);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(gainPeak, t + dur * 0.12);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    car.connect(g); g.connect(sfxMasterGain);
+    mod.start(t); car.start(t); mod.stop(t+dur+0.05); car.stop(t+dur+0.05);
+    return g;
+  }
+
+  // Helper: shaped noise burst (breath, rustle, etc.)
+  function noiseBurst(lpFreq, hpFreq, dur, gainPeak, attack) {
+    const buf2 = ac.createBuffer(1, Math.ceil(ac.sampleRate * (dur + 0.02)), ac.sampleRate);
+    const d = buf2.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const src = ac.createBufferSource(); src.buffer = buf2;
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = lpFreq;
+    const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = hpFreq;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(gainPeak, t + (attack||dur*0.1));
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(lp); lp.connect(hp); hp.connect(g); g.connect(sfxMasterGain);
+    src.start(t); src.stop(t + dur + 0.03);
+  }
+
+  switch (creatureId) {
+
+    case 'sowa': {
+      // Owl: two-note hoot with vibrato — "hoo-HOO"
+      // First soft hoo
+      const o1 = ac.createOscillator(); const g1 = ac.createGain();
+      const vib1 = ac.createOscillator(); const vibG1 = ac.createGain();
+      vib1.frequency.value = 5.5; vibG1.gain.value = 6;
+      vib1.connect(vibG1); vibG1.connect(o1.frequency);
+      o1.type = 'sine'; o1.frequency.value = 290;
+      g1.gain.setValueAtTime(0,t); g1.gain.linearRampToValueAtTime(0.35,t+0.08);
+      g1.gain.setValueAtTime(0.35,t+0.28); g1.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+      o1.connect(g1); g1.connect(sfxMasterGain);
+      vib1.start(t); o1.start(t); vib1.stop(t+0.45); o1.stop(t+0.45);
+      // Second louder HOO
+      setTimeout(() => {
+        const t2 = ac.currentTime;
+        const o2 = ac.createOscillator(); const g2 = ac.createGain();
+        const vib2 = ac.createOscillator(); const vibG2 = ac.createGain();
+        vib2.frequency.value = 5; vibG2.gain.value = 8;
+        vib2.connect(vibG2); vibG2.connect(o2.frequency);
+        o2.type = 'sine'; o2.frequency.value = 245;
+        g2.gain.setValueAtTime(0,t2); g2.gain.linearRampToValueAtTime(0.5,t2+0.1);
+        g2.gain.setValueAtTime(0.5,t2+0.32); g2.gain.exponentialRampToValueAtTime(0.001,t2+0.55);
+        o2.connect(g2); g2.connect(sfxMasterGain);
+        vib2.start(t2); o2.start(t2); vib2.stop(t2+0.6); o2.stop(t2+0.6);
+      }, 480);
+      break;
+    }
+
+    case 'swinka': {
+      // Pig: nasal oink — quick upward squeal with sawtooth + lowpass
+      for (let rep = 0; rep < 2; rep++) {
+        const d = rep * 0.25;
+        const o = ac.createOscillator(); const g = ac.createGain();
+        const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900;
+        const lp2 = ac.createBiquadFilter(); lp2.type = 'bandpass'; lp2.frequency.value = 700; lp2.Q.value = 2;
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(220 + rep*30, t + d);
+        o.frequency.linearRampToValueAtTime(340 + rep*30, t + d + 0.12);
+        o.frequency.exponentialRampToValueAtTime(260 + rep*20, t + d + 0.22);
+        g.gain.setValueAtTime(0,t+d); g.gain.linearRampToValueAtTime(0.4,t+d+0.04);
+        g.gain.setValueAtTime(0.4,t+d+0.18); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.28);
+        o.connect(lp); lp.connect(lp2); lp2.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.32);
+      }
+      break;
+    }
+
+    case 'szynszyla': {
+      // Chinchilla: rapid high-pitched chitter "kek-kek-kek"
+      for (let i = 0; i < 5; i++) {
+        const d = i * 0.055;
+        const o = ac.createOscillator(); const g = ac.createGain();
+        const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800;
+        o.type = 'triangle';
+        o.frequency.value = 2200 + (i%2)*400;
+        g.gain.setValueAtTime(0.25, t+d); g.gain.exponentialRampToValueAtTime(0.001, t+d+0.04);
+        o.connect(hp); hp.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.05);
+        // small noise puff with each chit
+        noiseBurst(4000, 2000, 0.025, 0.12);
+      }
+      break;
+    }
+
+    case 'wiewiorka': {
+      // Squirrel: sharp "chuck chuck" alarm call — staccato clicks with a nasal tone
+      for (let i = 0; i < 4; i++) {
+        const d = i * 0.1;
+        const o = ac.createOscillator(); const g = ac.createGain();
+        const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = 3;
+        o.type = 'triangle';
+        o.frequency.setValueAtTime(1100, t+d);
+        o.frequency.exponentialRampToValueAtTime(800, t+d+0.06);
+        g.gain.setValueAtTime(0.3,t+d); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.07);
+        o.connect(bp); bp.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.08);
+      }
+      break;
+    }
+
+    case 'winniczek': {
+      // Snail: very soft slow "pop" — a single gentle low bubble
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(320,t);
+      o.frequency.exponentialRampToValueAtTime(80,t+0.18);
+      g.gain.setValueAtTime(0.25,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.22);
+      o.connect(g); g.connect(sfxMasterGain);
+      o.start(t); o.stop(t+0.25);
+      noiseBurst(500,80,0.12,0.08,0.02);
+      break;
+    }
+
+    case 'wrobel': {
+      // Sparrow: chirp-chirp-chirp — rapid FM chirps descending
+      const chirpFreqs = [3200, 2800, 3500, 2600, 3000];
+      chirpFreqs.forEach((cf, i) => {
+        const d = i * 0.07;
+        const mod = ac.createOscillator(); const modG = ac.createGain();
+        const car = ac.createOscillator(); const g = ac.createGain();
+        mod.frequency.value = cf * 0.5;
+        modG.gain.value = cf * 0.3;
+        mod.connect(modG); modG.connect(car.frequency);
+        car.type = 'sine'; car.frequency.value = cf;
+        g.gain.setValueAtTime(0,t+d); g.gain.linearRampToValueAtTime(0.28,t+d+0.01);
+        g.gain.exponentialRampToValueAtTime(0.001,t+d+0.065);
+        car.connect(g); g.connect(sfxMasterGain);
+        mod.start(t+d); car.start(t+d); mod.stop(t+d+0.08); car.stop(t+d+0.08);
+      });
+      break;
+    }
+
+    case 'zabka': {
+      // Frog: "ribbit" — AM-modulated low buzz
+      const carr = ac.createOscillator(); const carrG = ac.createGain();
+      const amMod = ac.createOscillator(); const amModG = ac.createGain();
+      carr.type = 'square'; carr.frequency.value = 180;
+      amMod.frequency.value = 40; // 40Hz AM = "rib-bit" rattle
+      amModG.gain.value = 0.5;
+      const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700;
+      const masterG = ac.createGain();
+      masterG.gain.setValueAtTime(0,t); masterG.gain.linearRampToValueAtTime(0.4,t+0.04);
+      masterG.gain.setValueAtTime(0.4,t+0.18); masterG.gain.exponentialRampToValueAtTime(0.001,t+0.28);
+      amMod.connect(amModG); amModG.connect(carrG.gain);
+      carr.connect(carrG); carrG.connect(lp); lp.connect(masterG); masterG.connect(sfxMasterGain);
+      amMod.start(t); carr.start(t); amMod.stop(t+0.32); carr.stop(t+0.32);
+      // second "bit"
+      setTimeout(()=>{
+        const t2 = ac.currentTime;
+        const c2 = ac.createOscillator(); const cg2 = ac.createGain();
+        const am2 = ac.createOscillator(); const amg2 = ac.createGain();
+        c2.type='square'; c2.frequency.value=160;
+        am2.frequency.value=38; amg2.gain.value=0.45;
+        const lp2 = ac.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=650;
+        const mg2 = ac.createGain();
+        mg2.gain.setValueAtTime(0,t2); mg2.gain.linearRampToValueAtTime(0.35,t2+0.03);
+        mg2.gain.setValueAtTime(0.35,t2+0.14); mg2.gain.exponentialRampToValueAtTime(0.001,t2+0.22);
+        am2.connect(amg2); amg2.connect(cg2.gain);
+        c2.connect(cg2); cg2.connect(lp2); lp2.connect(mg2); mg2.connect(sfxMasterGain);
+        am2.start(t2); c2.start(t2); am2.stop(t2+0.25); c2.stop(t2+0.25);
+      }, 320);
+      break;
+    }
+
+    case 'zolw': {
+      // Tortoise: very slow deep exhale/grunt
+      noiseBurst(400, 40, 0.6, 0.3, 0.15);
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(90,t);
+      o.frequency.exponentialRampToValueAtTime(60,t+0.5);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.2,t+0.18);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.65);
+      o.connect(g); g.connect(sfxMasterGain);
+      o.start(t); o.stop(t+0.7);
+      break;
+    }
+
+    case 'biedronka': {
+      // Ladybird: tiny soft wing buzz — very brief and light
+      noiseBurst(5000, 2000, 0.08, 0.18, 0.01);
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type = 'triangle'; o.frequency.value = 4000;
+      g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+      o.connect(g); g.connect(sfxMasterGain);
+      o.start(t); o.stop(t+0.08);
+      break;
+    }
+
+    case 'chomik': {
+      // Hamster: fast squeaky teeth chatter "tsk-tsk"
+      for (let i = 0; i < 4; i++) {
+        const d = i * 0.06;
+        const o = ac.createOscillator(); const g = ac.createGain();
+        o.type = 'sawtooth';
+        o.frequency.value = 1800 + (i % 2)*600;
+        const lp = ac.createBiquadFilter(); lp.type='bandpass'; lp.frequency.value=2000; lp.Q.value=4;
+        g.gain.setValueAtTime(0.22,t+d); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.04);
+        o.connect(lp); lp.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.05);
+      }
+      break;
+    }
+
+    case 'dzdz': {
+      // Earthworm: very subtle soil-movement sound — low thumps
+      for (let i = 0; i < 3; i++) {
+        const d = i * 0.12;
+        const o = ac.createOscillator(); const g = ac.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(120,t+d);
+        o.frequency.exponentialRampToValueAtTime(50,t+d+0.1);
+        g.gain.setValueAtTime(0.18,t+d); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.12);
+        o.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.14);
+      }
+      noiseBurst(300,20,0.35,0.1,0.05);
+      break;
+    }
+
+    case 'jaszczurka': {
+      // Lizard: fast tongue flick + hiss — ts-ts-hssss
+      for (let i = 0; i < 2; i++) {
+        const d = i * 0.09;
+        const buf2 = ac.createBuffer(1,Math.ceil(ac.sampleRate*0.04),ac.sampleRate);
+        const dat = buf2.getChannelData(0);
+        for (let j=0;j<dat.length;j++) dat[j]=(Math.random()*2-1)*Math.exp(-j/300);
+        const src = ac.createBufferSource(); src.buffer=buf2;
+        const bp = ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=4000; bp.Q.value=3;
+        const g = ac.createGain(); g.gain.setValueAtTime(0.3,t+d); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.04);
+        src.connect(bp); bp.connect(g); g.connect(sfxMasterGain);
+        src.start(t+d); src.stop(t+d+0.05);
+      }
+      // hiss
+      noiseBurst(3000, 1500, 0.22, 0.15, 0.03);
+      break;
+    }
+
+    case 'jez': {
+      // Hedgehog: snuffling/snorting — rhythmic breath puffs
+      for (let i = 0; i < 3; i++) {
+        const d = i * 0.14;
+        noiseBurst(600, 100, 0.1, 0.22, 0.02);
+        const o = ac.createOscillator(); const g = ac.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(220,t+d);
+        o.frequency.exponentialRampToValueAtTime(160,t+d+0.08);
+        g.gain.setValueAtTime(0.12,t+d); g.gain.exponentialRampToValueAtTime(0.001,t+d+0.1);
+        o.connect(g); g.connect(sfxMasterGain);
+        o.start(t+d); o.stop(t+d+0.12);
+      }
+      break;
+    }
+
+    case 'kameleon': {
+      // Chameleon: very slow, quiet hiss with a tiny vibration
+      noiseBurst(2000, 400, 0.4, 0.15, 0.08);
+      const o = ac.createOscillator(); const g = ac.createGain();
+      const trem = ac.createOscillator(); const tremG = ac.createGain();
+      trem.frequency.value = 18; tremG.gain.value = 0.08;
+      trem.connect(tremG); tremG.connect(g.gain);
+      o.type = 'sine'; o.frequency.value = 280;
+      g.gain.setValueAtTime(0.1,t); g.gain.linearRampToValueAtTime(0.18,t+0.12);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.45);
+      o.connect(g); g.connect(sfxMasterGain);
+      trem.start(t); o.start(t); trem.stop(t+0.5); o.stop(t+0.5);
+      break;
+    }
+
+    default: {
+      // Generic soft chime fallback
+      const o = ac.createOscillator(); const g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = 1200;
+      g.gain.setValueAtTime(0.3, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      o.connect(g); g.connect(sfxMasterGain); o.start(t); o.stop(t + 0.4);
+      break;
+    }
+  }
+}
+
 /* ══ MENU ══ */
 let currentSub=null;
 function menuGoTo(sub){
@@ -848,12 +1591,12 @@ function menuGoTo(sub){
   document.getElementById('menu-sub').style.display='block';
   document.getElementById('menu-back-btn').style.display='block';
   document.getElementById('menu-close-btn').style.display='none';
-  ['settings','ctrl','char','exit'].forEach(s=>{
+  ['settings','audio','ctrl','char','exit'].forEach(s=>{
     document.getElementById('sub-'+s).style.display=s===sub?'':'none';
   });
   if(sub==='ctrl')buildCtrlTable(document.getElementById('ctrl-content-sub'));
   document.getElementById('menu-title-txt').textContent=
-    {settings:'\u2699 Ustawienia',ctrl:'\uD83C\uDFB5 Sterowanie',char:'\uD83D\uDC64 Zmie\u0144 posta\u0107',exit:'\uD83D\uDEAA Wyj\u015b\u0107'}[sub]||'MENU';
+    {settings:'\u2699 Ustawienia',audio:'\uD83C\uDFB5 D\u017awi\u0119k i muzyka',ctrl:'\uD83C\uDFB9 Sterowanie',char:'\uD83D\uDC64 Zmie\u0144 posta\u0107',exit:'\uD83D\uDEAA Wyj\u015b\u0107'}[sub]||'MENU';
   currentSub=sub;
 }
 function menuBack(){
@@ -946,24 +1689,30 @@ function refreshHzGrid(){
 }
 
 /* ══ NOTE TILES ══ */
-function shuffleTileOrder(){for(let i=tileOrder.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[tileOrder[i],tileOrder[j]]=[tileOrder[j],tileOrder[i]];}}
+function shuffleTileOrder(){
+  for(let i=tileOrder.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [tileOrder[i],tileOrder[j]]=[tileOrder[j],tileOrder[i]];
+  }
+}
 function notesForDir(dir){return MN.filter(n=>n.dir===dir);}
 
-// Po każdym ruchu przetasuj nuty (nowy losowy zestaw 4 nut z zakresu)
 function reshuffleNotes(){
+  shuffleTileOrder();
   buildActiveNotes();
   buildNoteTiles();
   refreshSideBar();
 }
 
 function buildNoteTiles(){
+  shuffleTileOrder();
   const bar=document.getElementById('note-bar');
   const show=controlMode==='tiles'||controlMode==='both';
   if(!show){bar.innerHTML='';bar.className='note-bar';return;}
   bar.innerHTML='';
   const barW=window.innerWidth;
-  const tileW=Math.min(80,Math.floor((barW-80)/4));
-  const tileH=noteLabels?Math.min(100,tileW+12):Math.min(92,tileW+8);
+  const tileW=Math.min(82,Math.floor((barW-80)/4));
+  const tileH=noteLabels?Math.min(102,tileW+14):Math.min(94,tileW+10);
   tileOrder.forEach(dir=>{
     const n=MN.find(x=>x.dir===dir);if(!n)return;
     const t=document.createElement('div');
@@ -992,14 +1741,14 @@ function stopPress(){clearInterval(pressTimer);pressTimer=null;if(activeTile){ac
 /* ══ SIDE BAR ══ */
 function buildCtrlTable(container){
   if(!container)return;
-  let h='<div style="margin-bottom:6px;"><h5 style="font-size:.5rem;color:#7a6a3a;letter-spacing:.06em;margin-bottom:3px;">Klawiatura</h5>';
+  let h='<div style="margin-bottom:7px;"><h5 style="font-size:.58rem;color:#8a7a5a;letter-spacing:.06em;margin-bottom:4px;">Klawiatura</h5>';
   h+=`<table class="ctrl-table"><thead><tr><th>Klawisz</th><th>Kier.</th></tr></thead><tbody>
     <tr><td><span class="ctrl-key">\u2191/W</span></td><td>G\u00f3ra</td></tr>
     <tr><td><span class="ctrl-key">\u2193/S</span></td><td>D\u00f3\u0142</td></tr>
     <tr><td><span class="ctrl-key">\u2190/A</span></td><td>Lewo</td></tr>
     <tr><td><span class="ctrl-key">\u2192/D</span></td><td>Prawo</td></tr>
   </tbody></table></div>`;
-  h+='<div><h5 style="font-size:.5rem;color:#7a6a3a;letter-spacing:.06em;margin-bottom:3px;">Nuty</h5>';
+  h+='<div><h5 style="font-size:.58rem;color:#8a7a5a;letter-spacing:.06em;margin-bottom:4px;">Nuty</h5>';
   h+=`<table class="ctrl-table"><thead><tr><th>Nuta</th><th>Kier.</th></tr></thead><tbody>`;
   MN.forEach(n=>{const col=coloredNotes?DIR_COLORS[n.dir]:NOTE_COLOR_DEFAULT;h+=`<tr><td style="color:${col}">${n.name}</td><td>${ARR[n.dir]}</td></tr>`;});
   h+='</tbody></table></div>';
@@ -1224,8 +1973,40 @@ function move(dir){
   playerR=nr;playerC=nc;updatePlayer();
   recordPlayerPos();checkCreaturePickup();
   if(fogEnabled){revealCell(playerR,playerC,true);revealNeighbours(playerR,playerC,true);}
-  if(nr===mazeData.goalR&&nc===mazeData.goalC){won=true;setTimeout(()=>document.getElementById('wo').classList.add('show'),500);}
+  if(nr===mazeData.goalR&&nc===mazeData.goalC){won=true;setTimeout(()=>showWinScreen(),500);}
 }
+
+/* ══ WIN SCREEN ══ */
+function showWinScreen() {
+  const total = creaturesOnMap.length + creaturesFollowing.length;
+  const got = creaturesFollowing.length;
+  document.getElementById('wo-summary').textContent =
+    'Zebrałeś ' + got + ' z ' + total + ' zwierzą' + (total === 1 ? 'tka' : 'tek') + '!';
+
+  const grid = document.getElementById('wo-creatures-grid');
+  grid.innerHTML = '';
+  if (creaturesFollowing.length === 0) {
+    document.getElementById('wo-empty').style.display = 'block';
+    document.getElementById('wo-creatures-title').style.display = 'none';
+  } else {
+    document.getElementById('wo-empty').style.display = 'none';
+    document.getElementById('wo-creatures-title').style.display = 'block';
+    creaturesFollowing.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'wo-creature-card';
+      const img = document.createElement('img');
+      img.src = c.img;
+      img.alt = c.name;
+      const lbl = document.createElement('span');
+      lbl.textContent = c.name;
+      card.appendChild(img);
+      card.appendChild(lbl);
+      grid.appendChild(card);
+    });
+  }
+  document.getElementById('wo').classList.add('show');
+}
+
 function newMaze(){
   won=false;stopPress();cellTiles2={};
   document.getElementById('wo').classList.remove('show');
@@ -1242,7 +2023,8 @@ async function startMic(){
   if(mReady)return;
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    mAC=new AudioContext();
+    if(!audioCtx){ensureAudioCtx();}
+    if(!mAC){mAC=audioCtx;}
     const src=mAC.createMediaStreamSource(stream);
     mGainNode=mAC.createGain();mGainNode.gain.value=micGain;src.connect(mGainNode);
     mAn=mAC.createAnalyser();mAn.fftSize=4096;mAn.smoothingTimeConstant=0.3;mGainNode.connect(mAn);
@@ -1257,7 +2039,6 @@ function closestNote(freq){
   return(best&&bd<=noteMargin)?best:null;
 }
 function closestNoteDisplay(freq){
-  // Szukaj w pełnym zakresie wszystkich nut
   const key=getRangeKey();
   const ids=NOTE_RANGE_MAP[key]||[];
   const pool=ids.map(id=>ALL_NOTE_DEFS.find(n=>n.id===id)).filter(Boolean);
@@ -1312,7 +2093,6 @@ function acorr(buf,sr){
   let T=mp;
   if(mp>0&&mp<L-1){const a=(c2[mp-1]+c2[mp+1]-2*c2[mp])/2,b=(c2[mp+1]-c2[mp-1])/2;if(a)T-=b/(2*a);}
   const f=sr/T;
-  // Rozszerzony zakres częstotliwości dla pełnego zestawu nut
   return(f<55||f>1100)?-1:f;
 }
 
@@ -1364,6 +2144,8 @@ function startGame(){
     cwBg.src=BG_GAME_SRC;
     cw.insertBefore(cwBg,cw.firstChild);
   }
+  ensureAudioCtx();
+  if(musicEnabled) startTechno();
   buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
@@ -1480,7 +2262,12 @@ function refreshCreatureSizes(){
 }
 function checkCreaturePickup(){
   const idx=creaturesOnMap.findIndex(c=>c.r===playerR&&c.c===playerC);
-  if(idx!==-1){const creature=creaturesOnMap.splice(idx,1)[0];creaturesFollowing.push(creature);updateCreatureHUD();}
+  if(idx!==-1){
+    const creature=creaturesOnMap.splice(idx,1)[0];
+    creaturesFollowing.push(creature);
+    playCreatureSound(creature.id);
+    updateCreatureHUD();
+  }
 }
 function updateCreatureHUD(){
   const el=document.getElementById('hud-creatures');if(!el)return;
