@@ -40,9 +40,6 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 .fcard.pressed,.fcard:active{transform:scale(0.91)!important;transition:transform .06s!important;}
 .fcard.move-card.pressed{box-shadow:0 0 20px rgba(68,170,255,0.45);}
 .fcard.shoot-card.pressed{box-shadow:0 0 20px rgba(255,221,0,0.45);}
-.fcard-label{font-size:14px;font-weight:bold;letter-spacing:1px;}
-.fcard.move-card .fcard-label{color:#44aaff;}
-.fcard.shoot-card .fcard-label{color:#ffdd00;}
 @keyframes shufflePop{0%{opacity:0.4;transform:scale(0.82);}60%{opacity:1;transform:scale(1.06);}100%{opacity:1;transform:scale(1);}}
 .fcard.shuffling{animation:shufflePop 0.38s ease forwards;}
 #col-labels{position:fixed;left:0;right:0;pointer-events:none;z-index:36;display:none;}
@@ -127,7 +124,7 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 <div id="hud">
   <div id="hud-score">0</div>
   <div class="hud-sep">|</div>
-  <div class="hud-mic-controls" id="hud-mic-controls">
+  <div class="hud-mic-controls hidden" id="hud-mic-controls">
     <div class="hud-mic-row">
       <div class="mdot" id="mdot"></div>
       <span id="hud-note">—</span>
@@ -192,18 +189,18 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
         <div class="tut-note"><b>1.</b> Nuta <b style="color:#44aaff;">oktawy małej</b> → przesuń pianino<br><b>2.</b> Nuta <b style="color:#ffdd00;">oktawy razkreślnej</b> z tą samą literą → strzał!</div>
       </div>
       <div class="tut-slide" id="s2">
-        <div class="stitle">📋 Krok 3 — Zasady</div>
+        <div class="stitle">📋 Krok 3 — Zasady & Bomba</div>
         <div class="rules-grid">
           <div class="rule-card"><div class="rule-icon">🎹</div><div class="rule-title">Pianino = ty</div><div class="rule-desc">Stoisz na dole. Nuty małe przesuwają pianino.</div></div>
           <div class="rule-card"><div class="rule-icon">👾</div><div class="rule-title">Potworki</div><div class="rule-desc">Każdy ma literę (C–H). Stań pod nim i zagraj nutę jednokreślną.</div></div>
           <div class="rule-card"><div class="rule-icon">💥</div><div class="rule-title">Trafienie</div><div class="rule-desc">Kula niszczy potworka tylko gdy litery się zgadzają.</div></div>
-          <div class="rule-card"><div class="rule-icon">🏆</div><div class="rule-title">Punkty</div><div class="rule-desc">+10 pkt za każdego pokonanego.</div></div>
+          <div class="rule-card"><div class="rule-icon">💣</div><div class="rule-title">Bomba</div><div class="rule-desc">Najniższy dostępny do trafienia potworek ma bombę. Trafienie go wysadza sąsiadów! Bomba przechodzi dalej.</div></div>
         </div>
         <div class="cheat">
           <div class="cheat-title">Ściągawka</div>
           <div class="cheat-grid">
             <div><div class="cheat-col-title" style="color:#44aaff;">Ruch (oktawa mała)</div><div class="cheat-item" id="cheatMove"></div></div>
-            <div><div class="cheat-col-title" style="color:#ffdd00;">Strzał (oktawa razkreślna)</div><div class="cheat-item" id="cheatShoot"></div></div>
+            <div><div class="cheat-col-title" style="color:#ffddoo;">Strzał (oktawa razkreślna)</div><div class="cheat-item" id="cheatShoot"></div></div>
           </div>
         </div>
       </div>
@@ -267,9 +264,9 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
     <div class="s-row">
       <span class="s-label">Tryb sterowania</span>
       <div class="seg-row">
-        <button class="seg-btn active" id="mode-mic" onclick="setInputMode('mic')">🎤 Tylko mikrofon</button>
+        <button class="seg-btn" id="mode-mic" onclick="setInputMode('mic')">🎤 Tylko mikrofon</button>
         <button class="seg-btn" id="mode-both" onclick="setInputMode('both')">🎤+🎹 Oba</button>
-        <button class="seg-btn" id="mode-tiles" onclick="setInputMode('tiles')">🎹 Tylko kafelki</button>
+        <button class="seg-btn active" id="mode-tiles" onclick="setInputMode('tiles')">🎹 Tylko kafelki</button>
       </div>
     </div>
     <div class="s-row">
@@ -288,7 +285,7 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
         <button class="seg-btn" id="diff-extreme" onclick="setDifficulty('extreme')">Ekstremalny</button>
       </div>
     </div>
-    <div class="s-row" id="settings-card-display" style="display:none;">
+    <div class="s-row" id="settings-card-display" style="display:block;">
       <span class="s-label">Wyświetlanie kafelków</span>
       <div class="seg-row">
         <button class="seg-btn" id="card-letters" onclick="setCardDisplay('letters')">Litery</button>
@@ -317,7 +314,22 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
         <button class="seg-btn" id="btn-mode-ordered" onclick="setMonsterMode('ordered')">🎼 Po kolei</button>
       </div>
     </div>
-    <div id="settings-mic-section">
+    <!-- VOLUME SETTINGS -->
+    <div class="s-row">
+      <span class="s-label">Głośność muzyki</span>
+      <div class="s-control">
+        <input type="range" class="s-slider" id="s-music-vol" min="0" max="100" step="5" value="70" oninput="setMusicVol(this.value)">
+        <span class="s-val" id="s-music-vol-val">70%</span>
+      </div>
+    </div>
+    <div class="s-row">
+      <span class="s-label">Głośność efektów dźwiękowych</span>
+      <div class="s-control">
+        <input type="range" class="s-slider" id="s-sfx-vol" min="0" max="100" step="5" value="80" oninput="setSfxVol(this.value)">
+        <span class="s-val" id="s-sfx-vol-val">80%</span>
+      </div>
+    </div>
+    <div id="settings-mic-section" style="display:none;">
       <div class="s-row">
         <span class="s-label">Kalibracja stroju (półtony)</span>
         <div class="s-control">
@@ -345,18 +357,14 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 </div>
 
 <script>
-// ══ IMAGES — ładowane z plików zewnętrznych ══
-var BG_IMG = new Image();
-var PIANO_IMG = new Image();
+'use strict';
+// ══ IMAGES ══
+var BG_IMG = new Image(), PIANO_IMG = new Image();
 var bgLoaded = false, pianoLoaded = false;
-
 BG_IMG.onload  = function(){ bgLoaded = true; };
-BG_IMG.onerror = function(){ bgLoaded = false; console.warn('Brak pliku: ' + BG_IMG.src + ' — używam tła proceduralnego.'); };
-
+BG_IMG.onerror = function(){ bgLoaded = false; };
 PIANO_IMG.onload  = function(){ pianoLoaded = true; };
-PIANO_IMG.onerror = function(){ pianoLoaded = false; console.warn('Brak pliku: ' + PIANO_IMG.src + ' — używam rysunku proceduralnego.'); };
-
-// Ścieżki względem lokalizacji pliku HTML (w katalogu index/gry/piano_invaders/)
+PIANO_IMG.onerror = function(){ pianoLoaded = false; };
 BG_IMG.src    = 'grafiki/t\u0142o invaders.png';
 PIANO_IMG.src = 'grafiki/pianino stoi.png';
 
@@ -405,9 +413,7 @@ function makeStaffSVG(noteId, color, w, h){
   if(!data) return '';
   var clefW = Math.round(w * 0.28);
   var sx = clefW + 2, sw = w - sx - 3;
-  var ls = h / 8;
-  var st = h * 0.16;
-  var sb = st + 4 * ls;
+  var ls = h / 8, st = h * 0.16, sb = st + 4 * ls;
   var lines = '';
   for(var i=0;i<5;i++){
     var ly = st + i*ls;
@@ -415,16 +421,13 @@ function makeStaffSVG(noteId, color, w, h){
   }
   var clefSvg = '';
   if(data.clef === 'treble'){
-    var clefY = sb + ls * 0.6;
-    var clefSize = h * 0.95;
+    var clefY = sb + ls * 0.6, clefSize = h * 0.95;
     clefSvg = '<text x="'+(clefW*0.18)+'" y="'+clefY.toFixed(1)+'" font-size="'+clefSize.toFixed(1)+'" fill="rgba(255,255,255,0.55)" font-family="serif" dominant-baseline="auto">\uD834\uDD1E</text>';
   } else {
-    var bclefY = (st + ls).toFixed(1);
-    var bclefSize = (ls * 3).toFixed(1);
+    var bclefY = (st + ls).toFixed(1), bclefSize = (ls * 3).toFixed(1);
     clefSvg = '<text x="2" y="'+bclefY+'" font-size="'+bclefSize+'" fill="rgba(255,255,255,0.55)" font-family="serif" dominant-baseline="hanging">\uD834\uDD22</text>';
   }
-  var noteY = sb - data.step * ls * 0.5;
-  var nr = ls * 0.62;
+  var noteY = sb - data.step * ls * 0.5, nr = ls * 0.62;
   var cx2 = (sx + sw * 0.5).toFixed(1);
   var ledger = '';
   if(data.step <= -2){
@@ -432,16 +435,13 @@ function makeStaffSVG(noteId, color, w, h){
     ledger += '<line x1="'+(parseFloat(cx2)-nr*1.7).toFixed(1)+'" y1="'+lly.toFixed(1)+'" x2="'+(parseFloat(cx2)+nr*1.7).toFixed(1)+'" y2="'+lly.toFixed(1)+'" stroke="rgba(255,255,255,0.45)" stroke-width="1.1"/>';
   }
   var noteHead = '<ellipse cx="'+cx2+'" cy="'+noteY.toFixed(1)+'" rx="'+(nr*1.15).toFixed(1)+'" ry="'+(nr*0.75).toFixed(1)+'" transform="rotate(-18,'+cx2+','+noteY.toFixed(1)+')" fill="'+color+'"/>';
-  var mid = (st + sb) / 2;
-  var stem = '';
+  var mid = (st + sb) / 2, stem = '';
   if(noteY >= mid){
     stem = '<line x1="'+(parseFloat(cx2)+nr*1.0).toFixed(1)+'" y1="'+noteY.toFixed(1)+'" x2="'+(parseFloat(cx2)+nr*1.0).toFixed(1)+'" y2="'+(noteY - ls*2.8).toFixed(1)+'" stroke="'+color+'" stroke-width="1.2"/>';
   } else {
     stem = '<line x1="'+(parseFloat(cx2)-nr*1.0).toFixed(1)+'" y1="'+noteY.toFixed(1)+'" x2="'+(parseFloat(cx2)-nr*1.0).toFixed(1)+'" y2="'+(noteY + ls*2.8).toFixed(1)+'" stroke="'+color+'" stroke-width="1.2"/>';
   }
-  return '<svg width="'+w+'" height="'+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">'+
-    lines + ledger + clefSvg + stem + noteHead +
-  '</svg>';
+  return '<svg width="'+w+'" height="'+h+'" xmlns="http://www.w3.org/2000/svg" style="display:block;">'+lines+ledger+clefSvg+stem+noteHead+'</svg>';
 }
 
 // ══ CANVAS & LAYOUT ══
@@ -499,11 +499,392 @@ function setDifficulty(d){
   });
 }
 
+// ══════════════════════════════════════════════════════
+// AUDIO ENGINE — Atari/C64 chip music + SFX
+// ══════════════════════════════════════════════════════
+var audioCtx = null;
+var musicGainNode = null, sfxGainNode = null;
+var musicVolume = 0.70, sfxVolume = 0.80;
+var musicRunning = false, musicScheduler = null;
+var musicNextTime = 0, musicStep = 0;
+
+function ensureAudio(){
+  if(audioCtx) return audioCtx;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  musicGainNode = audioCtx.createGain();
+  musicGainNode.gain.value = musicVolume;
+  musicGainNode.connect(audioCtx.destination);
+  sfxGainNode = audioCtx.createGain();
+  sfxGainNode.gain.value = sfxVolume;
+  sfxGainNode.connect(audioCtx.destination);
+  return audioCtx;
+}
+
+function setMusicVol(v){
+  musicVolume = parseInt(v)/100;
+  document.getElementById('s-music-vol-val').textContent = v+'%';
+  if(musicGainNode) musicGainNode.gain.setTargetAtTime(musicVolume, audioCtx.currentTime, 0.05);
+}
+function setSfxVol(v){
+  sfxVolume = parseInt(v)/100;
+  document.getElementById('s-sfx-vol-val').textContent = v+'%';
+  if(sfxGainNode) sfxGainNode.gain.setTargetAtTime(sfxVolume, audioCtx.currentTime, 0.05);
+}
+
+// ── Atari-style square wave note ──
+function chipNote(freq, dur, vol, t, dest){
+  var ac = audioCtx;
+  var osc = ac.createOscillator();
+  var g   = ac.createGain();
+  osc.type = 'square';
+  osc.frequency.value = freq;
+  // Hard attack, slight release — classic chip
+  g.gain.setValueAtTime(0, t);
+  g.gain.setValueAtTime(vol, t + 0.003);
+  g.gain.setValueAtTime(vol * 0.85, t + dur * 0.6);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  osc.connect(g); g.connect(dest);
+  osc.start(t); osc.stop(t + dur + 0.01);
+}
+
+// ── Atari noise burst (for percussion / snare effect) ──
+function chipNoise(dur, vol, lpFreq, t, dest){
+  var ac = audioCtx;
+  var bufLen = Math.ceil(ac.sampleRate * dur);
+  var buf = ac.createBuffer(1, bufLen, ac.sampleRate);
+  var d = buf.getChannelData(0);
+  // LFSR-style pseudo-noise: repeating pattern, very "chip" sounding
+  var reg = 0xACE1;
+  for(var i=0; i<bufLen; i++){
+    var bit = ((reg >> 0) ^ (reg >> 2) ^ (reg >> 3) ^ (reg >> 5)) & 1;
+    reg = (reg >> 1) | (bit << 15);
+    d[i] = (bit ? 1 : -1) * 0.7;
+  }
+  var src = ac.createBufferSource();
+  src.buffer = buf;
+  var lp = ac.createBiquadFilter();
+  lp.type = 'lowpass'; lp.frequency.value = lpFreq;
+  var g = ac.createGain();
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(lp); lp.connect(g); g.connect(dest);
+  src.start(t); src.stop(t + dur + 0.01);
+}
+
+// ── MUSIC: classic Atari invaders tune ──
+// Pattern: melody + bass + arpeggiated harmony, 8-bit square waves
+// Sequence built from classic minor pentatonic + chromatic passing tones
+
+var MUSIC_BPM = 148;
+var MUSIC_STEP_DUR = 60 / MUSIC_BPM / 2; // 16th note
+
+// Melody: encoded as [semitones from A3=220Hz, length_in_steps, -1=rest]
+// Base = 220 Hz (A3)
+var BASE_FREQ = 220;
+function st(n){ return BASE_FREQ * Math.pow(2, n/12); }
+
+// Full 32-step melody loop — 8-bit invaders feel
+var MELODY = [
+  // Bar 1: rising motif
+  [0,1],[3,1],[7,1],[10,1],[12,2],[-1,1],[7,1],
+  // Bar 2: descending answer
+  [10,1],[7,1],[3,1],[0,2],[-1,1],[5,1],[3,1],
+  // Bar 3: tension
+  [7,1],[10,1],[14,1],[10,1],[7,1],[5,1],[3,2],
+  // Bar 4: resolve + tag
+  [0,2],[3,1],[5,1],[7,2],[-1,2],
+];
+
+// Bass: root + fifth pattern (two octaves down)
+var BASS = [
+  [-24,2],[-17,2],[-24,2],[-17,2],
+  [-24,2],[-19,2],[-24,2],[-19,2],
+  [-24,2],[-17,2],[-24,2],[-17,2],
+  [-22,4],[-24,4],
+];
+
+// Arp: rapid chord arpeggios
+var ARP_CHORDS = [
+  [0,3,7],[0,3,7],[0,5,10],[0,5,10],
+  [0,3,7],[-2,2,7],[-2,2,5],[-2,2,5],
+];
+
+// Percussion: kick on 1&3, noise snare on 2&4, hihat every step
+var KICK_STEPS  = [0,8,16,24];
+var SNARE_STEPS = [4,12,20,28];
+
+var melodyFlat = [];
+var bassFlat   = [];
+(function(){
+  for(var i=0;i<MELODY.length;i++){
+    for(var s=0;s<MELODY[i][1];s++) melodyFlat.push(MELODY[i][0]);
+  }
+  for(var i=0;i<BASS.length;i++){
+    for(var s=0;s<BASS[i][1];s++) bassFlat.push(BASS[i][0]);
+  }
+  // Pad/loop to 32
+  while(melodyFlat.length < 32) melodyFlat.push(-1);
+  while(bassFlat.length < 32)   bassFlat.push(-24);
+})();
+
+var TOTAL_STEPS = 32;
+var arpPhase = 0;
+
+function musicTick(){
+  if(!audioCtx || !musicRunning) return;
+  var lookahead = 0.12;
+  while(musicNextTime < audioCtx.currentTime + lookahead){
+    var t = musicNextTime;
+    var s = musicStep % TOTAL_STEPS;
+    var dur = MUSIC_STEP_DUR;
+
+    // Melody
+    var mn = melodyFlat[s];
+    if(mn !== -1) chipNote(st(mn), dur * 0.75, 0.28, t, musicGainNode);
+
+    // Bass (one octave lower)
+    var bn = bassFlat[s % bassFlat.length];
+    if(bn !== -1) chipNote(st(bn) * 0.5, dur * 0.9, 0.22, t, musicGainNode);
+
+    // Arp: runs every step through chord tones
+    var chordIdx = Math.floor(s / 4) % ARP_CHORDS.length;
+    var chord = ARP_CHORDS[chordIdx];
+    var arpNote = chord[arpPhase % chord.length];
+    chipNote(st(arpNote) * 2, dur * 0.45, 0.10, t, musicGainNode);
+    arpPhase++;
+
+    // Kick drum
+    if(KICK_STEPS.indexOf(s) >= 0){
+      var ko = audioCtx.createOscillator();
+      var kg = audioCtx.createGain();
+      ko.type = 'square'; ko.frequency.setValueAtTime(120, t); ko.frequency.exponentialRampToValueAtTime(40, t + 0.06);
+      kg.gain.setValueAtTime(0.35, t); kg.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+      ko.connect(kg); kg.connect(musicGainNode); ko.start(t); ko.stop(t+0.12);
+    }
+    // Snare noise
+    if(SNARE_STEPS.indexOf(s) >= 0) chipNoise(0.06, 0.18, 6000, t, musicGainNode);
+    // Hihat (every step, softer)
+    chipNoise(0.018, 0.06, 12000, t, musicGainNode);
+
+    musicStep++;
+    musicNextTime += dur;
+  }
+}
+
+function startMusic(){
+  if(musicRunning) return;
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  musicNextTime = audioCtx.currentTime + 0.05;
+  musicStep = 0; arpPhase = 0;
+  musicRunning = true;
+  musicScheduler = setInterval(musicTick, 25);
+}
+function stopMusic(){
+  musicRunning = false;
+  if(musicScheduler){ clearInterval(musicScheduler); musicScheduler = null; }
+}
+
+// ── SFX ──
+function sfxKill(col){
+  // Ascending arpeggio — satisfying "invader destroyed" sound
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  var ac = audioCtx;
+  var t = ac.currentTime;
+  var freqs = [880, 1100, 1320, 1760];
+  freqs.forEach(function(f, i){
+    chipNote(f, 0.055, 0.5, t + i*0.045, sfxGainNode);
+  });
+}
+
+function sfxWrongHit(){
+  // Buzzy low descending — "nope"
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  var ac = audioCtx;
+  var t = ac.currentTime;
+  var osc = ac.createOscillator();
+  var g   = ac.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(180, t);
+  osc.frequency.exponentialRampToValueAtTime(80, t + 0.18);
+  g.gain.setValueAtTime(0.45, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+  osc.connect(g); g.connect(sfxGainNode);
+  osc.start(t); osc.stop(t + 0.22);
+  chipNoise(0.12, 0.2, 1200, t + 0.04, sfxGainNode);
+}
+
+function sfxBombExplosion(){
+  // Big Atari-style explosion: noise burst + falling tone
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  var ac = audioCtx;
+  var t = ac.currentTime;
+  chipNoise(0.35, 0.7, 800, t, sfxGainNode);
+  var osc = ac.createOscillator();
+  var g   = ac.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(440, t);
+  osc.frequency.exponentialRampToValueAtTime(55, t + 0.3);
+  g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+  osc.connect(g); g.connect(sfxGainNode); osc.start(t); osc.stop(t + 0.35);
+}
+
+function sfxTilePress(){
+  // Subtle blip — very short, soft
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  var ac = audioCtx;
+  var t = ac.currentTime;
+  var osc = ac.createOscillator();
+  var g   = ac.createGain();
+  osc.type = 'square';
+  osc.frequency.value = 880;
+  g.gain.setValueAtTime(0.12, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  osc.connect(g); g.connect(sfxGainNode); osc.start(t); osc.stop(t + 0.045);
+  // Haptic vibration if supported
+  if(navigator.vibrate) navigator.vibrate(18);
+}
+
+function sfxBombMove(){
+  // Quick "transfer" ping
+  ensureAudio();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  var t = audioCtx.currentTime;
+  chipNote(1320, 0.04, 0.3, t, sfxGainNode);
+  chipNote(1760, 0.04, 0.25, t + 0.05, sfxGainNode);
+}
+
+// ══ BOMB SYSTEM ══
+// bombCol: which column currently has the bomb
+// bombMonsterId: which specific monster has the bomb (by index in monsters[])
+var bombMonsterIdx = -1;
+
+// Explosion particles for visual effect
+var particles = [];
+
+function updateBomb(){
+  // Find the lowest alive monster in the column that the piano COULD hit
+  // (i.e., the monster with the highest y value that is alive and in playerCol)
+  // The bomb is always on the lowest monster in ANY column that's reachable
+  // Specifically: lowest monster overall (highest y), alive, in player's current column
+  // We recalculate every frame so it tracks correctly
+
+  if(!gameRunning || monsters.length === 0) return;
+
+  // Current bomb monster must still be alive
+  if(bombMonsterIdx >= 0 && (bombMonsterIdx >= monsters.length || !monsters[bombMonsterIdx].alive)){
+    bombMonsterIdx = -1;
+  }
+
+  // Find the best bomb candidate: lowest (highest y) alive monster in playerCol
+  var bestIdx = -1, bestY = -Infinity;
+  for(var i=0; i<monsters.length; i++){
+    var m = monsters[i];
+    if(!m.alive) continue;
+    if(m.col !== playerCol) continue;
+    if(m.y > bestY){ bestY = m.y; bestIdx = i; }
+  }
+
+  if(bestIdx !== bombMonsterIdx){
+    if(bestIdx >= 0) sfxBombMove();
+    bombMonsterIdx = bestIdx;
+  }
+}
+
+function triggerBombExplosion(originIdx){
+  // Explode origin, then chain to neighbors: left, right, up (1 step each)
+  sfxBombExplosion();
+  var origin = monsters[originIdx];
+  if(!origin) return;
+
+  // Collect neighbors: monsters adjacent (col±1, same or higher row within radius)
+  var toExplode = [];
+  for(var i=0; i<monsters.length; i++){
+    if(i === originIdx || !monsters[i].alive) continue;
+    var m = monsters[i];
+    var dcol = Math.abs(m.col - origin.col);
+    var dy   = origin.y - m.y; // positive = m is above origin
+    // neighbors: 1 col away, or directly above in same col
+    if(dcol <= 1 && dy >= -10 && dy <= COL_W * 2.5) toExplode.push(i);
+  }
+
+  // Spawn particles at origin
+  spawnExplosion(origin.x, origin.y, origin.color);
+
+  // Kill neighbors with short delays
+  toExplode.slice(0, 4).forEach(function(idx, di){
+    setTimeout(function(){
+      var m2 = monsters[idx];
+      if(!m2 || !m2.alive) return;
+      m2.alive = false;
+      score += 10;
+      document.getElementById('hud-score').textContent = score;
+      spawnExplosion(m2.x, m2.y, m2.color);
+      sfxKill();
+    }, 120 + di * 90);
+  });
+
+  // Kill origin
+  origin.alive = false;
+  score += 10;
+  document.getElementById('hud-score').textContent = score;
+
+  // Reset bomb — updateBomb() will assign it next frame
+  bombMonsterIdx = -1;
+}
+
+// ══ EXPLOSION PARTICLES ══
+function spawnExplosion(x, y, color){
+  for(var i=0; i<14; i++){
+    var ang = (i / 14) * Math.PI * 2;
+    var spd = 2 + Math.random() * 4;
+    particles.push({
+      x:x, y:y,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd - 2,
+      life: 1.0,
+      decay: 0.04 + Math.random() * 0.03,
+      size: 3 + Math.random() * 4,
+      color: color
+    });
+  }
+  // Central flash
+  particles.push({ x:x, y:y, vx:0, vy:0, life:1.0, decay:0.12, size:16, color:'#fff', flash:true });
+}
+
+function updateParticles(){
+  particles = particles.filter(function(p){ return p.life > 0; });
+  particles.forEach(function(p){
+    p.x += p.vx; p.y += p.vy;
+    if(!p.flash){ p.vy += 0.18; } // gravity on non-flash
+    p.life -= p.decay;
+  });
+}
+
+function drawParticles(){
+  particles.forEach(function(p){
+    cx.save();
+    cx.globalAlpha = Math.max(0, p.life);
+    cx.fillStyle = p.color;
+    if(p.flash){
+      cx.shadowColor = '#fff'; cx.shadowBlur = 20;
+      cx.beginPath(); cx.arc(p.x, p.y, p.size * p.life, 0, Math.PI*2); cx.fill();
+    } else {
+      cx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size * p.life, p.size * p.life);
+    }
+    cx.restore();
+  });
+}
+
 // ══ MONSTERS ══
 var monsters=[], monsterMode='random', score=0;
 var MONSTER_COLORS = ['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
 function buildMonsters(){
-  monsters=[];
+  monsters=[]; bombMonsterIdx = -1;
   var ROWS=3, yStep=PH*0.09;
   var availLetters = SHOOT_LETTERS.slice();
   if(monsterDisplayMode==='staff' && octaveScope==='both'){
@@ -512,8 +893,7 @@ function buildMonsters(){
   for(var r=0;r<ROWS;r++) for(var col=0;col<COLS;col++){
     var letter, noteId;
     if(monsterMode==='ordered'){
-      letter = SHOOT_LETTERS[col];
-      noteId = letter+'1';
+      letter = SHOOT_LETTERS[col]; noteId = letter+'1';
     } else {
       var idx = Math.floor(Math.random()*availLetters.length);
       letter = availLetters[idx];
@@ -540,52 +920,33 @@ function drawStaffOnCanvas(ctx, noteId, x, y, w, h, noteColor){
   ctx.save();
   var clefW = Math.round(w * 0.30);
   var sx = x + clefW + 2, sw = w - clefW - 5;
-  var ls = h / 8;
-  var st = y + h * 0.14;
-  var sb = st + 4 * ls;
-  var midY = (st + sb) / 2;
-  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-  ctx.lineWidth = 0.9;
+  var ls = h / 8, st = y + h * 0.14, sb = st + 4 * ls, midY = (st + sb) / 2;
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 0.9;
   for(var i=0;i<5;i++){
     var ly = st + i*ls;
     ctx.beginPath(); ctx.moveTo(sx, ly); ctx.lineTo(sx+sw, ly); ctx.stroke();
   }
-  ctx.fillStyle = 'rgba(0,0,0,0.8)';
-  ctx.textBaseline = 'middle';
-  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(0,0,0,0.8)'; ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
   if(data.clef === 'treble'){
-    ctx.font = (h*0.88)+'px serif';
-    ctx.fillText('\uD834\uDD1E', x + clefW*0.5, midY + ls*0.3);
+    ctx.font = (h*0.88)+'px serif'; ctx.fillText('\uD834\uDD1E', x + clefW*0.5, midY + ls*0.3);
   } else {
-    ctx.font = (ls*2.8)+'px serif';
-    ctx.fillText('\uD834\uDD22', x + clefW*0.5, st + ls*1.2);
+    ctx.font = (ls*2.8)+'px serif'; ctx.fillText('\uD834\uDD22', x + clefW*0.5, st + ls*1.2);
   }
-  var noteY = sb - data.step * ls * 0.5;
-  var nr = ls * 0.62;
-  var nx = sx + sw * 0.5;
-  ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-  ctx.lineWidth = 1.1;
+  var noteY = sb - data.step * ls * 0.5, nr = ls * 0.62, nx = sx + sw * 0.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.7)'; ctx.lineWidth = 1.1;
   if(data.step <= -2){
     var lly = sb + ls;
     ctx.beginPath(); ctx.moveTo(nx-nr*1.7,lly); ctx.lineTo(nx+nr*1.7,lly); ctx.stroke();
   }
-  ctx.strokeStyle = noteColor;
-  ctx.lineWidth = 1.2;
-  if(noteY >= midY){
-    ctx.beginPath(); ctx.moveTo(nx+nr*1.0,noteY); ctx.lineTo(nx+nr*1.0,noteY-ls*2.8); ctx.stroke();
-  } else {
-    ctx.beginPath(); ctx.moveTo(nx-nr*1.0,noteY); ctx.lineTo(nx-nr*1.0,noteY+ls*2.8); ctx.stroke();
-  }
-  ctx.fillStyle = noteColor;
-  ctx.shadowColor = noteColor; ctx.shadowBlur = 4;
-  ctx.beginPath();
-  ctx.ellipse(nx, noteY, nr*1.15, nr*0.75, -0.3, 0, Math.PI*2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.restore();
+  ctx.strokeStyle = noteColor; ctx.lineWidth = 1.2;
+  if(noteY >= midY){ ctx.beginPath(); ctx.moveTo(nx+nr*1.0,noteY); ctx.lineTo(nx+nr*1.0,noteY-ls*2.8); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.moveTo(nx-nr*1.0,noteY); ctx.lineTo(nx-nr*1.0,noteY+ls*2.8); ctx.stroke(); }
+  ctx.fillStyle = noteColor; ctx.shadowColor = noteColor; ctx.shadowBlur = 4;
+  ctx.beginPath(); ctx.ellipse(nx, noteY, nr*1.15, nr*0.75, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0; ctx.restore();
 }
 
-// ══ DRAW PIANO FALLBACK ══
+// ══ DRAW PIANO ══
 function drawPiano(px,py,pw,ph){
   cx.fillStyle='#1a1008'; cx.fillRect(px-pw/2,py,pw,ph);
   var ww=pw/7;
@@ -603,36 +964,71 @@ function draw(){
     var scaledW = BG_IMG.width * scale;
     if(scaledW < PW){ scale = PW / BG_IMG.width; scaledW = PW; }
     var scaledH = BG_IMG.height * scale;
-    var drawX = (PW - scaledW) / 2;
-    var drawY = PH - scaledH;
-    cx.drawImage(BG_IMG, drawX, drawY, scaledW, scaledH);
+    cx.drawImage(BG_IMG, (PW-scaledW)/2, PH-scaledH, scaledW, scaledH);
   } else {
     if(!bgBuilt||bgCanvas.width!==PW) buildBg(PW,Math.max(PH,600));
     var bh=bgCanvas.height; cx.drawImage(bgCanvas,0,bh-PH,PW,PH,0,0,PW,PH);
   }
+
+  // Grid lines
   cx.strokeStyle='rgba(68,170,255,0.07)'; cx.lineWidth=1;
   for(var i=1;i<COLS;i++){ cx.beginPath(); cx.moveTo(i*COL_W,0); cx.lineTo(i*COL_W,PH); cx.stroke(); }
+
   if(colLabelMode==='off'){
     cx.textAlign='center'; cx.textBaseline='middle'; cx.font='bold 12px Courier New';
     for(var i=0;i<COLS;i++){ cx.fillStyle='rgba(68,170,255,0.45)'; cx.fillText(MOVE_NOTES[i].label,colX(i),PH-18); }
   }
-  monsters.forEach(function(m){
-    if(!m.alive) return; m.bob+=0.03;
+
+  // Monsters
+  monsters.forEach(function(m, idx){
+    if(!m.alive) return;
+    m.bob += 0.03;
     var mx=m.x, my=m.y+Math.sin(m.bob)*3, mw=COL_W*0.62, mh=mw*0.55;
+    var isBomb = (idx === bombMonsterIdx);
+
+    // Bomb glow ring
+    if(isBomb){
+      var pulse = 0.5 + 0.5 * Math.sin(t * 0.18);
+      cx.save();
+      cx.shadowColor = '#ff4400';
+      cx.shadowBlur = 24 + pulse * 18;
+      cx.strokeStyle = 'rgba(255,100,0,' + (0.6 + pulse * 0.4) + ')';
+      cx.lineWidth = 2.5;
+      cx.beginPath();
+      cx.roundRect(mx - mw/2 - 4, my - mh/2 - 4, mw + 8, mh + 8, 8);
+      cx.stroke();
+      cx.restore();
+    }
+
     cx.shadowColor=m.color; cx.shadowBlur=18;
     cx.fillStyle=m.color; cx.beginPath(); cx.roundRect(mx-mw/2,my-mh/2,mw,mh,5); cx.fill(); cx.shadowBlur=0;
     cx.strokeStyle='rgba(255,255,255,0.35)'; cx.lineWidth=1.5; cx.beginPath(); cx.roundRect(mx-mw/2,my-mh/2,mw,mh,5); cx.stroke();
+
     if(monsterDisplayMode==='staff' && m.noteId && STAFF_DATA[m.noteId]){
       drawStaffOnCanvas(cx, m.noteId, mx-mw/2+2, my-mh/2+2, mw-4, mh-4, 'rgba(0,0,0,0.9)');
     } else {
-      cx.fillStyle='rgba(0,0,0,0.82)'; cx.font='bold '+Math.round(mh*0.6)+'px Courier New'; cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(m.letter,mx,my);
+      cx.fillStyle='rgba(0,0,0,0.82)'; cx.font='bold '+Math.round(mh*0.6)+'px Courier New';
+      cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(m.letter,mx,my);
+    }
+
+    // Bomb emoji on top
+    if(isBomb){
+      cx.font = Math.round(mh * 0.45) + 'px serif';
+      cx.textAlign = 'center'; cx.textBaseline = 'bottom';
+      cx.fillText('💣', mx, my - mh/2 - 2);
     }
   });
+
+  // Bullets
   bullets.forEach(function(b){
     cx.shadowColor='#fff'; cx.shadowBlur=8; cx.fillStyle='#fff'; cx.fillRect(b.x-2,b.y,4,12);
     cx.shadowBlur=16; cx.fillStyle='#ffdd00'; cx.fillRect(b.x-1,b.y,2,6); cx.shadowBlur=0;
     cx.font='bold 10px Courier New'; cx.fillStyle='#ffdd00'; cx.textAlign='center'; cx.fillText(b.letter,b.x,b.y-8);
   });
+
+  drawParticles();
+
+  // Piano
   updatePlayerSize();
   var px = colX(playerCol);
   if(pianoLoaded){
@@ -654,40 +1050,65 @@ function update(){
       m.y += spd;
       if(m.y > playerY - 10) m.y = 40 + Math.random()*20;
     });
-    var mw = COL_W*0.62, mh = mw*0.55;
-    var minDist = mh + 4;
+    var mw=COL_W*0.62, mh=mw*0.55, minDist=mh+4;
     for(var pass=0; pass<3; pass++){
       for(var i=0;i<monsters.length;i++){
         if(!monsters[i].alive) continue;
         for(var j=i+1;j<monsters.length;j++){
           if(!monsters[j].alive) continue;
-          var dx = Math.abs(monsters[i].x - monsters[j].x);
-          var dy = Math.abs(monsters[i].y - monsters[j].y);
-          if(dx < mw*0.8 && dy < minDist){
-            var push = (minDist - dy) * 0.5 + 1;
-            if(monsters[i].y < monsters[j].y){ monsters[i].y -= push; monsters[j].y += push; }
-            else { monsters[i].y += push; monsters[j].y -= push; }
-            if(monsters[i].y < 20) monsters[i].y = 20;
-            if(monsters[j].y < 20) monsters[j].y = 20;
+          var dx=Math.abs(monsters[i].x-monsters[j].x), dy=Math.abs(monsters[i].y-monsters[j].y);
+          if(dx<mw*0.8&&dy<minDist){
+            var push=(minDist-dy)*0.5+1;
+            if(monsters[i].y<monsters[j].y){ monsters[i].y-=push; monsters[j].y+=push; }
+            else { monsters[i].y+=push; monsters[j].y-=push; }
+            if(monsters[i].y<20) monsters[i].y=20;
+            if(monsters[j].y<20) monsters[j].y=20;
           }
         }
       }
     }
   }
-  bullets.forEach(function(b){ b.y-=BULLET_SPEED; });
+
+  bullets.forEach(function(b){ b.y -= BULLET_SPEED; });
+
   bullets.forEach(function(b){
-    if(b.dead||b.y<-20){ b.dead=true; return; }
-    monsters.forEach(function(m){
-      if(!m.alive||b.dead) return;
-      var mw=COL_W*0.62,mh=mw*0.55;
-      if(Math.abs(b.x-m.x)<mw/2+4&&b.y<m.y+mh/2&&b.y>m.y-mh/2-14){
-        b.dead=true; if(b.letter===m.letter){ m.alive=false; score+=10; document.getElementById('hud-score').textContent=score; }
+    if(b.dead || b.y < -20){ b.dead=true; return; }
+    var hit = false;
+    monsters.forEach(function(m, idx){
+      if(!m.alive || b.dead) return;
+      var mw=COL_W*0.62, mh=mw*0.55;
+      if(Math.abs(b.x-m.x)<mw/2+4 && b.y<m.y+mh/2 && b.y>m.y-mh/2-14){
+        b.dead = true;
+        if(b.letter === m.letter){
+          // Correct hit
+          if(idx === bombMonsterIdx){
+            // BOMB KILL — chain explosion
+            triggerBombExplosion(idx);
+          } else {
+            m.alive = false;
+            score += 10;
+            document.getElementById('hud-score').textContent = score;
+            spawnExplosion(m.x, m.y, m.color);
+            sfxKill();
+          }
+        } else {
+          // Wrong hit
+          sfxWrongHit();
+        }
+        hit = true;
       }
     });
   });
-  bullets=bullets.filter(function(b){ return !b.dead; });
-  if(monsters.every(function(m){ return !m.alive; })) setTimeout(function(){ buildMonsters(); },700);
+
+  bullets = bullets.filter(function(b){ return !b.dead; });
+  updateParticles();
+  updateBomb();
+
+  if(monsters.every(function(m){ return !m.alive; })){
+    setTimeout(function(){ buildMonsters(); }, 700);
+  }
 }
+
 function loop(){ if(!gameRunning) return; update(); draw(); requestAnimationFrame(loop); }
 
 // ══ COLUMN LABELS ══
@@ -697,15 +1118,11 @@ function updateColLabels(){
   container.innerHTML = '';
   if(colLabelMode === 'off' || !gameRunning){ container.classList.remove('visible'); return; }
   container.classList.add('visible');
-  var tH = getTileH();
-  var staffH = Math.min(COL_W * 0.82, 68);
-  var staffW = Math.min(COL_W * 0.86, 76);
-  container.style.bottom = tH + 'px';
-  container.style.height = staffH + 'px';
+  var tH = getTileH(), staffH = Math.min(COL_W * 0.82, 68), staffW = Math.min(COL_W * 0.86, 76);
+  container.style.bottom = tH + 'px'; container.style.height = staffH + 'px';
   MOVE_NOTES.forEach(function(n,i){
     var div = document.createElement('div');
-    div.className = 'col-note-label';
-    div.style.left = colX(i)+'px';
+    div.className = 'col-note-label'; div.style.left = colX(i)+'px';
     div.innerHTML = makeStaffSVG(n.id, 'rgba(68,170,255,0.85)', staffW, staffH);
     container.appendChild(div);
   });
@@ -721,15 +1138,12 @@ function setColLabels(mode){
 var cardDisplayMode = 'staff';
 function setCardDisplay(mode){
   cardDisplayMode = mode;
-  ['letters','staff','both'].forEach(function(m){
-    document.getElementById('card-'+m).classList.toggle('active', m===mode);
-  });
+  ['letters','staff','both'].forEach(function(m){ document.getElementById('card-'+m).classList.toggle('active', m===mode); });
   buildTileCards();
 }
 
 // ══ TILE CARDS ══
-var inputMode = 'mic';
-var moveCards = [], shootCards = [];
+var inputMode = 'tiles', moveCards = [], shootCards = [];
 
 function buildTileCards(){
   var wrap = document.getElementById('tile-wrap');
@@ -739,14 +1153,13 @@ function buildTileCards(){
   zoneMove.querySelectorAll('.fcard').forEach(function(e){ e.remove(); });
   moveCards=[]; shootCards=[];
   if(inputMode === 'mic'){ wrap.classList.remove('visible'); resize(); return; }
-  wrap.classList.add('visible');
-  resize();
-  var rH = getTileH() / 2;
-  var cardSz = Math.min(rH * 0.82, 72);
+  wrap.classList.add('visible'); resize();
+  var rH = getTileH() / 2, cardSz = Math.min(rH * 0.82, 72);
   MOVE_NOTES.forEach(function(n){
     var card = makeCard(n, 'move', cardSz, zoneMove, function(){
       if(!gameRunning) return;
       playerCol = n.col;
+      sfxTilePress();
       triggerShuffle('move', card.el);
     });
     moveCards.push(card);
@@ -755,6 +1168,7 @@ function buildTileCards(){
     var card = makeCard(n, 'shoot', cardSz, zoneShoot, function(){
       if(!gameRunning) return;
       shoot(n.letter);
+      sfxTilePress();
       triggerShuffle('shoot', card.el);
     });
     shootCards.push(card);
@@ -766,21 +1180,18 @@ function buildTileCards(){
 function makeCard(note, type, sz, zone, onPress){
   var el = document.createElement('div');
   el.className = 'fcard '+(type==='move'?'move-card':'shoot-card');
-  el.style.width = sz+'px';
-  el.style.height = sz+'px';
+  el.style.width = sz+'px'; el.style.height = sz+'px';
   el.style.transition = 'left 0.45s cubic-bezier(.4,0,.2,1), top 0.45s cubic-bezier(.4,0,.2,1)';
   var noteColor = type==='move' ? 'rgba(68,170,255,0.9)' : 'rgba(255,221,0,0.9)';
   var showStaff = (cardDisplayMode==='staff' || cardDisplayMode==='both');
   var showLabel = (cardDisplayMode==='letters' || cardDisplayMode==='both');
   if(showStaff){
-    var svgH = showLabel ? sz * 0.52 : sz * 0.72;
-    var svgW = sz * 0.92;
+    var svgH = showLabel ? sz * 0.52 : sz * 0.72, svgW = sz * 0.92;
     el.insertAdjacentHTML('beforeend', makeStaffSVG(note.id, noteColor, svgW, svgH));
   }
   if(showLabel){
     var label = document.createElement('div');
-    label.className = 'fcard-label';
-    label.textContent = note.label;
+    label.className = 'fcard-label'; label.textContent = note.label;
     if(!showStaff) label.style.fontSize = Math.round(sz*0.32)+'px';
     el.appendChild(label);
   }
@@ -792,35 +1203,25 @@ function makeCard(note, type, sz, zone, onPress){
 }
 
 function repositionCards(cards, zone){
-  var W = window.innerWidth;
-  var H = zone.getBoundingClientRect().height || getTileH()/2;
+  var W = window.innerWidth, H = zone.getBoundingClientRect().height || getTileH()/2;
   var sz = cards.length > 0 ? parseFloat(cards[0].el.style.width) : 60;
-  var pad = 6, gap = 5, leftOff = 56;
-  var placed = [];
+  var pad=6, gap=5, leftOff=56, placed=[];
   cards.forEach(function(c){
     var pos = findFreePos(W, H, sz, pad, gap, placed, leftOff);
-    placed.push(pos);
-    c.pos = pos;
-    c.el.style.left = pos.x+'px';
-    c.el.style.top  = pos.y+'px';
+    placed.push(pos); c.pos = pos;
+    c.el.style.left = pos.x+'px'; c.el.style.top = pos.y+'px';
   });
 }
-
 function repositionAllCards(){
   if(moveCards.length)  repositionCards(moveCards,  document.getElementById('zone-move'));
   if(shootCards.length) repositionCards(shootCards, document.getElementById('zone-shoot'));
 }
-
 function findFreePos(W, H, sz, pad, gap, placed, leftOff){
   leftOff = leftOff || 0;
-  var xMin = leftOff + pad, xMax = W - sz - pad;
-  var yMin = pad, yMax = H - sz - pad;
-  if(xMax < xMin) xMax = xMin;
-  if(yMax < yMin) yMax = yMin;
+  var xMin=leftOff+pad, xMax=W-sz-pad, yMin=pad, yMax=H-sz-pad;
+  if(xMax<xMin) xMax=xMin; if(yMax<yMin) yMax=yMin;
   for(var tries=0; tries<90; tries++){
-    var x = xMin + Math.random() * (xMax - xMin);
-    var y = yMin + Math.random() * (yMax - yMin);
-    var ok = true;
+    var x=xMin+Math.random()*(xMax-xMin), y=yMin+Math.random()*(yMax-yMin), ok=true;
     for(var j=0;j<placed.length;j++){
       if(Math.abs(x-placed[j].x)<sz+gap && Math.abs(y-placed[j].y)<sz+gap){ ok=false; break; }
     }
@@ -828,32 +1229,23 @@ function findFreePos(W, H, sz, pad, gap, placed, leftOff){
   }
   return {x:xMin+Math.random()*(xMax-xMin), y:yMin+Math.random()*(yMax-yMin)};
 }
-
 function triggerShuffle(rowType, pressedEl){
   var cards = rowType==='move' ? moveCards : shootCards;
   var zone  = document.getElementById(rowType==='move' ? 'zone-move' : 'zone-shoot');
-  var W = window.innerWidth;
-  var H = zone.getBoundingClientRect().height || getTileH()/2;
-  var sz = cards.length>0 ? parseFloat(cards[0].el.style.width) : 60;
-  var pad=6, gap=5, leftOff=56;
-  var placed=[];
-  var pressedCard = null;
+  var W=window.innerWidth, H=zone.getBoundingClientRect().height||getTileH()/2;
+  var sz=cards.length>0?parseFloat(cards[0].el.style.width):60, pad=6, gap=5, leftOff=56, placed=[];
+  var pressedCard=null;
   cards.forEach(function(c){ if(c.el===pressedEl) pressedCard=c; });
   if(pressedCard) placed.push(pressedCard.pos);
   cards.forEach(function(c){
     if(c.el===pressedEl) return;
-    var pos = findFreePos(W,H,sz,pad,gap,placed,leftOff);
-    placed.push(pos);
-    c.pos=pos;
-    c.el.classList.remove('shuffling');
-    void c.el.offsetWidth;
-    c.el.classList.add('shuffling');
-    c.el.style.left=pos.x+'px';
-    c.el.style.top=pos.y+'px';
+    var pos=findFreePos(W,H,sz,pad,gap,placed,leftOff);
+    placed.push(pos); c.pos=pos;
+    c.el.classList.remove('shuffling'); void c.el.offsetWidth; c.el.classList.add('shuffling');
+    c.el.style.left=pos.x+'px'; c.el.style.top=pos.y+'px';
     setTimeout(function(){ c.el.classList.remove('shuffling'); },420);
   });
 }
-
 function setInputMode(mode){
   inputMode=mode;
   ['mic','both','tiles'].forEach(function(m){ document.getElementById('mode-'+m).classList.toggle('active',m===mode); });
@@ -872,7 +1264,7 @@ function setMonsterMode(mode){
   document.getElementById('btn-mode-random').classList.toggle('active',mode==='random');
   document.getElementById('btn-mode-ordered').classList.toggle('active',mode==='ordered');
 }
-var transpose=0,marginHz=8,gainVal=3.5;
+var transpose=0, marginHz=8, gainVal=3.5;
 function setTranspose(v){ transpose=parseInt(v); var l=(v>0?'+':'')+v; document.getElementById('hud-transpose-val').textContent=l; document.getElementById('s-transpose-val').textContent=l; document.getElementById('hud-transpose').value=v; document.getElementById('s-transpose').value=v; }
 function setMargin(v){ marginHz=parseFloat(v); var l=v+' Hz'; document.getElementById('hud-margin-val').textContent=l; document.getElementById('s-margin-val').textContent=l; document.getElementById('hud-margin').value=v; document.getElementById('s-margin').value=v; }
 function setGain(v){ gainVal=parseFloat(v); var l=parseFloat(v).toFixed(1)+'\u00d7'; document.getElementById('hud-gain-val').textContent=l; document.getElementById('s-gain-val').textContent=l; document.getElementById('hud-gain').value=v; document.getElementById('s-gain').value=v; if(gainNode) gainNode.gain.value=gainVal; }
@@ -895,7 +1287,9 @@ var mAC=null,mAn=null,gainNode=null,fH=[],dCD=0,mReady=false,buf=new Float32Arra
 function startMic(){
   navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})
   .then(function(stream){
-    mAC=new AudioContext(); var src=mAC.createMediaStreamSource(stream);
+    ensureAudio();
+    mAC = audioCtx;
+    var src=mAC.createMediaStreamSource(stream);
     gainNode=mAC.createGain(); gainNode.gain.value=gainVal; src.connect(gainNode);
     mAn=mAC.createAnalyser(); mAn.fftSize=4096; mAn.smoothingTimeConstant=0.3; gainNode.connect(mAn);
     mReady=true; document.getElementById('mdot').className='mdot on'; detect();
@@ -949,8 +1343,7 @@ function exitGame(){
 }
 
 // ══ MONSTER DISPLAY MODE ══
-var monsterDisplayMode = 'letters';
-var octaveScope = 'razkreslna';
+var monsterDisplayMode = 'letters', octaveScope = 'razkreslna';
 function setMonsterDisplay(mode){
   monsterDisplayMode = mode;
   document.getElementById('mdisp-letters').classList.toggle('active', mode==='letters');
@@ -966,13 +1359,15 @@ function setOctaveScope(scope){
 }
 
 // ══ TUTORIAL ══
-var tutSlide=0,TOTAL_SLIDES=3,gameRunning=false;
+var tutSlide=0, TOTAL_SLIDES=3, gameRunning=false;
 function tutNav(dir){ tutSlide=Math.max(0,Math.min(TOTAL_SLIDES-1,tutSlide+dir)); renderTut(); }
 function startGame(){
   document.getElementById('tut').style.display='none'; stopDemoAnim();
   resize(); buildMonsters(); buildTileCards(); gameRunning=true;
   if(inputMode!=='tiles') startMic();
-  updateColLabels(); loop();
+  updateColLabels();
+  startMusic();
+  loop();
 }
 function renderTut(){
   for(var i=0;i<TOTAL_SLIDES;i++){ var el=document.getElementById('s'+i); if(el) el.classList.toggle('active',i===tutSlide); }
@@ -994,7 +1389,7 @@ function buildTutContent(){
 }
 
 // ══ DEMO ANIM ══
-var demoAnimId=null,demoT=0;
+var demoAnimId=null, demoT=0;
 function startDemoAnim(){ if(demoAnimId) return; demoT=0; animDemo(); }
 function stopDemoAnim(){ if(demoAnimId){ cancelAnimationFrame(demoAnimId); demoAnimId=null; } }
 function animDemo(){
