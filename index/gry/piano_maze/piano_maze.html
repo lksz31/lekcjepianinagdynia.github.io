@@ -871,16 +871,14 @@ if(IMGS.drzwi)DRZWIIMG.src=IMGS.drzwi;
 if(IMGS.polowaDrzwi)POLOWINADRZWIIMG.src=IMGS.polowaDrzwi;
 
 /* ══════════════════════════════════════════════════════════════
-   IMPRESSIONIST AUDIO ENGINE
-   Debussy atmospheres through Messiaen's modal harmonics:
-   — Modes of limited transposition (2, 3, 6) for colour harmony
-   — Free-floating tempo (no percussion, no pulse)
-   — Four independent asynchronous layers:
-       1. Bass pedal (deep resonant sine, long decay, vibrato)
-       2. Harmonic clusters (Messiaen chords, slow breath)
-       3. Melodic arabesque (modal, ornamented, with echo)
-       4. Upper shimmer (tremolo oscillators, very soft)
-   — Reverb simulation via all-pass delay network
+   SPELUNKY-STYLE ATARI CHIPTUNE ENGINE
+   Exploration / cave-crawling vibes:
+   — Square-wave lead melody (NES-style pulse channel)
+   — Triangle-wave bass walking a minor groove
+   — Rapid pulse arpeggio for harmonic colour
+   — LFSR chip noise for kick+snare percussion
+   — Short note lengths, punchy envelopes, zero reverb
+   — 130 BPM, 16th-note scheduler, 64-step loop
    ══════════════════════════════════════════════════════════════ */
 let audioCtx = null;
 let musicEnabled = true;
@@ -891,45 +889,18 @@ let musicMasterGain = null;
 let sfxMasterGain = null;
 let technoRunning = false;
 let technoScheduler = null;
-let technoNextBeat = 0;   // kept for API compat
-let technoStep16 = 0;     // kept for API compat
+let technoNextBeat = 0;
+let technoStep16 = 0;
 
-/* ── Reverb: a simple Schroeder all-pass network ── */
-let reverbNode = null;
-function buildReverb(ac) {
-  // Build an impulse-response reverb from shaped noise
-  const sr = ac.sampleRate;
-  const len = Math.floor(sr * 3.2); // 3.2 s tail
-  const buf = ac.createBuffer(2, len, sr);
-  for (let ch = 0; ch < 2; ch++) {
-    const d = buf.getChannelData(ch);
-    for (let i = 0; i < len; i++) {
-      // Exponential decay + pink-ish noise
-      const env = Math.pow(1 - i / len, 2.2);
-      d[i] = (Math.random() * 2 - 1) * env * (ch === 0 ? 1 : 0.97);
-    }
-  }
-  const conv = ac.createConvolver();
-  conv.buffer = buf;
-  return conv;
-}
+const CHIP_BPM = 130;
+const CHIP_STEP = 60 / CHIP_BPM / 4; // 16th note duration in seconds
 
 function ensureAudioCtx() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Reverb send/return
-    reverbNode = buildReverb(audioCtx);
-    const reverbGain = audioCtx.createGain();
-    reverbGain.gain.value = 0.12;
-    reverbNode.connect(reverbGain);
-    reverbGain.connect(audioCtx.destination);
-
     musicMasterGain = audioCtx.createGain();
     musicMasterGain.gain.value = musicEnabled ? musicVol : 0;
     musicMasterGain.connect(audioCtx.destination);
-    musicMasterGain.connect(reverbNode); // dry + wet
-
     sfxMasterGain = audioCtx.createGain();
     sfxMasterGain.gain.value = sfxEnabled ? sfxVol : 0;
     sfxMasterGain.connect(audioCtx.destination);
@@ -938,306 +909,194 @@ function ensureAudioCtx() {
   return audioCtx;
 }
 
-/* ── MODAL PITCH SETS ──────────────────────────────────────────
-   All frequencies in Hz, built from Messiaen's modes.
-
-   MODE 2 (Octatonic, half–whole): C C# Eb E F# G A Bb
-   Rooted on D (293.66 Hz) for a darker, more ambiguous colour.
-
-   MODE 3: C D Eb E F# Ab A  (rooted on Eb)
-
-   MODE 6: C D Eb E F# G Ab A B  (whole-tone inflected)
-
-   Arabesque: pentatonic subset drawn from mode 2
-   Pedal:    root & fifth of mode 2 (D and A)
-   Cluster:  stacked 3rds / tritones from mode 2 & 3
-   Shimmer:  high overtones of mode 6
+/* ── Pitch helpers ──
+   All pitches as MIDI note numbers → Hz.
+   Base scale: A natural minor (A B C D E F G), rooted at A3=220 Hz.
+   Spelunky uses minor with chromatic passing tones — very "dungeon-y".
 */
-const M2_D = [ // Mode 2 transposition on D — Hz values
-  293.66, 311.13, 349.23, 369.99, 415.30, 440.00, 493.88, 523.25,
-  587.33, 622.25, 698.46, 739.99, 830.61, 880.00, 987.77, 1046.50,
-];
-const M3_Eb = [ // Mode 3 on Eb
-  311.13, 349.23, 369.99, 392.00, 466.16, 523.25, 554.37, 587.33,
-  698.46, 739.99, 783.99, 932.33, 1046.50, 1108.73,
-];
-const M6_C = [ // Mode 6 on C — whole-tone + chromatic colour
-  261.63, 293.66, 311.13, 329.63, 369.99, 392.00, 415.30, 440.00,
-  493.88, 523.25, 587.33, 622.25, 659.26, 739.99, 783.99, 880.00,
-];
+function midiHz(n) { return 440 * Math.pow(2, (n - 69) / 12); }
 
-// Arabesque melody — a lyrical modal phrase from M2_D (mid-register)
-const ARABESQUE = [
-  M2_D[0], M2_D[2], M2_D[4], M2_D[3], M2_D[5], M2_D[4],   // ascent
-  M2_D[6], M2_D[5], M2_D[7], M2_D[6], M2_D[4], M2_D[2],   // descent
-  M2_D[1], M2_D[3], M2_D[2], M2_D[0],                      // resolve
-  M3_Eb[2], M3_Eb[4], M3_Eb[3], M3_Eb[5], M3_Eb[4],       // colour shift
-  M6_C[3],  M6_C[5],  M6_C[4],  M6_C[2],  M6_C[0],        // whole-tone dissolution
-];
+// Note constants (MIDI)
+const A3=57,B3=59,C4=60,D4=62,E4=64,F4=65,G4=67,
+      A4=69,B4=71,C5=72,D5=74,E5=76,F5=77,G5=79,A5=81,
+      Bb3=58,Bb4=70,Gs3=56,Gs4=68,
+      A2=45,E3=52,D3=50,C3=48,G3=55,F3=53;
 
-// Harmonic clusters — Messiaen-style stacked intervals (M2 + M3 superimposition)
-const CLUSTERS = [
-  // Each entry: [bass, mid1, mid2, mid3, upper]
-  [M2_D[0], M2_D[2], M3_Eb[0], M2_D[4], M3_Eb[2]],  // dense tonic colour
-  [M2_D[1], M2_D[3], M3_Eb[1], M2_D[5], M3_Eb[3]],  // parallel shift
-  [M2_D[4], M2_D[6], M3_Eb[4], M2_D[0]*2, M3_Eb[0]*2], // tritone cloud
-  [M3_Eb[0], M3_Eb[2], M6_C[2], M3_Eb[4], M6_C[4]], // mode 3/6 overlap
-  [M6_C[0], M6_C[2], M6_C[4], M6_C[6], M6_C[1]],    // whole-tone stacking
-  [M2_D[3], M2_D[5], M3_Eb[3], M2_D[7], M3_Eb[5]],  // upper register spread
+/* ── MELODY: 64-step lead ──
+   Classic Spelunky-like: starts with a hooky 4-bar phrase,
+   then a contrasting "B section", repeating. -1 = rest.
+   Durations in 16th notes are baked into repetition.
+*/
+const MELODY_SEQ = [
+// Bar 1-2: main hook — rising minor line then bounce
+  E4,  -1,  E4,  D4,   C4,  -1,  A3,  -1,
+  C4,  D4,  E4,  -1,   G4,  -1,  A4,  -1,
+// Bar 3-4: answer phrase — drops down, ends on tension
+  G4,  -1,  F4,  E4,   D4,  -1,  B3,  -1,
+  C4,  -1,  A3,  Gs3,  A3,  -1,  -1,  -1,
+// Bar 5-6: B section — faster feel, chromatic colour
+  C5,  B4,  A4,  G4,   F4,  E4,  D4,  C4,
+  Bb3, -1,  C4,  -1,   D4,  E4,  -1,  -1,
+// Bar 7-8: build and return — sequence climbs back up
+  A3,  C4,  E4,  G4,   A4,  -1,  G4,  E4,
+  D4,  C4,  B3,  A3,   -1,  -1,  A3,  -1,
 ];
 
-// Shimmer notes — very high, from mode 6 upper octave
-const SHIMMER_NOTES = [
-  M6_C[8], M6_C[10], M6_C[12], M6_C[14], M6_C[9], M6_C[11], M6_C[13],
+/* ── BASS: walking triangle-wave ──
+   Spelunky bass is simple root/fifth punches.
+   Triangle wave = warm, slightly muted NES triangle channel.
+*/
+const BASS_SEQ = [
+// Bar 1-2
+  A2,  -1,  A2,  -1,   A2,  -1,  E3,  -1,
+  A2,  -1,  A2,  -1,   C3,  -1,  E3,  -1,
+// Bar 3-4
+  D3,  -1,  D3,  -1,   D3,  -1,  A3,  -1,
+  A2,  -1,  Gs3, -1,   A2,  -1,  -1,  -1,
+// Bar 5-6
+  F3,  -1,  F3,  -1,   C4,  -1,  F3,  -1,
+  Bb3, -1,  Bb3, -1,   F3,  -1,  G3,  -1,
+// Bar 7-8
+  A2,  -1,  C3,  -1,   E3,  -1,  A3,  -1,
+  D3,  -1,  E3,  -1,   A2,  -1,  A2,  -1,
 ];
 
-/* ── LAYER TIMERS (all free-tempo, independent) ── */
-let arabIdx = 0;
-let clusterIdx = 0;
-let shimmerIdx = 0;
-let pedalPhase = 0;
+/* ── ARP: rapid chord tones on a pulse wave ──
+   Fast arpeggio every 16th note, cycles through chord tones.
+   Very low volume — provides harmonic shimmer without mud.
+*/
+const ARP_CHORDS = [
+  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  // i
+  [A3,C4,E4],  [A3,C4,E4],  [E3,G3,B3],  [E3,G3,B3],  // i → v
+  [D3,F3,A3],  [D3,F3,A3],  [D3,F3,A3],  [D3,F3,A3],  // iv
+  [A3,C4,E4],  [Gs3,B3,E4], [A3,C4,E4],  [E3,G3,B3],  // i → v
+  [F3,A3,C4],  [F3,A3,C4],  [C3,E3,G3],  [C3,E3,G3],  // VI → III
+  [Bb3,D4,F4], [Bb3,D4,F4], [F3,A3,C4],  [G3,B3,D4],  // bVII → iv → V
+  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  // i
+  [D3,F3,A3],  [E3,G3,B3],  [A2,E3,A3],  [A2,E3,A3],  // iv → v → i
+];
+let arpPhase = 0;
 
-// Timing parameters (seconds) — deliberately irregular, like rubato
-const ARAB_MIN = 0.55, ARAB_MAX = 1.80;   // note durations
-const CLUSTER_DUR = [11, 14, 9, 16, 12, 10]; // cluster breath durations
-const CLUSTER_FADE = 2.8;
-const PEDAL_DUR = 22;
-const SHIMMER_INTERVAL = [2.1, 2.9, 1.8, 3.4, 2.5];
-
-let arabTimer = null, clusterTimer = null, shimmerTimer = null, pedalTimer = null;
-
-/* ── UTILITY: sine oscillator with slow vibrato ── */
-function makeVibSine(ac, freq, vibRate, vibDepth, dest) {
-  const osc = ac.createOscillator();
-  const vib = ac.createOscillator();
-  const vibG = ac.createGain();
-  osc.type = 'sine';
-  osc.frequency.value = freq;
-  vib.type = 'sine';
-  vib.frequency.value = vibRate;
-  vibG.gain.value = vibDepth;
-  vib.connect(vibG); vibG.connect(osc.frequency);
-  osc.connect(dest);
-  vib.start(); osc.start();
-  return { osc, vib };
+/* ── PERCUSSION: LFSR noise ──
+   Classic Atari/NES bit-shift noise for drums.
+*/
+function chipNoiseBuf(ac, durationS) {
+  const len = Math.ceil(ac.sampleRate * durationS);
+  const buf = ac.createBuffer(1, len, ac.sampleRate);
+  const d = buf.getChannelData(0);
+  let reg = 0xACE1;
+  for (let i = 0; i < len; i++) {
+    const bit = ((reg >> 0) ^ (reg >> 2) ^ (reg >> 3) ^ (reg >> 5)) & 1;
+    reg = (reg >> 1) | (bit << 15);
+    d[i] = bit ? 0.9 : -0.9;
+  }
+  return buf;
 }
+let noiseBuf = null; // lazily built
 
-/* ── LAYER 1: BASS PEDAL ──
-   A deep resonant tone with slow vibrato and very long decay.
-   Alternates between D2 (146.83) and A2 (220) — root and fifth of mode 2.
-*/
-function schedulePedal() {
-  if (!audioCtx || !musicEnabled) return;
+function scheduleNoise(t, dur, vol, lpHz) {
   const ac = audioCtx;
-  const t = ac.currentTime + 0.05;
-  const freqs = [146.83, 110.00, 165.00, 130.81]; // D2, A1, E2, C2
-  const f = freqs[pedalPhase % freqs.length];
-  pedalPhase++;
-
+  if (!noiseBuf) noiseBuf = chipNoiseBuf(ac, 0.25);
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuf;
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = lpHz;
   const g = ac.createGain();
-  g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.18, t + 3.5);
-  g.gain.setValueAtTime(0.18, t + PEDAL_DUR - 4);
-  g.gain.linearRampToValueAtTime(0, t + PEDAL_DUR);
-  g.connect(musicMasterGain);
-
-  // Fundamental + octave for richness
-  [f, f * 2].forEach((freq, i) => {
-    const { osc, vib } = makeVibSine(ac, freq, 4.5 - i * 0.5, freq * 0.003, g);
-    osc.stop(t + PEDAL_DUR + 0.1);
-    vib.stop(t + PEDAL_DUR + 0.1);
-  });
-
-  // Schedule next pedal with overlap
-  pedalTimer = setTimeout(schedulePedal, (PEDAL_DUR - 4) * 1000);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  src.connect(lp); lp.connect(g); g.connect(musicMasterGain);
+  src.start(t); src.stop(t + dur + 0.01);
 }
 
-/* ── LAYER 2: HARMONIC CLUSTERS ──
-   Messiaen-style chord clusters that breathe slowly in and out.
-   Each voice has slight detuning for a "shimmer" effect.
-   Voices enter staggered (like organ registration).
-*/
-function scheduleCluster() {
-  if (!audioCtx || !musicEnabled) return;
+/* ── CHIP NOTE: square wave (lead) or triangle (bass) ── */
+function chipNote(t, freq, dur, vol, wave) {
   const ac = audioCtx;
-  const t = ac.currentTime + 0.1;
-  const voices = CLUSTERS[clusterIdx % CLUSTERS.length];
-  clusterIdx++;
-  const dur = CLUSTER_DUR[clusterIdx % CLUSTER_DUR.length];
-  const fade = CLUSTER_FADE;
-
-  voices.forEach((freq, i) => {
-    const stagger = i * 0.35; // enter one by one, like a chorale
-    const detune = (Math.random() - 0.5) * freq * 0.0015; // micro-detuning
-
-    // Each voice: two slightly detuned sines for chorusing
-    for (let d = 0; d < 2; d++) {
-      const osc = ac.createOscillator();
-      const g = ac.createGain();
-      const lp = ac.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 1800 - i * 120;
-      osc.type = 'sine';
-      osc.frequency.value = freq + detune + (d ? freq * 0.0008 : 0);
-
-      // Gain: fade in staggered, sustain, fade out together
-      const vol = (0.055 - i * 0.006) * (1 - d * 0.3);
-      g.gain.setValueAtTime(0, t + stagger);
-      g.gain.linearRampToValueAtTime(vol, t + stagger + fade);
-      g.gain.setValueAtTime(vol, t + dur - fade);
-      g.gain.linearRampToValueAtTime(0, t + dur);
-
-      osc.connect(lp); lp.connect(g); g.connect(musicMasterGain);
-      osc.start(t + stagger);
-      osc.stop(t + dur + 0.2);
-    }
-  });
-
-  // Schedule next cluster with overlap (crossfade)
-  const nextIn = (dur - fade - 0.5) * 1000;
-  clusterTimer = setTimeout(scheduleCluster, nextIn);
-}
-
-/* ── LAYER 3: MELODIC ARABESQUE ──
-   A flowing single-note melody using modal notes.
-   Duration of each note varies (rubato), with a gentle echo delay.
-   The melody traces the modal contours like Debussy's Arabesques.
-*/
-let arabEchoDelay = null;
-
-function scheduleArabNote() {
-  if (!audioCtx || !musicEnabled) return;
-  const ac = audioCtx;
-  const t = ac.currentTime + 0.02;
-  const freq = ARABESQUE[arabIdx % ARABESQUE.length];
-  arabIdx++;
-
-  // Duration: rubato — weighted towards longer values
-  const noteDur = ARAB_MIN + Math.random() * Math.random() * (ARAB_MAX - ARAB_MIN);
-  const attackT = Math.min(0.18, noteDur * 0.2);
-  const releaseT = Math.min(noteDur * 0.7, 0.9);
-
-  // Melody voice: triangle wave (flute-like) with gentle vibrato
   const osc = ac.createOscillator();
-  const vibM = ac.createOscillator();
-  const vibMG = ac.createGain();
-  osc.type = 'triangle';
-  osc.frequency.value = freq;
-  vibM.type = 'sine';
-  vibM.frequency.value = 5.2;
-  vibMG.gain.value = freq * 0.004; // vibrato depth proportional to pitch
-  vibM.connect(vibMG); vibMG.connect(osc.frequency);
-
-  // Ensure echo delay node exists
-  if (!arabEchoDelay) {
-    arabEchoDelay = ac.createDelay(2.0);
-    arabEchoDelay.delayTime.value = 0.52;
-    const echoFB = ac.createGain(); echoFB.gain.value = 0.28;
-    const echoOut = ac.createGain(); echoOut.gain.value = 0.22;
-    arabEchoDelay.connect(echoFB); echoFB.connect(arabEchoDelay);
-    arabEchoDelay.connect(echoOut); echoOut.connect(musicMasterGain);
-  }
-
   const g = ac.createGain();
+  osc.type = wave || 'square';
+  osc.frequency.value = freq;
+  // Classic chip envelope: instant attack, slight decay, hard cut
   g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.12, t + attackT);
-  g.gain.setValueAtTime(0.12, t + noteDur - releaseT);
-  g.gain.exponentialRampToValueAtTime(0.001, t + noteDur);
-
-  osc.connect(g);
-  g.connect(musicMasterGain);
-  g.connect(arabEchoDelay); // send to echo
-
-  vibM.start(t); osc.start(t);
-  vibM.stop(t + noteDur + 0.1); osc.stop(t + noteDur + 0.1);
-
-  // Ornament: occasional grace note before some melody notes (Debussy-style)
-  if (Math.random() < 0.28 && arabIdx % 3 === 0) {
-    const graceFreq = ARABESQUE[(arabIdx + 2) % ARABESQUE.length];
-    const gosc = ac.createOscillator();
-    const gg = ac.createGain();
-    gosc.type = 'triangle';
-    gosc.frequency.value = graceFreq;
-    gg.gain.setValueAtTime(0.06, t - 0.07);
-    gg.gain.exponentialRampToValueAtTime(0.001, t);
-    gosc.connect(gg); gg.connect(musicMasterGain);
-    gosc.start(Math.max(0, t - 0.08));
-    gosc.stop(t + 0.02);
-  }
-
-  // Next note: small gap between notes for breathing
-  const gap = noteDur * 0.88 + Math.random() * 0.15;
-  arabTimer = setTimeout(scheduleArabNote, gap * 1000);
+  g.gain.setValueAtTime(vol, t + 0.004);
+  g.gain.setValueAtTime(vol * 0.75, t + dur * 0.5);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  osc.connect(g); g.connect(musicMasterGain);
+  osc.start(t); osc.stop(t + dur + 0.01);
 }
 
-/* ── LAYER 4: UPPER SHIMMER ──
-   Very high, soft sine tones from Mode 6, appearing
-   irregularly like light catching water — Debussy's tremolo effect.
-   Each shimmer is a pair of slightly detuned sines (like harmonics).
-*/
-function scheduleShimmer() {
-  if (!audioCtx || !musicEnabled) return;
+/* ── KICK: pitched sine thump (Atari-style) ── */
+function scheduleKick(t) {
   const ac = audioCtx;
-  const t = ac.currentTime + 0.05;
-  const freq = SHIMMER_NOTES[shimmerIdx % SHIMMER_NOTES.length];
-  shimmerIdx++;
+  const osc = ac.createOscillator();
+  const g = ac.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(120, t);
+  osc.frequency.exponentialRampToValueAtTime(38, t + 0.07);
+  g.gain.setValueAtTime(0.55, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  osc.connect(g); g.connect(musicMasterGain);
+  osc.start(t); osc.stop(t + 0.13);
+}
 
-  const dur = 1.2 + Math.random() * 2.8;
+/* ── PATTERN: which steps get what ──
+   64 steps total (matches MELODY_SEQ / BASS_SEQ length).
+   Kick: beats 1 & 3 of every bar (steps 0,8,16,24,32,40,48,56 of 64)
+   Snare: beats 2 & 4 (steps 4,12,20,28,36,44,52,60)
+   Hihat: every even step
+*/
+const TOTAL_STEPS = 64;
 
-  for (let i = 0; i < 3; i++) {
-    const detune = (i - 1) * freq * 0.0012;
-    const osc = ac.createOscillator();
-    const g = ac.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq + detune;
+function isKick(s)  { return s % 8 === 0; }
+function isSnare(s) { return s % 8 === 4; }
+function isHihat(s) { return s % 2 === 0 && !isKick(s) && !isSnare(s); }
 
-    // Tremolo effect via LFO on gain
-    const lfo = ac.createOscillator();
-    const lfoG = ac.createGain();
-    lfo.type = 'sine';
-    lfo.frequency.value = 6 + i * 0.7 + Math.random() * 1.5;
-    lfoG.gain.value = 0.012;
-    lfo.connect(lfoG); lfoG.connect(g.gain);
+/* ── MAIN SCHEDULER TICK ── */
+function technoTick() {
+  if (!audioCtx || !musicEnabled) return;
+  const lookahead = 0.12;
+  while (technoNextBeat < audioCtx.currentTime + lookahead) {
+    const t  = technoNextBeat;
+    const s  = technoStep16 % TOTAL_STEPS;
+    const sd = CHIP_STEP * 0.88; // note duration slightly shorter than step (staccato feel)
 
-    const baseVol = 0.028 - i * 0.006;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(baseVol, t + 0.25);
-    g.gain.setValueAtTime(baseVol, t + dur - 0.4);
-    g.gain.linearRampToValueAtTime(0, t + dur);
+    // ── Melody (square wave, lead channel) ──
+    const mn = MELODY_SEQ[s];
+    if (mn !== -1) chipNote(t, midiHz(mn), sd, 0.22, 'square');
 
-    osc.connect(g); g.connect(musicMasterGain);
-    lfo.start(t); osc.start(t);
-    lfo.stop(t + dur + 0.1); osc.stop(t + dur + 0.1);
+    // ── Bass (triangle wave, NES ch3) ──
+    const bn = BASS_SEQ[s];
+    if (bn !== -1) chipNote(t, midiHz(bn), CHIP_STEP * 1.85, 0.18, 'triangle');
+
+    // ── Arp (thin pulse, very quiet) ──
+    const chordIdx = Math.floor(s / 2) % ARP_CHORDS.length;
+    const chord    = ARP_CHORDS[chordIdx];
+    const arpNote  = chord[arpPhase % chord.length];
+    arpPhase++;
+    chipNote(t, midiHz(arpNote) * 2, CHIP_STEP * 0.5, 0.06, 'square');
+
+    // ── Percussion ──
+    if (isKick(s))       scheduleKick(t);
+    if (isSnare(s))      scheduleNoise(t, 0.055, 0.30, 5000);
+    if (isHihat(s))      scheduleNoise(t, 0.020, 0.10, 14000);
+
+    technoStep16++;
+    technoNextBeat += CHIP_STEP;
   }
-
-  const nextIn = (SHIMMER_INTERVAL[shimmerIdx % SHIMMER_INTERVAL.length] + Math.random() * 0.8) * 1000;
-  shimmerTimer = setTimeout(scheduleShimmer, nextIn);
 }
 
 /* ── ENGINE START / STOP ── */
 function startTechno() {
   if (technoRunning) return;
   ensureAudioCtx();
+  noiseBuf = null; // rebuild for new AudioContext
+  technoNextBeat = audioCtx.currentTime + 0.05;
+  technoStep16 = 0; arpPhase = 0;
   technoRunning = true;
-  arabIdx = 0; clusterIdx = 0; shimmerIdx = 0; pedalPhase = 0;
-  arabEchoDelay = null;
-
-  // Stagger layer starts for a natural emergence
-  schedulePedal();
-  setTimeout(scheduleCluster, 800);
-  setTimeout(scheduleArabNote, 2200);
-  setTimeout(scheduleShimmer, 1400);
-
-  // Dummy scheduler kept for API compat
-  technoScheduler = setInterval(() => {}, 5000);
+  technoScheduler = setInterval(technoTick, 25);
 }
 
 function stopTechno() {
   technoRunning = false;
   if (technoScheduler) { clearInterval(technoScheduler); technoScheduler = null; }
-  [arabTimer, clusterTimer, shimmerTimer, pedalTimer].forEach(t => t && clearTimeout(t));
-  arabTimer = clusterTimer = shimmerTimer = pedalTimer = null;
-  arabEchoDelay = null;
 }
 
 function setMusicEnabled(on) {
