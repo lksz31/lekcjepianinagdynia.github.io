@@ -318,8 +318,8 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
     <div class="s-row">
       <span class="s-label">Głośność muzyki</span>
       <div class="s-control">
-        <input type="range" class="s-slider" id="s-music-vol" min="0" max="100" step="5" value="70" oninput="setMusicVol(this.value)">
-        <span class="s-val" id="s-music-vol-val">70%</span>
+        <input type="range" class="s-slider" id="s-music-vol" min="0" max="100" step="5" value="25" oninput="setMusicVol(this.value)">
+        <span class="s-val" id="s-music-vol-val">25%</span>
       </div>
     </div>
     <div class="s-row">
@@ -504,7 +504,7 @@ function setDifficulty(d){
 // ══════════════════════════════════════════════════════
 var audioCtx = null;
 var musicGainNode = null, sfxGainNode = null;
-var musicVolume = 0.70, sfxVolume = 0.80;
+var musicVolume = 0.25, sfxVolume = 0.80;
 var musicRunning = false, musicScheduler = null;
 var musicNextTime = 0, musicStep = 0;
 
@@ -538,7 +538,6 @@ function chipNote(freq, dur, vol, t, dest){
   var g   = ac.createGain();
   osc.type = 'square';
   osc.frequency.value = freq;
-  // Hard attack, slight release — classic chip
   g.gain.setValueAtTime(0, t);
   g.gain.setValueAtTime(vol, t + 0.003);
   g.gain.setValueAtTime(vol * 0.85, t + dur * 0.6);
@@ -547,13 +546,26 @@ function chipNote(freq, dur, vol, t, dest){
   osc.start(t); osc.stop(t + dur + 0.01);
 }
 
-// ── Atari noise burst (for percussion / snare effect) ──
+// ── Triangle bass note ──
+function chipBass(freq, dur, vol, t, dest){
+  var ac = audioCtx;
+  var osc = ac.createOscillator();
+  var g   = ac.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t + 0.003);
+  g.gain.setValueAtTime(vol * 0.8, t + dur * 0.7);
+  g.gain.linearRampToValueAtTime(0, t + dur);
+  osc.connect(g); g.connect(dest);
+  osc.start(t); osc.stop(t + dur + 0.01);
+}
+
+// ── Atari noise burst ──
 function chipNoise(dur, vol, lpFreq, t, dest){
   var ac = audioCtx;
-  var bufLen = Math.ceil(ac.sampleRate * dur);
+  var bufLen = Math.ceil(ac.sampleRate * Math.min(dur, 0.3));
   var buf = ac.createBuffer(1, bufLen, ac.sampleRate);
   var d = buf.getChannelData(0);
-  // LFSR-style pseudo-noise: repeating pattern, very "chip" sounding
   var reg = 0xACE1;
   for(var i=0; i<bufLen; i++){
     var bit = ((reg >> 0) ^ (reg >> 2) ^ (reg >> 3) ^ (reg >> 5)) & 1;
@@ -571,100 +583,177 @@ function chipNoise(dur, vol, lpFreq, t, dest){
   src.start(t); src.stop(t + dur + 0.01);
 }
 
-// ── MUSIC: classic Atari invaders tune ──
-// Pattern: melody + bass + arpeggiated harmony, 8-bit square waves
-// Sequence built from classic minor pentatonic + chromatic passing tones
+// ════════════════════════════════════════════════════════
+//  THREE SONGS — Atari / Spelunky-style chiptunes
+//  Each song: { bpm, steps, melody[], bass[], arp[][], kick[], snare[] }
+//  melody/bass: array of [semitones_from_A3, length_in_steps]  (-1 = rest)
+//  arp: chord per bar (4 steps), cycles through notes
+// ════════════════════════════════════════════════════════
 
-var MUSIC_BPM = 148;
-var MUSIC_STEP_DUR = 60 / MUSIC_BPM / 2; // 16th note
+var BASE = 220; // A3 = 220 Hz
+function hz(semi){ return BASE * Math.pow(2, semi / 12); }
 
-// Melody: encoded as [semitones from A3=220Hz, length_in_steps, -1=rest]
-// Base = 220 Hz (A3)
-var BASE_FREQ = 220;
-function st(n){ return BASE_FREQ * Math.pow(2, n/12); }
+// ── Song 1: "Dungeon March" — minor march, A natural minor ──
+var SONG1 = {
+  bpm: 150,
+  melody: [
+    [0,1],[3,1],[7,1],[10,1],  [12,2],[-1,1],[7,1],
+    [10,1],[7,1],[3,1],[0,2],  [-1,1],[5,1],[3,1],
+    [7,1],[10,1],[14,1],[10,1],[7,1],[5,1],[3,2],
+    [0,2],[3,1],[5,1],[7,2],   [-1,2],
+    [0,1],[3,1],[5,1],[7,1],   [10,2],[-1,1],[5,1],
+    [7,1],[5,1],[3,1],[0,2],   [-1,1],[3,1],[5,1],
+    [7,1],[5,1],[3,1],[7,1],   [10,1],[12,1],[10,1],[7,1],
+    [5,2],[3,1],[0,1],         [-1,4],
+  ],
+  bass: [
+    [-24,2],[-17,2], [-24,2],[-17,2],
+    [-24,2],[-19,2], [-24,2],[-19,2],
+    [-24,2],[-17,2], [-24,2],[-17,2],
+    [-22,4],         [-24,4],
+    [-24,2],[-17,2], [-19,2],[-17,2],
+    [-24,2],[-22,2], [-24,2],[-19,2],
+    [-17,2],[-19,2], [-22,2],[-17,2],
+    [-19,4],         [-24,4],
+  ],
+  arp: [[0,3,7],[0,3,7],[0,5,10],[0,5,10],[0,3,7],[-2,2,7],[-2,2,5],[-2,2,5]],
+  kick:  [0,8,16,24,32,40,48,56],
+  snare: [4,12,20,28,36,44,52,60],
+};
 
-// Full 32-step melody loop — 8-bit invaders feel
-var MELODY = [
-  // Bar 1: rising motif
-  [0,1],[3,1],[7,1],[10,1],[12,2],[-1,1],[7,1],
-  // Bar 2: descending answer
-  [10,1],[7,1],[3,1],[0,2],[-1,1],[5,1],[3,1],
-  // Bar 3: tension
-  [7,1],[10,1],[14,1],[10,1],[7,1],[5,1],[3,2],
-  // Bar 4: resolve + tag
-  [0,2],[3,1],[5,1],[7,2],[-1,2],
-];
+// ── Song 2: "Cave Rag" — faster, pentatonic, upbeat minor ──
+var SONG2 = {
+  bpm: 168,
+  melody: [
+    [0,1],[5,1],[7,1],[10,1],  [12,1],[10,1],[7,1],[5,1],
+    [3,1],[5,1],[7,1],[3,1],   [0,2],[-1,2],
+    [5,1],[7,1],[10,1],[12,1], [14,1],[12,1],[10,1],[7,1],
+    [5,1],[3,1],[0,1],[3,1],   [5,2],[-1,2],
+    [-5,1],[0,1],[3,1],[5,1],  [7,1],[5,1],[3,1],[0,1],
+    [3,1],[5,1],[7,1],[10,1],  [12,2],[-1,2],
+    [10,1],[12,1],[14,1],[12,1],[10,1],[7,1],[5,1],[3,1],
+    [0,2],[5,1],[7,1],         [-1,4],
+  ],
+  bass: [
+    [-24,1],[-24,1],[-17,1],[-17,1], [-19,2],[-17,2],
+    [-24,1],[-24,1],[-17,1],[-17,1], [-22,2],[-24,2],
+    [-24,1],[-24,1],[-17,1],[-17,1], [-19,2],[-17,2],
+    [-24,2],         [-17,2],        [-19,4],
+    [-17,1],[-17,1],[-19,1],[-19,1], [-22,2],[-24,2],
+    [-24,1],[-24,1],[-17,1],[-17,1], [-19,2],[-22,2],
+    [-24,1],[-24,1],[-19,1],[-19,1], [-17,2],[-19,2],
+    [-24,2],[-22,2],                 [-24,4],
+  ],
+  arp: [[0,3,7],[0,5,7],[2,5,9],[0,3,7],[0,3,10],[2,5,9],[0,5,7],[0,3,7]],
+  kick:  [0,6,16,22,32,38,48,54],
+  snare: [4,12,20,28,36,44,52,60],
+};
 
-// Bass: root + fifth pattern (two octaves down)
-var BASS = [
-  [-24,2],[-17,2],[-24,2],[-17,2],
-  [-24,2],[-19,2],[-24,2],[-19,2],
-  [-24,2],[-17,2],[-24,2],[-17,2],
-  [-22,4],[-24,4],
-];
+// ── Song 3: "Treasure Room" — slower, mysterious, lydian feel ──
+var SONG3 = {
+  bpm: 128,
+  melody: [
+    [0,2],[4,1],[7,1],   [11,2],[9,2],
+    [7,2],[4,1],[2,1],   [0,2],[-1,2],
+    [2,1],[4,1],[7,1],[9,1],[11,2],[7,2],
+    [4,2],[2,1],[0,1],   [-1,4],
+    [0,2],[4,1],[7,1],   [12,2],[11,2],
+    [9,2],[7,1],[4,1],   [2,2],[0,2],
+    [4,1],[7,1],[9,1],[11,1],[14,2],[11,2],
+    [9,2],[7,1],[4,1],   [-1,4],
+  ],
+  bass: [
+    [-24,2],[-17,2], [-12,2],[-17,2],
+    [-24,2],[-19,2], [-24,2],[-24,2],
+    [-17,2],[-12,2], [-17,2],[-14,2],
+    [-19,4],         [-24,4],
+    [-24,2],[-17,2], [-12,2],[-10,2],
+    [-17,2],[-19,2], [-24,2],[-24,2],
+    [-17,2],[-12,2], [-10,2],[-12,2],
+    [-14,4],         [-24,4],
+  ],
+  arp: [[0,4,7],[0,4,11],[2,4,9],[0,4,7],[0,4,11],[2,9,11],[0,7,11],[0,4,7]],
+  kick:  [0,16,32,48],
+  snare: [8,24,40,56],
+};
 
-// Arp: rapid chord arpeggios
-var ARP_CHORDS = [
-  [0,3,7],[0,3,7],[0,5,10],[0,5,10],
-  [0,3,7],[-2,2,7],[-2,2,5],[-2,2,5],
-];
+var SONGS = [SONG1, SONG2, SONG3];
+var currentSongIdx = 0;
+var TOTAL_STEPS = 64; // all songs have 64-step loops
+var musicStepFlat = [];
+var musicBassFlat = [];
+var currentBpm = SONG1.bpm;
 
-// Percussion: kick on 1&3, noise snare on 2&4, hihat every step
-var KICK_STEPS  = [0,8,16,24];
-var SNARE_STEPS = [4,12,20,28];
-
-var melodyFlat = [];
-var bassFlat   = [];
-(function(){
-  for(var i=0;i<MELODY.length;i++){
-    for(var s=0;s<MELODY[i][1];s++) melodyFlat.push(MELODY[i][0]);
+function buildSongFlats(song){
+  musicStepFlat = [];
+  musicBassFlat = [];
+  var mIdx = 0;
+  for(var i=0;i<song.melody.length;i++){
+    for(var s=0;s<song.melody[i][1];s++) musicStepFlat.push(song.melody[i][0]);
   }
-  for(var i=0;i<BASS.length;i++){
-    for(var s=0;s<BASS[i][1];s++) bassFlat.push(BASS[i][0]);
+  for(var i=0;i<song.bass.length;i++){
+    for(var s=0;s<song.bass[i][1];s++) musicBassFlat.push(song.bass[i][0]);
   }
-  // Pad/loop to 32
-  while(melodyFlat.length < 32) melodyFlat.push(-1);
-  while(bassFlat.length < 32)   bassFlat.push(-24);
-})();
+  while(musicStepFlat.length < TOTAL_STEPS) musicStepFlat.push(-1);
+  while(musicBassFlat.length < TOTAL_STEPS) musicBassFlat.push(-24);
+  musicStepFlat = musicStepFlat.slice(0, TOTAL_STEPS);
+  musicBassFlat = musicBassFlat.slice(0, TOTAL_STEPS);
+  currentBpm = song.bpm;
+}
 
-var TOTAL_STEPS = 32;
+// Song rotation — switch every 2 full loops (128 steps)
+var SONG_SWITCH_STEPS = 128;
+
 var arpPhase = 0;
 
 function musicTick(){
   if(!audioCtx || !musicRunning) return;
-  var lookahead = 0.12;
+  var song = SONGS[currentSongIdx];
+  var stepDur = 60 / currentBpm / 2; // 16th note
+  var lookahead = 0.15;
   while(musicNextTime < audioCtx.currentTime + lookahead){
     var t = musicNextTime;
     var s = musicStep % TOTAL_STEPS;
-    var dur = MUSIC_STEP_DUR;
 
-    // Melody
-    var mn = melodyFlat[s];
-    if(mn !== -1) chipNote(st(mn), dur * 0.75, 0.28, t, musicGainNode);
+    // Check song rotation
+    if(musicStep > 0 && musicStep % SONG_SWITCH_STEPS === 0){
+      currentSongIdx = (currentSongIdx + 1) % SONGS.length;
+      buildSongFlats(SONGS[currentSongIdx]);
+      stepDur = 60 / currentBpm / 2;
+    }
 
-    // Bass (one octave lower)
-    var bn = bassFlat[s % bassFlat.length];
-    if(bn !== -1) chipNote(st(bn) * 0.5, dur * 0.9, 0.22, t, musicGainNode);
+    var dur = stepDur;
 
-    // Arp: runs every step through chord tones
-    var chordIdx = Math.floor(s / 4) % ARP_CHORDS.length;
-    var chord = ARP_CHORDS[chordIdx];
+    // Melody (square lead)
+    var mn = musicStepFlat[s];
+    if(mn !== -1) chipNote(hz(mn), dur * 0.78, 0.28, t, musicGainNode);
+
+    // Bass (triangle)
+    var bn = musicBassFlat[s];
+    if(bn !== -1) chipBass(hz(bn) * 0.5, dur * 1.8, 0.20, t, musicGainNode);
+
+    // Arp (thin, quiet)
+    var chordIdx = Math.floor(s / 4) % song.arp.length;
+    var chord = song.arp[chordIdx];
     var arpNote = chord[arpPhase % chord.length];
-    chipNote(st(arpNote) * 2, dur * 0.45, 0.10, t, musicGainNode);
     arpPhase++;
+    chipNote(hz(arpNote) * 2, dur * 0.42, 0.08, t, musicGainNode);
 
-    // Kick drum
-    if(KICK_STEPS.indexOf(s) >= 0){
+    // Kick
+    if(song.kick.indexOf(s) >= 0){
       var ko = audioCtx.createOscillator();
       var kg = audioCtx.createGain();
-      ko.type = 'square'; ko.frequency.setValueAtTime(120, t); ko.frequency.exponentialRampToValueAtTime(40, t + 0.06);
-      kg.gain.setValueAtTime(0.35, t); kg.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-      ko.connect(kg); kg.connect(musicGainNode); ko.start(t); ko.stop(t+0.12);
+      ko.type = 'square';
+      ko.frequency.setValueAtTime(110, t);
+      ko.frequency.exponentialRampToValueAtTime(38, t + 0.07);
+      kg.gain.setValueAtTime(0.38, t);
+      kg.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+      ko.connect(kg); kg.connect(musicGainNode); ko.start(t); ko.stop(t+0.13);
     }
-    // Snare noise
-    if(SNARE_STEPS.indexOf(s) >= 0) chipNoise(0.06, 0.18, 6000, t, musicGainNode);
-    // Hihat (every step, softer)
-    chipNoise(0.018, 0.06, 12000, t, musicGainNode);
+    // Snare
+    if(song.snare.indexOf(s) >= 0) chipNoise(0.06, 0.20, 5500, t, musicGainNode);
+    // Hihat every even step
+    if(s % 2 === 0) chipNoise(0.018, 0.07, 13000, t, musicGainNode);
 
     musicStep++;
     musicNextTime += dur;
@@ -675,6 +764,8 @@ function startMusic(){
   if(musicRunning) return;
   ensureAudio();
   if(audioCtx.state === 'suspended') audioCtx.resume();
+  currentSongIdx = 0;
+  buildSongFlats(SONGS[0]);
   musicNextTime = audioCtx.currentTime + 0.05;
   musicStep = 0; arpPhase = 0;
   musicRunning = true;
@@ -716,22 +807,6 @@ function sfxWrongHit(){
   chipNoise(0.12, 0.2, 1200, t + 0.04, sfxGainNode);
 }
 
-function sfxBombExplosion(){
-  // Big Atari-style explosion: noise burst + falling tone
-  ensureAudio();
-  if(audioCtx.state === 'suspended') audioCtx.resume();
-  var ac = audioCtx;
-  var t = ac.currentTime;
-  chipNoise(0.35, 0.7, 800, t, sfxGainNode);
-  var osc = ac.createOscillator();
-  var g   = ac.createGain();
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(440, t);
-  osc.frequency.exponentialRampToValueAtTime(55, t + 0.3);
-  g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
-  osc.connect(g); g.connect(sfxGainNode); osc.start(t); osc.stop(t + 0.35);
-}
-
 function sfxTilePress(){
   // Subtle blip — very short, soft
   ensureAudio();
@@ -749,93 +824,74 @@ function sfxTilePress(){
   if(navigator.vibrate) navigator.vibrate(18);
 }
 
-function sfxBombMove(){
-  // Quick "transfer" ping
-  ensureAudio();
-  if(audioCtx.state === 'suspended') audioCtx.resume();
-  var t = audioCtx.currentTime;
-  chipNote(1320, 0.04, 0.3, t, sfxGainNode);
-  chipNote(1760, 0.04, 0.25, t + 0.05, sfxGainNode);
+
+// ══ SPECIAL MONSTER SYSTEM ══
+// One monster at a time has the "splash" property.
+// Hit it correctly → kills it + adjacent (col±1 same row, col same row above).
+// The property then moves to a random alive monster.
+// Normal hits kill only the target.
+
+var splashIdx = -1;  // index into monsters[] of the current splash monster
+var splashPulse = 0; // animation phase
+
+function assignSplash(){
+  // Pick a random alive monster to carry the splash property
+  var alive = [];
+  for(var i = 0; i < monsters.length; i++){
+    if(monsters[i].alive) alive.push(i);
+  }
+  if(alive.length === 0){ splashIdx = -1; return; }
+  // Avoid re-assigning the same one if possible
+  var candidates = alive.filter(function(i){ return i !== splashIdx; });
+  if(candidates.length === 0) candidates = alive;
+  splashIdx = candidates[Math.floor(Math.random() * candidates.length)];
 }
 
-// ══ BOMB SYSTEM ══
-// bombCol: which column currently has the bomb
-// bombMonsterId: which specific monster has the bomb (by index in monsters[])
-var bombMonsterIdx = -1;
-
-// Explosion particles for visual effect
-var particles = [];
-
-function updateBomb(){
-  // Find the lowest alive monster in the column that the piano COULD hit
-  // (i.e., the monster with the highest y value that is alive and in playerCol)
-  // The bomb is always on the lowest monster in ANY column that's reachable
-  // Specifically: lowest monster overall (highest y), alive, in player's current column
-  // We recalculate every frame so it tracks correctly
-
-  if(!gameRunning || monsters.length === 0) return;
-
-  // Current bomb monster must still be alive
-  if(bombMonsterIdx >= 0 && (bombMonsterIdx >= monsters.length || !monsters[bombMonsterIdx].alive)){
-    bombMonsterIdx = -1;
+function killMonsterAt(idx, scoreAward){
+  var m = monsters[idx];
+  if(!m || !m.alive) return;
+  m.alive = false;
+  if(scoreAward){
+    score += 10;
+    document.getElementById('hud-score').textContent = score;
   }
-
-  // Find the best bomb candidate: lowest (highest y) alive monster in playerCol
-  var bestIdx = -1, bestY = -Infinity;
-  for(var i=0; i<monsters.length; i++){
-    var m = monsters[i];
-    if(!m.alive) continue;
-    if(m.col !== playerCol) continue;
-    if(m.y > bestY){ bestY = m.y; bestIdx = i; }
-  }
-
-  if(bestIdx !== bombMonsterIdx){
-    if(bestIdx >= 0) sfxBombMove();
-    bombMonsterIdx = bestIdx;
-  }
+  spawnExplosion(m.x, m.y, m.color);
 }
 
-function triggerBombExplosion(originIdx){
-  // Explode origin, then chain to neighbors: left, right, up (1 step each)
-  sfxBombExplosion();
+function triggerSplashKill(originIdx){
   var origin = monsters[originIdx];
   if(!origin) return;
+  sfxKill();
+  killMonsterAt(originIdx, true);
 
-  // Collect neighbors: monsters adjacent (col±1, same or higher row within radius)
-  var toExplode = [];
-  for(var i=0; i<monsters.length; i++){
+  // Kill adjacent: col±1 same row, and one directly above
+  var oCol = origin.col;
+  var oY   = origin.y;
+  var mw   = COL_W * 0.62;
+  var mh   = mw * 0.55;
+
+  for(var i = 0; i < monsters.length; i++){
     if(i === originIdx || !monsters[i].alive) continue;
     var m = monsters[i];
-    var dcol = Math.abs(m.col - origin.col);
-    var dy   = origin.y - m.y; // positive = m is above origin
-    // neighbors: 1 col away, or directly above in same col
-    if(dcol <= 1 && dy >= -10 && dy <= COL_W * 2.5) toExplode.push(i);
+    var sameRow  = Math.abs(m.y - oY) < mh * 1.5;
+    var colLeft  = (m.col === oCol - 1);
+    var colRight = (m.col === oCol + 1);
+    var above    = (m.col === oCol && m.y < oY && oY - m.y < mh * 2.5);
+    if((sameRow && (colLeft || colRight)) || above){
+      killMonsterAt(i, true);
+    }
   }
 
-  // Spawn particles at origin
-  spawnExplosion(origin.x, origin.y, origin.color);
-
-  // Kill neighbors with short delays
-  toExplode.slice(0, 4).forEach(function(idx, di){
-    setTimeout(function(){
-      var m2 = monsters[idx];
-      if(!m2 || !m2.alive) return;
-      m2.alive = false;
-      score += 10;
-      document.getElementById('hud-score').textContent = score;
-      spawnExplosion(m2.x, m2.y, m2.color);
-      sfxKill();
-    }, 120 + di * 90);
-  });
-
-  // Kill origin
-  origin.alive = false;
-  score += 10;
-  document.getElementById('hud-score').textContent = score;
-
-  // Reset bomb — updateBomb() will assign it next frame
-  bombMonsterIdx = -1;
+  // Transfer splash to a new random alive monster
+  assignSplash();
 }
+
+function updateBomb(){
+  splashPulse += 0.12;
+}
+
+var particles = [];
+
 
 // ══ EXPLOSION PARTICLES ══
 function spawnExplosion(x, y, color){
@@ -884,7 +940,7 @@ function drawParticles(){
 var monsters=[], monsterMode='random', score=0;
 var MONSTER_COLORS = ['#f44','#f84','#ff4','#4f4','#4ff','#48f','#a4f'];
 function buildMonsters(){
-  monsters=[]; bombMonsterIdx = -1;
+  monsters=[]; splashIdx = -1;
   var ROWS=3, yStep=PH*0.09;
   var availLetters = SHOOT_LETTERS.slice();
   if(monsterDisplayMode==='staff' && octaveScope==='both'){
@@ -904,6 +960,8 @@ function buildMonsters(){
     var color = MONSTER_COLORS[colorIdx >= 0 ? colorIdx : col];
     monsters.push({col:col,x:colX(col),y:(r*yStep)+60,letter:letter,noteId:noteId,alive:true,bob:Math.random()*Math.PI*2,color:color});
   }
+  // Assign the splash property to one random monster
+  assignSplash();
 }
 
 // ══ BULLETS ══
@@ -984,18 +1042,18 @@ function draw(){
     if(!m.alive) return;
     m.bob += 0.03;
     var mx=m.x, my=m.y+Math.sin(m.bob)*3, mw=COL_W*0.62, mh=mw*0.55;
-    var isBomb = (idx === bombMonsterIdx);
+    var isSplash = (idx === splashIdx);
 
-    // Bomb glow ring
-    if(isBomb){
-      var pulse = 0.5 + 0.5 * Math.sin(t * 0.18);
+    // Special monster: pulsing bright outline
+    if(isSplash){
+      var pulse = 0.55 + 0.45 * Math.sin(splashPulse);
       cx.save();
-      cx.shadowColor = '#ff4400';
-      cx.shadowBlur = 24 + pulse * 18;
-      cx.strokeStyle = 'rgba(255,100,0,' + (0.6 + pulse * 0.4) + ')';
-      cx.lineWidth = 2.5;
+      cx.shadowColor = '#fff';
+      cx.shadowBlur = 14 + pulse * 14;
+      cx.strokeStyle = 'rgba(255,255,255,' + (0.7 + pulse * 0.3) + ')';
+      cx.lineWidth = 3;
       cx.beginPath();
-      cx.roundRect(mx - mw/2 - 4, my - mh/2 - 4, mw + 8, mh + 8, 8);
+      cx.roundRect(mx - mw/2 - 3, my - mh/2 - 3, mw + 6, mh + 6, 7);
       cx.stroke();
       cx.restore();
     }
@@ -1009,13 +1067,6 @@ function draw(){
     } else {
       cx.fillStyle='rgba(0,0,0,0.82)'; cx.font='bold '+Math.round(mh*0.6)+'px Courier New';
       cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(m.letter,mx,my);
-    }
-
-    // Bomb emoji on top
-    if(isBomb){
-      cx.font = Math.round(mh * 0.45) + 'px serif';
-      cx.textAlign = 'center'; cx.textBaseline = 'bottom';
-      cx.fillText('💣', mx, my - mh/2 - 2);
     }
   });
 
@@ -1080,16 +1131,13 @@ function update(){
       if(Math.abs(b.x-m.x)<mw/2+4 && b.y<m.y+mh/2 && b.y>m.y-mh/2-14){
         b.dead = true;
         if(b.letter === m.letter){
-          // Correct hit
-          if(idx === bombMonsterIdx){
-            // BOMB KILL — chain explosion
-            triggerBombExplosion(idx);
+          if(idx === splashIdx){
+            // Special splash monster — chain kill + transfer property
+            triggerSplashKill(idx);
           } else {
-            m.alive = false;
-            score += 10;
-            document.getElementById('hud-score').textContent = score;
-            spawnExplosion(m.x, m.y, m.color);
+            // Normal hit — kill only this one
             sfxKill();
+            killMonsterAt(idx, true);
           }
         } else {
           // Wrong hit
