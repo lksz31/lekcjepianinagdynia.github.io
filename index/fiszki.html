@@ -152,7 +152,15 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
 .beat-dot.lit{transform:scale(2);background:#ef4444!important;border-color:#ef4444!important;}
 .beat-sep{width:1px;height:22px;background:#cbd5e1;flex-shrink:0;margin:0 2px;}
 .rhythm-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:700px;}
-.rhythm-tile{background:white;border-radius:16px;border:2px solid var(--border);cursor:pointer;transition:all 0.2s;padding:12px 8px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.rhythm-tile{background:white;border-radius:16px;border:2px solid var(--border);cursor:pointer;transition:all 0.2s;padding:14px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;overflow:hidden;}
+.rhythm-tile:hover:not([disabled]){border-color:var(--navy);background:#f0f7ff;transform:translateY(-2px);}
+.rhythm-tile.ok{background:#dcfce7!important;border-color:var(--green)!important;}
+.rhythm-tile.bad{background:#fee2e2!important;border-color:#dc2626!important;}
+.rhythm-tile[disabled]{cursor:not-allowed;opacity:0.8;}
+.rhythm-tile-lbl{font-size:0.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;}
+.build-chip:hover{border-color:var(--navy)!important;background:#f0f7ff!important;}
+.rsub-btn{padding:5px 12px;border-radius:50px;border:2px solid var(--navy);background:white;color:var(--navy);font-weight:700;cursor:pointer;transition:0.2s;font-size:0.72rem;font-family:'Poppins',sans-serif;}
+.rsub-btn.active{background:var(--navy);color:white;}
 .rhythm-tile:hover:not(:disabled){border-color:var(--navy);background:#f0f7ff;transform:translateY(-2px);}
 .rhythm-tile.ok{background:#dcfce7!important;border-color:var(--green)!important;}
 .rhythm-tile.bad{background:#fee2e2!important;border-color:#dc2626!important;}
@@ -359,30 +367,57 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
     <!-- RHYTHM MODE SETTINGS -->
     <div id="rhythm-settings-group" style="display:none;">
       <div class="ctrl-row">
+        <span class="ctrl-lbl">Podtryb</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-rsub-read"  onclick="setRhythmSub('read')">🎼 Czytaj nuty</button>
+          <button class="cb"        id="cb-rsub-hear"  onclick="setRhythmSub('hear')">🎧 Słuchaj</button>
+          <button class="cb"        id="cb-rsub-build" onclick="setRhythmSub('build')">✏️ Układaj</button>
+        </div>
+      </div>
+      <div class="ctrl-row">
         <span class="ctrl-lbl">Metrum</span>
         <div class="ctrl-btns">
           <button class="cb active" id="cb-ts-44" onclick="setTimeSig('4/4')">4/4</button>
           <button class="cb"        id="cb-ts-34" onclick="setTimeSig('3/4')">3/4</button>
           <button class="cb"        id="cb-ts-24" onclick="setTimeSig('2/4')">2/4</button>
           <button class="cb"        id="cb-ts-68" onclick="setTimeSig('6/8')">6/8</button>
+          <button class="cb"        id="cb-ts-38" onclick="setTimeSig('3/8')">3/8</button>
         </div>
       </div>
       <div class="ctrl-row">
-        <span class="ctrl-lbl">Trudność</span>
+        <span class="ctrl-lbl">Wartości nut</span>
+        <div class="ctrl-btns" style="flex-wrap:wrap;gap:5px;">
+          <button class="cb active" id="cb-rv-whole"     onclick="toggleRhythmVal('whole')">𝅝 Cała</button>
+          <button class="cb active" id="cb-rv-half"      onclick="toggleRhythmVal('half')">𝅗 Półnuta</button>
+          <button class="cb active" id="cb-rv-quarter"   onclick="toggleRhythmVal('quarter')">♩ Ćwierćnuta</button>
+          <button class="cb active" id="cb-rv-eighth"    onclick="toggleRhythmVal('eighth')">♪ Ósemka</button>
+          <button class="cb"        id="cb-rv-sixteenth" onclick="toggleRhythmVal('sixteenth')">𝅘𝅥𝅯 Szesnastka</button>
+          <button class="cb"        id="cb-rv-triplet"   onclick="toggleRhythmVal('triplet')">♩³ Triola</button>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Opcje</span>
+        <div class="ctrl-btns" style="flex-wrap:wrap;gap:5px;">
+          <button class="cb" id="cb-rv-dotted" onclick="toggleRhythmVal('dotted')">♩. Kropkowane</button>
+          <button class="cb active" id="cb-rv-rests" onclick="toggleRhythmVal('rests')">𝄾 Pauzy</button>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Takty</span>
         <div class="ctrl-btns">
-          <button class="cb active" id="cb-rd-easy"   onclick="setRhythmDifficulty('easy')">Łatwy</button>
-          <button class="cb"        id="cb-rd-medium" onclick="setRhythmDifficulty('medium')">Średni</button>
-          <button class="cb"        id="cb-rd-hard"   onclick="setRhythmDifficulty('hard')">Trudny</button>
+          <button class="cb active" id="cb-bars-1" onclick="setRhythmBars(1)">1</button>
+          <button class="cb"        id="cb-bars-2" onclick="setRhythmBars(2)">2</button>
+          <button class="cb"        id="cb-bars-4" onclick="setRhythmBars(4)">4</button>
         </div>
       </div>
       <div class="ctrl-row">
         <span class="ctrl-lbl">Tempo</span>
         <div class="slider-wrap">
-          <span class="sl-lbl">60</span>
-          <input type="range" id="bpm-slider" min="60" max="180" step="5" value="80" oninput="setBpm(+this.value)">
-          <span class="sl-lbl">180</span>
+          <span class="sl-lbl">40</span>
+          <input type="range" id="bpm-slider" min="40" max="200" step="5" value="72" oninput="setBpm(+this.value)">
+          <span class="sl-lbl">200</span>
         </div>
-        <span class="sl-sfx" id="bpm-val">80 BPM</span>
+        <span class="sl-sfx" id="bpm-val">72 BPM</span>
       </div>
     </div>
     <!-- FUNC MODE SETTINGS -->
@@ -549,19 +584,63 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
 
   <!-- ═══ TRYB RYTM ═══ -->
   <div id="rhythmModeWrap" style="width:100%;display:none;flex-direction:column;align-items:center;gap:14px;">
-    <div class="rhythm-display-wrap">
-      <div class="rhythm-question-label">🥁 Jaki to rytm?</div>
-      <div class="rhythm-pulse-row" id="rhythmPulseRow">
-        <!-- filled by JS -->
+
+    <!-- ── SUB-TRYB A: Czytaj nuty → wybierz dźwięk ── -->
+    <div id="rsub-read" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;">
+      <!-- Pięciolinia z zapisanym rytmem -->
+      <div style="width:100%;max-width:760px;background:#f8fafc;border-radius:16px;border:1px solid var(--border);padding:18px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;">Jaki to rytm? Wybierz odpowiedź po wysłuchaniu</div>
+        <div id="rStaffWrapA" style="width:100%;overflow-x:auto;display:flex;justify-content:center;padding:4px 0;">
+          <svg id="rStaffA" style="display:block;max-width:100%;"></svg>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="rhythm-action-btn" style="border-color:#d4af37;color:#7a5800;background:white;" onclick="stopRhythmPlayback();playPulseBeat()">🥁 Puls</button>
+          <button class="rhythm-action-btn next" onclick="go()">🎲 Nowy rytm</button>
+        </div>
       </div>
-      <div class="rhythm-btn-row">
-        <button class="rhythm-action-btn repeat" onclick="playCurrentRhythm()">🔁 Powtórz</button>
-        <button class="rhythm-action-btn next"   onclick="go()">🎲 Nowy rytm</button>
+      <!-- 4 przyciski odtwarzania jako odpowiedzi -->
+      <div style="font-size:0.72rem;color:#64748b;text-align:center;">🎧 Kliknij aby odsłuchać, potem wybierz pasujący do zapisu</div>
+      <div class="rhythm-choice-grid" id="rChoiceGridA"></div>
+    </div>
+
+    <!-- ── SUB-TRYB B: Słuchaj → wybierz nuty ── -->
+    <div id="rsub-hear" style="width:100%;display:none;flex-direction:column;align-items:center;gap:14px;">
+      <!-- Puls i odtwarzanie -->
+      <div style="width:100%;max-width:760px;background:#f8fafc;border-radius:16px;border:1px solid var(--border);padding:18px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;">Jaki to rytm? Posłuchaj i wybierz zapis</div>
+        <div id="rhythmPulseDots" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;min-height:22px;"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="rhythm-action-btn repeat" onclick="stopRhythmPlayback();playCurrentRhythm()">▶ Odtwórz ponownie</button>
+          <button class="rhythm-action-btn" style="border-color:#d4af37;color:#7a5800;background:white;" onclick="stopRhythmPlayback();playPulseBeat()">🥁 Puls</button>
+          <button class="rhythm-action-btn next" onclick="go()">🎲 Nowy rytm</button>
+        </div>
+      </div>
+      <!-- 4 pięciolinie jako odpowiedzi -->
+      <div class="rhythm-choice-grid" id="rChoiceGridB"></div>
+    </div>
+
+    <!-- ── SUB-TRYB C: Słuchaj → przeciągnij nuty ── -->
+    <div id="rsub-build" style="width:100%;display:none;flex-direction:column;align-items:center;gap:14px;">
+      <div style="width:100%;max-width:760px;background:#f8fafc;border-radius:16px;border:1px solid var(--border);padding:18px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div style="font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;">Ułóż rytm który słyszysz</div>
+        <div id="rhythmPulseDotsB" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;min-height:22px;"></div>
+        <!-- Strefa upuszczenia — pięciolinia do budowania -->
+        <div id="rBuildZone" style="width:100%;min-height:80px;border-radius:12px;border:2px dashed #94a3b8;background:white;display:flex;align-items:center;padding:8px;gap:4px;flex-wrap:nowrap;overflow-x:auto;position:relative;transition:border-color 0.2s;">
+          <span id="rBuildEmpty" style="color:#94a3b8;font-size:0.78rem;font-style:italic;white-space:nowrap;">← Przeciągnij nuty tutaj</span>
+        </div>
+        <!-- Paleta wartości do przeciągania -->
+        <div id="rBuildPalette" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px 0;"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+          <button class="rhythm-action-btn repeat" onclick="stopRhythmPlayback();playCurrentRhythm()">▶ Ponownie</button>
+          <button class="rhythm-action-btn" style="border-color:#d4af37;color:#7a5800;background:white;" onclick="stopRhythmPlayback();playPulseBeat()">🥁 Puls</button>
+          <button class="rhythm-action-btn" style="border-color:#dc2626;color:#dc2626;" onclick="clearBuildZone()">🗑 Wyczyść</button>
+          <button class="rhythm-action-btn next" onclick="checkBuildAnswer()">✓ Sprawdź</button>
+          <button class="rhythm-action-btn next" onclick="go()">🎲 Nowy</button>
+        </div>
+        <div id="rBuildResult" style="font-size:0.82rem;font-weight:700;min-height:1.4em;text-align:center;"></div>
       </div>
     </div>
-    <div class="rhythm-choice-grid" id="rhythmChoiceGrid">
-      <!-- filled by JS -->
-    </div>
+
   </div>
 
   <!-- ═══ TRYB FUNKCJE ═══ -->
@@ -777,278 +856,872 @@ let placeCurrentP=null;
 let placeConfirmed=false;
 
 // ══════════════════════════════════════════════════════════
-// ═══════════════ RHYTHM MODE STATE ════════════════════════
+// ═══════════════ RHYTHM MODE — KOMPLETNY SILNIK ═══════════
 // ══════════════════════════════════════════════════════════
-// A rhythm is an array of "events" — each is a beat subdivision unit.
-// Unit: { type: 'hit'|'rest', dur: number (in beat units, 1=quarter) }
-// We use a flat array of 16th-note slots (1=hit, 0=rest)
-// Beats are grouped by time signature denominator
+//
+// Trzy podtryby:
+//   'read'  — wyświetlone nuty, wybierz 1 z 4 nagrań
+//   'hear'  — zagrane, wybierz 1 z 4 pięciolinii
+//   'build' — zagrane, przeciągnij wartości by ułożyć rytm
+//
+// Zdarzenie: {type:'note'|'rest', dur, dotted, triplet, tied}
+//   dur: 1=cała, 0.5=pół, 0.25=ćwierć, 0.125=ósemka, 0.0625=szesnastka
+//        0.08333=triola ćwierćnutowa (1/3), 0.16666=triola ósemkowa (1/6)
+//   triplet: true → rysuj "3" nad grupą
 
-let rhythmTimeSig = '4/4';
-let rhythmDifficulty = 'easy';
-let rhythmBpm = 80;
-let currentRhythm = null;    // the correct rhythm pattern
-let rhythmChoices = [];       // array of 4 rhythm patterns
+let rhythmTimeSig  = '4/4';
+let rhythmBpm      = 72;
+let rhythmBars     = 1;
+let rhythmSub      = 'read';   // 'read' | 'hear' | 'build'
+let rhythmVals     = new Set(['whole','half','quarter','eighth']);
+let rhythmUseDots  = false;
+let rhythmUseRests = true;
+let rhythmUseTriplets = false;
+
+let currentRhythm  = null;
+let rhythmChoices  = [];
 let rhythmAnswered = false;
-let rhythmTimeout = null;
+let rhythmPlayTids = [];
 
-// Beat subdivision: how many 16th-note slots per bar
-const TS_SLOTS = {'4/4':16,'3/4':12,'2/4':8,'6/8':12};
-// Accent positions (0-indexed slot) per time sig
-const TS_ACCENTS = {
-  '4/4':[0,4,8,12], '3/4':[0,4,8], '2/4':[0,4], '6/8':[0,6]
+// ── Metrum info ──
+const TS_BEATS_INFO = {
+  '4/4': {beats:4, unit:0.25,  compound:false},
+  '3/4': {beats:3, unit:0.25,  compound:false},
+  '2/4': {beats:2, unit:0.25,  compound:false},
+  '6/8': {beats:2, unit:0.375, compound:true,  subUnit:0.125},
+  '3/8': {beats:1, unit:0.375, compound:true,  subUnit:0.125},
 };
 
-// Rhythm building blocks per difficulty
-// Each block = array of 16th-note slots for ONE beat (4 slots in simple time, 3 in 6/8)
-const BEAT_BLOCKS = {
-  easy: [
-    [1,0,0,0], // ♩ quarter
-    [1,0,1,0], // ♪♪ two eighths
-    [0,0,0,0], // rest quarter
-    [1,0,0,0], // ♩
-    [1,0,1,0], // ♪♪
-    [1,0,1,0], // ♪♪
-  ],
-  medium: [
-    [1,0,0,0], [1,0,1,0], [0,0,0,0],
-    [1,1,0,0], // dotted eighth + 16th
-    [1,0,0,1], // syncopation
-    [0,1,0,0], // off-beat eighth
-    [1,1,1,1], // four 16ths
-    [1,0,1,1], // quarter + two 16ths
-  ],
-  hard: [
-    [1,0,0,0],[1,0,1,0],[0,0,0,0],[1,1,0,0],
-    [1,0,0,1],[0,1,0,0],[1,1,1,1],[1,0,1,1],
-    [0,0,1,0],[1,0,0,0],[1,1,0,1],[0,1,1,0],
-    [1,0,1,0,1,0],[1,1,0,0,1,0], // 6/8 blocks
-  ]
-};
-
-// 6/8 has 2 beats of 3 eighth-notes each
-const BEAT_BLOCKS_68 = {
-  easy:   [[1,0,0],[1,0,1],[0,0,0],[1,0,0],[1,0,1]],
-  medium: [[1,0,0],[1,0,1],[0,0,0],[1,1,0],[0,1,0],[1,1,1]],
-  hard:   [[1,0,0],[1,0,1],[0,0,0],[1,1,0],[0,1,0],[1,1,1],[1,0,0],[0,0,1],[1,1,1]]
-};
-
-function buildRhythm(ts, diff) {
-  const slots = TS_SLOTS[ts] || 16;
-  const is68 = ts === '6/8';
-  const beatSize = is68 ? 3 : 4;
-  const numBeats = Math.floor(slots / beatSize);
-  const blocks = is68 ? BEAT_BLOCKS_68[diff] : BEAT_BLOCKS[diff];
-  let pattern = [];
-  for(let b = 0; b < numBeats; b++) {
-    const block = blocks[Math.floor(Math.random() * blocks.length)];
-    pattern = pattern.concat(block.slice(0, beatSize));
-  }
-  // Ensure at least first beat has a hit
-  if(pattern[0] === 0) pattern[0] = 1;
-  return pattern;
+function barDuration(ts) {
+  const b = TS_BEATS_INFO[ts] || TS_BEATS_INFO['4/4'];
+  return b.beats * b.unit;
 }
 
-function rhythmsEqual(a, b) {
-  if(a.length !== b.length) return false;
-  return a.every((v, i) => v === b[i]);
+const DUR_MAP = {
+  whole:1, half:0.5, quarter:0.25, eighth:0.125, sixteenth:0.0625
+};
+
+// Triola ćwierćnutowa = 1/3 taktu w 3/4 albo 1/3 uderzenia w 4/4
+// W 4/4: triola ósemkowa = trzy ósemki = 0.25 (jedno uderzenie), każda = 0.0833
+const TRIPLET_DUR = {
+  quarter:  1/3,       // trzy ćwierćnuty wypełniają 1 całą (triola ćwierćnutowa)
+  eighth:   1/6,       // trzy ósemki = 1 ćwierćnuta (triola ósemkowa)
+  sixteenth: 1/12,
+};
+
+function getAllowedDurs() {
+  const durs = [];
+  rhythmVals.forEach(v => { if(DUR_MAP[v]) durs.push(DUR_MAP[v]); });
+  if(!durs.length) durs.push(0.25);
+  return durs.sort((a,b) => b-a);
+}
+
+// ══ GENEROWANIE RYTMU ══
+function buildRhythm() {
+  const bd      = barDuration(rhythmTimeSig);
+  const allowed = getAllowedDurs();
+  const minDur  = Math.min(...allowed);
+  const tsInfo  = TS_BEATS_INFO[rhythmTimeSig] || TS_BEATS_INFO['4/4'];
+  const beatU   = tsInfo.unit;
+  const events  = [];
+
+  for (let bar = 0; bar < rhythmBars; bar++) {
+    let barLeft = bd;
+    const barEvs = [];
+
+    while (barLeft > minDur / 2 + 1e-9) {
+      // Try triplet?
+      const canTriplet = rhythmUseTriplets && barLeft >= 0.25 - 1e-9;
+      if (canTriplet && Math.random() < 0.25) {
+        // Insert a triplet group (3 eighth-note triplets = 1 quarter)
+        const tripDur = 0.0833333;  // each triplet note
+        const groupDur = 0.25;
+        if (groupDur <= barLeft + 1e-9) {
+          for (let k=0; k<3; k++) {
+            const isRest = rhythmUseRests && Math.random()<0.15 && k>0;
+            barEvs.push({type: isRest?'rest':'note', dur: tripDur, dotted:false, triplet:true, tripletPos:k, tied:false});
+          }
+          barLeft -= groupDur;
+          continue;
+        }
+      }
+
+      const fits = allowed.filter(d => d <= barLeft + 1e-9);
+      if (!fits.length) break;
+      let dur = fits[Math.floor(Math.random() * fits.length)];
+      let dotted = false;
+      if (rhythmUseDots && Math.random() < 0.28 && dur * 1.5 <= barLeft + 1e-9) {
+        dotted = true;
+      }
+      const actualDur = dotted ? dur * 1.5 : dur;
+      if (actualDur > barLeft + 1e-9) { barLeft = 0; break; }
+      const isRest = rhythmUseRests && Math.random() < 0.22 && barEvs.length > 0;
+      barEvs.push({type: isRest?'rest':'note', dur, dotted, triplet:false, tied:false});
+      barLeft -= actualDur;
+    }
+
+    // Fill remainder with rests
+    let rl = barLeft;
+    while (rl > 1e-9) {
+      const f = allowed.filter(d => d <= rl + 1e-9);
+      if (!f.length) { barEvs.push({type:'rest', dur:rl, dotted:false, triplet:false, tied:false}); break; }
+      barEvs.push({type:'rest', dur:f[0], dotted:false, triplet:false, tied:false});
+      rl -= f[0];
+    }
+
+    events.push(...barEvs);
+  }
+
+  const hasNote = events.some(e=>e.type==='note');
+  if (!hasNote && events.length) events[0].type = 'note';
+  return events;
+}
+
+function evDur(ev) { return ev.dotted ? ev.dur*1.5 : ev.dur; }
+
+function rhythmsEqual(a,b) {
+  if(!a||!b||a.length!==b.length) return false;
+  return a.every((e,i) =>
+    e.type===b[i].type &&
+    Math.abs(e.dur-b[i].dur)<1e-9 &&
+    e.dotted===b[i].dotted &&
+    !!e.triplet===!!b[i].triplet
+  );
 }
 
 function buildRhythmChoices(correct) {
   const choices = [correct];
+  const totC = correct.reduce((s,e)=>s+evDur(e),0);
   let tries = 0;
-  while(choices.length < 4 && tries < 200) {
+  while (choices.length < 4 && tries < 600) {
     tries++;
-    const c = buildRhythm(rhythmTimeSig, rhythmDifficulty);
-    if(!choices.some(x => rhythmsEqual(x, c))) choices.push(c);
+    const candidate = buildRhythm();
+    const totR = candidate.reduce((s,e)=>s+evDur(e),0);
+    if (Math.abs(totC-totR) > 1e-9) continue;
+    if (!choices.some(x=>rhythmsEqual(x,candidate))) choices.push(candidate);
   }
-  // Shuffle
-  for(let i = choices.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [choices[i], choices[j]] = [choices[j], choices[i]];
+  // Fallback: modify existing
+  while (choices.length < 4) {
+    const base = choices[0].map(e=>({...e}));
+    if (base.length > 1) {
+      const idx = 1 + Math.floor(Math.random()*(base.length-1));
+      base[idx] = {...base[idx], type: base[idx].type==='note'?'rest':'note'};
+    }
+    if (!choices.some(x=>rhythmsEqual(x,base))) choices.push(base);
+    else choices.push(correct.map(e=>({...e})));
+  }
+  for (let i=choices.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [choices[i],choices[j]]=[choices[j],choices[i]];
   }
   return choices;
 }
 
-// Draw a rhythm pattern as a compact SVG showing note symbols
-function drawRhythmSVG(pattern, ts, W, H, highlight) {
-  const slots = pattern.length;
-  const is68 = ts === '6/8';
-  const beatSize = is68 ? 3 : 4;
-  const accentSlots = TS_ACCENTS[ts] || [0,4,8,12];
-  const slotW = (W - 16) / slots;
-  const cy = H / 2;
-  const r = Math.min(slotW * 0.32, 8);
+// ══ RYSOWANIE PIĘCIOLINII ══
+function drawRhythmStaff(events, ts, compact, hilite) {
+  // ─ Layout ─
+  // SG = gap between staff lines
+  // Line 1 (top)=ST, Line2=ST+SG, Line3=ST+2*SG, Line4=ST+3*SG, Line5(bottom)=ST+4*SG
+  // f¹ sits in the space ABOVE line 1 (between line 1 and the space above it)
+  // Wait — f¹ in treble clef sits between line 1 and line 2 from the TOP.
+  // Treble clef: lines from bottom = E4 G4 B4 D5 F5; spaces = F4 A4 C5 E5
+  // f¹ = F4 = FIRST space from the bottom = between lines 4 and 5 (from top = between lines 1 and 2 from bottom)
+  // From top: line1=F5, line2=D5, line3=B4, line4=G4, line5=E4
+  // Space between line4 and line5 (from top) = F4 = f¹
+  // So NOTE_Y = ST + 3*SG + SG*0.5 = ST + 3.5*SG
+  const SG    = compact ? 8 : 11;
+  const PAD_T = compact ? 26 : 38;   // above staff: stems go up, triplet "3"
+  const PAD_B = compact ? 10 : 12;
+  const ST    = PAD_T;               // y of line 1 (top line)
+  const SH    = 4 * SG;              // staff height
 
-  let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  // f¹ = space between line 4 and line 5 from top = ST + 3.5*SG
+  const NOTE_Y = ST + 3.5 * SG;
 
-  // Beat separators
-  for(let b = 1; b < Math.floor(slots/beatSize); b++) {
-    const bx = 8 + b * beatSize * slotW;
-    svg += `<line x1="${bx}" y1="${H*0.15}" x2="${bx}" y2="${H*0.85}" stroke="#e2e8f0" stroke-width="1.5"/>`;
-  }
+  const CLEF_W = compact ? 26 : 34;
+  const TS_W   = compact ? 14 : 20;  // wider for bigger numbers
+  const NRX    = compact ? 4.5 : 6.0;
+  const NRY    = compact ? 3.0 : 4.0;
+  const STEM_H = compact ? 26 : 32;  // stems go UP from notehead
+  const BEAM_H = compact ? 2.5 : 3.2;
 
-  for(let i = 0; i < slots; i++) {
-    const cx = 8 + i * slotW + slotW/2;
-    const isAccent = accentSlots.includes(i);
-    const isHit = pattern[i] === 1;
-    if(isHit) {
-      const fillColor = highlight ? (highlight === 'correct' ? '#16a34a' : '#dc2626') : (isAccent ? '#d4af37' : '#1e3a8a');
-      const rad = isAccent ? r * 1.25 : r;
-      svg += `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${(rad*1.3).toFixed(1)}" ry="${(rad*0.9).toFixed(1)}" fill="${fillColor}" transform="rotate(-15,${cx.toFixed(1)},${cy.toFixed(1)})"/>`;
-      // Stem
-      svg += `<line x1="${(cx+rad).toFixed(1)}" y1="${cy.toFixed(1)}" x2="${(cx+rad).toFixed(1)}" y2="${(cy - H*0.3).toFixed(1)}" stroke="${fillColor}" stroke-width="1.5"/>`;
-    } else {
-      // Rest symbol — small x
-      const rc = '#94a3b8';
-      svg += `<line x1="${(cx-r*0.7).toFixed(1)}" y1="${(cy-r*0.7).toFixed(1)}" x2="${(cx+r*0.7).toFixed(1)}" y2="${(cy+r*0.7).toFixed(1)}" stroke="${rc}" stroke-width="1.5"/>`;
-      svg += `<line x1="${(cx+r*0.7).toFixed(1)}" y1="${(cy-r*0.7).toFixed(1)}" x2="${(cx-r*0.7).toFixed(1)}" y2="${(cy+r*0.7).toFixed(1)}" stroke="${rc}" stroke-width="1.5"/>`;
+  // Stem: attaches at LEFT side of notehead (stems go up from left on low notes)
+  // f¹ is below mid-staff, so stem goes UP from right side
+  const STEM_TOP = NOTE_Y - STEM_H;
+  const STEM_BOT = NOTE_Y - NRY;   // touches top of ellipse
+
+  // ─ Cell width ─
+  const allD = events.map(e => evDur(e)).filter(d=>d>0);
+  const minDur = allD.length ? Math.min(...allD) : 0.25;
+  const baseCell = minDur <= 0.0625 ? (compact?13:17) :
+                   minDur <= 0.084  ? (compact?12:16) :
+                   minDur <= 0.125  ? (compact?15:20) :
+                   minDur <= 0.25   ? (compact?19:26) :
+                   minDur <= 0.5    ? (compact?26:36) :
+                                      (compact?34:48);
+  function d2px(d) { return Math.max(2, Math.round(d / minDur * baseCell)); }
+
+  const bd     = barDuration(ts);
+  const tsInfo = TS_BEATS_INFO[ts] || TS_BEATS_INFO['4/4'];
+  const beatU  = tsInfo.unit;
+
+  // ─ Compute X positions, bar lines ─
+  const evX = [], barLineXs = [];
+  let curX = CLEF_W + TS_W;   // notes start right after time sig — NO extra bar line here
+  let tBar = 0;
+
+  events.forEach((ev, i) => {
+    evX.push(curX);
+    const ad = evDur(ev);
+    tBar += ad;
+    curX += d2px(ad);
+    if (tBar >= bd - 1e-9 && i < events.length - 1) {
+      barLineXs.push(curX + 2);
+      curX += 7;
+      tBar  = 0;
     }
-  }
-
-  svg += '</svg>';
-  return svg;
-}
-
-// Draw the "playing" dots in the rhythm-pulse-row
-function renderRhythmPulse(pattern, ts, litIdx) {
-  const row = document.getElementById('rhythmPulseRow');
-  const is68 = ts === '6/8';
-  const beatSize = is68 ? 3 : 4;
-  const accentSlots = TS_ACCENTS[ts] || [0,4,8,12];
-  row.innerHTML = '';
-  for(let i = 0; i < pattern.length; i++) {
-    if(i > 0 && i % beatSize === 0) {
-      const sep = document.createElement('div');
-      sep.className = 'beat-sep';
-      row.appendChild(sep);
-    }
-    const cell = document.createElement('div');
-    cell.className = 'beat-cell';
-    const dot = document.createElement('div');
-    const isHit = pattern[i] === 1;
-    const isAccent = accentSlots.includes(i);
-    let cls = 'beat-dot';
-    if(!isHit) cls += ' rest';
-    else if(isAccent) cls += ' accent';
-    if(i === litIdx) cls += ' lit';
-    dot.className = cls;
-    cell.appendChild(dot);
-    row.appendChild(cell);
-  }
-}
-
-function buildRhythmChoiceGrid(correctIdx) {
-  const grid = document.getElementById('rhythmChoiceGrid');
-  grid.innerHTML = '';
-  rhythmChoices.forEach((pattern, idx) => {
-    const tile = document.createElement('button');
-    tile.className = 'rhythm-tile';
-    tile.setAttribute('data-idx', idx);
-    const tileW = Math.min(300, (window.innerWidth - 60) / 2);
-    const tileH = 56;
-    tile.innerHTML = drawRhythmSVG(pattern, rhythmTimeSig, tileW, tileH, null) +
-      `<div class="rhythm-tile-label">Wariant ${idx+1}</div>`;
-    tile.onclick = () => handleRhythmChoice(idx);
-    grid.appendChild(tile);
   });
+
+  const SVG_W = Math.max(compact ? 160 : 270, curX + 14);
+  const SVG_H = PAD_T + SH + PAD_B;
+  const CC = hilite==='ok' ? '#16a34a' : hilite==='bad' ? '#dc2626' : '#1e3a8a';
+  const SC = '#1e3a8a';
+
+  let s = `<svg width="${SVG_W}" height="${SVG_H}" viewBox="0 0 ${SVG_W} ${SVG_H}" xmlns="http://www.w3.org/2000/svg" style="display:block;">`;
+  s += `<rect width="${SVG_W}" height="${SVG_H}" rx="8" fill="white" stroke="${hilite==='ok'?'#16a34a':hilite==='bad'?'#dc2626':'#e2e8f0'}" stroke-width="${hilite?'2':'1'}"/>`;
+
+  // ─ 5 staff lines ─
+  for (let i=0;i<5;i++) {
+    const ly = ST + i*SG;
+    s += `<line x1="4" y1="${ly}" x2="${SVG_W-4}" y2="${ly}" stroke="${SC}" stroke-width="1.1" opacity="0.7"/>`;
+  }
+
+  // ─ Treble clef ─
+  // The glyph &#119070; (𝄞) has its G-loop on the second line from bottom.
+  // Second line from bottom = line 4 from top = ST + 3*SG.
+  // We position by setting font baseline at ST+SH + small offset so the G-loop lands on line4.
+  // Empirically with Georgia: baseline ≈ ST+SH, glyph extends well above.
+  const tfs = Math.round(SG * 5.2);
+  s += `<text x="1" y="${ST + SH + Math.round(SG*0.2)}" font-size="${tfs}" font-family="Georgia,'Times New Roman',serif" fill="${SC}" opacity="0.9">&#119070;</text>`;
+
+  // ─ Time signature — bigger numbers, closer together ─
+  // Place numbers so they fill lines 1-4 (avoid line 5/bottom area)
+  const tsMFS = compact ? 12 : Math.round(SG * 1.55);  // bigger
+  const tsCX  = CLEF_W + Math.round(TS_W * 0.5);
+  const [tsN, tsD] = ts.split('/');
+  // Upper number: centred on space between line 1 and line 2 = ST + SG*0.5... 
+  // Standard: numerator above mid-staff, denominator below
+  // Mid-staff = ST + 2*SG. Numerator at ST+SG*0.9, denominator at ST+SG*2.9
+  s += `<text x="${tsCX}" y="${ST + Math.round(SG*1.0)}" text-anchor="middle" font-size="${tsMFS}" font-family="'Times New Roman',serif" font-weight="bold" fill="${SC}">${tsN}</text>`;
+  s += `<text x="${tsCX}" y="${ST + Math.round(SG*3.1)}" text-anchor="middle" font-size="${tsMFS}" font-family="'Times New Roman',serif" font-weight="bold" fill="${SC}">${tsD}</text>`;
+
+  // ─ No bar line at start of piece (standard notation: bar lines only between bars) ─
+  // Notes start right after time signature
+
+  // ─ Beam grouping ─
+  const beamGroups = [];
+  let beamRun = [], beatAcc = 0, barAcc = 0;
+
+  events.forEach((ev, i) => {
+    const ad = evDur(ev);
+    const beamable = ev.type==='note' && ev.dur<=0.125 && !ev.dotted && !ev.triplet;
+    // Beat boundary check
+    const newBeatAcc = beatAcc + ad;
+    const crossesBeat = Math.floor(beatAcc/beatU + 1e-9) !== Math.floor((newBeatAcc-1e-9)/beatU);
+    const crossesBar  = barAcc + ad >= bd - 1e-9;
+
+    if (beamable && !crossesBeat && !crossesBar) {
+      beamRun.push(i);
+    } else {
+      if (beamRun.length > 1) beamGroups.push([...beamRun]);
+      beamRun = [];
+      if (beamable && !crossesBeat && !crossesBar) beamRun.push(i);
+    }
+
+    beatAcc = crossesBar ? 0 : newBeatAcc % beatU < 1e-9 ? 0 : newBeatAcc % beatU;
+    barAcc += ad;
+    if (barAcc >= bd - 1e-9) {
+      if (beamRun.length > 1) beamGroups.push([...beamRun]);
+      beamRun = []; barAcc = 0; beatAcc = 0;
+    }
+  });
+  if (beamRun.length > 1) beamGroups.push([...beamRun]);
+  const beamed = new Set(beamGroups.flat());
+
+  // Triplet groups
+  const tripletGroups = [];
+  let tripRun = [];
+  events.forEach((ev,i)=>{
+    if(ev.triplet) tripRun.push(i);
+    else { if(tripRun.length>=2) tripletGroups.push([...tripRun]); tripRun=[]; }
+  });
+  if(tripRun.length>=2) tripletGroups.push([...tripRun]);
+  const tripletBeamed = new Set(tripletGroups.flat());
+
+  // ─ Draw stems FIRST (behind noteheads) ─
+  // Stem on RIGHT side of notehead, going UP
+  events.forEach((ev, i) => {
+    if (ev.type !== 'note' || ev.dur >= 1) return;
+    const cx = evX[i] + NRX;
+    const sx = cx + NRX - 0.5;  // right edge of ellipse
+    s += `<line x1="${sx.toFixed(1)}" y1="${STEM_BOT.toFixed(1)}" x2="${sx.toFixed(1)}" y2="${STEM_TOP.toFixed(1)}" stroke="${CC}" stroke-width="1.5"/>`;
+  });
+
+  // ─ Draw beams ─
+  beamGroups.forEach(grp => {
+    if (grp.length < 2) return;
+    const x1 = evX[grp[0]]               + NRX + NRX - 0.5;
+    const x2 = evX[grp[grp.length-1]]    + NRX + NRX - 0.5;
+    // Primary (eighth) beam
+    s += `<rect x="${x1.toFixed(1)}" y="${(STEM_TOP-BEAM_H).toFixed(1)}" width="${(x2-x1+1).toFixed(1)}" height="${BEAM_H.toFixed(1)}" fill="${CC}" rx="1"/>`;
+    // Secondary (sixteenth) beam
+    grp.forEach((idx,gi) => {
+      if (events[idx].dur <= 0.0625) {
+        const bx  = evX[idx] + NRX + NRX - 0.5;
+        const bx2 = gi < grp.length-1 ? evX[grp[gi+1]] + NRX + NRX - 0.5 : Math.min(bx+baseCell*1.2, x2);
+        s += `<rect x="${bx.toFixed(1)}" y="${(STEM_TOP-BEAM_H*2-2).toFixed(1)}" width="${(bx2-bx+1).toFixed(1)}" height="${BEAM_H.toFixed(1)}" fill="${CC}" rx="1"/>`;
+      }
+    });
+  });
+
+  // Triplet beams + "3" bracket
+  tripletGroups.forEach(grp => {
+    if (grp.length < 2) return;
+    const x1 = evX[grp[0]]             + NRX + NRX - 0.5;
+    const x2 = evX[grp[grp.length-1]]  + NRX + NRX - 0.5;
+    s += `<rect x="${x1.toFixed(1)}" y="${(STEM_TOP-BEAM_H).toFixed(1)}" width="${(x2-x1+1).toFixed(1)}" height="${BEAM_H.toFixed(1)}" fill="${CC}" rx="1"/>`;
+    const mx = (x1+x2)/2;
+    const bracketY = STEM_TOP - BEAM_H - (compact?8:12);
+    const fs3 = compact ? 8 : 10;
+    s += `<line x1="${x1.toFixed(1)}" y1="${bracketY+4}" x2="${x1.toFixed(1)}" y2="${bracketY}" stroke="${CC}" stroke-width="1.1"/>`;
+    s += `<line x1="${x1.toFixed(1)}" y1="${bracketY}" x2="${(mx-fs3*0.6-1).toFixed(1)}" y2="${bracketY}" stroke="${CC}" stroke-width="1.1"/>`;
+    s += `<text x="${mx.toFixed(1)}" y="${(bracketY+2).toFixed(1)}" text-anchor="middle" font-size="${fs3}" font-family="'Times New Roman',serif" fill="${CC}" font-style="italic">3</text>`;
+    s += `<line x1="${(mx+fs3*0.6+1).toFixed(1)}" y1="${bracketY}" x2="${x2.toFixed(1)}" y2="${bracketY}" stroke="${CC}" stroke-width="1.1"/>`;
+    s += `<line x1="${x2.toFixed(1)}" y1="${bracketY}" x2="${x2.toFixed(1)}" y2="${bracketY+4}" stroke="${CC}" stroke-width="1.1"/>`;
+  });
+
+  // ─ Noteheads and rests ─
+  events.forEach((ev, i) => {
+    const ex = evX[i];
+    const cx = ex + NRX;
+
+    if (ev.type === 'note') {
+      if (ev.dur >= 1) {
+        // Whole note — open ellipse, no stem
+        s += `<ellipse cx="${cx.toFixed(1)}" cy="${NOTE_Y.toFixed(1)}" rx="${(NRX+1.5).toFixed(1)}" ry="${(NRY+0.8).toFixed(1)}" fill="none" stroke="${CC}" stroke-width="1.8" transform="rotate(-12,${cx.toFixed(1)},${NOTE_Y.toFixed(1)})"/>`;
+      } else if (ev.dur >= 0.5) {
+        // Half note — open ellipse + stem already drawn
+        s += `<ellipse cx="${cx.toFixed(1)}" cy="${NOTE_Y.toFixed(1)}" rx="${NRX.toFixed(1)}" ry="${NRY.toFixed(1)}" fill="none" stroke="${CC}" stroke-width="1.7" transform="rotate(-12,${cx.toFixed(1)},${NOTE_Y.toFixed(1)})"/>`;
+      } else {
+        // Quarter / eighth / sixteenth — filled ellipse
+        s += `<ellipse cx="${cx.toFixed(1)}" cy="${NOTE_Y.toFixed(1)}" rx="${NRX.toFixed(1)}" ry="${NRY.toFixed(1)}" fill="${CC}" transform="rotate(-12,${cx.toFixed(1)},${NOTE_Y.toFixed(1)})"/>`;
+        // Flags for unbeamed short notes
+        if (ev.dur <= 0.125 && !beamed.has(i) && !tripletBeamed.has(i)) {
+          const fx = (cx + NRX - 0.5).toFixed(1);
+          const fy = STEM_TOP.toFixed(1);
+          const fyn = (STEM_TOP+1).toFixed(1);
+          s += `<path d="M${fx},${fyn} C${cx+NRX+11},${STEM_TOP+5} ${cx+NRX+12},${STEM_TOP+13} ${cx+NRX+1},${STEM_TOP+17}" fill="none" stroke="${CC}" stroke-width="1.8" stroke-linecap="round"/>`;
+          if (ev.dur <= 0.0625) {
+            s += `<path d="M${fx},${STEM_TOP+8} C${cx+NRX+11},${STEM_TOP+13} ${cx+NRX+12},${STEM_TOP+20} ${cx+NRX+1},${STEM_TOP+24}" fill="none" stroke="${CC}" stroke-width="1.8" stroke-linecap="round"/>`;
+          }
+        }
+      }
+      // Augmentation dot — in the space to the right of notehead, slightly above centre
+      if (ev.dotted) {
+        const dotX = (cx + NRX + 4).toFixed(1);
+        const dotY = (NOTE_Y - SG*0.5).toFixed(1);
+        s += `<circle cx="${dotX}" cy="${dotY}" r="${compact?1.8:2.2}" fill="${CC}"/>`;
+      }
+
+    } else if (ev.type === 'rest') {
+      const pw = compact ? 9 : 12;
+      const rd = ev.dur;
+
+      if (rd >= 1) {
+        // Whole rest: rectangle hanging BELOW line 1 (the top line)
+        s += `<rect x="${ex+1}" y="${(ST+1).toFixed(1)}" width="${pw}" height="${(SG*0.55).toFixed(1)}" fill="${CC}" rx="1"/>`;
+      } else if (rd >= 0.5) {
+        // Half rest: rectangle sitting ON line 3 (mid-staff line)
+        const halfY = (ST + 2*SG - SG*0.55).toFixed(1);
+        s += `<rect x="${ex+1}" y="${halfY}" width="${pw}" height="${(SG*0.55).toFixed(1)}" fill="${CC}" rx="1"/>`;
+      } else if (rd >= 0.24) {
+        // Quarter rest: proper squiggle
+        const qx=ex+1, qy=ST+SG*1.5, qH=SG*2.2, qW=pw*0.9;
+        s += `<path d="M${(qx+qW*0.5).toFixed(1)},${qy.toFixed(1)} C${(qx+qW).toFixed(1)},${(qy+qH*0.14).toFixed(1)} ${(qx+qW).toFixed(1)},${(qy+qH*0.26).toFixed(1)} ${(qx+qW*0.15).toFixed(1)},${(qy+qH*0.38).toFixed(1)} L${(qx+qW*0.9).toFixed(1)},${(qy+qH*0.54).toFixed(1)} C${qx.toFixed(1)},${(qy+qH*0.68).toFixed(1)} ${qx.toFixed(1)},${(qy+qH*0.84).toFixed(1)} ${(qx+qW*0.5).toFixed(1)},${(qy+qH).toFixed(1)}" fill="none" stroke="${CC}" stroke-width="${compact?1.6:2.0}" stroke-linecap="round" stroke-linejoin="round"/>`;
+      } else if (rd >= 0.08) {
+        // Eighth rest
+        const rx=ex+2, ry=ST+SG*2.2, rSt=SG*1.3;
+        s += `<circle cx="${rx+3}" cy="${(ry+2).toFixed(1)}" r="${compact?2.2:2.8}" fill="${CC}"/>`;
+        s += `<line x1="${rx+3}" y1="${(ry+2).toFixed(1)}" x2="${rx+9}" y2="${(ry-rSt).toFixed(1)}" stroke="${CC}" stroke-width="1.4"/>`;
+        s += `<path d="M${rx+9},${(ry-rSt).toFixed(1)} C${rx+18},${(ry-rSt+3).toFixed(1)} ${rx+17},${(ry-rSt+SG+2).toFixed(1)} ${rx+8},${(ry-rSt+SG+2).toFixed(1)}" fill="none" stroke="${CC}" stroke-width="1.3"/>`;
+      } else {
+        // Sixteenth rest
+        const rx2=ex+2, ry2=ST+SG*2.0, rS2=SG*1.6;
+        s += `<circle cx="${rx2+3}" cy="${(ry2+rS2+2).toFixed(1)}" r="${compact?2:2.5}" fill="${CC}"/>`;
+        s += `<circle cx="${rx2+4}" cy="${(ry2+rS2*0.5).toFixed(1)}" r="${compact?2:2.5}" fill="${CC}"/>`;
+        s += `<line x1="${rx2+3}" y1="${(ry2+rS2+2).toFixed(1)}" x2="${rx2+10}" y2="${ry2.toFixed(1)}" stroke="${CC}" stroke-width="1.3"/>`;
+        s += `<path d="M${rx2+10},${ry2.toFixed(1)} C${rx2+19},${(ry2+2).toFixed(1)} ${rx2+18},${(ry2+SG).toFixed(1)} ${rx2+9},${(ry2+SG).toFixed(1)}" fill="none" stroke="${CC}" stroke-width="1.2"/>`;
+        s += `<path d="M${rx2+10},${(ry2+SG*0.6).toFixed(1)} C${rx2+19},${(ry2+SG*0.6+2).toFixed(1)} ${rx2+18},${(ry2+SG*1.6).toFixed(1)} ${rx2+9},${(ry2+SG*1.6).toFixed(1)}" fill="none" stroke="${CC}" stroke-width="1.2"/>`;
+      }
+      if (ev.dotted) {
+        s += `<circle cx="${ex+pw+7}" cy="${(ST+SG*0.5).toFixed(1)}" r="${compact?1.6:2}" fill="${CC}"/>`;
+      }
+    }
+  });
+
+  // ─ Bar lines between bars ─
+  barLineXs.forEach(bx => {
+    s += `<line x1="${bx}" y1="${ST}" x2="${bx}" y2="${ST+SH}" stroke="${SC}" stroke-width="1.3"/>`;
+  });
+
+  // ─ Final double bar ─
+  const endX = SVG_W - 4;
+  s += `<line x1="${endX-3}" y1="${ST}" x2="${endX-3}" y2="${ST+SH}" stroke="${SC}" stroke-width="1.2"/>`;
+  s += `<line x1="${endX}"   y1="${ST}" x2="${endX}"   y2="${ST+SH}" stroke="${SC}" stroke-width="3.5"/>`;
+  s += '</svg>';
+  return s;
+}
+
+// ── Helper: inject SVG into element ──
+function setSVG(el, svgStr) {
+  if (!el) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = svgStr;
+  const ns = tmp.firstChild;
+  if (!ns) return;
+  const w = parseFloat(ns.getAttribute('width'));
+  const h = parseFloat(ns.getAttribute('height'));
+  el.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  el.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  el.style.height = h + 'px';
+  el.innerHTML = ns.innerHTML;
+}
+
+// ── Puls dots ──
+function updatePulseDots(events, litIdx, elId) {
+  const el = document.getElementById(elId || 'rhythmPulseDots');
+  if (!el) return;
+  el.innerHTML = '';
+  events.forEach((ev, i) => {
+    if (ev.type !== 'note') return;
+    const d = document.createElement('div');
+    const lit = i === litIdx;
+    d.style.cssText = `width:9px;height:9px;border-radius:50%;flex-shrink:0;background:${lit?'#ef4444':'#1e3a8a'};transform:scale(${lit?'2.2':'1'});transition:transform .06s,background .06s;`;
+    el.appendChild(d);
+  });
+}
+
+// ══ ODTWARZANIE ══
+function stopRhythmPlayback() {
+  rhythmPlayTids.forEach(t => clearTimeout(t));
+  rhythmPlayTids = [];
+}
+
+function playRhythmEvents(events, onDone, pulseDotsId) {
+  // No automatic pulse — just play the rhythm precisely
+  const ac = getACtx();
+  const tsInfo = TS_BEATS_INFO[rhythmTimeSig] || TS_BEATS_INFO['4/4'];
+  const qSec   = 60 / rhythmBpm;   // duration of 1 quarter note in seconds
+  // dur values: 1=whole=4 quarters, 0.5=half=2q, 0.25=quarter=1q, 0.125=eighth=0.5q ...
+  // So actual seconds = dur * 4 * qSec
+  const durToSec = d => d * 4 * qSec;
+
+  function clickSound(t, strong) {
+    try {
+      const osc = ac.createOscillator(), g = ac.createGain();
+      osc.type = 'square';
+      osc.frequency.value = strong ? 1320 : 880;
+      g.gain.setValueAtTime(0, t);
+      g.gain.setValueAtTime(strong ? 0.28 : 0.18, t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.075);
+      osc.connect(g); g.connect(ac.destination);
+      osc.start(t); osc.stop(t + 0.09);
+    } catch(e) {}
+  }
+
+  updatePulseDots(events, -1, pulseDotsId);
+
+  let tStart = ac.currentTime + 0.08;
+  let elapsedSec = 0;
+
+  events.forEach((ev, i) => {
+    const actualDur = evDur(ev);           // in "dur units" (1=whole)
+    const durSec    = durToSec(actualDur); // in seconds
+    const tPlay     = tStart + elapsedSec;
+    const tMs       = Math.round(elapsedSec * 1000);
+
+    if (ev.type === 'note' && !ev.tied) {
+      const isStrong = (i === 0);
+      clickSound(tPlay, isStrong);
+    }
+
+    const tid = setTimeout(() => {
+      updatePulseDots(events, ev.type==='note' ? i : -1, pulseDotsId);
+    }, tMs);
+    rhythmPlayTids.push(tid);
+
+    elapsedSec += durSec;
+  });
+
+  const tidEnd = setTimeout(() => {
+    updatePulseDots(events, -1, pulseDotsId);
+    if (onDone) onDone();
+  }, Math.round(elapsedSec * 1000) + 150);
+  rhythmPlayTids.push(tidEnd);
+}
+
+function playPulseBeat() {
+  // Play exactly ONE bar of pulse beats
+  stopRhythmPlayback();
+  const ac = getACtx();
+  const tsInfo = TS_BEATS_INFO[rhythmTimeSig] || TS_BEATS_INFO['4/4'];
+  const beatU  = tsInfo.unit;
+  const beatsPerBar = tsInfo.beats;
+  const qSec   = 60 / rhythmBpm;
+  const beatSec = beatU * 4 * qSec;
+  const dotsId = (rhythmSub === 'build') ? 'rhythmPulseDotsB' : 'rhythmPulseDots';
+
+  // Create beat dots
+  const dotsEl = document.getElementById(dotsId);
+  if (dotsEl) {
+    dotsEl.innerHTML = '';
+    for (let i=0; i<beatsPerBar; i++) {
+      const d = document.createElement('div');
+      d.id = `pdot_${i}`;
+      d.style.cssText = 'width:9px;height:9px;border-radius:50%;flex-shrink:0;background:#94a3b8;transition:transform .06s,background .06s;';
+      dotsEl.appendChild(d);
+    }
+  }
+
+  let tNow = ac.currentTime + 0.08;
+  for (let i=0; i<beatsPerBar; i++) {
+    const t = tNow + i*beatSec;
+    const strong = (i===0);
+    try {
+      const osc=ac.createOscillator(), g=ac.createGain();
+      osc.type='square'; osc.frequency.value=strong?1760:880;
+      g.gain.setValueAtTime(0,t); g.gain.setValueAtTime(strong?.30:.18,t+.004);
+      g.gain.exponentialRampToValueAtTime(.001,t+.08);
+      osc.connect(g); g.connect(ac.destination); osc.start(t); osc.stop(t+.1);
+    } catch(e) {}
+    const tMs = Math.round(i*beatSec*1000);
+    const tid = setTimeout(()=>{
+      const d=document.getElementById(`pdot_${i}`);
+      if(d){d.style.background=strong?'#d4af37':'#1e3a8a';d.style.transform='scale(2.2)';}
+      if(i>0){const p=document.getElementById(`pdot_${i-1}`);if(p){p.style.background='#94a3b8';p.style.transform='scale(1)';}}
+    }, tMs);
+    rhythmPlayTids.push(tid);
+  }
+  const totalMs = Math.round(beatsPerBar*beatSec*1000)+100;
+  const tidEnd = setTimeout(()=>{
+    if(dotsEl) dotsEl.innerHTML='';
+  }, totalMs);
+  rhythmPlayTids.push(tidEnd);
 }
 
 function playCurrentRhythm() {
-  if(!currentRhythm) return;
-  if(rhythmTimeout) clearTimeout(rhythmTimeout);
-  const ac = getACtx();
-  const stepDur = 60 / rhythmBpm / 4; // 16th note duration in seconds
-  const is68 = rhythmTimeSig === '6/8';
-  const stepDur68 = is68 ? (60/rhythmBpm/2) : stepDur; // 8th note in 6/8
-  const actualStep = is68 ? stepDur68 : stepDur;
+  if (!currentRhythm) return;
+  stopRhythmPlayback();
+  const dotsId = (rhythmSub === 'build') ? 'rhythmPulseDotsB' : 'rhythmPulseDots';
+  playRhythmEvents(currentRhythm, null, dotsId);
+}
 
-  renderRhythmPulse(currentRhythm, rhythmTimeSig, -1);
-
-  currentRhythm.forEach((hit, i) => {
-    const t = ac.currentTime + i * actualStep + 0.05;
-    const isAccent = (TS_ACCENTS[rhythmTimeSig]||[0,4,8,12]).includes(i);
-
-    // Visual pulse
-    rhythmTimeout = setTimeout(() => {
-      renderRhythmPulse(currentRhythm, rhythmTimeSig, hit ? i : -1);
-      if(i === currentRhythm.length - 1) {
-        setTimeout(() => renderRhythmPulse(currentRhythm, rhythmTimeSig, -1), actualStep * 1000 * 0.8);
+// ══ SUB-TRYB A: Czytaj nuty → wybierz dźwięk ══
+function goRhythmRead() {
+  setSVG(document.getElementById('rStaffA'), drawRhythmStaff(currentRhythm, rhythmTimeSig, false, null));
+  const grid = document.getElementById('rChoiceGridA');
+  grid.innerHTML = '';
+  rhythmChoices.forEach((pat, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'rhythm-tile';
+    btn.setAttribute('data-idx', idx);
+    // Label + play icon — clicking plays audio
+    btn.innerHTML = `
+      <div style="font-size:1.8rem;">▶</div>
+      <div class="rhythm-tile-lbl">Posłuchaj ${idx+1}</div>
+    `;
+    let played = false;
+    btn.onclick = () => {
+      if (rhythmAnswered) return;
+      if (!played) {
+        // First click: just play this variant
+        played = true;
+        stopRhythmPlayback();
+        const tmpEvs = pat;
+        const ac = getACtx();
+        const tsInfo = TS_BEATS_INFO[rhythmTimeSig]||TS_BEATS_INFO['4/4'];
+        const beatU  = tsInfo.unit, beatsPerBar=tsInfo.beats, qSec=60/rhythmBpm;
+        const beatSec = beatU*qSec*4, pulseCount=beatsPerBar*2;
+        let tNow=ac.currentTime+0.1, elapsed=0;
+        for(let i=0;i<pulseCount;i++){
+          const t=tNow+i*beatSec, strong=(i%beatsPerBar===0);
+          try{const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=strong?1760:880;g.gain.setValueAtTime(0,t);g.gain.setValueAtTime(strong?.28:.16,t+.003);g.gain.exponentialRampToValueAtTime(.001,t+.07);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+.09);}catch(e){}
+        }
+        const rStart=tNow+pulseCount*beatSec;
+        tmpEvs.forEach(ev=>{
+          if(ev.type==='note'&&!ev.tied){
+            try{const o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=880;g.gain.setValueAtTime(0,rStart+elapsed);g.gain.setValueAtTime(.22,rStart+elapsed+.003);g.gain.exponentialRampToValueAtTime(.001,rStart+elapsed+.07);o.connect(g);g.connect(ac.destination);o.start(rStart+elapsed);o.stop(rStart+elapsed+.1);}catch(e){}
+          }
+          elapsed += evDur(ev)*qSec*4;
+        });
+        btn.innerHTML = `<div style="font-size:1.8rem;">🔁</div><div class="rhythm-tile-lbl">Ponownie ${idx+1}</div>`;
+        // Show "confirm" overlay after playing
+        const totalMs = Math.round((pulseCount*beatSec+elapsed)*1000)+300;
+        setTimeout(() => {
+          if (!rhythmAnswered) {
+            btn.innerHTML = `
+              <div style="font-size:1.5rem;">▶ / ✓</div>
+              <div class="rhythm-tile-lbl">Wybierz ${idx+1}</div>
+            `;
+          }
+        }, totalMs);
+      } else {
+        // Second click: select this answer
+        if (rhythmAnswered) return;
+        handleRhythmChoiceA(idx);
       }
-    }, i * actualStep * 1000);
-
-    if(hit) {
-      // Play a woodblock-like click
-      const osc = ac.createOscillator();
-      const g   = ac.createGain();
-      osc.type = 'square';
-      osc.frequency.value = isAccent ? 880 : 660;
-      g.gain.setValueAtTime(0, t);
-      g.gain.setValueAtTime(isAccent ? 0.45 : 0.30, t + 0.004);
-      g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      osc.connect(g); g.connect(ac.destination);
-      osc.start(t); osc.stop(t + 0.1);
-      // Noise layer for percussive click
-      const nBuf = ac.createBuffer(1, Math.ceil(ac.sampleRate * 0.04), ac.sampleRate);
-      const nd = nBuf.getChannelData(0);
-      for(let j=0;j<nd.length;j++) nd[j]=(Math.random()*2-1)*Math.exp(-j/400);
-      const nSrc = ac.createBufferSource(); nSrc.buffer = nBuf;
-      const ng = ac.createGain(); ng.gain.setValueAtTime(0.25, t); ng.gain.exponentialRampToValueAtTime(0.001, t+0.04);
-      nSrc.connect(ng); ng.connect(ac.destination); nSrc.start(t); nSrc.stop(t+0.05);
-    }
+    };
+    grid.appendChild(btn);
   });
 }
 
-function handleRhythmChoice(chosenIdx) {
-  if(rhythmAnswered) return;
+function handleRhythmChoiceA(chosenIdx) {
+  if (rhythmAnswered) return;
   rhythmAnswered = true;
-  const correctIdx = rhythmChoices.findIndex(p => rhythmsEqual(p, currentRhythm));
-  const correct = chosenIdx === correctIdx;
-
-  cnt++; document.getElementById('sCnt').textContent = cnt;
-  if(correct) { ok++; }
+  const correctIdx = rhythmChoices.findIndex(p=>rhythmsEqual(p,currentRhythm));
+  const isOk = chosenIdx === correctIdx;
+  cnt++; document.getElementById('sCnt').textContent=cnt;
+  if(isOk) ok++;
   updScore();
+  document.querySelectorAll('#rChoiceGridA .rhythm-tile').forEach((tile,i)=>{
+    tile.setAttribute('disabled','');
+    if(i===correctIdx) tile.classList.add('ok');
+    else if(i===chosenIdx&&!isOk) tile.classList.add('bad');
+  });
+  if(document.getElementById('toggleFeedbackSound').checked) playPyk(isOk);
+  if(isOk){spawnSpecificEmoji(window.innerWidth/2,window.innerHeight/2,EMOJIS_GOOD[emojiGoodIdx]);emojiGoodIdx=(emojiGoodIdx+1)%EMOJIS_GOOD.length;}
+  setTimeout(()=>{rhythmAnswered=false;go();},1500);
+}
 
-  // Visual feedback on tiles
-  const tiles = document.querySelectorAll('.rhythm-tile');
-  tiles.forEach((tile, i) => {
-    tile.disabled = true;
-    if(i === correctIdx) tile.classList.add('ok');
-    else if(i === chosenIdx && !correct) tile.classList.add('bad');
+// ══ SUB-TRYB B: Słuchaj → wybierz pięciolinię ══
+function goRhythmHear() {
+  updatePulseDots(currentRhythm, -1, 'rhythmPulseDots');
+  const grid = document.getElementById('rChoiceGridB');
+  grid.innerHTML = '';
+  rhythmChoices.forEach((pat, idx) => {
+    const tile = document.createElement('button');
+    tile.className = 'rhythm-tile';
+    tile.setAttribute('data-idx', idx);
+    tile.innerHTML = drawRhythmStaff(pat, rhythmTimeSig, true, null) +
+      `<div class="rhythm-tile-lbl">Wariant ${idx+1}</div>`;
+    tile.onclick = () => handleRhythmChoiceB(idx);
+    grid.appendChild(tile);
+  });
+  // Auto-play
+  setTimeout(playCurrentRhythm, 400);
+}
+
+function handleRhythmChoiceB(chosenIdx) {
+  if (rhythmAnswered) return;
+  rhythmAnswered = true;
+  const correctIdx = rhythmChoices.findIndex(p=>rhythmsEqual(p,currentRhythm));
+  const isOk = chosenIdx === correctIdx;
+  cnt++; document.getElementById('sCnt').textContent=cnt;
+  if(isOk) ok++;
+  updScore();
+  document.querySelectorAll('#rChoiceGridB .rhythm-tile').forEach((tile,i)=>{
+    tile.setAttribute('disabled','');
+    if(i===correctIdx){tile.classList.add('ok');tile.innerHTML=drawRhythmStaff(rhythmChoices[i],rhythmTimeSig,true,'ok')+`<div class="rhythm-tile-lbl">✓ Poprawny</div>`;}
+    else if(i===chosenIdx&&!isOk){tile.classList.add('bad');tile.innerHTML=drawRhythmStaff(rhythmChoices[i],rhythmTimeSig,true,'bad')+`<div class="rhythm-tile-lbl">✗ Błędny</div>`;}
+  });
+  if(document.getElementById('toggleFeedbackSound').checked) playPyk(isOk);
+  if(isOk){spawnSpecificEmoji(window.innerWidth/2,window.innerHeight/2,EMOJIS_GOOD[emojiGoodIdx]);emojiGoodIdx=(emojiGoodIdx+1)%EMOJIS_GOOD.length;}
+  setTimeout(()=>{rhythmAnswered=false;go();},1500);
+}
+
+// ══ SUB-TRYB C: Słuchaj → przeciągnij ══
+let buildZoneEvents = [];
+
+function goRhythmBuild() {
+  buildZoneEvents = [];
+  renderBuildZone();
+  buildPalette();
+  updatePulseDots(currentRhythm, -1, 'rhythmPulseDotsB');
+  document.getElementById('rBuildResult').textContent = '';
+  setTimeout(playCurrentRhythm, 400);
+}
+
+function buildPalette() {
+  const pal = document.getElementById('rBuildPalette');
+  if (!pal) return;
+  pal.innerHTML = '';
+  // Create draggable items for each allowed duration + rests
+  const items = [];
+  if (rhythmVals.has('whole'))     { items.push({type:'note',dur:1,label:'Cała ♩'}); if(rhythmUseRests) items.push({type:'rest',dur:1,label:'Pauza ━'}); }
+  if (rhythmVals.has('half'))      { items.push({type:'note',dur:0.5,label:'Pół ♩'}); if(rhythmUseRests) items.push({type:'rest',dur:0.5,label:'Pauza ▄'}); }
+  if (rhythmVals.has('quarter'))   { items.push({type:'note',dur:0.25,label:'Ćwierć ♩'}); if(rhythmUseRests) items.push({type:'rest',dur:0.25,label:'Pauza ꜝ'}); }
+  if (rhythmVals.has('eighth'))    { items.push({type:'note',dur:0.125,label:'Ósemka ♪'}); if(rhythmUseRests) items.push({type:'rest',dur:0.125,label:'Pauza ♪'}); }
+  if (rhythmVals.has('sixteenth')) { items.push({type:'note',dur:0.0625,label:'Szest. 𝅘𝅥𝅯'}); }
+  if (rhythmUseTriplets)           { items.push({type:'triplet',dur:0.0833,label:'Triola ³'}); }
+  if (rhythmUseDots)               { items.push({type:'note',dur:0.25,dotted:true,label:'Krop. ♩.'}); }
+
+  items.forEach(item => {
+    const btn = document.createElement('div');
+    btn.draggable = true;
+    btn.style.cssText = `
+      padding:6px 10px;border-radius:8px;border:2px solid var(--navy);
+      background:white;cursor:grab;font-size:0.72rem;font-weight:700;
+      color:var(--navy);user-select:none;touch-action:manipulation;
+      flex-shrink:0;text-align:center;min-width:56px;
+    `;
+    btn.textContent = item.label;
+    btn.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', JSON.stringify(item));
+    });
+    // Touch drag fallback
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      btn._touchItem = item;
+      btn.style.opacity = '0.6';
+    }, {passive:false});
+    btn.addEventListener('touchend', e => {
+      btn.style.opacity = '1';
+      const t = e.changedTouches[0];
+      const zone = document.getElementById('rBuildZone');
+      const rect = zone.getBoundingClientRect();
+      if (t.clientX >= rect.left && t.clientX <= rect.right &&
+          t.clientY >= rect.top  && t.clientY <= rect.bottom) {
+        addToBuildZone(btn._touchItem);
+      }
+    });
+    pal.appendChild(btn);
   });
 
-  if(document.getElementById('toggleFeedbackSound').checked) playPyk(correct);
-  if(correct) {
-    spawnSpecificEmoji(window.innerWidth/2, window.innerHeight/2, EMOJIS_GOOD[emojiGoodIdx]);
-    emojiGoodIdx = (emojiGoodIdx+1)%EMOJIS_GOOD.length;
+  // Drop zone handlers
+  const zone = document.getElementById('rBuildZone');
+  zone.ondragover = e => { e.preventDefault(); zone.style.borderColor='var(--navy)'; };
+  zone.ondragleave = () => { zone.style.borderColor='#94a3b8'; };
+  zone.ondrop = e => {
+    e.preventDefault();
+    zone.style.borderColor = '#94a3b8';
+    try {
+      const item = JSON.parse(e.dataTransfer.getData('text/plain'));
+      addToBuildZone(item);
+    } catch(err) {}
+  };
+}
+
+function addToBuildZone(item) {
+  const ev = {type:item.type==='rest'?'rest':'note', dur:item.dur||0.25, dotted:!!item.dotted, triplet:!!item.triplet, tied:false};
+  buildZoneEvents.push(ev);
+  renderBuildZone();
+}
+
+function renderBuildZone() {
+  const zone = document.getElementById('rBuildZone');
+  const empty = document.getElementById('rBuildEmpty');
+  if (!zone) return;
+
+  // Remove old chips
+  zone.querySelectorAll('.build-chip').forEach(c=>c.remove());
+  if (empty) empty.style.display = buildZoneEvents.length ? 'none' : '';
+
+  buildZoneEvents.forEach((ev, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'build-chip';
+    // Draw tiny staff for each event
+    chip.innerHTML = drawRhythmStaff([ev], rhythmTimeSig, true, null);
+    chip.style.cssText = 'flex-shrink:0;cursor:pointer;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;padding:2px;';
+    chip.title = 'Kliknij aby usunąć';
+    chip.onclick = () => { buildZoneEvents.splice(i,1); renderBuildZone(); };
+    zone.appendChild(chip);
+  });
+}
+
+function clearBuildZone() {
+  buildZoneEvents = [];
+  renderBuildZone();
+  document.getElementById('rBuildResult').textContent = '';
+}
+
+function checkBuildAnswer() {
+  if (!currentRhythm) return;
+  const totCorrect = currentRhythm.reduce((s,e)=>s+evDur(e),0);
+  const totBuilt   = buildZoneEvents.reduce((s,e)=>s+evDur(e),0);
+  const res = document.getElementById('rBuildResult');
+
+  if (Math.abs(totBuilt - totCorrect) > 1e-9) {
+    res.textContent = `Łączna wartość: ${totBuilt.toFixed(3)} ≠ ${totCorrect.toFixed(3)} — uzupełnij!`;
+    res.style.color = '#dc2626';
+    return;
   }
 
-  // Redraw tiles with highlight
-  const tileW = Math.min(300, (window.innerWidth - 60) / 2);
-  tiles.forEach((tile, i) => {
-    tile.innerHTML = drawRhythmSVG(rhythmChoices[i], rhythmTimeSig, tileW, 56,
-      i === correctIdx ? 'correct' : (i === chosenIdx && !correct ? 'wrong' : null)) +
-      `<div class="rhythm-tile-label">Wariant ${i+1}</div>`;
-  });
+  const isOk = rhythmsEqual(buildZoneEvents, currentRhythm);
+  cnt++; document.getElementById('sCnt').textContent=cnt;
+  if(isOk) ok++;
+  updScore();
 
-  setTimeout(() => { rhythmAnswered = false; go(); }, 1400);
+  if(isOk) {
+    res.textContent = '✓ Brawo! Rytm ułożony poprawnie!';
+    res.style.color = '#16a34a';
+    if(document.getElementById('toggleFeedbackSound').checked) playPyk(true);
+    spawnSpecificEmoji(window.innerWidth/2,window.innerHeight/2,EMOJIS_GOOD[emojiGoodIdx]);
+    emojiGoodIdx=(emojiGoodIdx+1)%EMOJIS_GOOD.length;
+    setTimeout(()=>go(),1600);
+  } else {
+    res.textContent = '✗ Nie pasuje — posłuchaj jeszcze raz i spróbuj ponownie';
+    res.style.color = '#dc2626';
+    if(document.getElementById('toggleFeedbackSound').checked) playPyk(false);
+    // Show correct answer briefly on staff
+    setTimeout(()=>{ playCurrentRhythm(); },600);
+  }
 }
 
-function setTimeSig(ts){
-  rhythmTimeSig=ts;
-  ['44','34','24','68'].forEach(t=>document.getElementById('cb-ts-'+t)?.classList.toggle('active',t.replace('','/')===ts.replace('/','').replace('/','')));
-  // fix: match by value
-  ['4/4','3/4','2/4','6/8'].forEach(t=>{
-    const id='cb-ts-'+t.replace('/','');
-    const el=document.getElementById(id);
-    if(el) el.classList.toggle('active',t===ts);
+// ══ GŁÓWNA LOGIKA RYTMU ══
+function setRhythmSub(sub) {
+  rhythmSub = sub;
+  ['read','hear','build'].forEach(s => {
+    document.getElementById('cb-rsub-'+s)?.classList.toggle('active', s===sub);
+    const el = document.getElementById('rsub-'+s);
+    if(el) el.style.display = s===sub ? 'flex' : 'none';
   });
 }
-function setRhythmDifficulty(d){
-  rhythmDifficulty=d;
-  ['easy','medium','hard'].forEach(k=>document.getElementById('cb-rd-'+k)?.classList.toggle('active',k===d));
+
+function goRhythm() {
+  rhythmAnswered = false;
+  stopRhythmPlayback();
+  currentRhythm = buildRhythm();
+  rhythmChoices = buildRhythmChoices(currentRhythm);
+
+  if (rhythmSub === 'read')  { goRhythmRead();  }
+  if (rhythmSub === 'hear')  { goRhythmHear();  }
+  if (rhythmSub === 'build') { goRhythmBuild(); }
+  anim();
 }
-function setBpm(v){ rhythmBpm=v; const el=document.getElementById('bpm-val'); if(el) el.textContent=v+' BPM'; }
+
+// ── Settery ──
+function setTimeSig(ts) {
+  rhythmTimeSig = ts;
+  ['4/4','3/4','2/4','6/8','3/8'].forEach(t => {
+    document.getElementById('cb-ts-'+t.replace('/',''))?.classList.toggle('active', t===ts);
+  });
+}
+
+function toggleRhythmVal(v) {
+  if (v==='dotted')  { rhythmUseDots=!rhythmUseDots;    document.getElementById('cb-rv-dotted')?.classList.toggle('active',rhythmUseDots); return; }
+  if (v==='rests')   { rhythmUseRests=!rhythmUseRests;   document.getElementById('cb-rv-rests')?.classList.toggle('active',rhythmUseRests); return; }
+  if (v==='triplet') { rhythmUseTriplets=!rhythmUseTriplets; document.getElementById('cb-rv-triplet')?.classList.toggle('active',rhythmUseTriplets); return; }
+  if (rhythmVals.has(v)) { if(rhythmVals.size<=1) return; rhythmVals.delete(v); }
+  else rhythmVals.add(v);
+  document.getElementById('cb-rv-'+v)?.classList.toggle('active', rhythmVals.has(v));
+}
+
+function setRhythmBars(n) {
+  rhythmBars = n;
+  [1,2,4].forEach(b => document.getElementById('cb-bars-'+b)?.classList.toggle('active', b===n));
+}
+
+function setBpm(v) { rhythmBpm=v; const el=document.getElementById('bpm-val'); if(el) el.textContent=v+' BPM'; }
 
 // ══════════════════════════════════════════════════════════
 // ═══════════════ FUNC MODE STATE ══════════════════════════
@@ -1536,16 +2209,6 @@ function go(){
   startTimer();anim();
 }
 
-function goRhythm() {
-  rhythmAnswered = false;
-  currentRhythm = buildRhythm(rhythmTimeSig, rhythmDifficulty);
-  rhythmChoices = buildRhythmChoices(currentRhythm);
-  renderRhythmPulse(currentRhythm, rhythmTimeSig, -1);
-  buildRhythmChoiceGrid();
-  anim();
-  // Auto-play after short delay
-  setTimeout(playCurrentRhythm, 400);
-}
 
 function goFunc() {
   funcAnswered = false;
@@ -1792,6 +2455,10 @@ function setMode(m){
   if(m!=='reveal'&&micOn)stopMic();
   updateSelfCheckVisibility();
   if(isPlace){render([]);}
+  // Initialize rhythm sub-mode visibility
+  if(isRhythm){
+    setRhythmSub(rhythmSub);
+  }
   go();
 }
 
