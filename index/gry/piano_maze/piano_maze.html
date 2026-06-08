@@ -317,9 +317,9 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
         <div class="srow">
           <label>Klucz nutowy</label>
           <div class="mgrp">
-            <button class="mmode on" id="clefG" onclick="setClef('G')">𝄞 Wiolinowy</button>
+            <button class="mmode" id="clefG" onclick="setClef('G')">𝄞 Wiolinowy</button>
             <button class="mmode" id="clefB" onclick="setClef('B')">𝄢 Basowy</button>
-            <button class="mmode" id="clefGB" onclick="setClef('GB')">𝄞+𝄢 Oba</button>
+            <button class="mmode on" id="clefGB" onclick="setClef('GB')">𝄞+𝄢 Oba</button>
           </div>
         </div>
         <div class="srow">
@@ -528,7 +528,9 @@ const CREATURE_IMGS = {
 
   // Try same-origin path first (served from site), then raw github
   const bgSrcs = [
+    SITE_BASE + 'loading_screen/t\u0142o_Music_maze_ok\u0142adka.png',
     SITE_BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
+    BASE + 'loading_screen/t\u0142o_Music_maze_ok\u0142adka.png',
     BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
   ];
   const imgStyle = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.8s;';
@@ -655,6 +657,7 @@ const DIR_COLORS = { N:'#e8c040', E:'#f06868', S:'#50a8f0', W:'#60d870' };
 const NOTE_COLOR_DEFAULT = '#c8b87a';
 
 const ALL_NOTE_DEFS = [
+  // Kontroktawa i wielka — pod pięciolinią basową (linie dodane dolne)
   {id:'C',  freq:65.41,  name:'C',  clef:'B', staffY_G:null, staffY_B:14},
   {id:'D',  freq:73.42,  name:'D',  clef:'B', staffY_G:null, staffY_B:13},
   {id:'E',  freq:82.41,  name:'E',  clef:'B', staffY_G:null, staffY_B:12},
@@ -662,13 +665,37 @@ const ALL_NOTE_DEFS = [
   {id:'G',  freq:98.00,  name:'G',  clef:'B', staffY_G:null, staffY_B:10},
   {id:'A',  freq:110.00, name:'A',  clef:'B', staffY_G:null, staffY_B:9},
   {id:'H',  freq:123.47, name:'H',  clef:'B', staffY_G:null, staffY_B:8},
-  {id:'c',  freq:130.81, name:'c',  clef:'B', staffY_G:null, staffY_B:7},
-  {id:'d',  freq:146.83, name:'d',  clef:'B', staffY_G:null, staffY_B:6},
-  {id:'e',  freq:164.81, name:'e',  clef:'B', staffY_G:null, staffY_B:5},
-  {id:'f',  freq:174.61, name:'f',  clef:'B', staffY_G:null, staffY_B:4},
-  {id:'g',  freq:196.00, name:'g',  clef:'B', staffY_G:null, staffY_B:3},
-  {id:'a',  freq:220.00, name:'a',  clef:'B', staffY_G:null, staffY_B:2},
-  {id:'h',  freq:246.94, name:'h',  clef:'B', staffY_G:null, staffY_B:1},
+  // Mała oktawa — wg opisu:
+  // staffY: 0=linia1(góra), 1=przestrzeń 1-2, 2=linia2, 3=przestrzeń 2-3,
+  //         4=linia3, 5=przestrzeń 3-4, 6=linia4, 7=przestrzeń 4-5, 8=linia5(dół)
+  // Wyższy dźwięk = wyżej na pięciolinii = mniejszy staffY
+  // c małe = nad linią 2    (przestrzeń między linią 2 a 3 od góry) → 3
+  // d małe = na linii 3     → 4 — ale wg opisu d jest na linii 3 od góry → staffY=4... ale "nad linią 2" = między 2-3 = staffY=3
+  // Poprawnie wg standardowego klucza F (linia 1 góra = A małe):
+  // linia1=A, między=G, linia2=F, między=E, linia3=D, między=C, linia4=H wielkie, między=A wielkie, linia5=G wielkie
+  // W tym schemacie:
+  // h małe: nad 5. linią — h jest wyżej niż a=linia5, więc h jest między linią 4 a 5: staffY=7
+  // a małe: na linii 5 (ale to jest linia dolna!): staffY=8
+  // Ale użytkownik powiedział: "c małe jest nad drugą główną linią" — więc w JEGO schemacie:
+  // linia 2 = f małe (standardowe klucz F), nad linią 2 = e małe
+  // Nowy opis: linia3=d, linia4=f... to odpowiada liniom od DOŁU. Czytamy go od dołu:
+  // linia5(dół)=pierwsza od dołu, linia1(góra)=piąta od dołu
+  // "nad" = wyżej na kartce = bliżej góry = mniejszy staffY (licząc od góry)
+  // Finalny schemat (staffY liczony od góry, linia1=0):
+  // h = nad 5.linią od dołu = nad linią1(od góry) = staffY=-1 (linia dodana górna)
+  // a = linia5(od dołu) = linia1(od góry) = staffY=0
+  // g = nad 4.linią od dołu = nad linią2(od góry) = staffY=1
+  // f = linia4(od dołu) = linia2(od góry) = staffY=2
+  // e = nad 3.linią od dołu = nad linią3(od góry) = staffY=3
+  // d = linia3(od dołu) = linia3(od góry) = staffY=4
+  // c = nad 2.linią od dołu = nad linią4(od góry) = staffY=5
+  {id:'c',  freq:130.81, name:'c',  clef:'B', staffY_G:null, staffY_B:5},
+  {id:'d',  freq:146.83, name:'d',  clef:'B', staffY_G:null, staffY_B:4},
+  {id:'e',  freq:164.81, name:'e',  clef:'B', staffY_G:null, staffY_B:3},
+  {id:'f',  freq:174.61, name:'f',  clef:'B', staffY_G:null, staffY_B:2},
+  {id:'g',  freq:196.00, name:'g',  clef:'B', staffY_G:null, staffY_B:1},
+  {id:'a',  freq:220.00, name:'a',  clef:'B', staffY_G:null, staffY_B:0},
+  {id:'h',  freq:246.94, name:'h',  clef:'B', staffY_G:null, staffY_B:-1},
   {id:'c1', freq:261.63, name:'c\u00b9', clef:'G', staffY_G:10, staffY_B:0},
   {id:'d1', freq:293.66, name:'d\u00b9', clef:'G', staffY_G:9,  staffY_B:-1},
   {id:'e1', freq:329.63, name:'e\u00b9', clef:'G', staffY_G:8,  staffY_B:-2},
@@ -708,7 +735,7 @@ let coloredNotes=false;
 function noteColor(n,dir){return coloredNotes?DIR_COLORS[dir]||NOTE_COLOR_DEFAULT:NOTE_COLOR_DEFAULT;}
 
 let MN = [];
-let clefMode = 'G';
+let clefMode = 'GB';
 let noteRange = 'small';
 
 function getRangeKey() { return clefMode + '_' + noteRange; }
@@ -780,7 +807,10 @@ function noteSVG(n, W, H, showLabel) {
     s += `<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="${Math.max(0.7, 0.9*scale)}" opacity="0.6"/>`;
   }
   if (isB) {
-    s += `<text x="4" y="${staffTop + sg * 2.5}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9">&#119074;</text>`;
+    // Klucz basowy (F): symbol siedzi na linii 4 od góry (staffTop + 3*sg)
+    // Dwa kropki: nad i pod linią 3 od góry
+    const clefY = staffTop + sg * 3.2;
+    s += `<text x="3" y="${clefY.toFixed(1)}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9" dominant-baseline="middle">&#119074;</text>`;
   } else {
     s += `<text x="3" y="${staffTop + sg * 4 + Math.round(2*scale)}" font-size="${trebleFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;
   }
@@ -917,63 +947,329 @@ function ensureAudioCtx() {
 function midiHz(n) { return 440 * Math.pow(2, (n - 69) / 12); }
 
 // Note constants (MIDI)
-const A3=57,B3=59,C4=60,D4=62,E4=64,F4=65,G4=67,
-      A4=69,B4=71,C5=72,D5=74,E5=76,F5=77,G5=79,A5=81,
-      Bb3=58,Bb4=70,Gs3=56,Gs4=68,
-      A2=45,E3=52,D3=50,C3=48,G3=55,F3=53;
+const A2=45, B2=47, C3=48, D3=50, E3=52, F3=53, G3=55,
+      A3=57, B3=59, C4=60, D4=62, E4=64, F4=65, G4=67,
+      A4=69, B4=71, C5=72, D5=74, E5=76, F5=77, G5=79, A5=81,
+      Gs2=44, Gs3=56, Gs4=68,
+      Bb2=46, Bb3=58, Bb4=70,
+      Eb4=63, Eb3=51, Eb5=75,
+      Fs3=54, Fs4=66;
 
-/* ── MELODY: 64-step lead ──
-   Classic Spelunky-like: starts with a hooky 4-bar phrase,
-   then a contrasting "B section", repeating. -1 = rest.
-   Durations in 16th notes are baked into repetition.
-*/
+/* ══════════════════════════════════════════════════════════════
+   MELODY_SEQ — 640 steps (80 bars × 8 steps)
+   20 sections of 4 bars each. -1 = rest.
+══════════════════════════════════════════════════════════════ */
 const MELODY_SEQ = [
-// Bar 1-2: main hook — rising minor line then bounce
+// ── SECTION A (bars 1–4): Main hook ──
   E4,  -1,  E4,  D4,   C4,  -1,  A3,  -1,
   C4,  D4,  E4,  -1,   G4,  -1,  A4,  -1,
-// Bar 3-4: answer phrase — drops down, ends on tension
   G4,  -1,  F4,  E4,   D4,  -1,  B3,  -1,
   C4,  -1,  A3,  Gs3,  A3,  -1,  -1,  -1,
-// Bar 5-6: B section — faster feel, chromatic colour
+// ── SECTION B (bars 5–8): Development ──
   C5,  B4,  A4,  G4,   F4,  E4,  D4,  C4,
   Bb3, -1,  C4,  -1,   D4,  E4,  -1,  -1,
-// Bar 7-8: build and return — sequence climbs back up
   A3,  C4,  E4,  G4,   A4,  -1,  G4,  E4,
   D4,  C4,  B3,  A3,   -1,  -1,  A3,  -1,
+// ── SECTION C (bars 9–12): Lower register ──
+  A3,  -1,  G3,  A3,   C4,  -1,  E4,  -1,
+  D4,  C4,  B3,  -1,   A3,  -1,  G3,  -1,
+  F3,  G3,  A3,  -1,   C4,  B3,  A3,  G3,
+  A3,  -1,  -1,  E3,   A3,  -1,  -1,  -1,
+// ── SECTION D (bars 13–16): Chromatic descent ──
+  A4,  Gs4, G4,  Fs4,  F4,  E4,  Eb4, D4,
+  C4,  -1,  D4,  -1,   E4,  -1,  F4,  -1,
+  G4,  F4,  E4,  D4,   C4,  B3,  A3,  Gs3,
+  A3,  -1,  -1,  -1,   A3,  C4,  E4,  -1,
+// ── SECTION E (bars 17–20): Higher register ──
+  E5,  -1,  D5,  C5,   B4,  -1,  A4,  -1,
+  C5,  B4,  A4,  -1,   G4,  A4,  B4,  -1,
+  C5,  -1,  B4,  A4,   G4,  -1,  E4,  -1,
+  F4,  G4,  A4,  -1,   E4,  -1,  A4,  -1,
+// ── SECTION F (bars 21–24): Modal detour ──
+  F4,  -1,  G4,  A4,   Bb4, -1,  A4,  G4,
+  F4,  E4,  D4,  -1,   C4,  -1,  D4,  -1,
+  Bb3, C4,  D4,  E4,   F4,  -1,  G4,  -1,
+  A4,  -1,  G4,  F4,   E4,  D4,  C4,  -1,
+// ── SECTION G (bars 25–28): Ornamented echo ──
+  E4,  Fs4, E4,  D4,   C4,  D4,  C4,  A3,
+  C4,  D4,  E4,  Fs4,  G4,  -1,  A4,  -1,
+  G4,  Fs4, F4,  E4,   D4,  C4,  B3,  A3,
+  C4,  E4,  A3,  Gs3,  A3,  -1,  -1,  -1,
+// ── SECTION H (bars 29–32): Fast run ──
+  A3,  B3,  C4,  D4,   E4,  F4,  G4,  A4,
+  B4,  A4,  G4,  F4,   E4,  D4,  C4,  B3,
+  C4,  E4,  G4,  A4,   G4,  E4,  C4,  A3,
+  D4,  F4,  A4,  -1,   E4,  G4,  B4,  -1,
+// ── SECTION I (bars 33–36): Sparse bridge ──
+  A4,  -1,  -1,  E4,   -1,  -1,  C4,  -1,
+  -1,  A3,  -1,  -1,   G3,  A3,  -1,  -1,
+  E4,  -1,  D4,  -1,   C4,  -1,  B3,  A3,
+  -1,  -1,  C4,  E4,   A4,  -1,  -1,  -1,
+// ── SECTION J (bars 37–40): Coda / recapitulation ──
+  E4,  -1,  E4,  D4,   C4,  -1,  A3,  G3,
+  C4,  D4,  E4,  F4,   G4,  A4,  B4,  C5,
+  A4,  G4,  E4,  D4,   C4,  B3,  A3,  Gs3,
+  A3,  C4,  E4,  A4,   A3,  -1,  A3,  -1,
+// ── SECTION K (bars 41–44): Pentatonic bounce ──
+  A3,  C4,  A3,  E4,   A3,  C4,  E4,  G4,
+  A4,  G4,  E4,  C4,   A3,  -1,  G3,  -1,
+  E3,  G3,  A3,  C4,   E4,  -1,  D4,  C4,
+  B3,  A3,  G3,  E3,   A3,  -1,  -1,  -1,
+// ── SECTION L (bars 45–48): Staccato motif ──
+  E4,  -1,  D4,  -1,   C4,  -1,  B3,  -1,
+  A3,  -1,  G3,  A3,   C4,  D4,  E4,  -1,
+  F4,  -1,  E4,  -1,   D4,  -1,  C4,  B3,
+  A3,  B3,  C4,  -1,   A3,  -1,  A3,  -1,
+// ── SECTION M (bars 49–52): Rising thirds ──
+  A3,  C4,  -1,  C4,   E4,  -1,  E4,  G4,
+  -1,  G4,  B4,  -1,   B4,  A4,  G4,  -1,
+  E4,  D4,  C4,  B3,   A3,  G3,  E3,  -1,
+  A3,  -1,  E4,  -1,   A4,  -1,  E4,  A3,
+// ── SECTION N (bars 53–56): Counter-melody ──
+  A4,  -1,  A4,  B4,   C5,  -1,  E5,  -1,
+  C5,  B4,  A4,  -1,   F4,  -1,  E4,  -1,
+  D4,  -1,  E4,  F4,   G4,  -1,  A4,  -1,
+  E4,  -1,  E4,  Fs4,  E4,  -1,  -1,  -1,
+// ── SECTION O (bars 57–60): Long tones ──
+  E4,  -1,  -1,  -1,   G4,  -1,  -1,  -1,
+  A4,  -1,  -1,  G4,   E4,  -1,  D4,  -1,
+  C4,  -1,  -1,  -1,   E4,  -1,  -1,  -1,
+  A3,  -1,  C4,  E4,   A4,  -1,  -1,  -1,
+// ── SECTION P (bars 61–64): Chromatic zigzag ──
+  E4,  Eb4, D4,  Db4,  C4,  B3,  Bb3, A3,
+  Bb3, B3,  C4,  Db4,  D4,  Eb4, E4,  F4,
+  Fs4, G4,  Gs4, A4,   G4,  F4,  E4,  D4,
+  C4,  B3,  A3,  Gs3,  A3,  -1,  -1,  -1,
+// ── SECTION Q (bars 65–68): Variant of C ──
+  A3,  G3,  A3,  C4,   E4,  G4,  E4,  C4,
+  B3,  A3,  G3,  F3,   E3,  -1,  G3,  A3,
+  C4,  B3,  A3,  G3,   F3,  G3,  A3,  -1,
+  E3,  A3,  E4,  -1,   A3,  -1,  E3,  -1,
+// ── SECTION R (bars 69–72): Drive (echo of H) ──
+  E4,  F4,  G4,  A4,   B4,  C5,  D5,  E5,
+  D5,  C5,  B4,  A4,   G4,  F4,  E4,  D4,
+  C4,  D4,  E4,  F4,   G4,  A4,  G4,  E4,
+  A4,  -1,  G4,  E4,   D4,  C4,  B3,  A3,
+// ── SECTION S (bars 73–76): Final sparse bridge ──
+  E5,  -1,  -1,  -1,   -1,  C5,  -1,  -1,
+  A4,  -1,  -1,  E4,   -1,  -1,  C4,  -1,
+  A3,  -1,  C4,  -1,   E4,  -1,  A4,  -1,
+  -1,  E4,  -1,  C4,   -1,  A3,  -1,  -1,
+// ── SECTION T (bars 77–80): Grand finale ──
+  E4,  -1,  E4,  D4,   C4,  D4,  E4,  G4,
+  A4,  G4,  E4,  D4,   C4,  B3,  A3,  G3,
+  A3,  B3,  C4,  D4,   E4,  F4,  G4,  A4,
+  A3,  -1,  E4,  -1,   A4,  E4,  A3,  -1,
 ];
 
-/* ── BASS: walking triangle-wave ──
-   Spelunky bass is simple root/fifth punches.
-   Triangle wave = warm, slightly muted NES triangle channel.
-*/
+/* ══════════════════════════════════════════════════════════════
+   BASS_SEQ — 640 steps (80 bars × 8 steps)
+══════════════════════════════════════════════════════════════ */
 const BASS_SEQ = [
-// Bar 1-2
-  A2,  -1,  A2,  -1,   A2,  -1,  E3,  -1,
-  A2,  -1,  A2,  -1,   C3,  -1,  E3,  -1,
-// Bar 3-4
-  D3,  -1,  D3,  -1,   D3,  -1,  A3,  -1,
-  A2,  -1,  Gs3, -1,   A2,  -1,  -1,  -1,
-// Bar 5-6
-  F3,  -1,  F3,  -1,   C4,  -1,  F3,  -1,
-  Bb3, -1,  Bb3, -1,   F3,  -1,  G3,  -1,
-// Bar 7-8
-  A2,  -1,  C3,  -1,   E3,  -1,  A3,  -1,
-  D3,  -1,  E3,  -1,   A2,  -1,  A2,  -1,
+// Section A
+  A2,-1,A2,-1, A2,-1,E3,-1,
+  A2,-1,A2,-1, C3,-1,E3,-1,
+  D3,-1,D3,-1, D3,-1,A3,-1,
+  A2,-1,Gs3,-1,A2,-1,-1,-1,
+// Section B
+  F3,-1,F3,-1, C3,-1,F3,-1,
+  Bb2,-1,Bb2,-1,F3,-1,G3,-1,
+  A2,-1,C3,-1, E3,-1,A3,-1,
+  D3,-1,E3,-1, A2,-1,A2,-1,
+// Section C
+  A2,-1,A2,-1, E3,-1,A2,-1,
+  D3,-1,D3,-1, A2,-1,E3,-1,
+  F3,-1,F3,-1, C3,-1,F3,-1,
+  A2,-1,E3,-1, A2,-1,-1,-1,
+// Section D
+  A2,-1,A2,-1, A2,-1,D3,-1,
+  A2,-1,D3,-1, A2,-1,E3,-1,
+  A2,-1,Gs2,-1,A2,-1,E3,-1,
+  A2,-1,A2,-1, C3,E3,A2,-1,
+// Section E
+  A2,-1,E3,-1, A2,-1,C3,-1,
+  E3,-1,A2,-1, E3,-1,G3,-1,
+  C3,-1,G3,-1, C3,-1,E3,-1,
+  F3,-1,C3,-1, A2,-1,E3,-1,
+// Section F
+  F3,-1,F3,-1, C3,-1,F3,-1,
+  Bb2,-1,F3,-1,Bb2,-1,G3,-1,
+  Bb2,-1,C3,-1,D3,-1,F3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section G
+  A2,-1,E3,-1, A2,-1,E3,-1,
+  A2,-1,D3,-1, E3,-1,A3,-1,
+  D3,-1,D3,-1, A2,-1,Gs2,-1,
+  A2,-1,C3,E3, A2,-1,-1,-1,
+// Section H
+  A2,-1,A2,-1, A2,E3,A2,-1,
+  E3,-1,D3,-1, C3,-1,E3,-1,
+  A2,-1,C3,-1, E3,-1,A3,-1,
+  D3,-1,F3,-1, E3,-1,Gs3,-1,
+// Section I
+  A2,-1,-1,-1, E3,-1,-1,-1,
+  A2,-1,-1,-1, E3,-1,-1,-1,
+  D3,-1,-1,-1, A2,-1,E3,-1,
+  A2,-1,C3,-1, E3,-1,A2,-1,
+// Section J
+  A2,-1,A2,-1, E3,-1,A2,-1,
+  C3,-1,F3,-1, C3,-1,F3,-1,
+  A2,-1,Gs2,-1,A2,-1,E3,-1,
+  A2,-1,E3,A3, A2,-1,A2,-1,
+// Section K
+  A2,-1,E3,-1, A2,-1,C3,-1,
+  E3,-1,A2,-1, E3,-1,A2,-1,
+  C3,-1,E3,-1, A2,-1,E3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section L
+  A2,-1,A2,-1, C3,-1,A2,-1,
+  E3,-1,A2,-1, C3,-1,E3,-1,
+  F3,-1,C3,-1, F3,-1,C3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section M
+  A2,-1,C3,-1, E3,-1,A3,-1,
+  E3,-1,G3,-1, B2,-1,E3,-1,
+  A2,-1,E3,-1, A2,-1,C3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section N
+  A2,-1,E3,-1, A2,-1,A3,-1,
+  C3,-1,A2,-1, F3,-1,C3,-1,
+  D3,-1,A2,-1, D3,-1,F3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section O
+  A2,-1,-1,-1, E3,-1,-1,-1,
+  A2,-1,-1,-1, C3,-1,-1,-1,
+  A2,-1,-1,-1, E3,-1,-1,-1,
+  A2,-1,C3,-1, E3,A3,A2,-1,
+// Section P
+  A2,-1,E3,-1, A2,-1,D3,-1,
+  Bb2,-1,F3,-1,Bb2,-1,F3,-1,
+  Fs3,-1,D3,-1,A2,-1,E3,-1,
+  A2,-1,Gs2,-1,A2,-1,A2,-1,
+// Section Q
+  A2,-1,E3,-1, A2,-1,E3,-1,
+  A2,-1,D3,-1, A2,-1,E3,-1,
+  F3,-1,C3,-1, F3,-1,C3,-1,
+  A2,-1,E3,-1, A2,-1,A2,-1,
+// Section R
+  A2,-1,A2,-1, E3,A2,E3,-1,
+  E3,-1,D3,-1, C3,D3,E3,-1,
+  A2,C3,E3,-1, A3,-1,E3,-1,
+  A2,-1,E3,-1, A3,E3,A2,-1,
+// Section S
+  A2,-1,-1,-1, -1,-1,E3,-1,
+  A2,-1,-1,-1, E3,-1,-1,-1,
+  A2,-1,C3,-1, E3,-1,A2,-1,
+  E3,-1,C3,-1, A2,-1,-1,-1,
+// Section T
+  A2,-1,E3,-1, A2,C3,E3,-1,
+  A3,-1,E3,-1, A2,-1,C3,-1,
+  A2,C3,E3,A3, E3,-1,A2,-1,
+  A2,-1,A3,-1, A2,-1,A2,-1,
 ];
 
-/* ── ARP: rapid chord tones on a pulse wave ──
-   Fast arpeggio every 16th note, cycles through chord tones.
-   Very low volume — provides harmonic shimmer without mud.
-*/
+/* ── ARP_CHORDS — 320 entries (80 bars × 4 entries per bar) ── */
 const ARP_CHORDS = [
-  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  // i
-  [A3,C4,E4],  [A3,C4,E4],  [E3,G3,B3],  [E3,G3,B3],  // i → v
-  [D3,F3,A3],  [D3,F3,A3],  [D3,F3,A3],  [D3,F3,A3],  // iv
-  [A3,C4,E4],  [Gs3,B3,E4], [A3,C4,E4],  [E3,G3,B3],  // i → v
-  [F3,A3,C4],  [F3,A3,C4],  [C3,E3,G3],  [C3,E3,G3],  // VI → III
-  [Bb3,D4,F4], [Bb3,D4,F4], [F3,A3,C4],  [G3,B3,D4],  // bVII → iv → V
-  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  [A3,C4,E4],  // i
-  [D3,F3,A3],  [E3,G3,B3],  [A2,E3,A3],  [A2,E3,A3],  // iv → v → i
+  // Section A (bars 1–4)
+  [A3,C4,E4],[A3,C4,E4],[A3,C4,E4],[A3,C4,E4],
+  [A3,C4,E4],[A3,C4,E4],[E3,G3,B3],[E3,G3,B3],
+  [D3,F3,A3],[D3,F3,A3],[D3,F3,A3],[D3,A3,D4],
+  [A3,C4,E4],[Gs3,B3,E4],[A3,C4,E4],[E3,G3,B3],
+  // Section B (bars 5–8)
+  [F3,A3,C4],[F3,A3,C4],[C3,E3,G3],[C3,E3,G3],
+  [Bb3,D4,F4],[Bb3,D4,F4],[F3,A3,C4],[G3,B3,D4],
+  [A3,C4,E4],[A3,C4,E4],[A3,C4,E4],[A3,C4,E4],
+  [D3,F3,A3],[E3,G3,B3],[A2,E3,A3],[A2,E3,A3],
+  // Section C (bars 9–12)
+  [A3,C4,E4],[A3,E3,A3],[A3,C4,E4],[E3,G3,B3],
+  [D3,F3,A3],[D3,F3,A3],[A2,E3,A3],[A2,E3,A3],
+  [F3,A3,C4],[F3,A3,C4],[F3,A3,C4],[G3,B3,D4],
+  [A3,C4,E4],[E3,G3,B3],[A2,E3,A3],[E3,Gs3,B3],
+  // Section D (bars 13–16)
+  [A3,C4,E4],[A3,C4,E4],[D3,F3,A3],[D3,F3,A3],
+  [A3,C4,E4],[D3,F3,A3],[E3,G3,B3],[E3,G3,B3],
+  [A3,C4,E4],[Gs3,B3,E4],[A3,C4,E4],[E3,Gs3,B3],
+  [A3,C4,E4],[A3,C4,E4],[C3,E3,G3],[E3,G3,B3],
+  // Section E (bars 17–20)
+  [A3,C4,E4],[A3,C4,E4],[E3,B3,E4],[E3,B3,E4],
+  [E3,G3,B3],[E3,G3,B3],[A3,C4,E4],[G3,B3,D4],
+  [C3,G3,C4],[C3,G3,C4],[C3,E3,G3],[G3,B3,D4],
+  [F3,A3,C4],[F3,A3,C4],[E3,G3,B3],[E3,G3,B3],
+  // Section F (bars 21–24)
+  [F3,A3,C4],[F3,A3,C4],[F3,C4,F4],[F3,C4,F4],
+  [Bb2,F3,Bb3],[Bb2,F3,Bb3],[F3,A3,C4],[G3,B3,D4],
+  [Bb2,D3,F3],[Bb2,D3,F3],[C3,G3,C4],[C3,G3,C4],
+  [A3,C4,E4],[A3,C4,E4],[E3,G3,B3],[A2,E3,A3],
+  // Section G (bars 25–28)
+  [A3,C4,E4],[A3,C4,E4],[A3,C4,E4],[E3,G3,B3],
+  [A3,C4,E4],[D3,F3,A3],[E3,G3,B3],[A3,E4,A4],
+  [D3,F3,A3],[D3,F3,A3],[Gs3,B3,E4],[Gs3,B3,E4],
+  [A3,C4,E4],[E3,G3,B3],[A2,E3,A3],[A2,E3,Gs3],
+  // Section H (bars 29–32)
+  [A3,C4,E4],[A3,C4,E4],[A3,C4,E4],[E3,G3,B3],
+  [E3,B3,E4],[E3,G3,B3],[D3,A3,D4],[E3,G3,B3],
+  [C3,E3,G3],[C3,G3,C4],[E3,G3,B3],[A3,C4,E4],
+  [D3,F3,A3],[F3,A3,C4],[E3,G3,B3],[E3,Gs3,B3],
+  // Section I (bars 33–36)
+  [A2,E3,A3],[A2,E3,A3],[E2,E3,B3],[E2,E3,B3],
+  [A2,E3,A3],[A2,E3,A3],[E2,E3,B3],[A2,E3,A3],
+  [D3,F3,A3],[D3,F3,A3],[A2,E3,A3],[E3,G3,B3],
+  [A2,E3,A3],[C3,E3,A3],[E3,G3,B3],[A2,E3,A3],
+  // Section J (bars 37–40)
+  [A3,C4,E4],[A3,C4,E4],[E3,G3,B3],[A3,C4,E4],
+  [C3,G3,C4],[F3,A3,C4],[C3,G3,C4],[F3,A3,C4],
+  [A3,C4,E4],[Gs3,B3,E4],[A3,C4,E4],[E3,Gs3,B3],
+  [A3,C4,E4],[A3,C4,E4],[A2,E3,A3],[A2,E3,A3],
+  // Section K (bars 41–44)
+  [A3,C4,E4],[A3,C4,E4],[E3,A3,C4],[E3,G3,B3],
+  [A3,C4,E4],[E3,G3,B3],[A2,E3,A3],[A3,C4,E4],
+  [C3,E3,G3],[C3,G3,C4],[E3,G3,B3],[A3,C4,E4],
+  [A2,E3,A3],[E3,B3,E4],[A2,E3,A3],[A2,E3,A3],
+  // Section L (bars 45–48)
+  [A3,C4,E4],[E3,G3,B3],[A3,C4,E4],[E3,G3,B3],
+  [A2,E3,A3],[C3,E3,A3],[E3,G3,B3],[A3,C4,E4],
+  [F3,A3,C4],[F3,C4,F4],[C3,F3,A3],[G3,B3,D4],
+  [A2,E3,A3],[E3,G3,B3],[A2,E3,A3],[A2,E3,A3],
+  // Section M (bars 49–52)
+  [A3,C4,E4],[C3,E3,G3],[E3,G3,B3],[A3,E4,A4],
+  [E3,G3,B3],[G3,B3,D4],[B2,D3,Fs3],[E3,G3,B3],
+  [A2,E3,A3],[C3,E3,A3],[E3,G3,B3],[A3,C4,E4],
+  [A2,E3,A3],[E3,G3,B3],[A2,E3,A3],[A2,E3,A3],
+  // Section N (bars 53–56)
+  [A2,E3,A3],[E3,A3,E4],[A3,C4,E4],[A3,C4,E4],
+  [C3,G3,C4],[C3,E3,G3],[F3,A3,C4],[C3,G3,C4],
+  [D3,F3,A3],[A2,D3,F3],[D3,F3,A3],[F3,A3,D4],
+  [A2,E3,A3],[E3,G3,B3],[A2,E3,A3],[A2,E3,A3],
+  // Section O (bars 57–60)
+  [A2,E3,A3],[A2,E3,A3],[E2,E3,B3],[E2,E3,B3],
+  [A2,C3,E3],[A2,C3,E3],[E2,B2,E3],[E2,B2,E3],
+  [A2,E3,A3],[A2,E3,A3],[E2,E3,B3],[E2,E3,B3],
+  [A2,E3,A3],[C3,E3,A3],[E3,G3,B3],[A2,E3,A3],
+  // Section P (bars 61–64)
+  [A3,C4,E4],[E3,G3,B3],[A2,E3,A3],[D3,F3,A3],
+  [Bb2,F3,D4],[Bb2,D3,F3],[Bb2,F3,Bb3],[F3,A3,C4],
+  [D3,Fs3,A3],[D3,Fs3,A3],[A2,E3,A3],[E3,Gs3,B3],
+  [A2,E3,A3],[E3,Gs3,B3],[A2,E3,A3],[A2,E3,Gs3],
+  // Section Q (bars 65–68)
+  [A3,C4,E4],[E3,G3,B3],[A3,C4,E4],[E3,G3,B3],
+  [A2,E3,A3],[D3,F3,A3],[A2,E3,A3],[E3,G3,B3],
+  [F3,A3,C4],[F3,C4,F4],[C3,F3,A3],[G3,C4,E4],
+  [A2,E3,A3],[E3,G3,B3],[A2,E3,A3],[A2,E3,A3],
+  // Section R (bars 69–72)
+  [A3,C4,E4],[C3,G3,C4],[A3,E4,A4],[E3,G3,B3],
+  [E3,G3,B3],[D3,F3,A3],[C3,E3,G3],[E3,G3,B3],
+  [A2,E3,A3],[C3,E3,G3],[E3,G3,B3],[A3,C4,E4],
+  [A2,E3,A3],[E3,Gs3,B3],[A2,E3,A3],[A2,E3,Gs3],
+  // Section S (bars 73–76)
+  [A2,E3,A3],[A2,E3,A3],[A2,E3,A3],[A2,E3,A3],
+  [A2,E3,A3],[E2,E3,B3],[A2,E3,A3],[E2,E3,B3],
+  [A2,C3,E3],[A2,C3,E3],[E3,G3,B3],[A2,E3,A3],
+  [E3,G3,B3],[C3,E3,A3],[A2,E3,A3],[E2,E3,A3],
+  // Section T (bars 77–80)
+  [A3,C4,E4],[A3,C4,E4],[E3,G3,B3],[A3,C4,E4],
+  [A3,C4,E4],[F3,A3,C4],[C3,G3,C4],[F3,A3,C4],
+  [A2,C3,E3],[A3,C4,E4],[E3,Gs3,B3],[A3,C4,E4],
+  [A2,E3,A3],[C3,E3,A3],[E3,G3,B3],[A2,E3,A3],
 ];
 let arpPhase = 0;
 
@@ -1038,12 +1334,12 @@ function scheduleKick(t) {
 }
 
 /* ── PATTERN: which steps get what ──
-   64 steps total (matches MELODY_SEQ / BASS_SEQ length).
-   Kick: beats 1 & 3 of every bar (steps 0,8,16,24,32,40,48,56 of 64)
-   Snare: beats 2 & 4 (steps 4,12,20,28,36,44,52,60)
+   640 steps total (40 bars × 16 steps).
+   Kick: beats 1 & 3 of every bar (step % 8 === 0)
+   Snare: beats 2 & 4 (step % 8 === 4)
    Hihat: every even step
 */
-const TOTAL_STEPS = 64;
+const TOTAL_STEPS = 640;
 
 function isKick(s)  { return s % 8 === 0; }
 function isSnare(s) { return s % 8 === 4; }
