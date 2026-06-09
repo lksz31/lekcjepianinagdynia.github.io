@@ -854,6 +854,7 @@ let placeHint='pl';
 let placeTargetNote=null;
 let placeCurrentP=null;
 let placeConfirmed=false;
+let placeInteractClef=null;  // which staff the user is currently dragging on
 
 // ══════════════════════════════════════════════════════════
 // ═══════════════ RHYTHM MODE — KOMPLETNY SILNIK ═══════════
@@ -2033,18 +2034,48 @@ function getPlacePool(){
 
 let isDragging=false;
 function canvasYtoP(canvasY){
-  const rect=cvP.getBoundingClientRect();const H=280;
+  const rect=cvP.getBoundingClientRect();
+  const dual=(clef==='both');
+  const H=dual?380:280;
   const relY=(canvasY-rect.top)*(H/rect.height);
-  let st;
-  if(clef==='both'){
-    const g=STEP*2.6,tot=4*STEP+g+4*STEP,sy=Math.round((H-tot)/2);
-    const tops=[sy,sy+4*STEP+g];
-    const tClef=placeTargetNote?(placeTargetNote.ct||'treble'):'treble';
-    st=tClef==='treble'?tops[0]:tops[1];
-  }else{st=Math.round(H/2-2*STEP);}
-  const p=(st+4*STEP-relY)/(STEP/2);return Math.round(p);
+
+  if(dual){
+    const g=STEP*2.6;
+    const PAD=50;
+    const tops=[PAD, PAD+4*STEP+g];
+
+    const trebleMid = tops[0] + 2*STEP;
+    const bassMid   = tops[1] + 2*STEP;
+    const distTreble = Math.abs(relY - trebleMid);
+    const distBass   = Math.abs(relY - bassMid);
+
+    let st, detectedClef;
+    if(distTreble <= distBass){
+      st = tops[0]; detectedClef = 'treble';
+    } else {
+      st = tops[1]; detectedClef = 'bass';
+    }
+    if(isDragging) placeInteractClef = detectedClef;
+    const p = (st+4*STEP-relY)/(STEP/2);
+    return Math.round(p);
+  } else {
+    const st=Math.round(H/2-2*STEP);
+    const p=(st+4*STEP-relY)/(STEP/2);
+    return Math.round(p);
+  }
 }
-function clampP(p){const pool=getPlacePool();const minP=Math.min(...pool.map(n=>n.p));const maxP=Math.max(...pool.map(n=>n.p));return Math.max(minP,Math.min(maxP,p));}
+
+function clampP(p){
+  const pool=getPlacePool();
+  // In dual mode, clamp to the pool of the currently interacted clef
+  const filteredPool = (clef==='both' && placeInteractClef)
+    ? pool.filter(n=>n.ct===placeInteractClef)
+    : pool;
+  if(!filteredPool.length) return p;
+  const minP=Math.min(...filteredPool.map(n=>n.p));
+  const maxP=Math.max(...filteredPool.map(n=>n.p));
+  return Math.max(minP,Math.min(maxP,p));
+}
 
 cvP.addEventListener('mousedown',startDrag);
 cvP.addEventListener('touchstart',startDragTouch,{passive:false});
@@ -2057,6 +2088,7 @@ document.addEventListener('touchend',function(){isDragging=false;});
 
 function confirmPlace(){
   if(placeCurrentP===null||!placeTargetNote)return;
+  // Tylko pozycja musi się zgadzać — klucz nie jest wymagany
   const correct=(placeCurrentP===placeTargetNote.p);
   cnt++;document.getElementById('sCnt').textContent=cnt;
   const btn=document.getElementById('confirmBtn');
@@ -2068,16 +2100,21 @@ function confirmPlace(){
 
 function renderPlace(dragP,correctP){
   const dpr=Math.min(window.devicePixelRatio||1,3);
-  const BASE_W=900,BASE_H=280;
+  const dual=(clef==='both');
+  // Dual mode needs extra height for ledger lines above treble and below bass
+  const BASE_W=900, BASE_H=dual?380:280;
   cvP.width=BASE_W*dpr;cvP.height=BASE_H*dpr;
   ctxP.setTransform(dpr,0,0,dpr,0,0);
   const W=BASE_W,H=BASE_H;
   ctxP.clearRect(0,0,W,H);
   ctxP.fillStyle='#fff';ctxP.beginPath();ctxP.roundRect(0,0,W,H,12);ctxP.fill();
-  const dual=(clef==='both');
   let tops,clefs2;
-  if(dual){const g=STEP*2.6,tot=4*STEP+g+4*STEP,sy=Math.round((H-tot)/2);tops=[sy,sy+4*STEP+g];clefs2=['treble','bass'];}
-  else{tops=[Math.round(H/2-2*STEP)];clefs2=[clef];}
+  if(dual){
+    const g=STEP*2.6;
+    const PAD=50; // padding for ledger lines above/below
+    tops=[PAD, PAD+4*STEP+g];
+    clefs2=['treble','bass'];
+  }else{tops=[Math.round(H/2-2*STEP)];clefs2=[clef];}
   if(dual){
     const ty=tops[0],by=tops[1]+4*STEP,mid=(ty+by)/2,aw=15;
     ctxP.save();ctxP.strokeStyle='#1e3a8a';ctxP.fillStyle='#1e3a8a';ctxP.lineCap='round';
@@ -2098,9 +2135,15 @@ function renderPlace(dragP,correctP){
   ctxP.strokeStyle='#1e3a8a';ctxP.lineWidth=2.5;
   ctxP.beginPath();ctxP.moveTo(W-RE,tops[0]);ctxP.lineTo(W-RE,tops[tops.length-1]+4*STEP);ctxP.stroke();
   const nx=W/2;
+  // In dual mode: use the clef the user is interacting with for dragging,
+  // but use target note's clef for correctP display
   const tClef=placeTargetNote?(placeTargetNote.ct||clef):clef;
-  const activeClef=dual?tClef:clef;
+  const dragClef = (dual && placeInteractClef) ? placeInteractClef : tClef;
+  const activeClef=dual ? dragClef : clef;
   const activeSt=dual?tops[clefs2.indexOf(activeClef)]:tops[0];
+  // For correctP, always show on the target note's staff
+  const correctClef = dual ? tClef : clef;
+  const correctSt   = dual ? tops[clefs2.indexOf(correctClef)] : tops[0];
   const poolFiltered=getPlacePool().filter(n=>(!dual)||(n.ct===activeClef));
   if(poolFiltered.length>0){
     const minP=Math.min(...poolFiltered.map(n=>n.p));
@@ -2109,7 +2152,7 @@ function renderPlace(dragP,correctP){
       if(p<-2||p>8){const ly=ny(activeSt,p);ctxP.save();ctxP.strokeStyle='rgba(30,58,138,0.12)';ctxP.lineWidth=1.2;ctxP.beginPath();ctxP.moveTo(nx-22,ly);ctxP.lineTo(nx+22,ly);ctxP.stroke();ctxP.restore();}
     }
   }
-  if(correctP!==undefined&&correctP!==null){const fn={p:correctP,l:'',f:0,a:null};drawNote(ctxP,activeSt,fn,nx,correctP<=4,'#16a34a',null,activeClef==='bass');}
+  if(correctP!==undefined&&correctP!==null){const fn={p:correctP,l:'',f:0,a:null};drawNote(ctxP,correctSt,fn,nx,correctP<=4,'#16a34a',null,correctClef==='bass');}
   if(dragP!==undefined&&dragP!==null){const col=(correctP!==undefined)?'#ef4444':'rgba(30,58,138,0.7)';const fn={p:dragP,l:'',f:0,a:null};drawNote(ctxP,activeSt,fn,nx,dragP<=4,col,null,activeClef==='bass');}
 }
 
@@ -2121,9 +2164,9 @@ function updatePlaceHintUI(){
   const sub=document.getElementById('placeTargetSub');
   const noteEl=document.getElementById('placeTargetNote');
   const playBtn=document.getElementById('placePlayBtn');
-  const clefSuffix=(clef==='both')?(n.ct==='treble'?' 𝄞':' 𝄢'):'';
-  if(placeHint==='en'){sub.textContent='Umieść:';noteEl.textContent=noteEN(n)+clefSuffix;noteEl.style.display='block';playBtn.style.display='none';}
-  else if(placeHint==='pl'){sub.textContent='Umieść:';noteEl.textContent=n.l+clefSuffix;noteEl.style.display='block';playBtn.style.display='none';}
+  // Nie pokazujemy klucza — można umieścić nutę w dowolnym kluczu
+  if(placeHint==='en'){sub.textContent='Umieść:';noteEl.textContent=noteEN(n);noteEl.style.display='block';playBtn.style.display='none';}
+  else if(placeHint==='pl'){sub.textContent='Umieść:';noteEl.textContent=n.l;noteEl.style.display='block';playBtn.style.display='none';}
   else{sub.textContent='Umieść:';noteEl.style.display='none';playBtn.style.display='block';setTimeout(()=>playPlaceTarget(),200);}
 }
 function setPlaceHint(h){placeHint=h;['en','pl','sound'].forEach(id=>document.getElementById('cb-hint-'+id).classList.toggle('active',id===h));updatePlaceHintUI();}
@@ -2221,7 +2264,12 @@ function goFunc() {
 function buildPlaceNote(){
   const p=getPlacePool();let note,attempts=0;
   do{note=p[rnd(p.length)];if(placeTargetNote&&note.l===placeTargetNote.l&&note.p===placeTargetNote.p&&note.ct===placeTargetNote.ct)note=null;attempts++;}while(!note&&attempts<50);
-  placeTargetNote=note||p[0];placeCurrentP=null;renderPlace();updatePlaceHintUI();
+  placeTargetNote=note||p[0];
+  placeCurrentP=null;
+  placeConfirmed=false;
+  // Initialize interact clef to target note's clef so ledger lines show on correct staff
+  placeInteractClef=(placeTargetNote&&placeTargetNote.ct)?placeTargetNote.ct:(clef==='both'?'treble':clef);
+  renderPlace();updatePlaceHintUI();
   const ph=document.getElementById('place-hint-text');if(ph)ph.style.display='block';
   startTimer();anim();
 }
@@ -2435,21 +2483,22 @@ function setMode(m){
   document.getElementById('rhythmModeWrap').style.display   = isRhythm  ? 'flex' : 'none';
   document.getElementById('funcModeWrap').style.display     = isFunc    ? 'flex' : 'none';
 
-  // Show/hide mic panel
+  // Show/hide mic panel — only for reveal/choice, not place
   document.getElementById('micSettingsOuter').style.display = (isNote && !isPlace) ? 'block' : 'none';
 
   // Show/hide settings groups
-  document.getElementById('note-settings-group').style.display    = isNote ? '' : 'none';
+  // Place mode shares note-settings-group (same clef, octave, accidentals, timer)
+  document.getElementById('note-settings-group').style.display    = (isNote || isPlace) ? '' : 'none';
   document.getElementById('rhythm-settings-group').style.display  = isRhythm ? '' : 'none';
   document.getElementById('func-settings-group').style.display    = isFunc ? '' : 'none';
 
   // Note-mode specific rows
-  document.getElementById('row-acc').style.display        = (isNote && !isPlace) ? 'flex' : 'none';
+  document.getElementById('row-acc').style.display        = 'flex';   // show for both note and place
   document.getElementById('row-name-format').style.display= isNote ? 'flex' : 'none';
   const soundBtn=document.getElementById('cb-nf-sound');
   if(soundBtn)soundBtn.style.display=(m==='choice')?'':'none';
   if(m!=='choice'&&nameFormat==='sound'){setNameFormat('pl');}
-  document.getElementById('row-notecount').style.display  = isNote ? 'flex' : 'none';
+  document.getElementById('row-notecount').style.display  = isNote ? 'flex' : 'none';   // not needed for place
   document.getElementById('row-place-hint').style.display = isPlace ? 'flex' : 'none';
 
   if(m!=='reveal'&&micOn)stopMic();
