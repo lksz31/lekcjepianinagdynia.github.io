@@ -362,11 +362,11 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 <script>
 'use strict';
 
-const BASE      = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano_maze/';
-const SITE_BASE = '/index/gry/piano_maze/';
-const BG_GAME_SRC = SITE_BASE + 'loading_screen/loading screen maze.png';
+var BASE      = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano_maze/';
+var SITE_BASE = '/index/gry/piano_maze/';
+var BG_GAME_SRC = SITE_BASE + 'loading_screen/loading screen maze.png';
 
-const TILE_SRCS = {
+var TILE_SRCS = {
   'NESW_1':SITE_BASE+'objekty/mapa/NESW 1.png','NESW_2':SITE_BASE+'objekty/mapa/NESW 2.png',
   'NESW_3':SITE_BASE+'objekty/mapa/NESW 3.png','NESW_4':SITE_BASE+'objekty/mapa/NESW 4.png',
   'NESW_5':SITE_BASE+'objekty/mapa/NESW 5.png','NES_1':SITE_BASE+'objekty/mapa/NES 1.png',
@@ -389,7 +389,7 @@ const TILE_SRCS = {
   'filler_5':SITE_BASE+'objekty/mapa/filler 5.png',
   'exit_1':SITE_BASE+'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
 };
-const IMGS = {
+var IMGS = {
   'poszukiwaczka':SITE_BASE+'objekty/postacie/gracz/poszukiwaczka przyg\u00f3d.png',
   'odkrywca':SITE_BASE+'objekty/postacie/gracz/odkrywca.png',
   'pies':SITE_BASE+'objekty/postacie/gracz/pies poszukiwacz.png',
@@ -447,7 +447,7 @@ const IMGS = {
 })();
 
 // ══ CHARS ══
-const CHARS=[
+var CHARS=[
   {id:1,img:'poszukiwaczka',name:'Poszukiwaczka'},
   {id:2,img:'odkrywca',name:'Odkrywca'},
   {id:3,img:'pies',name:'Pies Odkrywca'},
@@ -467,7 +467,7 @@ if(rBg){
 }
 
 // ══ TILES ══
-const TILES_BY_PATH={
+var TILES_BY_PATH={
   'ENSW':['NESW_1','NESW_2','NESW_3','NESW_4','NESW_5'],
   'ENS':['NES_1','NES_2'],'ENW':['NEW_1','NEW_2'],'NSW':['NSW_1'],'ESW':['ESW_1','ESW_2'],
   'NS':['NS_2','NS_3','N_S_1'],'EW':['EW_2','E_W_1'],
@@ -478,7 +478,7 @@ const TILES_BY_PATH={
 };
 function openKey(s){return[...s].sort().join('');}
 function pickTileName(openSet){const k=openKey(openSet);if(TILES_BY_PATH[k]){const a=TILES_BY_PATH[k];return a[Math.floor(Math.random()*a.length)];}return TILES_BY_PATH['WALL'][Math.floor(Math.random()*5)];}
-const IMG={};let imgsLoaded=0,imgsTotal=0;
+var IMG={};var imgsLoaded=0,imgsTotal=0;
 function preloadAll(cb){
   const names=new Set();for(const a of Object.values(TILES_BY_PATH))a.forEach(n=>names.add(n));
   imgsTotal=names.size;if(!imgsTotal){cb();return;}
