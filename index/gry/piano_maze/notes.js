@@ -85,7 +85,7 @@ function noteSVG(n,W,H,showLabel){
   let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s+=`<rect width="${W}" height="${H}" rx="7" fill="rgba(2,6,2,0.75)" stroke="${c}" stroke-width="1.5"/>`;
   for(let i=0;i<5;i++){const ly=staffTop+i*sg;s+=`<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="${Math.max(0.7,0.9*scale)}" opacity="0.6"/>`;}
-  if(isB){const clefY=staffTop+sg*3.2;s+=`<text x="3" y="${clefY.toFixed(1)}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9" dominant-baseline="middle">&#119074;</text>`;}
+  if(isB){const clefY=staffTop+sg*1.2;s+=`<text x="3" y="${clefY.toFixed(1)}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9" dominant-baseline="middle">&#119074;</text>`;}
   else{s+=`<text x="3" y="${staffTop+sg*4+Math.round(2*scale)}" font-size="${trebleFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;}
   const topLine=staffTop,botLine=staffTop+4*sg,ledW=Math.max(6,Math.round(9*scale));
   if(noteY>botLine+sg*0.5){let ly=botLine+sg;while(ly<=noteY+sg*0.3){s+=`<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="${Math.max(0.8,1.2*scale)}"/>`;ly+=sg;}}
