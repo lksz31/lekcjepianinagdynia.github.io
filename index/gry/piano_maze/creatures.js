@@ -1,21 +1,5 @@
 /* ══ CREATURES ══ */
 
-const CREATURE_IMGS = {
-  'biedronka':SITE_BASE+'objekty/postacie/zwierzeta/biedronka maze.png',
-  'chomik':SITE_BASE+'objekty/postacie/zwierzeta/chomik maze.png',
-  'dzdz':SITE_BASE+'objekty/postacie/zwierzeta/d\u017cd\u017cownica maze.png',
-  'jaszczurka':SITE_BASE+'objekty/postacie/zwierzeta/jaszczurka maze.png',
-  'jez':SITE_BASE+'objekty/postacie/zwierzeta/je\u017c maze.png',
-  'kameleon':SITE_BASE+'objekty/postacie/zwierzeta/kameleon maze.png',
-  'sowa':SITE_BASE+'objekty/postacie/zwierzeta/sowa maze.png',
-  'swinka':SITE_BASE+'objekty/postacie/zwierzeta/swinka m maze.png',
-  'szynszyla':SITE_BASE+'objekty/postacie/zwierzeta/szynszyla maze.png',
-  'wiewiorka':SITE_BASE+'objekty/postacie/zwierzeta/wiewi\u00f3rka maze.png',
-  'winniczek':SITE_BASE+'objekty/postacie/zwierzeta/winniczek maze.png',
-  'wrobel':SITE_BASE+'objekty/postacie/zwierzeta/wr\u00f3bel maze.png',
-  'zabka':SITE_BASE+'objekty/postacie/zwierzeta/\u017cabka maze.png',
-  'zolw':SITE_BASE+'objekty/postacie/zwierzeta/\u017c\u00f3\u0142w maze.png',
-};
 
 const CREATURE_DEFS=[
   {id:'sowa',name:'Sowa',img:CREATURE_IMGS.sowa},{id:'swinka',name:'\u015awinka',img:CREATURE_IMGS.swinka},
