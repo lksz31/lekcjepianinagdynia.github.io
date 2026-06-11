@@ -953,6 +953,7 @@ const A2=45, B2=47, C3=48, D3=50, E3=52, F3=53, G3=55,
       Gs2=44, Gs3=56, Gs4=68,
       Bb2=46, Bb3=58, Bb4=70,
       Eb4=63, Eb3=51, Eb5=75,
+      Db3=49, Db4=61, Db5=73,
       Fs3=54, Fs4=66;
 
 /* ══════════════════════════════════════════════════════════════
@@ -1273,9 +1274,12 @@ const ARP_CHORDS = [
 ];
 let arpPhase = 0;
 
+  
 /* ── PERCUSSION: LFSR noise ──
    Classic Atari/NES bit-shift noise for drums.
 */
+let noiseBuf = null; // lazily built
+  
 function chipNoiseBuf(ac, durationS) {
   const len = Math.ceil(ac.sampleRate * durationS);
   const buf = ac.createBuffer(1, len, ac.sampleRate);
@@ -1288,7 +1292,7 @@ function chipNoiseBuf(ac, durationS) {
   }
   return buf;
 }
-let noiseBuf = null; // lazily built
+
 
 function scheduleNoise(t, dur, vol, lpHz) {
   const ac = audioCtx;
@@ -2299,8 +2303,7 @@ function startGame(){
     cwBg.src=BG_GAME_SRC;
     cw.insertBefore(cwBg,cw.firstChild);
   }
-  ensureAudioCtx();
-  if(musicEnabled) startTechno();
+try { ensureAudioCtx(); if(musicEnabled) startTechno(); } catch(e) { console.warn('Music init error:', e); }
   buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
