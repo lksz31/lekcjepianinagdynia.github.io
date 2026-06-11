@@ -139,4 +139,3 @@ function newMaze(){
   buildActiveNotes();initFog();fitCanvas();updatePlayer();spawnCreatures();refreshCreatureSizes();
 }
 function loop(){drawMaze();updatePlayer();recordPlayerPos();updateCreaturePositions();requestAnimationFrame(loop);}
-
