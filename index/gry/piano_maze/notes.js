@@ -142,4 +142,3 @@ function buildCtrlTable(container){
   h+='</tbody></table></div>';container.innerHTML=h;
 }
 function refreshSideBar(){const sb=document.getElementById('side-content');if(sb)buildCtrlTable(sb);}
-
