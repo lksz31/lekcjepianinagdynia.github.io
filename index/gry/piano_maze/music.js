@@ -21,7 +21,7 @@ function ensureAudioCtx(){
 function midiHz(n){return 440*Math.pow(2,(n-69)/12);}
 
 // FIX 1: ALL midi constants defined here, including Db4=61
-const A2=45,B2=47,C3=48,D3=50,E3=52,F3=53,G3=55,
+const E2=40,A2=45,B2=47,C3=48,D3=50,E3=52,F3=53,G3=55,
       A3=57,B3=59,C4=60,D4=62,E4=64,F4=65,G4=67,
       A4=69,B4=71,C5=72,D5=74,E5=76,F5=77,G5=79,A5=81,
       Gs2=44,Gs3=56,Gs4=68,Bb2=46,Bb3=58,Bb4=70,
@@ -183,7 +183,6 @@ function chipNoiseBuf(ac,durationS){
   for(let i=0;i<len;i++){const bit=((reg>>0)^(reg>>2)^(reg>>3)^(reg>>5))&1;reg=(reg>>1)|(bit<<15);d[i]=bit?0.9:-0.9;}
   return b;
 }
-let noiseBuf = null; // lazily built
 
 function scheduleNoise(t,dur,vol,lpHz){
   const ac=audioCtx;
