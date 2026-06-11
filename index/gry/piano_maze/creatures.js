@@ -62,5 +62,3 @@ function checkCreaturePickup(){
   if(idx!==-1){const creature=creaturesOnMap.splice(idx,1)[0];creaturesFollowing.push(creature);playCreatureSound(creature.id);updateCreatureHUD();}
 }
 function updateCreatureHUD(){const el=document.getElementById('hud-creatures');if(el)el.textContent='\uD83D\uDC3E '+creaturesFollowing.length+'/'+(creaturesOnMap.length+creaturesFollowing.length);}
-</script>
-</body>
