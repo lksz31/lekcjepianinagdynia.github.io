@@ -313,3 +313,36 @@ body.kid-mode .ctrl-div{background:linear-gradient(90deg,transparent,#ffb3d9,tra
 .wrong-notes-table tbody td:last-child{
   text-align:right;color:#ef4444;font-weight:800;font-size:0.85rem;
 }
+
+/* ══ KWIATY W TLE – tryb dziecięcy ══ */
+#kid-flowers-bg{
+  position:fixed;inset:0;
+  pointer-events:none;z-index:0;
+  overflow:hidden;
+}
+/* Treści strony nad kwiatami */
+.main,.terminy-section,.site-footer{position:relative;z-index:1;}
+
+.kid-flower{
+  position:absolute;
+  object-fit:contain;
+  opacity:0;
+  transform-origin:50% 90%;
+  animation:flowerPop 0.75s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+@keyframes flowerPop{
+  0%  {opacity:0;  transform:scale(0)    rotate(var(--rot)) translateY(30px);}
+  60% {opacity:0.95;transform:scale(1.28) rotate(var(--rot)) translateY(-10px);}
+  80% {           transform:scale(0.90) rotate(var(--rot)) translateY(4px);}
+  100%{opacity:0.82;transform:scale(1)    rotate(var(--rot)) translateY(0);}
+}
+/* Delikatne kołysanie po pojawieniu */
+@keyframes flowerSway{
+  0%,100%{transform:scale(1) rotate(calc(var(--rot) - 4deg)) translateY(0);}
+  50%    {transform:scale(1) rotate(calc(var(--rot) + 4deg)) translateY(0);}
+}
+.kid-flower.swaying{
+  animation:flowerSway 3s ease-in-out infinite;
+  animation-delay:var(--sway-delay,0s);
+}
