@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiszki Nutowe – Łukasz Ganczarek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&family=Nunito:wght@400;700;800;900&family=Noto+Music&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/fiszki.css">
+</head>
+<body>
+
+<div id="kid-anim-overlay"><canvas id="kid-anim-canvas"></canvas></div>
+
+<nav class="site-nav">
+  <a href="/index.html">Strona główna</a>
+  <a href="/index/fiszki.html">Fiszki</a>
+  <a href="/index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/podrecznik/podrecznik.html">Podręcznik</a>
+  <a href="/index.html#briefy">Materiały</a>
+</nav>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="#" class="mn-cta" onclick="openBookingModal();return false;">🎹 Umów</a>
+    <a href="/index/fiszki.html" class="active"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
+
+<main class="main">
+<h1 class="page-title">Fiszki <em>nutowe</em></h1>
+
+<!-- PANEL STEROWANIA -->
+<div class="ctrl-outer">
+  <div class="ctrl-topbar">
+    <div class="ctrl-topbar-left">
+      <span class="ctrl-topbar-title">🎵 Rozpoznawanie Dźwięków</span>
+      <div class="mode-btns">
+        <button class="mb active" id="mb-reveal"  onclick="setMode('reveal')">Zagraj nuty</button>
+        <button class="mb"        id="mb-place"   onclick="setMode('place')">Umieść nutę</button>
+        <button class="mb"        id="mb-choice"  onclick="setMode('choice')">Zgadnij odpowiedź</button>
+      </div>
+    </div>
+    <button class="ctrl-collapse-btn" id="collapseBtn" onclick="togglePanel()">▲ Zwiń</button>
+  </div>
+  <div class="ctrl-body" id="ctrlBody">
+    <div id="note-settings-group">
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Klucz</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-treble" onclick="setClef('treble')">𝄞 Wiolinowy</button>
+          <button class="cb"        id="cb-bass"   onclick="setClef('bass')">𝄢 Basowy</button>
+          <button class="cb"        id="cb-both"   onclick="setClef('both')">𝄞+𝄢 Oba</button>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Oktawy</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-small" onclick="setRange('small')">Od małej do razkreślnej</button>
+          <button class="cb"        id="cb-full"  onclick="setRange('full')">Od kontra do trzykreślnej</button>
+        </div>
+      </div>
+      <div class="ctrl-row" id="row-acc">
+        <span class="ctrl-lbl">Dźwięki</span>
+        <div class="ctrl-btns">
+          <button class="cb" id="cb-acc" onclick="setAcc()">Diatoniczne</button>
+        </div>
+      </div>
+      <div class="ctrl-div"></div>
+      <div class="ctrl-row" id="row-notecount">
+        <span class="ctrl-lbl">Nut naraz</span>
+        <div class="slider-wrap">
+          <span class="sl-lbl">1</span>
+          <input type="range" id="slider" min="1" max="10" value="1" oninput="setN(+this.value)">
+          <span class="sl-lbl">10</span>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-lbl">Timer</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-t0"  onclick="setTimer(0)">Wył.</button>
+          <button class="cb"        id="cb-t5"  onclick="setTimer(5)">5s</button>
+          <button class="cb"        id="cb-t10" onclick="setTimer(10)">10s</button>
+          <button class="cb"        id="cb-t30" onclick="setTimer(30)">30s</button>
+        </div>
+      </div>
+      <div class="ctrl-row" id="row-name-format">
+        <span class="ctrl-lbl">Nazwy nut</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-nf-pl"    onclick="setNameFormat('pl')">Polska</button>
+          <button class="cb"        id="cb-nf-en"    onclick="setNameFormat('en')">Angielska</button>
+          <button class="cb"        id="cb-nf-both"  onclick="setNameFormat('both')">Obie</button>
+          <button class="cb"        id="cb-nf-sound" onclick="setNameFormat('sound')" style="display:none;">Tylko dźwięk</button>
+        </div>
+      </div>
+      <div class="ctrl-row" id="row-place-hint" style="display:none;">
+        <span class="ctrl-lbl">Podpowiedź</span>
+        <div class="ctrl-btns">
+          <button class="cb active" id="cb-hint-pl"    onclick="setPlaceHint('pl')">Polska</button>
+          <button class="cb"        id="cb-hint-en"    onclick="setPlaceHint('en')">Angielska</button>
+          <button class="cb"        id="cb-hint-sound" onclick="setPlaceHint('sound')">Tylko dźwięk</button>
+        </div>
+      </div>
+    </div>
+    <div class="ctrl-div"></div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Tryb</span>
+      <div class="toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleKidMode" onchange="setKidMode(this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-lbl">🐝 Tryb dziecięcy (pszczółka zamiast nuty)</span>
+      </div>
+    </div>
+    <div class="ctrl-row" id="row-sound-toggles">
+      <span class="ctrl-lbl">Widok</span>
+      <div class="toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="togglePlayBtn" checked onchange="updatePlayBtnVisibility()">
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-lbl">Pokaż przycisk "Odtwórz dźwięk"</span>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl"></span>
+      <div class="toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="togglePopSound" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-lbl">Dźwięk pop przy animacji</span>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl"></span>
+      <div class="toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleFeedbackSound" checked>
+          <span class="toggle-slider"></span>
+        </label>
+        <span class="toggle-lbl">Dźwięk poprawnie / błędnie</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- USTAWIENIA MIKROFONU -->
+<div class="mic-settings-outer" id="micSettingsOuter">
+  <div class="mic-settings-topbar" onclick="toggleMicPanel()">
+    <div class="mic-settings-title">🎤 <span>Ustawienia mikrofonu</span></div>
+    <button class="ctrl-collapse-btn" id="micPanelBtn" style="pointer-events:none;">▼ Rozwiń</button>
+  </div>
+  <div class="mic-settings-body collapsed" id="micSettingsBody">
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Mikrofon</span>
+      <button class="mic-btn-inline" id="micBtn" onclick="toggleMic()">🎤 Włącz mikrofon</button>
+    </div>
+    <div class="ctrl-div"></div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Tolerancja</span>
+      <div class="slider-wrap">
+        <span class="sl-lbl">0.5%</span>
+        <input type="range" id="sliderTol" min="5" max="50" value="15" oninput="updateTolLabel(this.value)">
+        <span class="sl-lbl">5%</span>
+      </div>
+      <span class="sl-sfx" id="tolVal">1.5%</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Czułość</span>
+      <div class="slider-wrap">
+        <span class="sl-lbl">1×</span>
+        <input type="range" id="sliderGain" min="10" max="50" value="20" oninput="updateGainLabel(this.value)">
+        <span class="sl-lbl">5×</span>
+      </div>
+      <span class="sl-sfx" id="gainVal">2.0×</span>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-lbl">Strój</span>
+      <div class="slider-wrap">
+        <span class="sl-lbl">-12</span>
+        <input type="range" id="sliderTune" min="-12" max="12" value="0" oninput="updateTuneLabel(this.value)">
+        <span class="sl-lbl">+12</span>
+      </div>
+      <span class="sl-sfx" id="tuneVal">0 st.</span>
+    </div>
+  </div>
+</div>
+
+<!-- KARTA Z NUTAMI -->
+<div class="card" id="card">
+  <div class="timer-disp" id="timerDisp">0:10</div>
+  <div class="ok-msg" id="okMsg">✓ Brawo!</div>
+
+  <!-- TRYB REVEAL / CHOICE -->
+  <div id="revealChoiceWrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;">
+    <div class="staff-row">
+      <div class="staff-wrap">
+        <canvas id="C" width="900" height="440"></canvas>
+      </div>
+      <div class="draw-col">
+        <button class="sc-btn good" id="scGood" onclick="handleSelfCheck(true)">🎉</button>
+        <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
+        <button class="sc-btn bad"  id="scBad"  onclick="handleSelfCheck(false)">😬</button>
+      </div>
+    </div>
+    <div class="reveal-sec" id="revealSec">
+      <div class="names-row" id="namesRow"></div>
+      <div class="reveal-bar">
+        <button class="rev-btn"        id="revBtn"        onclick="toggleReveal()">Pokaż nuty</button>
+        <button class="play-btn"       id="playBtnEl"     onclick="playNotes()">▶ Odtwórz dźwięk</button>
+        <button class="mic-btn-inline" id="micBtnCard"    onclick="toggleMic()">🎤 Mikrofon</button>
+      </div>
+      <div class="mic-live-panel" id="micPanel">
+        <div class="mic-lbl">Wykryty dźwięk</div>
+        <div class="mic-row">
+          <span class="mic-det" id="micDet">—</span>
+          <span class="mic-res wait" id="micRes">Graj nutę...</span>
+        </div>
+        <div class="pitch-wrap"><div class="pitch-bar" id="pitchBar"></div></div>
+      </div>
+    </div>
+    <div id="choiceSec" style="display:none;">
+      <div class="names-row" id="namesRowC" style="margin-bottom:8px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:8px;flex-wrap:wrap;">
+        <button class="play-btn" id="playBtnChoiceEl" onclick="playCurrentGuess()">▶ Odtwórz</button>
+      </div>
+      <div id="choice-sound-hint" style="display:none;font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:6px;">🎵 Najedź na przycisk lub dotknij, żeby usłyszeć dźwięk</div>
+      <div class="choice-grid" id="choiceGrid"></div>
+    </div>
+  </div>
+
+  <!-- TRYB PLACE -->
+  <div id="placeModeWrap" style="width:100%;display:none;flex-direction:column;align-items:center;gap:8px;">
+    <div id="placeTargetRow" style="display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;justify-content:center;">
+      <span id="placeTargetSub" style="font-size:0.62rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;">Umieść:</span>
+      <span id="placeTargetNote" style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--navy);line-height:1.1;">—</span>
+      <button class="play-btn" id="placePlayBtn" onclick="playPlaceTarget()" style="display:none;font-size:0.72rem;">▶ Odtwórz dźwięk</button>
+    </div>
+    <div style="width:100%;display:flex;align-items:center;gap:0;min-width:0;">
+      <div class="staff-wrap" style="flex:1;min-width:0;overflow:hidden;position:relative;cursor:crosshair;">
+        <canvas id="Cplace" width="900" height="280" style="width:100%;height:auto;display:block;border-radius:10px;"></canvas>
+      </div>
+      <div class="draw-col">
+        <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
+      </div>
+    </div>
+    <div id="place-hint-text" style="font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:2px;">👆 Kliknij lub przeciągnij nutę na właściwą pozycję</div>
+    <button class="confirm-btn" id="confirmBtn" onclick="confirmPlace()" style="width:200px;padding:12px 24px;font-size:0.8rem;">Zatwierdź</button>
+
+    <!-- ── POPRZEDNIE ZAGRANIE ── -->
+    <div id="prevAttemptPanel" style="display:none;width:100%;flex-direction:column;gap:0;">
+      <div class="prev-attempt-wrap">
+        <div class="prev-attempt-label">Poprzednie zagranie</div>
+        <canvas id="Cprev" width="900" height="148"
+          style="width:100%;height:auto;display:block;"></canvas>
+
+        <!-- Historia błędów (zwijane) -->
+        <div id="wrongNotesHeader" class="wrong-notes-header" onclick="toggleWrongNotes()" style="display:none;">
+          <span class="wnh-arrow">▼</span>
+          <span>Historia błędów</span>
+          <span class="wrong-notes-badge" id="wrongNotesBadge"></span>
+        </div>
+        <div id="wrongNotesTable" class="wrong-notes-table" style="display:none;">
+          <table>
+            <thead><tr><th>Nuta (poprawna)</th><th>Błędów</th></tr></thead>
+            <tbody id="wrongNotesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="score-bar">
+  Wylosowanych: <strong id="sCnt">0</strong>
+  &nbsp;·&nbsp;
+  Poprawnych: <strong id="cCnt">0</strong>
+  <span class="score-pct" id="sPct"></span>
+</div>
+</main>
+
+<!-- TERMINY / KALENDARZ -->
+<div class="terminy-section">
+  <div class="apple-card" id="appleCard">
+    <h2 class="apple-card-title">Wolne Terminy</h2>
+    <div class="info-card">
+      <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz terminów"></iframe>
+      <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
+    </div>
+    <div class="form-overlay" id="formOverlay">
+      <button class="close-btn" onclick="toggleForm(false)">✕</button>
+      <div class="form-content">
+        <h3>Szczegóły rezerwacji</h3>
+        <div class="price-tag"><span id="price-val" style="font-weight:800;font-size:1.4rem;color:var(--navy);">99 zł / h</span></div>
+        <div class="bento-grid">
+          <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+          <div class="form-tile"          id="loc-uczen"  onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+        </div>
+        <div id="piano-options">
+          <div class="bento-grid">
+            <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b><br><small>Standard</small></div>
+            <div class="form-tile"          id="piano-no"  onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu (+20 zł)</small></div>
+          </div>
+        </div>
+        <div class="contact-box">
+          <input type="text"  id="res-name"  placeholder="Twoje imię i nazwisko" oninput="val()">
+          <input type="tel"   id="res-phone" placeholder="Numer telefonu"         oninput="val()">
+          <input type="email" id="res-email" placeholder="Adres email"            oninput="val()">
+          <textarea           id="res-msg"   placeholder="Dodatkowe informacje..."></textarea>
+          <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
+        </div>
+        <div id="res-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-row">
+        <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo">
+        <div><div class="footer-name">Łukasz Ganczarek</div><div class="footer-tagline">Nauka gry na pianinie</div></div>
+      </div>
+      <div class="footer-rule"></div>
+      <div class="footer-contacts">
+        <div class="footer-contact-row"><span class="footer-contact-label">Tel</span><a href="tel:514338875" class="footer-contact-val">514 338 875</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">Email</span><a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-contact-val">lukaszgkorepetycje@gmail.com</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">WWW</span><a href="https://lekcjepianinagdynia.pl" class="footer-contact-val">lekcjepianinagdynia.pl</a></div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Nawigacja</div>
+      <ul class="footer-links">
+        <li><a href="">Strona główna</a></li>
+        <li><a href="#o-mnie">O mnie</a></li>
+        <li><a href="#terminy">Wolne terminy</a></li>
+        <li><a href="/index/fiszki.html">Fiszki nutowe</a></li>
+        <li><a href="/index/podrecznik/podrecznik.html">Podręcznik</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Ogłoszenia</div>
+      <ul class="footer-links">
+        <li><a href="https://buki.org.pl/user-123621/" target="_blank">Profil Buki.org</a></li>
+        <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">Profil Superprof</a></li>
+      </ul>
+    </div>
+    <div class="footer-cta-col">
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="footer-bottom">
+      <span class="footer-location">♪ Gdynia · online</span>
+      <span class="footer-copy">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL LEKCJI PRÓBNEJ -->
+<div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
+  <div class="footer-modal">
+    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+    <div class="modal-left">
+      <h3>Lekcja próbna</h3>
+      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
+      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+      <div class="m-tile"          id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+      <div id="m-piano-box">
+        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)"  style="margin:0;"><b>Mam</b></div>
+          <div class="m-tile"          id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <input type="text"  id="m-name"  placeholder="Twoje imię i nazwisko">
+      <input type="tel"   id="m-phone" placeholder="Numer telefonu">
+      <input type="email" id="m-email" placeholder="Adres email">
+      <textarea           id="m-msg"   placeholder="Wiek ucznia, preferowane godziny..."></textarea>
+      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
+      <div id="modal-status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SKRYPTY (kolejność ładowania ma znaczenie) -->
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/kids.js"></script>
+<script src="js/canvas.js"></script>
+<script src="js/mic.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/form.js"></script>
+<script>
+  /* START – inicjalizacja */
+  render([]);
+  renderPlace();
+</script>
+</body>
+</html>
