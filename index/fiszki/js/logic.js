@@ -118,7 +118,7 @@ function updateSelfCheckVisibility(){
 function handleSelfCheck(correct){
   if(mode==='reveal'&&!selfCheckActive)return;
   cnt++;document.getElementById('sCnt').textContent=cnt;
-  if(correct){ok++;if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);flyNotesFromCanvas(EMOJIS_GOOD[emojiGoodIdx]);document.getElementById('scGood').textContent=nextEmojiGood();}
+  if(correct){ok++;if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);flyNotesFromCanvas(EMOJIS_GOOD[emojiGoodIdx]);document.getElementById('scGood').textContent=nextEmojiGood();if(kidMode)spawnKidFlower();}
   else{if(document.getElementById('toggleFeedbackSound').checked)playPyk(false);flyNotesFromCanvas(EMOJIS_BAD[emojiBadIdx]);document.getElementById('scBad').textContent=nextEmojiBad();}
   updScore();go();
 }
@@ -169,6 +169,7 @@ function handleChoice(chosen,correct){
     if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=formatNoteName(correct);if(correct.kontra)nb.classList.add('kontra');}
     render(notes,guessIdx,'#16a34a');
     if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);
+    if(kidMode)spawnKidFlower();
     flyNoteAnimation(document.getElementById('C'),allBtns[0]);
     guessIdx++;
     if(guessIdx>=notes.length){ok++;updScore();cooldown=true;resetTimer();setTimeout(go,600);}
@@ -186,6 +187,7 @@ function handleChoice(chosen,correct){
 /* ── Mikrofon – sukces ── */
 function allGood(){
   ok++;cnt++;document.getElementById('sCnt').textContent=cnt;updScore();cooldown=true;
+  if(kidMode)spawnKidFlower();
   document.getElementById('okMsg').textContent='✓ Brawo! Zagrano poprawnie!';document.getElementById('okMsg').classList.add('show');
   resetTimer();setTimeout(()=>{document.getElementById('okMsg').classList.remove('show');go();},1500);
 }
@@ -229,7 +231,7 @@ function confirmPlace(){
   const correct=(placeCurrentP===placeTargetNote.p);
   cnt++;document.getElementById('sCnt').textContent=cnt;
   const btn=document.getElementById('confirmBtn');
-  if(correct){ok++;btn.classList.add('flash-good');if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);flyPlaceEmoji(true);}
+  if(correct){ok++;btn.classList.add('flash-good');if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);flyPlaceEmoji(true);if(kidMode)spawnKidFlower();}
   else{btn.classList.add('flash-bad');if(document.getElementById('toggleFeedbackSound').checked)playPyk(false);flyPlaceEmoji(false);renderPlace(placeCurrentP,placeTargetNote.p);}
   updScore();placeConfirmed=true;
   /* Zapisz do historii */
