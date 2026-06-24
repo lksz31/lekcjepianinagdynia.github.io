@@ -40,7 +40,10 @@ function playPlaceTarget(){
 }
 
 function playPyk(correct){
-  if(kidMode&&typeof runBeeAnim==='function')runBeeAnim(correct);
+  /* W trybie dziecięcym:
+     - błąd  → szybki przelot pszczółki (runBeeAnim)
+     - sukces → animację startuje spawnKidFlower (runBeeToFlower)  */
+  if(kidMode&&!correct&&typeof runBeeAnim==='function')runBeeAnim(false);
   try{
     const ac=getACtx();const now=ac.currentTime;
     const osc=ac.createOscillator();const gain=ac.createGain();
