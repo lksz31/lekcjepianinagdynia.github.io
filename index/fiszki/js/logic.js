@@ -67,10 +67,9 @@ function go(){
 }
 
 function buildPlaceNote(){
-  /* Panel poprzedniego zagrania: zawsze UKRYTY gdy losuje nową nutę.
-     Pokazuje się tylko gdy użytkownik popełni błąd (w confirmPlace). */
-  const panel=document.getElementById('prevAttemptPanel');
-  if(panel)panel.style.display='none';
+  /* Panel poprzedniego zagrania NIE jest chowany przy losowaniu nowej nuty –
+     ma być widoczny przez cały czas umieszczania następnej nuty.
+     Znika dopiero gdy użytkownik trafi poprawnie (obsługuje showPrevAttempt). */
   /* Losuj nową nutę (nie tę samą co poprzednia) */
   const p=getPlacePool();let note,attempts=0;
   do{
@@ -255,13 +254,17 @@ function getNoteLabelForP(clefType,p){
 }
 
 function showPrevAttempt(entry){
-  /* Panel rozwijamy wyłącznie gdy użytkownik popełnił błąd.
-     Przy poprawnej odpowiedzi aktualizujemy tylko tabelkę błędów (badge). */
+  /* Panel widoczny przez CAŁY czas umieszczania następnej nuty:
+     – błąd  → pokaż panel z nowym błędnym zagraniem
+     – trafił → schowaj panel (nagroda za poprawną odpowiedź)          */
   updateWrongNotesTable();
-  if(!entry||entry.wasCorrect)return;
   const panel=document.getElementById('prevAttemptPanel');
   if(!panel)return;
-  panel.style.display='flex';
+  if(!entry||entry.wasCorrect){
+    panel.style.display='none';          /* poprawna odpowiedź → chowamy */
+    return;
+  }
+  panel.style.display='flex';            /* błąd → pokazujemy             */
   renderPrevAttempt(entry);
 }
 
