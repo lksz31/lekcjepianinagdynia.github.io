@@ -168,7 +168,10 @@ body.kid-mode .toggle-switch input:checked+.toggle-slider{background:linear-grad
 body.kid-mode .toggle-lbl{font-family:'Nunito',sans-serif!important;font-size:0.82rem!important;font-weight:700!important;color:#555!important;}
 body.kid-mode .card{border-radius:36px!important;border:4px dashed #81d4fa!important;box-shadow:0 10px 40px rgba(41,182,246,0.18)!important;background:rgba(255,255,255,0.97)!important;}
 body.kid-mode .mic-settings-outer{border-radius:32px!important;border:3px dashed #a5d6a7!important;box-shadow:0 6px 20px rgba(0,200,83,0.12)!important;}
-body.kid-mode .mic-settings-topbar{background:linear-gradient(90deg,#e8f5e9,#f1f8e9)!important;border-bottom:2px dashed #a5d6a7!important;border-radius:29px 29px 0 0!important;}
+/* Usunięto border-bottom z topbara – przy zwinięciu nie ma już podwójnego paska.
+   Separator (dashed) dostarczy border-top na .mic-settings-body gdy rozwinięty. */
+body.kid-mode .mic-settings-topbar{background:linear-gradient(90deg,#e8f5e9,#f1f8e9)!important;border-bottom:none!important;border-radius:29px 29px 0 0!important;}
+body.kid-mode .mic-settings-body{border-top:2px dashed #a5d6a7!important;}
 body.kid-mode .mic-settings-title span{font-family:'Nunito',sans-serif!important;font-weight:900!important;color:#2e7d32!important;}
 body.kid-mode .ctrl-collapse-btn{font-family:'Nunito',sans-serif!important;font-weight:800!important;border:2px solid #ffb3d9!important;color:#e83e8c!important;border-radius:50px!important;}
 body.kid-mode .score-bar{font-family:'Nunito',sans-serif!important;font-size:1rem!important;font-weight:800!important;color:#d6006e!important;gap:18px!important;}
