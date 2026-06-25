@@ -75,15 +75,16 @@ function _drawBrace(ctxR,tops){
 
 /* ── Klucze ──
    Klucz wiolinowy: PNG wiolinowy_fiszki_bez_tla.png
-     h=STEP*8, w=h*(581/1361), topY=st-STEP*2.6
-     Linia G (4. linia od góry) trafia na st+3*STEP ✓
+     Kalibracja piks. (581×1361): linia G na 64% od góry PNG (nie 70% jak wcześniej)
+     h=STEP*6.5, w=h*(581/1361), topY=st-STEP*1.16
+     → linia G trafia na st+3*STEP (4. linia od góry) ✓
    Klucz basowy: PNG klucz_beztla.png
      h=STEP*6.24, w=h*(148/231), topY=st-STEP*1.284
-     Linia F (2. linia od góry) trafia na st+STEP, kropki na st+10 i st+30 ✓ */
+     → linia F trafia na st+STEP, kropki na st+10 i st+30 ✓ */
 function _drawClef(ctx,which,st){
   if(which==='treble'){
-    const h=STEP*8, w=h*(581/1361);
-    ctx.drawImage(TREBLE_CLF_IMG, LX+3, st-STEP*2.6, w, h);
+    const h=STEP*6.5, w=h*(581/1361);
+    ctx.drawImage(TREBLE_CLF_IMG, LX+3, st-STEP*1.16, w, h);
   }else{
     const h=STEP*6.24, w=h*(148/231);
     ctx.drawImage(BASS_CLF_IMG, LX+2, st-STEP*1.284, w, h);
