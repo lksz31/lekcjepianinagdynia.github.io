@@ -67,13 +67,10 @@ function go(){
 }
 
 function buildPlaceNote(){
-  /* Pokaż poprzednie zagranie (jeśli istnieje) */
-  if(placeHistory.length>0){
-    showPrevAttempt(placeHistory[placeHistory.length-1]);
-  }else{
-    const panel=document.getElementById('prevAttemptPanel');
-    if(panel)panel.style.display='none';
-  }
+  /* Panel poprzedniego zagrania: zawsze UKRYTY gdy losuje nową nutę.
+     Pokazuje się tylko gdy użytkownik popełni błąd (w confirmPlace). */
+  const panel=document.getElementById('prevAttemptPanel');
+  if(panel)panel.style.display='none';
   /* Losuj nową nutę (nie tę samą co poprzednia) */
   const p=getPlacePool();let note,attempts=0;
   do{
@@ -235,16 +232,19 @@ function confirmPlace(){
   else{btn.classList.add('flash-bad');if(document.getElementById('toggleFeedbackSound').checked)playPyk(false);flyPlaceEmoji(false);renderPlace(placeCurrentP,placeTargetNote.p);}
   updScore();placeConfirmed=true;
   /* Zapisz do historii */
-  placeHistory.push({
+  const entry={
     targetNote:{...placeTargetNote},
     userP:placeCurrentP,
     wasCorrect:correct,
     clefType:placeTargetNote.ct||clef
-  });
+  };
+  placeHistory.push(entry);
   if(!correct){
     const key=placeTargetNote.l;
     placeWrongCounts[key]=(placeWrongCounts[key]||0)+1;
   }
+  /* Pokaż panel (tylko przy błędzie) już teraz, przed go() */
+  showPrevAttempt(entry);
   setTimeout(()=>{btn.classList.remove('flash-good','flash-bad');go();},900);
 }
 
@@ -255,11 +255,14 @@ function getNoteLabelForP(clefType,p){
 }
 
 function showPrevAttempt(entry){
+  /* Panel rozwijamy wyłącznie gdy użytkownik popełnił błąd.
+     Przy poprawnej odpowiedzi aktualizujemy tylko tabelkę błędów (badge). */
+  updateWrongNotesTable();
+  if(!entry||entry.wasCorrect)return;
   const panel=document.getElementById('prevAttemptPanel');
   if(!panel)return;
   panel.style.display='flex';
   renderPrevAttempt(entry);
-  updateWrongNotesTable();
 }
 
 function updateWrongNotesTable(){
