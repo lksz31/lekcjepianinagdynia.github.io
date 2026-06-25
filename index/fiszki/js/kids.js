@@ -21,45 +21,55 @@ const KID_FLOWERS = [
   'slonecznik.png','stokrotka.png','szafirek.png','tulipan.png'
 ];
 const MAX_FLOWERS = 60;
-const MIN_FLOWER_DIST = 80; /* minimalna odległość między środkami (px) */
 
-/* Śledzenie pozycji kwiatów (aby unikać pełnego nachodzenia) */
+/* Śledzenie pozycji kwiatów {x, y, size} – do detekcji kolizji */
 let placedFlowerPositions = [];
 
 /* ─────────────────────────────────────
-   getFlowerPos – losuj pozycję na boku
+   getFlowerPos – pas wzdłuż każdej krawędzi ekranu
+   Kwiaty są W PEŁNI widoczne (środek ≥ r od krawędzi),
+   rozmieszczone w „pasie" o szerokości ~25 % mniejszego wymiaru.
    ───────────────────────────────────── */
 function getFlowerPos(size) {
   const VW = window.innerWidth;
   const VH = window.innerHeight;
-  const side = Math.random() < 0.5 ? 'left' : 'right';
+  const r  = size / 2;
 
-  /* Kwiatek ma być widoczny w 45–80 % – na krawędzi lub w marginesie */
-  let cx, cy;
-  let bestCx = null, bestCy = null, bestDist = -1;
+  /* Szerokość pasa krawędziowego: max(1.2×size, 22% ekranu) */
+  const bandW = Math.min(Math.max(size * 1.4, VW * 0.22), VW * 0.38);
+  const bandH = Math.min(Math.max(size * 1.4, VH * 0.20), VH * 0.35);
 
-  for (let attempt = 0; attempt < 18; attempt++) {
-    const vis = size * (0.45 + Math.random() * 0.35);  /* ile widoczne */
+  /* Dozwolone nachodzenie: maks. 18 % sumy promieni dwóch kwiatów */
+  const OVERLAP = 0.82;  /* min_dist = (r1+r2) × OVERLAP → 18% overlap */
 
-    if (side === 'left') {
-      cx = vis - size / 2;                             /* ujemne OK – poza ekranem */
-    } else {
-      cx = VW - vis + size / 2;
+  let bestCx = null, bestCy = null, bestScore = -Infinity;
+
+  for (let attempt = 0; attempt < 24; attempt++) {
+    /* Tylko lewa (0) lub prawa (1) krawędź */
+    const edge = Math.floor(Math.random() * 2);
+    let cx, cy;
+
+    if (edge === 0) {   /* lewa krawędź */
+      cx = r + Math.random() * Math.max(1, bandW - r);
+      cy = r + Math.random() * Math.max(1, VH - 2*r);
+    } else {            /* prawa krawędź */
+      cx = VW - r - Math.random() * Math.max(1, bandW - r);
+      cy = r + Math.random() * Math.max(1, VH - 2*r);
     }
-    cy = VH * 0.10 + Math.random() * VH * 0.78;
 
-    /* minimalna odległość od istniejących kwiatów */
-    const minD = placedFlowerPositions.reduce((d, p) => {
-      const dist = Math.hypot(p.x - cx, p.y - cy);
-      return Math.min(d, dist);
+    /* Oblicz najmniejszą przerwę do już postawionych kwiatów */
+    const minGap = placedFlowerPositions.reduce((g, p) => {
+      const dist    = Math.hypot(p.x - cx, p.y - cy);
+      const minDist = (p.size / 2 + r) * OVERLAP;
+      return Math.min(g, dist - minDist);
     }, Infinity);
 
-    if (minD > MIN_FLOWER_DIST || placedFlowerPositions.length === 0) {
-      return { cx, cy, side };
+    if (minGap >= 0 || placedFlowerPositions.length === 0) {
+      return { cx, cy, edge };
     }
-    if (minD > bestDist) { bestDist = minD; bestCx = cx; bestCy = cy; }
+    if (minGap > bestScore) { bestScore = minGap; bestCx = cx; bestCy = cy; }
   }
-  return { cx: bestCx ?? cx, cy: bestCy ?? cy, side };
+  return { cx: bestCx ?? r, cy: bestCy ?? r, edge: 0 };
 }
 
 /* ─────────────────────────────────────
@@ -72,7 +82,6 @@ function bloomFlower(bg, flower, pos, size, rot, swayDelay) {
   img.className = 'kid-flower';
   img.draggable = false;
 
-  /* Pozycja: CSS left/top to lewy-górny róg elementu */
   img.style.cssText =
     'left:' + (pos.cx - size / 2) + 'px;' +
     'top:'  + (pos.cy - size / 2) + 'px;' +
@@ -82,11 +91,10 @@ function bloomFlower(bg, flower, pos, size, rot, swayDelay) {
 
   bg.appendChild(img);
 
-  /* Zapisz pozycję do kolizji */
-  placedFlowerPositions.push({ x: pos.cx, y: pos.cy });
+  /* Zapisz pozycję + rozmiar do kolizji */
+  placedFlowerPositions.push({ x: pos.cx, y: pos.cy, size });
   if (placedFlowerPositions.length > MAX_FLOWERS) placedFlowerPositions.shift();
 
-  /* Po animacji pop – zamroz i zacznij kołysanie */
   img.addEventListener('animationend', () => {
     img.style.opacity = '0.88';
     img.style.transform = 'rotate(' + rot + 'deg) scale(1)';
@@ -104,15 +112,17 @@ function spawnKidFlower() {
   if (!bg) return;
   if (bg.childElementCount >= MAX_FLOWERS) bg.removeChild(bg.firstChild);
 
-  const flower   = KID_FLOWERS[Math.floor(Math.random() * KID_FLOWERS.length)];
-  const size     = 130 + Math.random() * 75;          /* 130–205 px */
-  const rot      = (Math.random() - 0.5) * 28;
-  const swayDel  = (Math.random() * 3).toFixed(2) + 's';
-  const pos      = getFlowerPos(size);
+  const flower  = KID_FLOWERS[Math.floor(Math.random() * KID_FLOWERS.length)];
+  const size    = 130 + Math.random() * 75;   /* 130–205 px */
+  const rot     = (Math.random() - 0.5) * 28;
+  const swayDel = (Math.random() * 3).toFixed(2) + 's';
+  const pos     = getFlowerPos(size);
 
-  /* Pszczółka wlatuje z przeciwnej strony i leci do pozycji kwiatu */
+  /* Pszczółka leci Z ZEWNĄTRZ względem krawędzi docelowej:
+     kwiat po lewej/górze → pszcz. wlatuje z prawej (fromRight=true)
+     kwiat po prawej/dole → pszcz. wlatuje z lewej  (fromRight=false) */
   if (typeof window.runBeeToFlower === 'function') {
-    const fromRight = (pos.side === 'left');  /* kwiat po lewej → pszcz. z prawej */
+    const fromRight = (pos.edge === 0); /* kwiat po lewej → pszcz. z prawej */
     window.runBeeToFlower(pos.cx, pos.cy, fromRight, () => {
       bloomFlower(bg, flower, pos, size, rot, swayDel);
     });
