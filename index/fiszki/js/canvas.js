@@ -159,7 +159,7 @@ function renderPrevAttempt(entry){
   if(!cvPrev||!entry)return;
   const ctx=cvPrev.getContext('2d');
   const dpr=Math.min(window.devicePixelRatio||1,3);
-  const W=900,H=148;
+  const W=900,H=240;                    /* zwiększone z 148 → 240 dla nut wysoko/nisko */
   cvPrev.width=W*dpr;cvPrev.height=H*dpr;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   ctx.clearRect(0,0,W,H);
@@ -168,8 +168,8 @@ function renderPrevAttempt(entry){
   ctx.beginPath();ctx.roundRect(0,0,W,H,10);ctx.fill();
   ctx.strokeStyle=entry.wasCorrect?'#86efac':'#fca5a5';ctx.lineWidth=2;
   ctx.beginPath();ctx.roundRect(1,1,W-2,H-2,10);ctx.stroke();
-  /* pięciolinia (szara, kompaktowa) */
-  const st=Math.round(H/2-2*STEP)-4;
+  /* pięciolinia wycentrowana w wyższym canvasie */
+  const st=Math.round(H/2-2*STEP);
   ctx.strokeStyle='#94a3b8';ctx.lineWidth=1.3;
   for(let i=0;i<5;i++){const y=st+i*STEP;ctx.beginPath();ctx.moveTo(LX,y);ctx.lineTo(W-RE,y);ctx.stroke();}
   ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(LX,st);ctx.lineTo(LX,st+4*STEP);ctx.stroke();
