@@ -9,9 +9,18 @@ const ctxP=cvP.getContext('2d');
 
 function ny(st,p){return st+4*STEP-p*(STEP/2);}
 
-/* Czcionka muzyczna */
+/* Czcionka muzyczna (tylko dla klucza wiolinowego) */
 const cfont=new FontFace('NotoMusic',"url('https://fonts.gstatic.com/s/notomusic/v20/pe0rMImSLYT1-7EeGl95MqrFJA.woff2')");
 cfont.load().then(f=>{document.fonts.add(f);render([]);renderPlace();}).catch(()=>{});
+
+/* Klucz basowy – PNG bez tła z concept_art/klucz_beztla.png
+   Kalibracja pikseli (PNG 148×231):
+     górna kropka center y=66  → 28.6% od góry  → ma lądować na st+10
+     dolna  kropka center y=103 → 44.6% od góry → ma lądować na st+30
+   Stąd: h=STEP*6.24, topY=st-STEP*1.284, w=h*(148/231)=STEP*4.0  */
+const BASS_CLF_IMG=new Image();
+BASS_CLF_IMG.onload=()=>{render([]);renderPlace();};
+BASS_CLF_IMG.src='concept_art/klucz_beztla.png';
 
 /* ── Pozycje nut na canvasie (dla animacji) ── */
 function computeNotePositions(items,tops,clefs,ns,nw){
@@ -43,18 +52,23 @@ function _drawBrace(ctxR,tops){
 }
 
 /* ── Klucze (treble / bass) ──
-   Klucz basowy przesunięty o jedną pozycję wyżej (STEP/2 = 10 px)   */
+   Klucz wiolinowy: NotoMusic (czcionka webowa).
+   Klucz basowy:    PNG concept_art/klucz_beztla.png (bez tła).
+   Kalibracja: analiza pikseli PNG 148×231 daje:
+     h = STEP*6.24, w = h*(148/231) ≈ STEP*4
+     topY = st - STEP*1.284
+   → górna kropka ląduje na st+10, dolna na st+30, linia F na st+20 ✓ */
 function _drawClef(ctx,which,st){
-  ctx.save();ctx.fillStyle='#1e3a8a';
+  ctx.save();
   if(which==='treble'){
+    ctx.fillStyle='#1e3a8a';
     ctx.font=(STEP*5.5*0.92)+'px NotoMusic,Times New Roman,serif';
     ctx.textBaseline='top';
     ctx.fillText(String.fromCodePoint(0x1D11E),LX+3,st-STEP*0.37);
   }else{
-    ctx.font=(STEP*4.2*1.1)+'px NotoMusic,Times New Roman,serif';
-    ctx.textBaseline='top';
-    /* POPRAWKA: przesunięto klucz basowy o 1 pozycję wyżej (−STEP zamiast −STEP*0.5) */
-    ctx.fillText(String.fromCodePoint(0x1D122),LX+2,st-STEP*1.0);
+    const h=STEP*6.24;
+    const w=h*(148/231);
+    ctx.drawImage(BASS_CLF_IMG, LX+2, st-STEP*1.284, w, h);
   }
   ctx.restore();
 }
@@ -116,14 +130,7 @@ function renderPlace(dragP,correctP){
   const activeSt=dual?tops[clefs2.indexOf(activeClef)]:tops[0];
   const correctClef=dual?tClef:clef;
   const correctSt=dual?tops[clefs2.indexOf(correctClef)]:tops[0];
-  const poolFiltered=getPlacePool().filter(n=>(!dual)||(n.ct===activeClef));
-  if(poolFiltered.length>0){
-    const minP=Math.min(...poolFiltered.map(n=>n.p));
-    const maxP=Math.max(...poolFiltered.map(n=>n.p));
-    for(let p=minP;p<=maxP;p+=2){
-      if(p<-2||p>8){const ly=ny(activeSt,p);ctxP.save();ctxP.strokeStyle='rgba(30,58,138,0.12)';ctxP.lineWidth=1.2;ctxP.beginPath();ctxP.moveTo(nx-22,ly);ctxP.lineTo(nx+22,ly);ctxP.stroke();ctxP.restore();}
-    }
-  }
+  /* szare linie pomocnicze usunięte na życzenie */
   if(correctP!==undefined&&correctP!==null)drawNote(ctxP,correctSt,{p:correctP,l:'',f:0,a:null},nx,correctP<=4,'#16a34a',null,correctClef==='bass');
   if(dragP!==undefined&&dragP!==null){const col=(correctP!==undefined)?'#ef4444':'rgba(30,58,138,0.7)';drawNote(ctxP,activeSt,{p:dragP,l:'',f:0,a:null},nx,dragP<=4,col,null,activeClef==='bass');}
 }
