@@ -10,17 +10,38 @@ const ctxP=cvP.getContext('2d');
 function ny(st,p){return st+4*STEP-p*(STEP/2);}
 
 /* Czcionka muzyczna (tylko dla klucza wiolinowego) */
-const cfont=new FontFace('NotoMusic',"url('https://fonts.gstatic.com/s/notomusic/v20/pe0rMImSLYT1-7EeGl95MqrFJA.woff2')");
-cfont.load().then(f=>{document.fonts.add(f);render([]);renderPlace();}).catch(()=>{});
+/* NotoMusic nie jest już potrzebny – oba klucze to PNG */
 
-/* Klucz basowy – PNG bez tła z concept_art/klucz_beztla.png
-   Kalibracja pikseli (PNG 148×231):
-     górna kropka center y=66  → 28.6% od góry  → ma lądować na st+10
-     dolna  kropka center y=103 → 44.6% od góry → ma lądować na st+30
-   Stąd: h=STEP*6.24, topY=st-STEP*1.284, w=h*(148/231)=STEP*4.0  */
+/* Klucz basowy – PNG bez tła (concept_art/klucz_beztla.png)
+   Kalibracja pikseli (148×231): górna kropka→st+10, dolna→st+30, linia F→st+20 ✓ */
 const BASS_CLF_IMG=new Image();
 BASS_CLF_IMG.onload=()=>{render([]);renderPlace();};
 BASS_CLF_IMG.src='concept_art/klucz_beztla.png';
+
+/* Klucz wiolinowy – PNG bez tła (concept_art/wiolinowy_fiszki_bez_tla.png)
+   Kalibracja pikseli (581×1361): linia G (4. od góry) na 70% → st+3*STEP ✓
+   h=STEP*8, w=h*(581/1361), topY=st-STEP*2.6                                  */
+const TREBLE_CLF_IMG=new Image();
+TREBLE_CLF_IMG.onload=()=>{render([]);renderPlace();};
+TREBLE_CLF_IMG.src='concept_art/wiolinowy_fiszki_bez_tla.png';
+
+/* Klamra – PNG bez tła (concept_art/klamra_bez_tla.png)
+   Czarny PNG koloryzowany na #1e3a8a techniką destination-in.
+   Wysokość = dynamicznie (tops[1]+4*STEP - tops[0]), szerokość ∝ 115/950.    */
+const BRACE_IMG=new Image();
+BRACE_IMG.onload=()=>{render([]);renderPlace();};
+BRACE_IMG.src='concept_art/klamra_bez_tla.png';
+
+/* Koloryzacja: zamienia ciemne piksele PNG na docelowy kolor (#1e3a8a) */
+function _drawColorized(ctx,img,dx,dy,dw,dh){
+  const oc=document.createElement('canvas');
+  oc.width=Math.round(dw);oc.height=Math.round(dh);
+  const ot=oc.getContext('2d');
+  ot.fillStyle='#1e3a8a';ot.fillRect(0,0,oc.width,oc.height);
+  ot.globalCompositeOperation='destination-in';
+  ot.drawImage(img,0,0,oc.width,oc.height);
+  ctx.drawImage(oc,dx,dy);
+}
 
 /* ── Pozycje nut na canvasie (dla animacji) ── */
 function computeNotePositions(items,tops,clefs,ns,nw){
@@ -38,39 +59,35 @@ function computeNotePositions(items,tops,clefs,ns,nw){
   });
 }
 
-/* ── Klamra Grand Staff ── */
+/* ── Klamra Grand Staff – PNG klamra_bez_tla.png ── */
 function _drawBrace(ctxR,tops){
-  const ty=tops[0],by=tops[1]+4*STEP,mid=(ty+by)/2,aw=15;
-  ctxR.save();ctxR.strokeStyle='#1e3a8a';ctxR.fillStyle='#1e3a8a';ctxR.lineCap='round';
-  ctxR.lineWidth=2.2;ctxR.beginPath();ctxR.moveTo(LX-3,ty);ctxR.lineTo(LX-3,by);ctxR.stroke();
-  ctxR.lineWidth=1.6;
-  ctxR.beginPath();ctxR.moveTo(LX-3,ty);ctxR.bezierCurveTo(LX-3-aw*0.7,ty+(mid-ty)*0.2,LX-3-aw,mid-STEP,LX-3-aw*0.2,mid);ctxR.stroke();
-  ctxR.beginPath();ctxR.moveTo(LX-3-aw*0.2,mid);ctxR.bezierCurveTo(LX-3-aw,mid+STEP,LX-3-aw*0.7,by-(by-mid)*0.2,LX-3,by);ctxR.stroke();
-  ctxR.beginPath();ctxR.moveTo(LX-3,ty);ctxR.lineTo(LX-9,ty+11);ctxR.lineTo(LX-1,ty+6);ctxR.closePath();ctxR.fill();
-  ctxR.beginPath();ctxR.moveTo(LX-3,by);ctxR.lineTo(LX-9,by-11);ctxR.lineTo(LX-1,by-6);ctxR.closePath();ctxR.fill();
+  const ty=tops[0], by=tops[1]+4*STEP;
+  const bh=by-ty;                       /* pełna wysokość grand staff */
+  const bw=bh*(115/950);                /* proporcja z PNG             */
+  const bx=LX-3-bw;                    /* do lewej od kreski taktowej */
+  /* klamra (PNG → kolor navy) */
+  _drawColorized(ctxR,BRACE_IMG,bx,ty,bw,bh);
+  /* pionowa kreska taktowa łącząca obie pięciolinie */
+  ctxR.save();ctxR.strokeStyle='#1e3a8a';ctxR.lineWidth=2.2;ctxR.lineCap='round';
+  ctxR.beginPath();ctxR.moveTo(LX-3,ty);ctxR.lineTo(LX-3,by);ctxR.stroke();
   ctxR.restore();
 }
 
-/* ── Klucze (treble / bass) ──
-   Klucz wiolinowy: NotoMusic (czcionka webowa).
-   Klucz basowy:    PNG concept_art/klucz_beztla.png (bez tła).
-   Kalibracja: analiza pikseli PNG 148×231 daje:
-     h = STEP*6.24, w = h*(148/231) ≈ STEP*4
-     topY = st - STEP*1.284
-   → górna kropka ląduje na st+10, dolna na st+30, linia F na st+20 ✓ */
+/* ── Klucze ──
+   Klucz wiolinowy: PNG wiolinowy_fiszki_bez_tla.png
+     h=STEP*8, w=h*(581/1361), topY=st-STEP*2.6
+     Linia G (4. linia od góry) trafia na st+3*STEP ✓
+   Klucz basowy: PNG klucz_beztla.png
+     h=STEP*6.24, w=h*(148/231), topY=st-STEP*1.284
+     Linia F (2. linia od góry) trafia na st+STEP, kropki na st+10 i st+30 ✓ */
 function _drawClef(ctx,which,st){
-  ctx.save();
   if(which==='treble'){
-    ctx.fillStyle='#1e3a8a';
-    ctx.font=(STEP*5.5*0.92)+'px NotoMusic,Times New Roman,serif';
-    ctx.textBaseline='top';
-    ctx.fillText(String.fromCodePoint(0x1D11E),LX+3,st-STEP*0.37);
+    const h=STEP*8, w=h*(581/1361);
+    ctx.drawImage(TREBLE_CLF_IMG, LX+3, st-STEP*2.6, w, h);
   }else{
-    const h=STEP*6.24;
-    const w=h*(148/231);
+    const h=STEP*6.24, w=h*(148/231);
     ctx.drawImage(BASS_CLF_IMG, LX+2, st-STEP*1.284, w, h);
   }
-  ctx.restore();
 }
 
 /* ── Rysowanie linii pięciolinii ── */
