@@ -148,6 +148,35 @@
   .footer-loc{font-size:12px;color:#aaa;}
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+  /* QUIZ */
+  .quiz-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.15s,transform 0.7s 0.15s;}
+  .quiz-inner.visible{opacity:1;transform:translateY(0);}
+  @media(max-width:700px){.quiz-inner{padding:22px 18px;}}
+  .quiz-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;display:block;}
+  .quiz-lead{font-size:0.88rem;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
+  .quiz-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .quiz-num{font-size:0.72rem;font-weight:700;color:var(--text-mid);white-space:nowrap;}
+  .quiz-bar{flex:1;height:5px;background:#e8eaee;border-radius:99px;overflow:hidden;}
+  .quiz-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;}
+  .quiz-question{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);font-weight:600;line-height:1.45;margin-bottom:18px;}
+  .quiz-answers{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .quiz-btn{background:#f8fafc;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Poppins',sans-serif;font-size:0.88rem;color:var(--text);text-align:left;cursor:pointer;transition:0.2s;line-height:1.4;}
+  .quiz-btn:hover:not(:disabled){border-color:var(--navy);background:#f0f4ff;color:var(--navy);}
+  .quiz-btn.correct{border-color:#16a34a;background:#f0fdf4;color:#15803d;font-weight:600;}
+  .quiz-btn.wrong{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
+  .quiz-btn:disabled{cursor:default;}
+  .quiz-explain{font-size:0.85rem;line-height:1.65;color:var(--text);background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid var(--gold);}
+  .quiz-next{background:var(--navy);color:white;border:none;padding:10px 22px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-next:hover{background:var(--gold);}
+  .quiz-score-box{text-align:center;padding:20px 0;}
+  .quiz-score-emoji{font-size:3rem;margin-bottom:10px;}
+  .quiz-score-num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--navy);}
+  .quiz-score-pct{font-size:1rem;color:var(--text-mid);margin-bottom:12px;}
+  .quiz-score-msg{font-size:0.95rem;color:var(--text);margin-bottom:22px;line-height:1.5;}
+  .quiz-retry{background:var(--navy);color:white;border:none;padding:10px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-retry:hover{background:var(--gold);}
 </style>
 </head>
 <body>
@@ -188,24 +217,46 @@
     <span class="art-label">Historia notacji · Średniowiecze i renesans</span>
     <h2>Od kreski dyrygenta do pięciolinii</h2>
 
-    <p>Muzyka przez tysiące lat żyła wyłącznie w ustnej tradycji — przekazywana z mistrza na ucznia, z ust do ust. Kiedy jednak pojawiła się potrzeba jej utrwalenia, muzycy musieli wynaleźć zapis od podstaw. Droga od pierwszego znaku do współczesnej pięciolinii trwała kilka stuleci.</p>
+    <p>W prehistorii muzyka nie była zapisywana — przekazywano ją wyłącznie ustnie, z mistrza na ucznia. Pierwszym zachowanym zapisem muzycznym na świecie jest <strong>Epitafium Seikilosa</strong> (I–II w. n.e.) — krótka pieśń wyryta na marmurowej steli odkrytej w Tralles w Azji Mniejszej. Zapis wykorzystywał litery alfabetu greckiego jako znaki nutowe umieszczone nad tekstem.</p>
+
+    <figure class="tl-img" style="margin:0 0 28px 0;">
+      <img src="ilustracje/brief_4/zapisana%20kompozycja%20Epitafium%20Seikilosa.png" alt="Stela z Epitafium Seikilosa">
+      <figcaption>Stela z Epitafium Seikilosa (I–II w. n.e.) — najstarszy zachowany kompletny utwór muzyczny na świecie. Obecnie w Narodowym Muzeum Danii w Kopenhadze. Źródło: <a href="https://en.wikipedia.org/wiki/Seikilos_epitaph" target="_blank">Wikipedia</a></figcaption>
+    </figure>
+
+    <p>Dopiero w średniowieczu zaczęto wypracowywać system zapisu muzycznego na potrzeby chorału kościelnego. Droga od pierwszego znaku do współczesnej pięciolinii trwała kilka stuleci.</p>
 
     <div class="timeline">
       <div class="tl-item">
-        <div class="tl-dot">IX w.</div>
+        <div class="tl-dot">IX–XI w.</div>
         <div class="tl-content">
-          <div class="tl-title">Notacja cheironomiczna</div>
+          <div class="tl-title">Notacja cheironomiczna — neumy</div>
           <div class="tl-desc">Najstarszy europejski zapis muzyczny. Zamiast nut używano <strong>neum</strong> (gr. <em>neuma</em> — oddech lub znak) — małych graficznych symboli nad tekstem, które wskazywały jedynie <strong>kierunek melodii</strong>, czyli jej wznoszenie lub opadanie. Nie określały precyzyjnej wysokości dźwięku.</div>
+          <figure class="tl-img">
+            <img src="ilustracje/brief_4/notacja%20cheironomiczna.png" alt="Notacja cheironomiczna — neumatyczna, IX–XI w.">
+            <figcaption>Notacja cheironomiczna–neumatyczna (IX–XI w.) — neumy nad tekstem wskazują kierunek melodii</figcaption>
+          </figure>
         </div>
       </div>
       <div class="tl-item">
         <div class="tl-dot">XI w.</div>
         <div class="tl-content">
-          <div class="tl-title">Notacja diastemiczna — Guido z Arezzo</div>
-          <div class="tl-desc">W pierwszej połowie XI wieku mnich <strong>Guido z Arezzo</strong> wprowadził przełomowy wynalazek: czteroliniowy zapis z precyzyjnym określeniem wysokości dźwięku. Po raz pierwszy można było odczytać melodię bez znajomości ustnej tradycji. To on nadał też dźwiękom nazwy: <em>ut, re, mi, fa, sol, la</em> — z pierwszych sylab hymnu do św. Jana.</div>
+          <div class="tl-title">Notacja literowa</div>
+          <div class="tl-desc">Równolegle z neumami stosowano <strong>notację literową</strong> — dźwięki oznaczano literami alfabetu umieszczonymi nad tekstem. Zapis był precyzyjniejszy co do nazwy dźwięku, lecz nadal nie oddawał dokładnie jego rytmu.</div>
           <figure class="tl-img">
-            <img src="ilustracje/brief_4/Rozwój notacji - jak wyglądała.jpg" alt="Rozwój notacji gregoriańskiej — Incypit offertorium Erit vobis">
-            <figcaption>Rozwój notacji gregoriańskiej — Incypit offertorium <em>Erit vobis</em>: od góry notacja cheironomiczna–neumatyczna (IX–XI w.), dalej notacja literowa oraz kolejne notacje diastematyczne (XIII–XX w.). [Bartkowski B., <em>Chorał gregoriański</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225.]</figcaption>
+            <img src="ilustracje/brief_4/notacja%20literowa.png" alt="Notacja literowa, XI w.">
+            <figcaption>Notacja literowa (XI w.) — litery alfabetu nad sylabach tekstu</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">XIII–XX w.</div>
+        <div class="tl-content">
+          <div class="tl-title">Notacje diastemiczne — od Guidona do dziś</div>
+          <div class="tl-desc">W pierwszej połowie XI wieku mnich <strong>Guido z Arezzo</strong> wprowadził przełomowy wynalazek: czteroliniowy zapis z precyzyjnym określeniem wysokości dźwięku. Po raz pierwszy można było odczytać melodię bez znajomości ustnej tradycji. To on nadał też dźwiękom nazwy: <em>ut, re, mi, fa, sol, la</em> — z pierwszych sylab hymnu do św. Jana. System rozwijał się przez kolejne wieki aż do współczesnej pięciolinii.</div>
+          <figure class="tl-img">
+            <img src="ilustracje/brief_4/notacje%20diastemiczne.png" alt="Notacje diastemiczne, XIII–XX w.">
+            <figcaption>Notacje diastemiczne (XIII–XX w.) — kolejne etapy od czteroliniowego zapisu Guidona do współczesnej pięciolinii. [Bartkowski B., <em>Chorał gregoriański</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225.]</figcaption>
           </figure>
         </div>
       </div>
@@ -215,7 +266,7 @@
           <div class="tl-title">Tabulatury — renesans</div>
           <div class="tl-desc">W renesansie popularne stały się <strong>tabulatury</strong> — uproszczone zapisy przeznaczone dla konkretnych instrumentów (lutni, organów, klawesynu). Zamiast nut pokazywały palcowanie lub pozycję strun.</div>
           <figure class="tl-img">
-            <img src="ilustracje/renesansowa_tabulatura.avif" alt="Renesansowa tabulatura lutniowa">
+            <img src="ilustracje/brief_4/renesansowa%20tabulatura.avif" alt="Renesansowa tabulatura lutniowa">
             <figcaption>Przykład renesansowej tabulatury lutniowej</figcaption>
           </figure>
         </div>
@@ -248,7 +299,7 @@
     <div class="b-box">
       <div class="b-card quad">
         <figure class="b-img-wrap">
-          <img src="ilustracje/B_kwadratowe.png" alt="B quadratum — różne historyczne formy zapisu">
+          <img src="ilustracje/brief_4/B%20kwadratowe.png" alt="B quadratum — różne historyczne formy zapisu">
           <figcaption>Historyczne formy B kwadratowego</figcaption>
         </figure>
         <div class="b-name">B quadratum / B durum — B kwadratowe, twarde</div>
@@ -256,7 +307,7 @@
       </div>
       <div class="b-card round">
         <figure class="b-img-wrap">
-          <img src="ilustracje/b_okrągłe.png" alt="B rotundum — różne historyczne formy zapisu">
+          <img src="ilustracje/brief_4/b%20okr%C4%85g%C5%82e.png" alt="B rotundum — różne historyczne formy zapisu">
           <figcaption>Historyczne formy B okrągłego</figcaption>
         </figure>
         <div class="b-name">B rotundum / B molle — B okrągłe, miękkie</div>
@@ -265,7 +316,7 @@
     </div>
 
     <figure class="b-staff-fig">
-      <img src="ilustracje/b_kwadratowe_na_pieciolinii.png" alt="B kwadratowe na pięciolinii">
+      <img src="ilustracje/brief_4/b%20kwadratowe%20na%20pieciolinii.png" alt="B kwadratowe na pięciolinii">
       <figcaption>Położenie dźwięku B (H) na pięciolinii — z bemolem i bez</figcaption>
     </figure>
 
@@ -296,7 +347,9 @@
       <div class="tags-wrap">
         <span class="tag">Neumy</span>
         <span class="tag">Notacja cheironomiczna</span>
+        <span class="tag">Notacja literowa</span>
         <span class="tag">Notacja diastemiczna</span>
+        <span class="tag">Epitafium Seikilosa</span>
         <span class="tag">Guido z Arezzo</span>
         <span class="tag">Tryton — diabolus in musica</span>
         <span class="tag">Musica recta — zapis nutowy</span>
@@ -311,15 +364,26 @@
   </div>
 </div>
 
+<!-- QUIZ -->
+<div class="quiz-wrap" id="quiz-section">
+  <div class="quiz-inner">
+    <span class="quiz-label">🎵 Sprawdź się — krótki quiz</span>
+    <p class="quiz-lead">Kilka pytań z treści briefa. Kliknij odpowiedź i sprawdź, ile zapamiętałeś!</p>
+    <div id="quiz-container"></div>
+    <div id="quiz-result" style="display:none;"></div>
+  </div>
+</div>
+
 <div class="sources-wrap">
   <div class="sources-inner" id="src">
     <span class="src-label">Źródła</span>
     <ol>
       <li>Józef M. Chomiński, Krystyna Wilkowska-Chomińska, <em>Historia muzyki</em>, cz. 1 (Kraków: PWM, 1989).</li>
+      <li><em>Seikilos epitaph</em>, Wikipedia: <a href="https://en.wikipedia.org/wiki/Seikilos_epitaph" target="_blank">en.wikipedia.org/wiki/Seikilos_epitaph</a> [ilustracja steli]</li>
       <li>Rafał Piwowarczuk, <em>Dźwięk H czy B? Historia i różnice w notacji muzycznej</em> [ilustracje B quadratum i B rotundum], online: <a href="https://rafalpiwowarczuk.pl/dzwiek-h-czy-b-historia-i-roznice-w-notacji-muzycznej" target="_blank">rafalpiwowarczuk.pl</a> (licencja CC BY-NC 4.0)</li>
-      <li><em>Renesansowa tabulatura lutniowa — metoda zapisu nutowego z XVI w.</em>, ilustracja: <a href="https://pl.123rf.com/photo_102876538_renesansowa-tabulatura-lutniowa-du%C5%BCy-obraz-metody-zapisu-nutowego-z-xvi-wieku.html" target="_blank">123rf.com</a></li>
-      <li>Bartkowski B., <em>Chorał gregoriański. IV. Rytm</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225. [ilustracja: Rozwój notacji gregoriańskiej] — za: <a href="https://zsm2.home.pl/zsm2/biblioteka/oprac_not_greg.php" target="_blank">zsm2.home.pl</a></li>
+      <li>Bartkowski B., <em>Chorał gregoriański. IV. Rytm</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225. [ilustracje notacji cheironomicznej, literowej i diastemicznych] — za: <a href="https://zsm2.home.pl/zsm2/biblioteka/oprac_not_greg.php" target="_blank">zsm2.home.pl</a></li>
       <li><em>Neumy</em>, Wikipedia: <a href="https://pl.wikipedia.org/wiki/Neumy" target="_blank">pl.wikipedia.org/wiki/Neumy</a></li>
+      <li><em>Renesansowa tabulatura lutniowa — metoda zapisu nutowego z XVI w.</em>, ilustracja: <a href="https://pl.123rf.com/photo_102876538_renesansowa-tabulatura-lutniowa-du%C5%BCy-obraz-metody-zapisu-nutowego-z-xvi-wieku.html" target="_blank">123rf.com</a></li>
       <li><em>Diabolus in musica</em>: <a href="https://diabolus.org/index.htm" target="_blank">diabolus.org</a></li>
     </ol>
   </div>
@@ -373,7 +437,157 @@
 
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
-['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+['article','src','cal','quiz-inner'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+// QUIZ
+const questions = [
+  {
+    q: "Co to były neumy w notacji cheironomicznej?",
+    answers: [
+      "Małe symbole graficzne wskazujące kierunek melodii",
+      "Nazwy dźwięków w systemie solmizacji",
+      "Cyfry oznaczające palcowanie na lutni",
+      "Litery alfabetu greckiego"
+    ],
+    correct: 0,
+    explain: "Neumy (gr. oddech lub znak) to małe symbole graficzne umieszczane nad tekstem — wskazywały jedynie czy melodia idzie w górę czy w dół, ale nie precyzowały dokładnej wysokości dźwięku."
+  },
+  {
+    q: "Dlaczego tryton nazywano „diabolus in musica\u201C?",
+    answers: [
+      "Bo był zbyt trudny do zaśpiewania przez chórzystów",
+      "Bo jego zgrzytliwe brzmienie kojarzyło się ze złem — leży dokładnie między dwiema pięknymi, konsonansowymi kwintą i kwartą",
+      "Bo składa się z siedmiu półtonów",
+      "Bo wynalazł go szatan podczas soboru w Trydencie"
+    ],
+    correct: 1,
+    explain: "Tryton leży dokładnie między kwartą czystą a kwintą czystą — obydwoma konsonansowymi i przyjemnymi interwałami. Jego własne brzmienie jest wyjątkowo dysonansowe i zgrzytliwe, co kojarzyło się z siłami zła."
+  },
+  {
+    q: "Co to była musica ficta?",
+    answers: [
+      "Muzyka grana na fikcyjnych instrumentach",
+      "Zapis nutowy chorału gregoriańskiego",
+      "Zmiany wprowadzane przez śpiewaków na żywo, by uniknąć trytonu",
+      "Notacja stosowana wyłącznie przez kompozytorów świeckich"
+    ],
+    correct: 2,
+    explain: "Musica ficta (muzyka fałszywa/fikcyjna) to praktyka samodzielnego obniżania B przez śpiewaków podczas wykonania, by ominąć zakazany tryton. Musica recta to zapis taki, jaki widniał w nutach."
+  },
+  {
+    q: "Co oznaczało B rotundum (B okrągłe)?",
+    answers: [
+      "Normalny, niezmodyfikowany dźwięk B",
+      "Dźwięk B obniżony o pół tonu",
+      "Dźwięk B podwyższony o pół tonu",
+      "Specjalny znak rytmiczny"
+    ],
+    correct: 1,
+    explain: "B rotundum (B okrągłe, miękkie — B molle) oznaczało dźwięk B obniżony o pół tonu. Właśnie ten znak stał się zalążkiem dzisiejszego bemola (\u266D). Natomiast B quadratum (kwadratowe, twarde) oznaczało normalne B."
+  },
+  {
+    q: "Jaki instrument ukrywa Bach w swoim nazwisku dzięki notacji niemieckiej?",
+    answers: [
+      "Cztery klawisze organów",
+      "Cztery nuty: B\u266D, A, C, H",
+      "Trzy nuty: B, A, C",
+      "Pięć nut: B, A, C, B, H"
+    ],
+    correct: 1,
+    explain: "W notacji niemiecko-polskiej BACH to cztery dźwięki: B\u266D (obniżone B), A, C, H (naturalne B). Gdyby Niemcy używali notacji angielskiej, gdzie nie ma litery H, sygnatura kompozytora przestałaby działać."
+  },
+  {
+    q: "Który z zapisów jako pierwszy precyzyjnie określał wysokość dźwięku?",
+    answers: [
+      "Notacja cheironomiczna — neumy",
+      "Notacja literowa",
+      "Notacja diastemiczna Guidona z Arezzo",
+      "Tabulatura renesansowa"
+    ],
+    correct: 2,
+    explain: "Guido z Arezzo w XI wieku wprowadził czteroliniowy zapis diastemiczny — po raz pierwszy w historii można było odczytać dokładną wysokość dźwięku bez znajomości ustnej tradycji. Neumy i zapis literowy wskazywały jedynie przybliżony kierunek melodii."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+function renderQuestion() {
+  const c = document.getElementById('quiz-container');
+  const q = questions[current];
+  c.innerHTML = `
+    <div class="quiz-progress">
+      <span class="quiz-num">Pytanie ${current+1} / ${questions.length}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(current/questions.length)*100}%"></div></div>
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-answers">
+      ${q.answers.map((a,i)=>`<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('')}
+    </div>
+    <div class="quiz-explain" id="quiz-explain" style="display:none;"></div>
+    <button class="quiz-next" id="quiz-next" style="display:none;" onclick="nextQ()">Następne pytanie →</button>
+  `;
+  answered = false;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === idx && idx !== q.correct) b.classList.add('wrong');
+  });
+  if (idx === q.correct) score++;
+  const exp = document.getElementById('quiz-explain');
+  exp.style.display = 'block';
+  exp.innerHTML = (idx === q.correct ? '✅ ' : '❌ ') + q.explain;
+  const nx = document.getElementById('quiz-next');
+  nx.style.display = 'block';
+  nx.textContent = current < questions.length-1 ? 'Następne pytanie →' : 'Zobacz wynik 🎯';
+}
+
+function nextQ() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const r = document.getElementById('quiz-result');
+  r.style.display = 'block';
+  const pct = Math.round((score/questions.length)*100);
+  let msg, emoji;
+  if (pct === 100) { msg = 'Perfekcja! Jesteś mistrzem historii notacji.'; emoji = '🏆'; }
+  else if (pct >= 66) { msg = 'Świetny wynik! Brief na pewno nie poszedł w las.'; emoji = '🎹'; }
+  else if (pct >= 33) { msg = 'Nieźle, ale tryton chyba trochę rozproszył uwagę…'; emoji = '😅'; }
+  else { msg = 'Wróć do briefa — diabeł tkwi w szczegółach!'; emoji = '😈'; }
+  r.innerHTML = `
+    <div class="quiz-score-box">
+      <div class="quiz-score-emoji">${emoji}</div>
+      <div class="quiz-score-num">${score} / ${questions.length}</div>
+      <div class="quiz-score-pct">${pct}%</div>
+      <div class="quiz-score-msg">${msg}</div>
+      <button class="quiz-retry" onclick="restartQuiz()">↺ Spróbuj jeszcze raz</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', renderQuestion);
 </script>
 </body>
 </html>
