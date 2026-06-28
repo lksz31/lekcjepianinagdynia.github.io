@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief No. 4 – Tajemnica litery H | Teoria postrzegania muzyki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--gold-light:#f0d060;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+  /* HEADER */
+  .site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;}
+  .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:1rem;}
+  .header-left{display:flex;align-items:center;gap:14px;}
+  .logo-img{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 4px 12px rgba(30,58,138,0.15);}
+  .series-label{font-size:0.65rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1px;}
+  .series-title{font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:600;color:var(--navy);}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:8px 18px;border-radius:50px;font-size:0.78rem;font-weight:700;text-decoration:none;transition:0.25s;white-space:nowrap;flex-shrink:0;}
+  .back-btn:hover{background:var(--gold);transform:translateY(-1px);}
+  .back-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:500px){.back-btn span{display:none;}.back-btn{padding:8px 12px;}}
+
+  /* MOBILE NAV */
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+  .mobile-nav a .mn-icon{font-size:1.15rem;}
+  .mobile-nav a:hover,.mobile-nav a.mn-home{color:var(--navy);}
+  .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  .mobile-nav a.mn-cta:hover{background:var(--gold);}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+
+  /* HERO */
+  .hero{background:var(--navy);padding:60px 5% 55px;position:relative;overflow:hidden;}
+  .hero::before{content:'♪';position:absolute;font-size:22rem;font-family:serif;color:rgba(255,255,255,0.03);top:-60px;right:-40px;pointer-events:none;line-height:1;}
+  .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(to right,var(--gold),var(--gold-light),var(--gold));}
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;}
+  .brief-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.1s;}
+  .brief-badge-line{width:32px;height:2px;background:var(--gold);flex-shrink:0;}
+  .brief-badge-text{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold);}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,5vw,3.4rem);color:white;line-height:1.15;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.25s;}
+  .hero h1 em{font-style:italic;color:var(--gold);}
+  .hero-lead{font-size:clamp(0.88rem,2vw,1.05rem);color:rgba(255,255,255,0.6);max-width:560px;line-height:1.7;font-weight:300;padding-left:18px;border-left:3px solid var(--gold);opacity:0;animation:fadeUp 0.7s ease forwards 0.4s;}
+
+  /* ARTYKUŁ */
+  .article-wrap{max-width:960px;margin:0 auto;padding:44px 5% 50px;}
+  .article-card{background:white;border-radius:28px;border:1px solid var(--border);box-shadow:0 4px 28px rgba(0,0,0,0.07);padding:50px 58px;opacity:0;transform:translateY(24px);transition:opacity 0.8s cubic-bezier(0.2,0.8,0.2,1),transform 0.8s cubic-bezier(0.2,0.8,0.2,1);}
+  .article-card.visible{opacity:1;transform:translateY(0);}
+  @media(max-width:700px){.article-card{padding:26px 22px;}}
+  .article-card .art-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:14px;display:block;}
+  .article-card h2{font-family:'Playfair Display',serif;font-size:clamp(1.45rem,3vw,2rem);color:var(--navy);margin-bottom:26px;line-height:1.2;}
+  .article-card p{font-size:1rem;line-height:1.9;color:var(--text);margin-bottom:20px;text-align:justify;hyphens:auto;}
+  .article-card p:last-child{margin-bottom:0;}
+  .article-card strong{color:var(--navy);font-weight:600;}
+  .clearfix::after{content:'';display:table;clear:both;}
+  .article-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--navy);margin:32px 0 14px;padding-left:16px;border-left:3px solid var(--gold);clear:both;}
+  .blockquote{margin:28px 0;padding:16px 24px;border-left:4px solid var(--navy);background:#f0f4ff;border-radius:0 12px 12px 0;clear:both;}
+  .blockquote p{font-family:'Playfair Display',serif!important;font-style:italic;color:var(--navy)!important;font-size:1.05rem!important;line-height:1.65!important;margin:0!important;text-align:left!important;}
+
+  /* TABELA NOTACJI */
+  .notation-table{width:100%;border-collapse:collapse;margin:24px 0;clear:both;}
+  .notation-table th{background:var(--navy);color:white;padding:10px 14px;font-size:0.8rem;font-weight:600;text-align:left;}
+  .notation-table td{padding:9px 14px;font-size:0.85rem;border-bottom:1px solid var(--border);}
+  .notation-table tr:nth-child(even) td{background:#f8fafc;}
+  .notation-table td:first-child{font-weight:700;color:var(--navy);}
+
+  /* TIMELINE NOTACJI */
+  .timeline{margin:32px 0;clear:both;}
+  .tl-item{display:flex;gap:20px;margin-bottom:22px;align-items:flex-start;}
+  .tl-dot{flex-shrink:0;width:38px;height:38px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;letter-spacing:0.05em;text-align:center;line-height:1.2;}
+  .tl-content{padding-top:6px;}
+  .tl-title{font-weight:700;color:var(--navy);font-size:0.95rem;margin-bottom:4px;}
+  .tl-desc{font-size:0.88rem;color:var(--text-mid);line-height:1.65;}
+
+  /* INFOGRAFIKA B — z obrazami */
+  .b-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:28px 0;clear:both;}
+  @media(max-width:560px){.b-box{grid-template-columns:1fr;}}
+  .b-card{border:2px solid var(--border);border-radius:16px;padding:20px 22px;text-align:center;background:#f8fafc;}
+  .b-card.quad{border-color:var(--navy);background:#f0f4ff;}
+  .b-card.round{border-color:var(--gold);background:#fffbf0;}
+  .b-img-wrap{margin-bottom:12px;}
+  .b-img-wrap img{width:100%;max-height:90px;object-fit:contain;display:block;margin:0 auto;}
+  .b-img-wrap figcaption{font-size:0.66rem;color:var(--text-mid);margin-top:5px;font-style:italic;}
+  .b-name{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-mid);margin-bottom:6px;}
+  .b-card.quad .b-name{color:var(--navy);}
+  .b-card.round .b-name{color:#b07a00;}
+  .b-desc{font-size:0.83rem;color:var(--text);line-height:1.55;}
+
+  /* B NA PIĘCIOLINII */
+  .b-staff-fig{margin:24px 0 28px;clear:both;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.07);background:#fff;}
+  .b-staff-fig img{width:100%;display:block;object-fit:contain;max-height:160px;padding:16px;box-sizing:border-box;}
+  .b-staff-fig figcaption{font-size:0.7rem;color:var(--text-mid);padding:8px 12px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
+
+  /* TIMELINE Z OBRAZEM */
+  .tl-img{margin-top:12px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+  .tl-img img{width:100%;display:block;max-height:180px;object-fit:cover;}
+  .tl-img figcaption{font-size:0.66rem;color:var(--text-mid);padding:6px 10px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
+
+  .tags-section{margin-top:36px;padding-top:26px;border-top:1px solid var(--border);clear:both;}
+  .tags-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{border:1.5px solid var(--navy);color:var(--navy);padding:5px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;transition:0.2s;cursor:default;}
+  .tag:hover{background:var(--navy);color:white;}
+
+  /* ŹRÓDŁA */
+  .sources-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .sources-inner{background:#f8fafc;border-radius:20px;border:1px solid var(--border);padding:24px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.1s,transform 0.7s 0.1s;}
+  .sources-inner.visible{opacity:1;transform:translateY(0);}
+  .src-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .sources-inner ol{padding-left:18px;font-size:0.8rem;color:var(--text-mid);line-height:1.8;}
+  .sources-inner a{color:var(--navy);font-weight:500;}
+  .sources-inner a:hover{color:var(--gold);}
+
+  /* KALENDARZ */
+  .cal-wrap{max-width:960px;margin:0 auto;padding:0 5% 50px;}
+  .cal-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:28px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.2s,transform 0.7s 0.2s;}
+  .cal-inner.visible{opacity:1;transform:translateY(0);}
+  .cal-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;filter:invert(92%) hue-rotate(190deg);}
+  @media(max-width:500px){.cal-inner iframe{height:260px;}}
+
+  /* STOPKA */
+  .site-footer-main{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:10px;}
+  .footer-main-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
+  @media(max-width:900px){.footer-main-inner{grid-template-columns:1fr 1fr;gap:2rem;}}
+  @media(max-width:560px){.footer-main-inner{grid-template-columns:1fr;padding:2rem 0;}}
+  .footer-brand-row{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
+  .footer-logo-img{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+  .footer-nm{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tg{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-rl{height:2px;background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px);margin-bottom:1.1rem;}
+  .footer-contacts{display:flex;flex-direction:column;gap:7px;}
+  .footer-cr{display:flex;align-items:baseline;gap:14px;}
+  .footer-cl{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;min-width:38px;}
+  .footer-cv{font-size:13px;color:var(--navy);text-decoration:none;}
+  .footer-cv:hover{color:var(--gold);}
+  .footer-ct{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#aaa;margin-bottom:0.75rem;}
+  .footer-lnks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-lnks a{font-size:13.5px;color:#3d3d4a;text-decoration:none;transition:color 0.2s;}
+  .footer-lnks a:hover{color:var(--navy);}
+  .footer-bot-inner{max-width:1100px;margin:0 auto;}
+  .footer-bot{border-top:1px solid #e8eaee;padding:0.85rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .footer-cop{font-size:11px;color:#c0c0cc;}
+  .footer-loc{font-size:12px;color:#aaa;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <img class="logo-img" src="https://imgur.com/7HNwsrN.png" alt="Logo">
+      <div><div class="series-label">Seria</div><div class="series-title">Teoria postrzegania muzyki</div></div>
+    </div>
+    <a href="https://lekcjepianinagdynia.pl" class="back-btn">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Strona główna</span>
+    </a>
+  </div>
+</header>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="/index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="/index/fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="brief-badge"><div class="brief-badge-line"></div><div class="brief-badge-text">Brief No. 4</div></div>
+    <h1>Tajemnica litery <em>H</em> –<br>jak przesądy zmieniły alfabet</h1>
+    <p class="hero-lead">Dlaczego po angielsku gama to A B C D E F G, a po polsku i niemiecku pojawia się tajemnicze H? Winny jest tryton, Kościół i prawdopodobnie Bach.</p>
+  </div>
+</div>
+
+<div class="article-wrap">
+  <div class="article-card clearfix" id="article">
+    <span class="art-label">Historia notacji · Średniowiecze i renesans</span>
+    <h2>Od kreski dyrygenta do pięciolinii</h2>
+
+    <p>Muzyka przez tysiące lat żyła wyłącznie w ustnej tradycji — przekazywana z mistrza na ucznia, z ust do ust. Kiedy jednak pojawiła się potrzeba jej utrwalenia, muzycy musieli wynaleźć zapis od podstaw. Droga od pierwszego znaku do współczesnej pięciolinii trwała kilka stuleci.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot">IX w.</div>
+        <div class="tl-content">
+          <div class="tl-title">Notacja cheironomiczna</div>
+          <div class="tl-desc">Najstarszy europejski zapis muzyczny. Zamiast nut używano <strong>neum</strong> (gr. <em>neuma</em> — oddech lub znak) — małych graficznych symboli nad tekstem, które wskazywały jedynie <strong>kierunek melodii</strong>, czyli jej wznoszenie lub opadanie. Nie określały precyzyjnej wysokości dźwięku.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">XI w.</div>
+        <div class="tl-content">
+          <div class="tl-title">Notacja diastemiczna — Guido z Arezzo</div>
+          <div class="tl-desc">W pierwszej połowie XI wieku mnich <strong>Guido z Arezzo</strong> wprowadził przełomowy wynalazek: czteroliniowy zapis z precyzyjnym określeniem wysokości dźwięku. Po raz pierwszy można było odczytać melodię bez znajomości ustnej tradycji. To on nadał też dźwiękom nazwy: <em>ut, re, mi, fa, sol, la</em> — z pierwszych sylab hymnu do św. Jana.</div>
+          <figure class="tl-img">
+            <img src="ilustracje/brief_4/Rozwój notacji - jak wyglądała.jpg" alt="Rozwój notacji gregoriańskiej — Incypit offertorium Erit vobis">
+            <figcaption>Rozwój notacji gregoriańskiej — Incypit offertorium <em>Erit vobis</em>: od góry notacja cheironomiczna–neumatyczna (IX–XI w.), dalej notacja literowa oraz kolejne notacje diastematyczne (XIII–XX w.). [Bartkowski B., <em>Chorał gregoriański</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225.]</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">XV w.</div>
+        <div class="tl-content">
+          <div class="tl-title">Tabulatury — renesans</div>
+          <div class="tl-desc">W renesansie popularne stały się <strong>tabulatury</strong> — uproszczone zapisy przeznaczone dla konkretnych instrumentów (lutni, organów, klawesynu). Zamiast nut pokazywały palcowanie lub pozycję strun.</div>
+          <figure class="tl-img">
+            <img src="ilustracje/renesansowa_tabulatura.avif" alt="Renesansowa tabulatura lutniowa">
+            <figcaption>Przykład renesansowej tabulatury lutniowej</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot">XVII w.</div>
+        <div class="tl-content">
+          <div class="tl-title">Współczesna notacja — barok</div>
+          <div class="tl-desc">W epoce baroku wykształciła się właściwie już <strong>współczesna notacja muzyczna</strong>: pięciolinia, klucze, nuty z ogonkami i kropkami — system, który znamy do dziś.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Diabelski interwał i problem z B</h3>
+
+    <p>Pierwotnie nazwy dźwięków we wszystkich europejskich tradycjach odpowiadały po prostu kolejnym literom alfabetu: <strong>A B C D E F G</strong>. Prosto i logicznie. Jednak pewien szczególny problem zmusił muzyków do skomplikowania tego porządku.</p>
+
+    <p>Tym problemem był <strong>tryton</strong> — interwał powstający między dźwiękami <strong>B i F</strong>, złożony z sześciu półtonów. Jego brzmienie było tak ostre i niepokojące, że w średniowiecznej Europie ochrzczono go mianem <em>diabolus in musica</em> — diabła w muzyce. Kościół katolicki <strong>zakazał używania trytonu</strong> w muzyce liturgicznej, a kompozytorzy nie mogli po prostu go stosować w swoich dziełach.</p>
+
+    <p>Skąd ta wyjątkowa wrogość? Wyobraź sobie skalę: kwarta czysta i kwinta czysta to interwały powszechnie uznawane za <strong>konsonansowe</strong> — brzmią stabilnie, harmonijnie, przyjemnie. Tryton leży dokładnie pomiędzy nimi, w samym środku — i jest od nich skrajnie różny. To interwał <strong>dysonansowy</strong>, wyjątkowo zgrzytliwy i napięty. Jakby ktoś umieścił coś radykalnie nieprzyjemnego między dwiema rzeczami uznanymi za piękne. Do tego sześć półtonów, z których się składa, mogło kojarzyć się z demoniczną liczbą — i tak tryton stał się muzycznym wrogiem publicznym.</p>
+
+    <div class="blockquote"><p>Kompozytorzy nie mogli używać trytonu — a śpiewacy, napotykając go w zapisie, zmieniali nuty na żywo, by go ominąć. Zapis mówił jedno, muzyka brzmiała inaczej.</p></div>
+
+    <p>Praktykę tę określano dwoma łacińskimi pojęciami. <strong>Musica recta</strong> (muzyka prawidłowa) — to zapis taki, jaki widniał w nutach. <strong>Musica ficta</strong> (muzyka fikcyjna, fałszywa) — to zmiany wprowadzane przez wykonawców na żywo, by uniknąć zakazanego trytonu. I tu pojawił się paradoks notacji: zapis muzyczny miał służyć temu, by <strong>dokładnie utrwalić</strong> to, co do tej pory przekazywano ustnie. A tymczasem muzycy zapisywali nuty w jeden sposób, a wykonywali je w drugi — omijając tryton z pełną świadomością, lecz bez śladu w partyturze.</p>
+
+    <h3>Dwa różne B: okrągłe i kwadratowe</h3>
+
+    <p>Uznano, że tę dwuznaczność trzeba jakoś rozwiązać w samej notacji. Muzycy postanowili stworzyć <strong>dwa różne znaki</strong> dla dźwięku B — w zależności od tego, które z nich mają na myśli.</p>
+
+    <div class="b-box">
+      <div class="b-card quad">
+        <figure class="b-img-wrap">
+          <img src="ilustracje/B_kwadratowe.png" alt="B quadratum — różne historyczne formy zapisu">
+          <figcaption>Historyczne formy B kwadratowego</figcaption>
+        </figure>
+        <div class="b-name">B quadratum / B durum — B kwadratowe, twarde</div>
+        <div class="b-desc">Normalny, niezmodyfikowany dźwięk B. Pisano go z kanciastą, kwadratową podstawą.</div>
+      </div>
+      <div class="b-card round">
+        <figure class="b-img-wrap">
+          <img src="ilustracje/b_okrągłe.png" alt="B rotundum — różne historyczne formy zapisu">
+          <figcaption>Historyczne formy B okrągłego</figcaption>
+        </figure>
+        <div class="b-name">B rotundum / B molle — B okrągłe, miękkie</div>
+        <div class="b-desc">B obniżone o pół tonu — to, które śpiewano, by unikać trytonu. Pisano je z miękką, okrągłą pętlą.</div>
+      </div>
+    </div>
+
+    <figure class="b-staff-fig">
+      <img src="ilustracje/b_kwadratowe_na_pieciolinii.png" alt="B kwadratowe na pięciolinii">
+      <figcaption>Położenie dźwięku B (H) na pięciolinii — z bemolem i bez</figcaption>
+    </figure>
+
+    <h3>Jak B stało się H — i dlaczego Bach miał tu coś do powiedzenia</h3>
+
+    <p>Na tym rozwidleniu tradycja angielska i niemiecka poszły w zupełnie różnych kierunkach, dając dzisiejszą różnicę między gamą angielską a polsko-niemiecką.</p>
+
+    <table class="notation-table">
+      <tr><th>Dźwięk</th><th>Notacja angielska</th><th>Notacja polska / niemiecka</th></tr>
+      <tr><td>Normalny dźwięk</td><td>B</td><td>H</td></tr>
+      <tr><td>Dźwięk obniżony o pół tonu</td><td>B♭ (B flat)</td><td>B</td></tr>
+    </table>
+
+    <p>Według najpopularniejszej teorii <strong>B okrągłe</strong> stało się dzisiejszym bemolem (♭), a <strong>B kwadratowe</strong> — zwykłą nutą bez znaku. Łącząc bemol z normalną nutą B, otrzymujemy angielskie B♭ (<em>B flat</em>). Taka jest logika angielskiego zapisu do dziś.</p>
+
+    <p>W tradycji niemieckiej — a za nią polskiej — sprawy potoczyły się inaczej. Istnieją trzy teorie wyjaśniające pojawienie się litery <strong>H</strong>:</p>
+
+    <p><strong>Teoria Bacha:</strong> Johann Sebastian Bach słynął z ukrywania własnego nazwiska w kompozycjach — po niemiecku B-A-C-H odpowiada czterem dźwiękom (B♭, A, C, H). Gdyby Niemcy zrezygnowali z H na rzecz angielskiego B, sygnatura kompozytora przestałaby działać — zamiast BACH w nutach pojawiałoby się coś w rodzaju B♭ACB♭. Popularność Bacha mogła więc dosłownie uratować literę H.</p>
+
+    <p><strong>Teoria kaligraficzna:</strong> Możliwe, że skryba, przepisując nuty, po prostu <strong>niechcący przetarł dolną laseczkę</strong> litery b i to, co wyglądało jak ♮b, zaczęto odczytywać jako h. Błąd powtórzony wystarczająco wiele razy staje się standardem.</p>
+
+    <p><strong>Teoria drukarska:</strong> Gdy muzyka trafiła pod prasę drukarską, zecerzy po prostu <strong>nie mieli odpowiedniego stempla</strong> dla B quadratum. Sięgali więc po najbliższe dostępne — literę H — i tak utrwalili zamiennik w druku.</p>
+
+    <p><strong>Teoria alfabetyczna:</strong> Być może Niemcy po prostu poszli za logiką alfabetu — A B C D E F G, a potem naturalnie <strong>H</strong> — i tak nazwali dźwięk bez bawienia się w rozróżnianie B okrągłego i kwadratowego. Każda z tych teorii ma swoich zwolenników, a historycy muzyki do dziś nie są zgodni, która jest prawdziwa.</p>
+
+    <div class="tags-section">
+      <span class="tags-label">Pojęcia kluczowe</span>
+      <div class="tags-wrap">
+        <span class="tag">Neumy</span>
+        <span class="tag">Notacja cheironomiczna</span>
+        <span class="tag">Notacja diastemiczna</span>
+        <span class="tag">Guido z Arezzo</span>
+        <span class="tag">Tryton — diabolus in musica</span>
+        <span class="tag">Musica recta — zapis nutowy</span>
+        <span class="tag">Musica ficta — zmiana na żywo</span>
+        <span class="tag">Konsonans i dysonans</span>
+        <span class="tag">B quadratum</span>
+        <span class="tag">B rotundum</span>
+        <span class="tag">Bemol (♭)</span>
+        <span class="tag">Sygnatura BACH</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sources-wrap">
+  <div class="sources-inner" id="src">
+    <span class="src-label">Źródła</span>
+    <ol>
+      <li>Józef M. Chomiński, Krystyna Wilkowska-Chomińska, <em>Historia muzyki</em>, cz. 1 (Kraków: PWM, 1989).</li>
+      <li>Rafał Piwowarczuk, <em>Dźwięk H czy B? Historia i różnice w notacji muzycznej</em> [ilustracje B quadratum i B rotundum], online: <a href="https://rafalpiwowarczuk.pl/dzwiek-h-czy-b-historia-i-roznice-w-notacji-muzycznej" target="_blank">rafalpiwowarczuk.pl</a> (licencja CC BY-NC 4.0)</li>
+      <li><em>Renesansowa tabulatura lutniowa — metoda zapisu nutowego z XVI w.</em>, ilustracja: <a href="https://pl.123rf.com/photo_102876538_renesansowa-tabulatura-lutniowa-du%C5%BCy-obraz-metody-zapisu-nutowego-z-xvi-wieku.html" target="_blank">123rf.com</a></li>
+      <li>Bartkowski B., <em>Chorał gregoriański. IV. Rytm</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225. [ilustracja: Rozwój notacji gregoriańskiej] — za: <a href="https://zsm2.home.pl/zsm2/biblioteka/oprac_not_greg.php" target="_blank">zsm2.home.pl</a></li>
+      <li><em>Neumy</em>, Wikipedia: <a href="https://pl.wikipedia.org/wiki/Neumy" target="_blank">pl.wikipedia.org/wiki/Neumy</a></li>
+      <li><em>Diabolus in musica</em>: <a href="https://diabolus.org/index.htm" target="_blank">diabolus.org</a></li>
+    </ol>
+  </div>
+</div>
+
+<div class="cal-wrap">
+  <div class="cal-inner" id="cal">
+    <span class="cal-label">📅 Wolne terminy zajęć</span>
+    <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
+  </div>
+</div>
+
+<footer class="site-footer-main">
+  <div class="footer-main-inner">
+    <div>
+      <div class="footer-brand-row">
+        <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo-img">
+        <div><div class="footer-nm">Łukasz Ganczarek</div><div class="footer-tg">Nauka gry na pianinie</div></div>
+      </div>
+      <div class="footer-rl"></div>
+      <div class="footer-contacts">
+        <div class="footer-cr"><span class="footer-cl">Tel</span><a href="tel:514338875" class="footer-cv">514 338 875</a></div>
+        <div class="footer-cr"><span class="footer-cl">Email</span><a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-cv">lukaszgkorepetycje@gmail.com</a></div>
+        <div class="footer-cr"><span class="footer-cl">WWW</span><a href="https://lekcjepianinagdynia.pl" class="footer-cv">lekcjepianinagdynia.pl</a></div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-ct">Nawigacja</div>
+      <ul class="footer-lnks">
+        <li><a href="/index.html">Strona główna</a></li>
+        <li><a href="/index.html#kontakt">Dla ucznia</a></li>
+        <li><a href="/index.html#terminy">Wolne terminy</a></li>
+        <li><a href="/index.html#kontakt">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-ct">Strona główna</div>
+      <ul class="footer-lnks">
+        <li><a href="https://buki.org.pl/user-123621/" target="_blank">Profil Buki.org</a></li>
+        <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">Profil Superprof</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bot-inner">
+    <div class="footer-bot">
+      <span class="footer-loc">♪ Gdynia · online</span>
+      <span class="footer-cop">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
+['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+</script>
+</body>
+</html>
