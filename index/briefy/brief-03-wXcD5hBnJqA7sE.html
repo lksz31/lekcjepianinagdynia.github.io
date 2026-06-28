@@ -11,7 +11,7 @@
   :root{--gold:#d4af37;--gold-light:#f0d060;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
- 
+
   /* HEADER */
   .site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;}
   .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:1rem;}
@@ -23,8 +23,8 @@
   .back-btn:hover{background:var(--gold);transform:translateY(-1px);}
   .back-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
   @media(max-width:500px){.back-btn span{display:none;}.back-btn{padding:8px 12px;}}
- 
-  /* MOBILE NAV — 5 ikon */
+
+  /* MOBILE NAV */
   .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
   .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
   .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
@@ -33,7 +33,7 @@
   .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
   .mobile-nav a.mn-cta:hover{background:var(--gold);}
   @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
- 
+
   /* HERO */
   .hero{background:var(--navy);padding:60px 5% 55px;position:relative;overflow:hidden;}
   .hero::before{content:'♪';position:absolute;font-size:22rem;font-family:serif;color:rgba(255,255,255,0.03);top:-60px;right:-40px;pointer-events:none;line-height:1;}
@@ -45,7 +45,7 @@
   .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,5vw,3.4rem);color:white;line-height:1.15;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.25s;}
   .hero h1 em{font-style:italic;color:var(--gold);}
   .hero-lead{font-size:clamp(0.88rem,2vw,1.05rem);color:rgba(255,255,255,0.6);max-width:560px;line-height:1.7;font-weight:300;padding-left:18px;border-left:3px solid var(--gold);opacity:0;animation:fadeUp 0.7s ease forwards 0.4s;}
- 
+
   /* ARTYKUŁ */
   .article-wrap{max-width:960px;margin:0 auto;padding:44px 5% 50px;}
   .article-card{background:white;border-radius:28px;border:1px solid var(--border);box-shadow:0 4px 28px rgba(0,0,0,0.07);padding:50px 58px;opacity:0;transform:translateY(24px);transition:opacity 0.8s cubic-bezier(0.2,0.8,0.2,1),transform 0.8s cubic-bezier(0.2,0.8,0.2,1);}
@@ -69,7 +69,7 @@
   .tags-wrap{display:flex;flex-wrap:wrap;gap:8px;}
   .tag{border:1.5px solid var(--navy);color:var(--navy);padding:5px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;transition:0.2s;cursor:default;}
   .tag:hover{background:var(--navy);color:white;}
- 
+
   /* ŹRÓDŁA */
   .sources-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
   .sources-inner{background:#f8fafc;border-radius:20px;border:1px solid var(--border);padding:24px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.1s,transform 0.7s 0.1s;}
@@ -78,7 +78,7 @@
   .sources-inner ol{padding-left:18px;font-size:0.8rem;color:var(--text-mid);line-height:1.8;}
   .sources-inner a{color:var(--navy);font-weight:500;}
   .sources-inner a:hover{color:var(--gold);}
- 
+
   /* KALENDARZ */
   .cal-wrap{max-width:960px;margin:0 auto;padding:0 5% 50px;}
   .cal-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:28px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.2s,transform 0.7s 0.2s;}
@@ -86,7 +86,7 @@
   .cal-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
   .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;filter:invert(92%) hue-rotate(190deg);}
   @media(max-width:500px){.cal-inner iframe{height:260px;}}
- 
+
   /* STOPKA */
   .site-footer-main{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:10px;}
   .footer-main-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
@@ -110,12 +110,40 @@
   .footer-bot{border-top:1px solid #e8eaee;padding:0.85rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
   .footer-cop{font-size:11px;color:#c0c0cc;}
   .footer-loc{font-size:12px;color:#aaa;}
- 
+
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+  /* QUIZ */
+  .quiz-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;}
+  @media(max-width:700px){.quiz-inner{padding:22px 18px;}}
+  .quiz-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;display:block;}
+  .quiz-lead{font-size:0.88rem;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
+  .quiz-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .quiz-num{font-size:0.72rem;font-weight:700;color:var(--text-mid);white-space:nowrap;}
+  .quiz-bar{flex:1;height:5px;background:#e8eaee;border-radius:99px;overflow:hidden;}
+  .quiz-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;}
+  .quiz-question{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);font-weight:600;line-height:1.45;margin-bottom:18px;}
+  .quiz-answers{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .quiz-btn{background:#f8fafc;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Poppins',sans-serif;font-size:0.88rem;color:var(--text);text-align:left;cursor:pointer;transition:0.2s;line-height:1.4;}
+  .quiz-btn:hover:not(:disabled){border-color:var(--navy);background:#f0f4ff;color:var(--navy);}
+  .quiz-btn.correct{border-color:#16a34a;background:#f0fdf4;color:#15803d;font-weight:600;}
+  .quiz-btn.wrong{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
+  .quiz-btn:disabled{cursor:default;}
+  .quiz-explain{font-size:0.85rem;line-height:1.65;color:var(--text);background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid var(--gold);}
+  .quiz-next{background:var(--navy);color:white;border:none;padding:10px 22px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-next:hover{background:var(--gold);}
+  .quiz-score-box{text-align:center;padding:20px 0;}
+  .quiz-score-emoji{font-size:3rem;margin-bottom:10px;}
+  .quiz-score-num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--navy);}
+  .quiz-score-pct{font-size:1rem;color:var(--text-mid);margin-bottom:12px;}
+  .quiz-score-msg{font-size:0.95rem;color:var(--text);margin-bottom:22px;line-height:1.5;}
+  .quiz-retry{background:var(--navy);color:white;border:none;padding:10px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-retry:hover{background:var(--gold);}
 </style>
 </head>
 <body>
- 
+
 <header class="site-header">
   <div class="header-inner">
     <div class="header-left">
@@ -128,8 +156,7 @@
     </a>
   </div>
 </header>
- 
-<!-- MOBILE NAV — 5 ikon -->
+
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
@@ -139,7 +166,7 @@
     <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
- 
+
 <div class="hero">
   <div class="hero-inner">
     <div class="brief-badge"><div class="brief-badge-line"></div><div class="brief-badge-text">Brief No. 3</div></div>
@@ -147,7 +174,7 @@
     <p class="hero-lead">Od pojedynczej struny Pitagorasa do subtelnego mechanizmu klawikordu.</p>
   </div>
 </div>
- 
+
 <div class="article-wrap">
   <div class="article-card clearfix" id="article">
     <span class="art-label">Starożytność · Mezopotamia i Egipt</span>
@@ -187,7 +214,17 @@
     </div>
   </div>
 </div>
- 
+
+<!-- QUIZ -->
+<div class="quiz-wrap">
+  <div class="quiz-inner">
+    <span class="quiz-label">🎵 Sprawdź się — krótki quiz</span>
+    <p class="quiz-lead">Kilka pytań z treści briefa. Kliknij odpowiedź i sprawdź, ile zapamiętałeś!</p>
+    <div id="quiz-container"></div>
+    <div id="quiz-result" style="display:none;"></div>
+  </div>
+</div>
+
 <div class="sources-wrap">
   <div class="sources-inner" id="src">
     <span class="src-label">Źródła</span>
@@ -197,15 +234,14 @@
     </ol>
   </div>
 </div>
- 
-<!-- KALENDARZ TERMINÓW -->
+
 <div class="cal-wrap">
   <div class="cal-inner" id="cal">
     <span class="cal-label">📅 Wolne terminy zajęć</span>
     <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
   </div>
 </div>
- 
+
 <footer class="site-footer-main">
   <div class="footer-main-inner">
     <div>
@@ -222,12 +258,12 @@
     </div>
     <div>
       <div class="footer-ct">Nawigacja</div>
-<ul class="footer-lnks">
-  <li><a href="/index.html">Strona główna</a></li>
-  <li><a href="/index.html#kontakt">Dla ucznia</a></li>
-  <li><a href="/index.html#terminy">Wolne terminy</a></li>
-  <li><a href="/index.html#kontakt">Kontakt</a></li>
-</ul>
+      <ul class="footer-lnks">
+        <li><a href="/index.html">Strona główna</a></li>
+        <li><a href="/index.html#kontakt">Dla ucznia</a></li>
+        <li><a href="/index.html#terminy">Wolne terminy</a></li>
+        <li><a href="/index.html#kontakt">Kontakt</a></li>
+      </ul>
     </div>
     <div>
       <div class="footer-ct">Strona główna</div>
@@ -244,10 +280,160 @@
     </div>
   </div>
 </footer>
- 
+
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
 ['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+// QUIZ
+const questions = [
+  {
+    q: "W jaki sposób Sumerowie przekazywali muzykę?",
+    answers: [
+      "Zapisywali nuty na glinianych tabliczkach",
+      "Ustnie, z mistrza na ucznia",
+      "Za pomocą liter alfabetu nad tekstem",
+      "Rysowali znaki na papirusie"
+    ],
+    correct: 1,
+    explain: "Choć Sumerowie wynalezli pismo, muzykę przekazywali wyłącznie ustnie. Nuty nie istnialy — melodie i rytmy uczono sie bezposrednio od nauczyciela."
+  },
+  {
+    q: "Do czego pierwotnie sluzyla muzyka w kulturach Mezopotamii?",
+    answers: [
+      "Do rozrywki na dworach krolewskich",
+      "Do celów liturgicznych podczas obrzedów religijnych",
+      "Do nauki czytania i pisania w szkolach",
+      "Do sygnalizowania niebezpieczenstwa podczas bitew"
+    ],
+    correct: 1,
+    explain: "Muzyka w kulturach Sumerów, Egiptu i Babilonii sluzyla przede wszystkim celom liturgicznym. Wykonywali ja glównie kaplani podczas obrzedów religijnych."
+  },
+  {
+    q: "Gdzie uczono muzyki u Sumerów?",
+    answers: [
+      "Wylacznie w domach prywatnych",
+      "Na targowiskach i placach miejskich",
+      "Najpierw w szkolach przyswiatynnych, pozniej tez na dworach",
+      "Tylko podczas corocznych swiat"
+    ],
+    correct: 2,
+    explain: "U Sumerów muzyki uczono poczatkowo w szkolach przylaczonych do swiatyn. Z czasem nauka muzyki pojawila sie równiez na dworach krolewskich."
+  },
+  {
+    q: "Jaką rolę odgrywała muzyka wokalna w starożytnych cywilizacjach?",
+    answers: [
+      "Byla mniej wazna niz instrumentalna",
+      "Najwazniejsza — to wokalistyka dominowala, instrumenty pelniły role uzupelniajaca",
+      "Uzywano jej wylacznie do przesylania wiadomosci",
+      "Nie istniala — spiewano tylko w ciszy"
+    ],
+    correct: 1,
+    explain: "W kulturach Sumerów, Egiptu i Babilonii najwazniejsza role odgrywala muzyka wokalna. Instrumenty — harfy, liry, aulosy, fletnie Pana — pelniły role melodyczna i perkusyjna, ale to glos byl najwazniejszy."
+  },
+  {
+    q: "Czym byla muzyka w starozytnych cywilizacjach Mezopotamii — tylko sztuka?",
+    answers: [
+      "Tak — to byla glównie rozrywka dla dworu",
+      "Nie — byla przede wszystkim rytuatem i jezykiem bogów, scisle zwiazanym z kosmosem",
+      "Nie — sluzyla wylacznie do przekazywania wiadomosci miedzy miastami",
+      "Tak — grano ja dla przyjemnosci w domach prywatnych"
+    ],
+    correct: 1,
+    explain: "Muzyka w Mezopotamii i Egipcie nie byla zwykla sztuka. Wierzono, ze jest scisle powiazana z kosmosem i odzwierciedla jego porzadek. Skale i stroje byly regulowane przez tradycje — zmiana skali podczas ceremonii religijnej mogla uchodzic za bluzniercstwo."
+  },
+  {
+    q: "Które z ponizszych instrumentów NIE nalezalo do instrumentarium starozytnego omawianego w briefie?",
+    answers: [
+      "Harfa i lira",
+      "Aulosy i fletnia Pana",
+      "Fortepian i organy",
+      "Bebny i grzechotki"
+    ],
+    correct: 2,
+    explain: "Fortepian i organy to instrumenty znacznie pozniejsze — fortepian powstal w XVIII w., organy w sredniowieczu. W starozytnej Mezopotamii i Egipcie uzywano harf, lir, aulosów, fletni Pana, kitar, lutn, bebów i grzechotek."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+function renderQuestion() {
+  const c = document.getElementById('quiz-container');
+  const q = questions[current];
+  c.innerHTML = `
+    <div class="quiz-progress">
+      <span class="quiz-num">Pytanie ${current+1} / ${questions.length}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(current/questions.length)*100}%"></div></div>
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-answers">
+      ${q.answers.map((a,i)=>`<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('')}
+    </div>
+    <div class="quiz-explain" id="quiz-explain" style="display:none;"></div>
+    <button class="quiz-next" id="quiz-next" style="display:none;" onclick="nextQ()">Następne pytanie →</button>
+  `;
+  answered = false;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === idx && idx !== q.correct) b.classList.add('wrong');
+  });
+  if (idx === q.correct) score++;
+  const exp = document.getElementById('quiz-explain');
+  exp.style.display = 'block';
+  exp.innerHTML = (idx === q.correct ? '✅ ' : '❌ ') + q.explain;
+  const nx = document.getElementById('quiz-next');
+  nx.style.display = 'block';
+  nx.textContent = current < questions.length-1 ? 'Następne pytanie →' : 'Zobacz wynik 🎯';
+}
+
+function nextQ() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const r = document.getElementById('quiz-result');
+  r.style.display = 'block';
+  const pct = Math.round((score/questions.length)*100);
+  let msg, emoji;
+  if (pct === 100) { msg = 'Perfekcja! Kapłani Sumeru byliby dumni.'; emoji = '🏆'; }
+  else if (pct >= 66) { msg = 'Swietny wynik! Mezopotamia nie ma przed toba tajemnic.'; emoji = '🎵'; }
+  else if (pct >= 33) { msg = 'Nie zle, ale skale i stroje jeszcze warto powtórzyc...'; emoji = '😅'; }
+  else { msg = 'Wróc do briefa — bogowie muzyki wymagaja wiecej!'; emoji = '🪘'; }
+  r.innerHTML = `
+    <div class="quiz-score-box">
+      <div class="quiz-score-emoji">${emoji}</div>
+      <div class="quiz-score-num">${score} / ${questions.length}</div>
+      <div class="quiz-score-pct">${pct}%</div>
+      <div class="quiz-score-msg">${msg}</div>
+      <button class="quiz-retry" onclick="restartQuiz()">↺ Spróbuj jeszcze raz</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', renderQuestion);
 </script>
 </body>
 </html>
