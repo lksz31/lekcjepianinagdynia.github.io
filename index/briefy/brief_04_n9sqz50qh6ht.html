@@ -97,7 +97,7 @@
 
   /* TIMELINE Z OBRAZEM */
   .tl-img{margin-top:12px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
-  .tl-img img{width:100%;display:block;max-height:180px;object-fit:cover;}
+  .tl-img img{width:100%;display:block;max-height:540px;object-fit:contain;background:#fff;}
   .tl-img figcaption{font-size:0.66rem;color:var(--text-mid);padding:6px 10px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
 
   .tags-section{margin-top:36px;padding-top:26px;border-top:1px solid var(--border);clear:both;}
@@ -149,11 +149,11 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
-  /* EPITAFIUM — portrait */
-  .epitafium-fig{margin:0 0 28px 0;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.07);background:#fff;max-width:260px;}
+  /* EPITAFIUM — float right, text wraps left */
+  .epitafium-fig{float:right;width:180px;margin:4px 0 18px 24px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.09);background:#fff;}
   .epitafium-fig img{width:100%;display:block;object-fit:contain;}
-  .epitafium-fig figcaption{font-size:0.7rem;color:var(--text-mid);padding:8px 12px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
-
+  .epitafium-fig figcaption{font-size:0.65rem;color:var(--text-mid);padding:7px 10px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
+  @media(max-width:560px){.epitafium-fig{float:none;width:140px;margin:0 auto 18px;display:block;}}
   /* TRADITION BOXES */
   .tradition-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;clear:both;}
   @media(max-width:560px){.tradition-box{grid-template-columns:1fr;}}
@@ -509,15 +509,15 @@ const questions = [
     explain: "B rotundum (B okrągłe, miękkie — B molle) oznaczało dźwięk B obniżony o pół tonu. Właśnie ten znak stał się zalążkiem dzisiejszego bemola (\u266D). Natomiast B quadratum (kwadratowe, twarde) oznaczało normalne B."
   },
   {
-    q: "Jaki instrument ukrywa Bach w swoim nazwisku dzięki notacji niemieckiej?",
+    q: "Co oznacza sygnatura B-A-C-H w notacji niemieckiej?",
     answers: [
-      "Cztery klawisze organów",
-      "Cztery nuty: B\u266D, A, C, H",
-      "Trzy nuty: B, A, C",
-      "Pięć nut: B, A, C, B, H"
+      "Skrót od nazwy kompozytora w języku łacińskim",
+      "Cztery kolejne dźwięki: B♭, A, C, H — Bach ukrywał swoje nazwisko w nutach",
+      "Cztery takty rytmiczne charakterystyczne dla baroku",
+      "Skrót od tytułu jego najsłynniejszej fugi"
     ],
     correct: 1,
-    explain: "W notacji niemiecko-polskiej BACH to cztery dźwięki: B\u266D (obniżone B), A, C, H (naturalne B). Gdyby Niemcy używali notacji angielskiej, gdzie nie ma litery H, sygnatura kompozytora przestałaby działać."
+    explain: "W notacji niemiecko-polskiej litery B-A-C-H odpowiadają czterem dźwiękom: B♭ (obniżone B), A, C i H (naturalne B). Bach ukrywał w ten sposób swoje nazwisko w kompozycjach. Gdyby Niemcy przyjęli notację angielską i nie mieli litery H, ta sygnatura przestałaby działać."
   },
   {
     q: "Który z zapisów jako pierwszy precyzyjnie określał wysokość dźwięku?",
