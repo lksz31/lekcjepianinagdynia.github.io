@@ -149,10 +149,26 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
-  /* QUIZ */
+  /* EPITAFIUM — portrait */
+  .epitafium-fig{margin:0 0 28px 0;border-radius:14px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.07);background:#fff;max-width:260px;}
+  .epitafium-fig img{width:100%;display:block;object-fit:contain;}
+  .epitafium-fig figcaption{font-size:0.7rem;color:var(--text-mid);padding:8px 12px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
+
+  /* TRADITION BOXES */
+  .tradition-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;clear:both;}
+  @media(max-width:560px){.tradition-box{grid-template-columns:1fr;}}
+  .trad-card{border-radius:16px;padding:20px 22px;border:2px solid var(--border);}
+  .trad-card.eng{border-color:#1e3a8a;background:#f0f4ff;}
+  .trad-card.ger{border-color:#b07a00;background:#fffbf0;}
+  .trad-title{font-size:0.78rem;font-weight:800;margin-bottom:10px;color:var(--navy);}
+  .trad-card.ger .trad-title{color:#b07a00;}
+  .trad-scale{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;letter-spacing:0.08em;color:var(--navy);margin-bottom:10px;}
+  .trad-card.ger .trad-scale{color:#b07a00;}
+  .trad-desc{font-size:0.83rem;color:var(--text);line-height:1.6;}
+
+  /* QUIZ — fix visibility */
   .quiz-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
-  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.15s,transform 0.7s 0.15s;}
-  .quiz-inner.visible{opacity:1;transform:translateY(0);}
+  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;}
   @media(max-width:700px){.quiz-inner{padding:22px 18px;}}
   .quiz-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;display:block;}
   .quiz-lead{font-size:0.88rem;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
@@ -214,12 +230,12 @@
 
 <div class="article-wrap">
   <div class="article-card clearfix" id="article">
-    <span class="art-label">Historia notacji · Średniowiecze i renesans</span>
-    <h2>Od kreski dyrygenta do pięciolinii</h2>
+    <span class="art-label">Starożytność · Średniowiecze · Czasy nowożytne</span>
+    <h2>Od umownych kresek do dokładnych nut</h2>
 
     <p>W prehistorii muzyka nie była zapisywana — przekazywano ją wyłącznie ustnie, z mistrza na ucznia. Pierwszym zachowanym zapisem muzycznym na świecie jest <strong>Epitafium Seikilosa</strong> (I–II w. n.e.) — krótka pieśń wyryta na marmurowej steli odkrytej w Tralles w Azji Mniejszej. Zapis wykorzystywał litery alfabetu greckiego jako znaki nutowe umieszczone nad tekstem.</p>
 
-    <figure class="tl-img" style="margin:0 0 28px 0;">
+    <figure class="epitafium-fig">
       <img src="ilustracje/brief_4/zapisana%20kompozycja%20Epitafium%20Seikilosa.png" alt="Stela z Epitafium Seikilosa">
       <figcaption>Stela z Epitafium Seikilosa (I–II w. n.e.) — najstarszy zachowany kompletny utwór muzyczny na świecie. Obecnie w Narodowym Muzeum Danii w Kopenhadze. Źródło: <a href="https://en.wikipedia.org/wiki/Seikilos_epitaph" target="_blank">Wikipedia</a></figcaption>
     </figure>
@@ -280,7 +296,7 @@
       </div>
     </div>
 
-    <h3>Diabelski interwał i problem z B</h3>
+    <h3>Problem z diabelskim interwałem</h3>
 
     <p>Pierwotnie nazwy dźwięków we wszystkich europejskich tradycjach odpowiadały po prostu kolejnym literom alfabetu: <strong>A B C D E F G</strong>. Prosto i logicznie. Jednak pewien szczególny problem zmusił muzyków do skomplikowania tego porządku.</p>
 
@@ -292,7 +308,7 @@
 
     <p>Praktykę tę określano dwoma łacińskimi pojęciami. <strong>Musica recta</strong> (muzyka prawidłowa) — to zapis taki, jaki widniał w nutach. <strong>Musica ficta</strong> (muzyka fikcyjna, fałszywa) — to zmiany wprowadzane przez wykonawców na żywo, by uniknąć zakazanego trytonu. I tu pojawił się paradoks notacji: zapis muzyczny miał służyć temu, by <strong>dokładnie utrwalić</strong> to, co do tej pory przekazywano ustnie. A tymczasem muzycy zapisywali nuty w jeden sposób, a wykonywali je w drugi — omijając tryton z pełną świadomością, lecz bez śladu w partyturze.</p>
 
-    <h3>Dwa różne B: okrągłe i kwadratowe</h3>
+    <h3>Koniec z musica ficta — dwa różne B</h3>
 
     <p>Uznano, że tę dwuznaczność trzeba jakoś rozwiązać w samej notacji. Muzycy postanowili stworzyć <strong>dwa różne znaki</strong> dla dźwięku B — w zależności od tego, które z nich mają na myśli.</p>
 
@@ -317,24 +333,31 @@
 
     <figure class="b-staff-fig">
       <img src="ilustracje/brief_4/b%20kwadratowe%20na%20pieciolinii.png" alt="B kwadratowe na pięciolinii">
-      <figcaption>Położenie dźwięku B (H) na pięciolinii — z bemolem i bez</figcaption>
+      <figcaption>Klawiatura z naniesionymi nazwami dźwięków. Dźwięk <strong>b</strong> oznaczony na klawiszu to B okrągłe (B rotundum) — obniżone, z bemolem. Bez znaku bemola ten sam klawisz wyżej to B kwadratowe (B durum) — dźwięk naturalny, czyli nasze <strong>H</strong>.</figcaption>
     </figure>
 
-    <h3>Jak B stało się H — i dlaczego Bach miał tu coś do powiedzenia</h3>
+    <h3>Jak B stało się H — i jaki udział miał w tym Bach</h3>
 
-    <p>Na tym rozwidleniu tradycja angielska i niemiecka poszły w zupełnie różnych kierunkach, dając dzisiejszą różnicę między gamą angielską a polsko-niemiecką.</p>
+    <p>Na tym rozwidleniu tradycja angielska i tradycja niemiecka poszły w zupełnie różnych kierunkach — i tak zostało do dziś.</p>
 
-    <table class="notation-table">
-      <tr><th>Dźwięk</th><th>Notacja angielska</th><th>Notacja polska / niemiecka</th></tr>
-      <tr><td>Normalny dźwięk</td><td>B</td><td>H</td></tr>
-      <tr><td>Dźwięk obniżony o pół tonu</td><td>B♭ (B flat)</td><td>B</td></tr>
-    </table>
+    <div class="tradition-box">
+      <div class="trad-card eng">
+        <div class="trad-title">🇬🇧 Tradycja anglosaska</div>
+        <div class="trad-scale">A · B · C · D · E · F · G</div>
+        <div class="trad-desc">B okrągłe stało się bemolem (♭). Normalny dźwięk to dalej <strong>B</strong>, a obniżony to <strong>B♭</strong> (<em>B flat</em>). Stosowana w USA, Wielkiej Brytanii, Francji.</div>
+      </div>
+      <div class="trad-card ger">
+        <div class="trad-title">🇩🇪 Tradycja niemiecka (i polska)</div>
+        <div class="trad-scale">A · H · C · D · E · F · G</div>
+        <div class="trad-desc">Naturalny dźwięk to <strong>H</strong>, a obniżony o pół tonu to <strong>B</strong>. Stosowana w Niemczech, Polsce, Czechach, Austrii.</div>
+      </div>
+    </div>
 
     <p>Według najpopularniejszej teorii <strong>B okrągłe</strong> stało się dzisiejszym bemolem (♭), a <strong>B kwadratowe</strong> — zwykłą nutą bez znaku. Łącząc bemol z normalną nutą B, otrzymujemy angielskie B♭ (<em>B flat</em>). Taka jest logika angielskiego zapisu do dziś.</p>
 
-    <p>W tradycji niemieckiej — a za nią polskiej — sprawy potoczyły się inaczej. Istnieją trzy teorie wyjaśniające pojawienie się litery <strong>H</strong>:</p>
+    <p>W tradycji niemieckiej — a za nią polskiej — pojawiła się litera <strong>H</strong>. Jak do tego doszło? Historycy muzyki wskazują cztery możliwe przyczyny:</p>
 
-    <p><strong>Teoria Bacha:</strong> Johann Sebastian Bach słynął z ukrywania własnego nazwiska w kompozycjach — po niemiecku B-A-C-H odpowiada czterem dźwiękom (B♭, A, C, H). Gdyby Niemcy zrezygnowali z H na rzecz angielskiego B, sygnatura kompozytora przestałaby działać — zamiast BACH w nutach pojawiałoby się coś w rodzaju B♭ACB♭. Popularność Bacha mogła więc dosłownie uratować literę H.</p>
+    <p><strong>Teoria Bacha:</strong> Johann Sebastian Bach zapisywał własne nazwisko w nutach — B-A-C-H to cztery dźwięki (B♭, A, C, H). Gdyby Niemcy przyjęli zapis angielski i zrezygnowali z H, ta muzyczna sygnatura przestałaby istnieć. Być może właśnie popularność Bacha i jego muzyki przyczyniła się do utrwalenia litery H w tradycji niemieckiej.</p>
 
     <p><strong>Teoria kaligraficzna:</strong> Możliwe, że skryba, przepisując nuty, po prostu <strong>niechcący przetarł dolną laseczkę</strong> litery b i to, co wyglądało jak ♮b, zaczęto odczytywać jako h. Błąd powtórzony wystarczająco wiele razy staje się standardem.</p>
 
@@ -437,7 +460,7 @@
 
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
-['article','src','cal','quiz-inner'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
 
 // QUIZ
 const questions = [
