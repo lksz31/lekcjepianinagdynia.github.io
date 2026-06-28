@@ -105,10 +105,38 @@
   .footer-cop{font-size:11px;color:#c0c0cc;}
   .footer-loc{font-size:12px;color:#aaa;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+  /* QUIZ */
+  .quiz-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;}
+  @media(max-width:700px){.quiz-inner{padding:22px 18px;}}
+  .quiz-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;display:block;}
+  .quiz-lead{font-size:0.88rem;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
+  .quiz-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .quiz-num{font-size:0.72rem;font-weight:700;color:var(--text-mid);white-space:nowrap;}
+  .quiz-bar{flex:1;height:5px;background:#e8eaee;border-radius:99px;overflow:hidden;}
+  .quiz-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;}
+  .quiz-question{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);font-weight:600;line-height:1.45;margin-bottom:18px;}
+  .quiz-answers{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .quiz-btn{background:#f8fafc;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Poppins',sans-serif;font-size:0.88rem;color:var(--text);text-align:left;cursor:pointer;transition:0.2s;line-height:1.4;}
+  .quiz-btn:hover:not(:disabled){border-color:var(--navy);background:#f0f4ff;color:var(--navy);}
+  .quiz-btn.correct{border-color:#16a34a;background:#f0fdf4;color:#15803d;font-weight:600;}
+  .quiz-btn.wrong{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
+  .quiz-btn:disabled{cursor:default;}
+  .quiz-explain{font-size:0.85rem;line-height:1.65;color:var(--text);background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid var(--gold);}
+  .quiz-next{background:var(--navy);color:white;border:none;padding:10px 22px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-next:hover{background:var(--gold);}
+  .quiz-score-box{text-align:center;padding:20px 0;}
+  .quiz-score-emoji{font-size:3rem;margin-bottom:10px;}
+  .quiz-score-num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--navy);}
+  .quiz-score-pct{font-size:1rem;color:var(--text-mid);margin-bottom:12px;}
+  .quiz-score-msg{font-size:0.95rem;color:var(--text);margin-bottom:22px;line-height:1.5;}
+  .quiz-retry{background:var(--navy);color:white;border:none;padding:10px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-retry:hover{background:var(--gold);}
 </style>
 </head>
 <body>
- 
+
 <header class="site-header">
   <div class="header-inner">
     <div class="header-left">
@@ -121,7 +149,7 @@
     </a>
   </div>
 </header>
- 
+
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
     <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
@@ -131,7 +159,7 @@
     <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
- 
+
 <div class="hero">
   <div class="hero-inner">
     <div class="brief-badge"><div class="brief-badge-line"></div><div class="brief-badge-text">Brief No. 2</div></div>
@@ -139,38 +167,38 @@
     <p class="hero-lead">Dlaczego pianino brzmi inaczej niż skrzypce, choć grają tę samą nutę? Odpowiedź kryje się w alikwotach — dźwiękach ukrytych w każdym dźwięku.</p>
   </div>
 </div>
- 
+
 <div class="article-wrap">
   <div class="article-card clearfix" id="article">
     <span class="art-label">Akustyka muzyczna · Teoria dźwięku</span>
     <h2>Trzy rodzaje dźwięków</h2>
- 
+
     <figure class="img-float">
       <img src="ilustracje/brief_02_Harmonic_partials_on_strings.svg" alt="Drgania struny — alikwoty">
       <figcaption>Drgania struny: ton podstawowy i kolejne alikwoty (½, ⅓, ¼…)</figcaption>
     </figure>
- 
+
     <p>Istnieją <strong>trzy rodzaje dźwięków</strong>: dźwięk prosty oraz dźwięki złożone — muzyczny i niemuzyczny. Dźwięk prosty składa się wyłącznie z jednej częstotliwości. Dźwięk muzyczny składa się z kilku dźwięków prostych i regularnie powtarzających się drgań. Natomiast niemuzyczny hałas czy szum składa się z dźwięków prostych, ale nieregularnie powtarzających się.</p>
- 
+
     <p>W muzyce instrumenty wykorzystują <strong>dźwięki muzyczne</strong>. Wyjątkiem są instrumenty mogące wydać dźwięk zbliżony do prostego — na przykład niektóre piszczałki organowe czy flażolety.</p>
- 
+
     <div class="blockquote"><p>Każdy dźwięk zagrany na pianinie brzmi bogato i głęboko, ponieważ zawiera w sobie wiele ukrytych dźwięków — alikwotów.</p></div>
- 
+
     <h3>Czym są alikwoty?</h3>
- 
+
     <p>Każdy dźwięk złożony składa się z pewnej sekwencji dźwięków, które razem tworzą barwę dźwięku podstawowego. Alikwoty — zwane też <strong>przytonami, tonami górnymi lub harmonicznymi</strong> — to właśnie te ukryte składowe każdego dźwięku muzycznego.</p>
- 
+
     <p>Kolejne tony harmoniczne pozostają do siebie w stosunku kolejnych liczb naturalnych: <strong>1 : 2 : 3 : 4 : 5…</strong> Dzieje się tak, ponieważ gdy młoteczek w pianinie uderzy strunę, zaczyna ona wibrować jako całość — dając ton podstawowy, najgłośniejszy. Jednocześnie struna samorzutnie dzieli się na dwie połowy, każda wydając cichszy, wyższy dźwięk. Następnie na trzy części — dając kolejny, jeszcze wyższy dźwięk. Teoretycznie ciąg ten ciągnie się w nieskończoność, lecz kolejne tony stają się coraz cichsze i w pewnym momencie przestają być słyszalne.</p>
- 
+
     <figure class="img-full">
       <img src="ilustracje/brief_02_szereg_nut_-_alikwoty.png" alt="Szereg alikwotów dźwięku C">
       <figcaption>Szereg alikwotów dźwięku C: C₁, C, G, c, e, g, b, c¹, d¹, e¹, fis¹, g¹, a¹, b¹, h¹, c²…</figcaption>
     </figure>
- 
+
     <h3>Szereg alikwotów dźwięku C</h3>
- 
+
     <p>Sumując kolejne alikwoty dźwięku <strong>C</strong>, otrzymujemy następujący szereg:</p>
- 
+
     <table class="harmonic-table">
       <tr><th>Nr harmonicznej</th><th>Dźwięk</th><th>Interwał od podstawy</th></tr>
       <tr><td>1</td><td>C₁</td><td>Ton podstawowy</td></tr>
@@ -182,9 +210,9 @@
       <tr><td>7</td><td>b♭¹</td><td>Septyma mała + dwie oktawy</td></tr>
       <tr><td>8</td><td>c²</td><td>Trzy oktawy</td></tr>
     </table>
- 
+
     <p>Alikwoty są <strong>wykorzystywane w muzyce współczesnej</strong> — kompozytorzy i wykonawcy świadomie operują barwą dźwięku, wiedząc, że różne instrumenty wzmacniają różne harmoniczne, co daje każdemu z nich niepowtarzalne brzmienie.</p>
- 
+
     <div class="tags-section">
       <span class="tags-label">Pojęcia kluczowe</span>
       <div class="tags-wrap">
@@ -196,7 +224,17 @@
     </div>
   </div>
 </div>
- 
+
+<!-- QUIZ -->
+<div class="quiz-wrap">
+  <div class="quiz-inner">
+    <span class="quiz-label">🎵 Sprawdź się — krótki quiz</span>
+    <p class="quiz-lead">Kilka pytań z treści briefa. Kliknij odpowiedź i sprawdź, ile zapamiętałeś!</p>
+    <div id="quiz-container"></div>
+    <div id="quiz-result" style="display:none;"></div>
+  </div>
+</div>
+
 <div class="sources-wrap">
   <div class="sources-inner" id="src">
     <span class="src-label">Źródła</span>
@@ -205,14 +243,14 @@
     </ol>
   </div>
 </div>
- 
+
 <div class="cal-wrap">
   <div class="cal-inner" id="cal">
     <span class="cal-label">📅 Wolne terminy zajęć</span>
     <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
   </div>
 </div>
- 
+
 <footer class="site-footer-main">
   <div class="footer-main-inner">
     <div>
@@ -251,10 +289,160 @@
     </div>
   </div>
 </footer>
- 
+
 <script>
 const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
 ['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+// QUIZ
+const questions = [
+  {
+    q: "Ile rodzajów dźwieków wyróżniono w briefie?",
+    answers: [
+      "Dwa: muzyczny i niemuzyczny",
+      "Trzy: prosty, muzyczny i niemuzyczny",
+      "Cztery: prosty, złożony, muzyczny i szum",
+      "Jeden — każdy dźwiek jest taki sam"
+    ],
+    correct: 1,
+    explain: "Brief wyróżnił trzy rodzaje dźwieków: dźwiek prosty (jedna częstotliwość), dźwiek muzyczny złożony (kilka dźwieków prostych, regularne drgania) oraz dźwiek niemuzyczny, czyli hałasy i szumy (drgania nieregularne)."
+  },
+  {
+    q: "Czym różni się dźwiek muzyczny od niemuzycznego?",
+    answers: [
+      "Dźwiek muzyczny jest zawsze głośniejszy",
+      "Dźwiek muzyczny ma regularnie powtarzające się drgania, niemuzyczny — nieregularne",
+      "Dźwiek niemuzyczny składa się z większej liczby częstotliwości",
+      "Nie ma między nimi żadnej różnicy fizycznej"
+    ],
+    correct: 1,
+    explain: "Kluczowa różnica to regularność drgań. Dźwiek muzyczny składa się z dźwieków prostych i regularnie powtarzających się drgań. Hałasy i szumy również składają się z dźwieków prostych, ale ich drgania są nieregularne."
+  },
+  {
+    q: "Jak inaczej można nazwać alikwoty?",
+    answers: [
+      "Rezonatory lub oscylatory",
+      "Przytony, tony górne lub harmoniczne",
+      "Podtony lub tony podstawowe",
+      "Modulatory lub filtry"
+    ],
+    correct: 1,
+    explain: "Alikwoty mają kilka równoważnych nazw: przytony, tony górne lub harmoniczne. Wszystkie oznaczają to samo — ukryte składowe dźwieków muzycznych, które razem tworzą jego barwę."
+  },
+  {
+    q: "W jakim stosunku pozostają kolejne tony harmoniczne?",
+    answers: [
+      "W stosunku kolejnych liczb parzystych: 2 : 4 : 6 : 8…",
+      "W stosunku kolejnych liczb naturalnych: 1 : 2 : 3 : 4 : 5…",
+      "W stosunku logarytmicznym",
+      "Nie ma między nimi żadnego regularnego stosunku"
+    ],
+    correct: 1,
+    explain: "Kolejne tony harmoniczne pozostają do siebie w stosunku kolejnych liczb naturalnych: 1 : 2 : 3 : 4 : 5… Wynika to z fizyki drgań struny, która samorzutnie dzieli się na połowy, trzecie części, ćwiartki itd."
+  },
+  {
+    q: "Jaki džwięk pojawia się jako trzecia harmoniczna w szeregu alikwotów dźwięku C?",
+    answers: [
+      "E (tercja wielka)",
+      "F (kwarta)",
+      "G (kwinta + oktawa, czyli duodecyma)",
+      "A (seksta)"
+    ],
+    correct: 2,
+    explain: "Trzecia harmoniczna dźwięku C to G — odległość kwinty powyżej oktawy, czyli duodecyma. Szereg alikwotów C zaczyna się od: C₁ (ton podstawowy), C (oktawa), G (duodecyma), c (dwie oktawy), e¹…"
+  },
+  {
+    q: "Dlaczego pianino brzmi inaczej niż skrzypce grające ten sam džwięk?",
+    answers: [
+      "Bo pianino gra głośniej",
+      "Bo różne instrumenty wzmacniają różne harmoniczne, co tworzy ich niepowtarzalną barwę",
+      "Bo struny pianina są dłuższe",
+      "Bo skrzypce nie mają alikwotów"
+    ],
+    correct: 1,
+    explain: "Różne instrumenty wzmacniają różne alikwoty — jedne bardziej, inne mniej. To właśnie różna kompozycja harmonicznych tworzy barwę džwięku, która sprawia, że pianino brzmi jak pianino, a skrzypce jak skrzypce, nawet gdy grają ten sam džwięk."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+function renderQuestion() {
+  const c = document.getElementById('quiz-container');
+  const q = questions[current];
+  c.innerHTML = `
+    <div class="quiz-progress">
+      <span class="quiz-num">Pytanie ${current+1} / ${questions.length}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(current/questions.length)*100}%"></div></div>
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-answers">
+      ${q.answers.map((a,i)=>`<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('')}
+    </div>
+    <div class="quiz-explain" id="quiz-explain" style="display:none;"></div>
+    <button class="quiz-next" id="quiz-next" style="display:none;" onclick="nextQ()">Następne pytanie →</button>
+  `;
+  answered = false;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === idx && idx !== q.correct) b.classList.add('wrong');
+  });
+  if (idx === q.correct) score++;
+  const exp = document.getElementById('quiz-explain');
+  exp.style.display = 'block';
+  exp.innerHTML = (idx === q.correct ? '✅ ' : '❌ ') + q.explain;
+  const nx = document.getElementById('quiz-next');
+  nx.style.display = 'block';
+  nx.textContent = current < questions.length-1 ? 'Następne pytanie →' : 'Zobacz wynik 🎯';
+}
+
+function nextQ() {
+  current++;
+  if (current >= questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const r = document.getElementById('quiz-result');
+  r.style.display = 'block';
+  const pct = Math.round((score/questions.length)*100);
+  let msg, emoji;
+  if (pct === 100) { msg = 'Perfekcja! Slyszysz nawet alikwoty.'; emoji = '🏆'; }
+  else if (pct >= 66) { msg = 'Swietny wynik! Barwa dzwieku nie ma przed toba tajemnic.'; emoji = '🎹'; }
+  else if (pct >= 33) { msg = 'Niezbyt. Warto powtorzyc szereg harmonicznych...'; emoji = '😅'; }
+  else { msg = 'Wróc do briefa — alikwoty sie nie poddaja!'; emoji = '🎵'; }
+  r.innerHTML = `
+    <div class="quiz-score-box">
+      <div class="quiz-score-emoji">${emoji}</div>
+      <div class="quiz-score-num">${score} / ${questions.length}</div>
+      <div class="quiz-score-pct">${pct}%</div>
+      <div class="quiz-score-msg">${msg}</div>
+      <button class="quiz-retry" onclick="restartQuiz()">↺ Spróbuj jeszcze raz</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', renderQuestion);
 </script>
 </body>
 </html>
