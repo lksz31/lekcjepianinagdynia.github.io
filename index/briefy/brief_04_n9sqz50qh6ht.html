@@ -172,8 +172,9 @@
   @media(max-width:560px){.theories-grid{grid-template-columns:1fr;}}
   .theory-card{border:1.5px solid var(--border);border-radius:14px;padding:18px 16px;background:#f8fafc;transition:0.2s;}
   .theory-card:hover{border-color:var(--navy);background:#f0f4ff;}
-  .theory-icon{font-size:1.6rem;margin-bottom:8px;}
-  .theory-name{font-weight:700;font-size:0.88rem;color:var(--navy);margin-bottom:6px;}
+  .theory-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .theory-icon{font-size:1.3rem;line-height:1;flex-shrink:0;}
+  .theory-name{font-weight:700;font-size:0.88rem;color:var(--navy);margin:0;}
   .theory-text{font-size:0.82rem;color:var(--text);line-height:1.6;}
   /* TRADITION BOXES */
   .tradition-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;clear:both;}
@@ -256,10 +257,10 @@
 
     <figure class="epitafium-fig">
       <img src="ilustracje/brief_4/zapisana%20kompozycja%20Epitafium%20Seikilosa.png" alt="Stela z Epitafium Seikilosa">
-      <figcaption>Stela z Epitafium Seikilosa (I–II w. n.e.) — najstarszy zachowany kompletny utwór muzyczny na świecie. Obecnie w Narodowym Muzeum Danii w Kopenhadze. Źródło: <a href="https://en.wikipedia.org/wiki/Seikilos_epitaph" target="_blank">Wikipedia</a></figcaption>
+      <figcaption>Stela z Epitafium Seikilosa. Źródło: <a href="https://en.wikipedia.org/wiki/Seikilos_epitaph" target="_blank">Wikipedia</a></figcaption>
     </figure>
 
-    <p>W prehistorii muzyka nie była zapisywana — przekazywano ją wyłącznie ustnie, z mistrza na ucznia. Pierwszym zachowanym zapisem muzycznym na świecie jest <strong>Epitafium Seikilosa</strong> (I–II w. n.e.) — krótka pieśń wyryta na marmurowej steli odkrytej w Tralles w Azji Mniejszej. Zapis wykorzystywał litery alfabetu greckiego jako znaki nutowe umieszczone nad tekstem.</p>
+    <p>W prehistorii muzyka nie była zapisywana — przekazywano ją wyłącznie ustnie, z mistrza na ucznia. Pierwszym zachowanym zapisem muzycznym na świecie jest <strong>Epitafium Seikilosa</strong> (I–II w. n.e.) — krótka pieśń wyryta na marmurowej steli odkrytej w Tralles w Azji Mniejszej. Obecnie przechowywana w Narodowym Muzeum Danii w Kopenhadze. Zapis wykorzystywał litery alfabetu greckiego jako znaki nutowe umieszczone nad tekstem.</p>
 
     <p>Dopiero w średniowieczu zaczęto wypracowywać system zapisu muzycznego na potrzeby chorału kościelnego. Droga od pierwszego znaku do współczesnej pięciolinii trwała kilka stuleci.</p>
 
@@ -295,24 +296,6 @@
             <img src="ilustracje/brief_4/notacje%20diastemiczne.png" alt="Notacje diastemiczne, XIII–XX w.">
             <figcaption>Notacje diastemiczne (XIII–XX w.) — kolejne etapy od czteroliniowego zapisu Guidona do współczesnej pięciolinii. [Bartkowski B., <em>Chorał gregoriański</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225.]</figcaption>
           </figure>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot">XV w.</div>
-        <div class="tl-content">
-          <div class="tl-title">Tabulatury — renesans</div>
-          <div class="tl-desc">W renesansie popularne stały się <strong>tabulatury</strong> — uproszczone zapisy przeznaczone dla konkretnych instrumentów (lutni, organów, klawesynu). Zamiast nut pokazywały palcowanie lub pozycję strun.</div>
-          <figure class="tl-img">
-            <img src="ilustracje/brief_4/renesansowa%20tabulatura.avif" alt="Renesansowa tabulatura lutniowa">
-            <figcaption>Przykład renesansowej tabulatury lutniowej</figcaption>
-          </figure>
-        </div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-dot">XVII w.</div>
-        <div class="tl-content">
-          <div class="tl-title">Współczesna notacja — barok</div>
-          <div class="tl-desc">W epoce baroku wykształciła się właściwie już <strong>współczesna notacja muzyczna</strong>: pięciolinia, klucze, nuty z ogonkami i kropkami — system, który znamy do dziś.</div>
         </div>
       </div>
     </div>
@@ -381,23 +364,19 @@
 
     <div class="theories-grid">
       <div class="theory-card">
-        <div class="theory-icon">🖋️</div>
-        <div class="theory-name">Teoria kaligraficzna</div>
+        <div class="theory-header"><div class="theory-icon">🖋️</div><div class="theory-name">Teoria kaligraficzna</div></div>
         <div class="theory-text">Skryba niechcący <strong>przetarł dolną laseczkę</strong> litery b. To, co wyglądało jak ♮b, zaczęto odczytywać jako h. Błąd powielany wystarczająco długo staje się standardem.</div>
       </div>
       <div class="theory-card">
-        <div class="theory-icon">🖨️</div>
-        <div class="theory-name">Teoria drukarska</div>
+        <div class="theory-header"><div class="theory-icon">🖨️</div><div class="theory-name">Teoria drukarska</div></div>
         <div class="theory-text">Zecerzy po prostu <strong>nie mieli stempla</strong> dla B quadratum. Sięgali po najbliższe dostępne — literę <strong>H</strong> — i tak utrwalili ją w druku.</div>
       </div>
       <div class="theory-card">
-        <div class="theory-icon">🔤</div>
-        <div class="theory-name">Teoria alfabetyczna</div>
+        <div class="theory-header"><div class="theory-icon">🔤</div><div class="theory-name">Teoria alfabetyczna</div></div>
         <div class="theory-text">Niemcy poszli za logiką alfabetu: A B C D E F G, a potem naturalnie <strong>H</strong> — bez bawienia się w rozróżnianie B okrągłego i kwadratowego.</div>
       </div>
       <div class="theory-card">
-        <div class="theory-icon">🎼</div>
-        <div class="theory-name">Teoria Bacha</div>
+        <div class="theory-header"><div class="theory-icon">🎼</div><div class="theory-name">Teoria Bacha</div></div>
         <div class="theory-text">B‑A‑C‑H to cztery dźwięki w notacji niemieckiej (B♭, A, C, H). Popularność Bacha i jego muzyki mogła przyczynić się do <strong>utrwalenia litery H</strong> — bez niej sygnatura by nie zadziałała.</div>
       </div>
     </div>
@@ -460,7 +439,6 @@
       <li>Rafał Piwowarczuk, <em>Dźwięk H czy B? Historia i różnice w notacji muzycznej</em>, online: <a href="https://rafalpiwowarczuk.pl/dzwiek-h-czy-b-historia-i-roznice-w-notacji-muzycznej" target="_blank">rafalpiwowarczuk.pl</a> [inspiracja i kontekst historyczny]</li>
       <li>Bartkowski B., <em>Chorał gregoriański. IV. Rytm</em>, w: Encyklopedia Katolicka, t. III, Lublin 1979, szp. 225. [ilustracje notacji cheironomicznej, literowej i diastemicznych] — za: <a href="https://zsm2.home.pl/zsm2/biblioteka/oprac_not_greg.php" target="_blank">zsm2.home.pl</a></li>
       <li><em>Neumy</em>, Wikipedia: <a href="https://pl.wikipedia.org/wiki/Neumy" target="_blank">pl.wikipedia.org/wiki/Neumy</a></li>
-      <li><em>Renesansowa tabulatura lutniowa — metoda zapisu nutowego z XVI w.</em>, ilustracja: <a href="https://pl.123rf.com/photo_102876538_renesansowa-tabulatura-lutniowa-du%C5%BCy-obraz-metody-zapisu-nutowego-z-xvi-wieku.html" target="_blank">123rf.com</a></li>
       <li><em>Diabolus in musica</em>: <a href="https://diabolus.org/index.htm" target="_blank">diabolus.org</a></li>
     </ol>
   </div>
