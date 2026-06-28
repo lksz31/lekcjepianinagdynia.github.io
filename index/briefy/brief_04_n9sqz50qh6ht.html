@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brief No. 4 – Tajemnica litery H | Historia Postrzegania Muzyki</title>
+<title>Brief No. 4 – Tajemnica litery H | Historia postrzegania muzyki</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -150,10 +150,31 @@
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 
   /* EPITAFIUM — float right, text wraps left */
-  .epitafium-fig{float:right;width:180px;margin:4px 0 18px 24px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.09);background:#fff;}
+  .epitafium-fig{float:right;width:180px;margin:0 0 18px 24px;border-radius:12px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.09);background:#f8fafc;}
   .epitafium-fig img{width:100%;display:block;object-fit:contain;}
   .epitafium-fig figcaption{font-size:0.65rem;color:var(--text-mid);padding:7px 10px;text-align:center;font-style:italic;background:#f8fafc;border-top:1px solid var(--border);}
-  @media(max-width:560px){.epitafium-fig{float:none;width:140px;margin:0 auto 18px;display:block;}}
+  @media(max-width:560px){.epitafium-fig{float:none;width:130px;margin:0 auto 18px;display:block;}}
+
+  /* INTERVAL VISUAL */
+  .interval-visual{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0;clear:both;}
+  @media(max-width:500px){.interval-visual{grid-template-columns:1fr;}}
+  .iv-item{border-radius:12px;padding:14px 12px;text-align:center;border:2px solid var(--border);}
+  .iv-item.cons{background:#f0fdf4;border-color:#16a34a;}
+  .iv-item.diab{background:#fef2f2;border-color:#dc2626;}
+  .iv-name{font-weight:700;font-size:0.85rem;color:var(--navy);margin-bottom:6px;}
+  .iv-item.diab .iv-name{color:#dc2626;}
+  .iv-badge{display:inline-block;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;padding:2px 8px;border-radius:99px;background:#16a34a;color:white;margin-bottom:8px;}
+  .iv-badge.bad{background:#dc2626;}
+  .iv-desc{font-size:0.78rem;color:var(--text-mid);line-height:1.5;}
+
+  /* THEORY CARDS */
+  .theories-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;clear:both;}
+  @media(max-width:560px){.theories-grid{grid-template-columns:1fr;}}
+  .theory-card{border:1.5px solid var(--border);border-radius:14px;padding:18px 16px;background:#f8fafc;transition:0.2s;}
+  .theory-card:hover{border-color:var(--navy);background:#f0f4ff;}
+  .theory-icon{font-size:1.6rem;margin-bottom:8px;}
+  .theory-name{font-weight:700;font-size:0.88rem;color:var(--navy);margin-bottom:6px;}
+  .theory-text{font-size:0.82rem;color:var(--text);line-height:1.6;}
   /* TRADITION BOXES */
   .tradition-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;clear:both;}
   @media(max-width:560px){.tradition-box{grid-template-columns:1fr;}}
@@ -298,15 +319,31 @@
 
     <h3>Problem z diabelskim interwałem</h3>
 
-    <p>Pierwotnie nazwy dźwięków we wszystkich europejskich tradycjach odpowiadały po prostu kolejnym literom alfabetu: <strong>A B C D E F G</strong>. Prosto i logicznie. Jednak pewien szczególny problem zmusił muzyków do skomplikowania tego porządku.</p>
+    <p>Pierwotnie nazwy dźwięków odpowiadały kolejnym literom alfabetu: <strong>A B C D E F G</strong>. Prosto i logicznie. Jednak między dźwiękami <strong>B i F</strong> powstaje szczególny interwał — <strong>tryton</strong> — złożony z sześciu półtonów, który zburzył ten porządek.</p>
 
-    <p>Tym problemem był <strong>tryton</strong> — interwał powstający między dźwiękami <strong>B i F</strong>, złożony z sześciu półtonów. Jego brzmienie było tak ostre i niepokojące, że w średniowiecznej Europie ochrzczono go mianem <em>diabolus in musica</em> — diabła w muzyce. Kościół katolicki <strong>zakazał używania trytonu</strong> w muzyce liturgicznej, a kompozytorzy nie mogli po prostu go stosować w swoich dziełach.</p>
+    <div class="interval-visual">
+      <div class="iv-item cons">
+        <div class="iv-name">Kwarta czysta</div>
+        <div class="iv-badge">konsonans</div>
+        <div class="iv-desc">5 półtonów<br>brzmi stabilnie</div>
+      </div>
+      <div class="iv-item diab">
+        <div class="iv-name">Tryton</div>
+        <div class="iv-badge bad">diabolus in musica</div>
+        <div class="iv-desc">6 półtonów<br>między B a F</div>
+      </div>
+      <div class="iv-item cons">
+        <div class="iv-name">Kwinta czysta</div>
+        <div class="iv-badge">konsonans</div>
+        <div class="iv-desc">7 półtonów<br>brzmi harmonijnie</div>
+      </div>
+    </div>
 
-    <p>Skąd ta wyjątkowa wrogość? Wyobraź sobie skalę: kwarta czysta i kwinta czysta to interwały powszechnie uznawane za <strong>konsonansowe</strong> — brzmią stabilnie, harmonijnie, przyjemnie. Tryton leży dokładnie pomiędzy nimi, w samym środku — i jest od nich skrajnie różny. To interwał <strong>dysonansowy</strong>, wyjątkowo zgrzytliwy i napięty. Jakby ktoś umieścił coś radykalnie nieprzyjemnego między dwiema rzeczami uznanymi za piękne. Do tego sześć półtonów, z których się składa, mogło kojarzyć się z demoniczną liczbą — i tak tryton stał się muzycznym wrogiem publicznym.</p>
+    <p>Tryton leżał dokładnie między dwiema pięknymi, konsonansowymi kwartą i kwintą — sam brzmiąc wyjątkowo zgrzytliwie i napięcie. Kościół katolicki <strong>zakazał jego używania</strong> w muzyce liturgicznej. Sześć półtonów mogło też kojarzyć się z demoniczną liczbą — i tak tryton stał się muzycznym wrogiem publicznym.</p>
 
     <div class="blockquote"><p>Kompozytorzy nie mogli używać trytonu — a śpiewacy, napotykając go w zapisie, zmieniali nuty na żywo, by go ominąć. Zapis mówił jedno, muzyka brzmiała inaczej.</p></div>
 
-    <p>Praktykę tę określano dwoma łacińskimi pojęciami. <strong>Musica recta</strong> (muzyka prawidłowa) — to zapis taki, jaki widniał w nutach. <strong>Musica ficta</strong> (muzyka fikcyjna, fałszywa) — to zmiany wprowadzane przez wykonawców na żywo, by uniknąć zakazanego trytonu. I tu pojawił się paradoks notacji: zapis muzyczny miał służyć temu, by <strong>dokładnie utrwalić</strong> to, co do tej pory przekazywano ustnie. A tymczasem muzycy zapisywali nuty w jeden sposób, a wykonywali je w drugi — omijając tryton z pełną świadomością, lecz bez śladu w partyturze.</p>
+    <p>Tę praktykę określano dwoma pojęciami: <strong>musica recta</strong> — zapis taki, jaki widniał w nutach, i <strong>musica ficta</strong> — zmiany wprowadzane przez wykonawców na żywo. Zapis muzyczny miał utrwalać muzykę, a tymczasem śpiewano inaczej niż zapisywano. Ten paradoks zmusił muzyków do działania.</p>
 
     <h3>Koniec z musica ficta — dwa różne B</h3>
 
@@ -338,32 +375,47 @@
 
     <h3>Jak B stało się H — i jaki udział miał w tym Bach</h3>
 
-    <p>Na tym rozwidleniu tradycja angielska i tradycja niemiecka poszły w zupełnie różnych kierunkach — i tak zostało do dziś.</p>
+    <p>W tradycji niemieckiej — a za nią polskiej — pojawiła się litera <strong>H</strong>. Jak do tego doszło? Historycy muzyki nie są zgodni. Istnieją cztery teorie:</p>
+
+    <div class="theories-grid">
+      <div class="theory-card">
+        <div class="theory-icon">🖋️</div>
+        <div class="theory-name">Teoria kaligraficzna</div>
+        <div class="theory-text">Skryba niechcący <strong>przetarł dolną laseczkę</strong> litery b. To, co wyglądało jak ♮b, zaczęto odczytywać jako h. Błąd powielany wystarczająco długo staje się standardem.</div>
+      </div>
+      <div class="theory-card">
+        <div class="theory-icon">🖨️</div>
+        <div class="theory-name">Teoria drukarska</div>
+        <div class="theory-text">Zecerzy po prostu <strong>nie mieli stempla</strong> dla B quadratum. Sięgali po najbliższe dostępne — literę <strong>H</strong> — i tak utrwalili ją w druku.</div>
+      </div>
+      <div class="theory-card">
+        <div class="theory-icon">🔤</div>
+        <div class="theory-name">Teoria alfabetyczna</div>
+        <div class="theory-text">Niemcy poszli za logiką alfabetu: A B C D E F G, a potem naturalnie <strong>H</strong> — bez bawienia się w rozróżnianie B okrągłego i kwadratowego.</div>
+      </div>
+      <div class="theory-card">
+        <div class="theory-icon">🎼</div>
+        <div class="theory-name">Teoria Bacha</div>
+        <div class="theory-text">B‑A‑C‑H to cztery dźwięki w notacji niemieckiej (B♭, A, C, H). Popularność Bacha i jego muzyki mogła przyczynić się do <strong>utrwalenia litery H</strong> — bez niej sygnatura by nie zadziałała.</div>
+      </div>
+    </div>
+
+    <h3>Skutek: dwie tradycje do dziś</h3>
+
+    <p>Niezależnie od tego, która teoria jest prawdziwa, skutek jest ten sam — dziś funkcjonują dwa różne systemy zapisu:</p>
 
     <div class="tradition-box">
       <div class="trad-card eng">
         <div class="trad-title">🇬🇧 Tradycja anglosaska</div>
         <div class="trad-scale">A · B · C · D · E · F · G</div>
-        <div class="trad-desc">B okrągłe stało się bemolem (♭). Normalny dźwięk to dalej <strong>B</strong>, a obniżony to <strong>B♭</strong> (<em>B flat</em>). Stosowana w USA, Wielkiej Brytanii, Francji.</div>
+        <div class="trad-desc">B okrągłe stało się bemolem (♭). Naturalny dźwięk to <strong>B</strong>, obniżony to <strong>B♭</strong> (<em>B flat</em>). Stosowana w USA, Wielkiej Brytanii, Francji.</div>
       </div>
       <div class="trad-card ger">
         <div class="trad-title">🇩🇪 Tradycja niemiecka (i polska)</div>
         <div class="trad-scale">A · H · C · D · E · F · G</div>
-        <div class="trad-desc">Naturalny dźwięk to <strong>H</strong>, a obniżony o pół tonu to <strong>B</strong>. Stosowana w Niemczech, Polsce, Czechach, Austrii.</div>
+        <div class="trad-desc">Naturalny dźwięk to <strong>H</strong>, obniżony o pół tonu to <strong>B</strong>. Stosowana w Niemczech, Polsce, Czechach, Austrii.</div>
       </div>
     </div>
-
-    <p>Według najpopularniejszej teorii <strong>B okrągłe</strong> stało się dzisiejszym bemolem (♭), a <strong>B kwadratowe</strong> — zwykłą nutą bez znaku. Łącząc bemol z normalną nutą B, otrzymujemy angielskie B♭ (<em>B flat</em>). Taka jest logika angielskiego zapisu do dziś.</p>
-
-    <p>W tradycji niemieckiej — a za nią polskiej — pojawiła się litera <strong>H</strong>. Jak do tego doszło? Historycy muzyki wskazują cztery możliwe przyczyny:</p>
-
-    <p><strong>Teoria Bacha:</strong> Johann Sebastian Bach zapisywał własne nazwisko w nutach — B-A-C-H to cztery dźwięki (B♭, A, C, H). Gdyby Niemcy przyjęli zapis angielski i zrezygnowali z H, ta muzyczna sygnatura przestałaby istnieć. Być może właśnie popularność Bacha i jego muzyki przyczyniła się do utrwalenia litery H w tradycji niemieckiej.</p>
-
-    <p><strong>Teoria kaligraficzna:</strong> Możliwe, że skryba, przepisując nuty, po prostu <strong>niechcący przetarł dolną laseczkę</strong> litery b i to, co wyglądało jak ♮b, zaczęto odczytywać jako h. Błąd powtórzony wystarczająco wiele razy staje się standardem.</p>
-
-    <p><strong>Teoria drukarska:</strong> Gdy muzyka trafiła pod prasę drukarską, zecerzy po prostu <strong>nie mieli odpowiedniego stempla</strong> dla B quadratum. Sięgali więc po najbliższe dostępne — literę H — i tak utrwalili zamiennik w druku.</p>
-
-    <p><strong>Teoria alfabetyczna:</strong> Być może Niemcy po prostu poszli za logiką alfabetu — A B C D E F G, a potem naturalnie <strong>H</strong> — i tak nazwali dźwięk bez bawienia się w rozróżnianie B okrągłego i kwadratowego. Każda z tych teorii ma swoich zwolenników, a historycy muzyki do dziś nie są zgodni, która jest prawdziwa.</p>
 
     <div class="tags-section">
       <span class="tags-label">Pojęcia kluczowe</span>
@@ -479,7 +531,7 @@ const questions = [
     q: "Dlaczego tryton nazywano „diabolus in musica\u201C?",
     answers: [
       "Bo był zbyt trudny do zaśpiewania przez chórzystów",
-      "Bo jego zgrzytliwe brzmienie kojarzyło się ze złem — leży dokładnie między dwiema pięknymi, konsonansowymi kwintą i kwartą",
+      "Bo jego zgrzytliwe brzmienie kojarzyło się ze złem — leży dokładnie w środku, między konsonansową kwartą a konsonansową kwintą",
       "Bo składa się z siedmiu półtonów",
       "Bo wynalazł go szatan podczas soboru w Trydencie"
     ],
@@ -512,7 +564,7 @@ const questions = [
     q: "Co oznacza sygnatura B-A-C-H w notacji niemieckiej?",
     answers: [
       "Skrót od nazwy kompozytora w języku łacińskim",
-      "Cztery kolejne dźwięki: B♭, A, C, H — Bach ukrywał swoje nazwisko w nutach",
+      "Cztery kolejne dźwięki: B\u266D, A, C, H — Bach ukrywał swoje nazwisko w nutach",
       "Cztery takty rytmiczne charakterystyczne dla baroku",
       "Skrót od tytułu jego najsłynniejszej fugi"
     ],
