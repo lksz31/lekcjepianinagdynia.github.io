@@ -3,183 +3,745 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Przerwa techniczna – Lekcje Pianina Gdynia</title>
-<meta name="robots" content="noindex">
+<title>Lekcje Pianina Gdynia – Łukasz Ganczarek</title>
+<meta name="description" content="Lekcje pianina w Gdyni (Mały Kack) i Sopocie — dla dzieci od 6 lat i dorosłych. Indywidualne podejście, dojazd do ucznia. Umów lekcję próbną: 99 zł/h.">
+<link rel="canonical" href="https://lekcjepianinagdynia.pl/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Lekcje Pianina Gdynia – Łukasz Ganczarek">
+<meta property="og:description" content="Profesjonalne lekcje fortepianu dla dzieci i dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do Ciebie.">
+<meta property="og:url" content="https://lekcjepianinagdynia.pl/">
+<meta property="og:image" content="https://lekcjepianinagdynia.pl/index/grafiki_index/wizytowka.png">
+<meta property="og:locale" content="pl_PL">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "Lekcje Pianina Gdynia – Łukasz Ganczarek",
+  "image": "https://lekcjepianinagdynia.pl/index/grafiki_index/wizytowka.png",
+  "url": "https://lekcjepianinagdynia.pl/",
+  "telephone": "+48514338875",
+  "email": "lukaszgkorepetycje@gmail.com",
+  "priceRange": "99-119 PLN",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Gdynia",
+    "addressRegion": "Pomorskie",
+    "addressCountry": "PL"
+  },
+  "areaServed": [
+    { "@type": "City", "name": "Gdynia" },
+    { "@type": "City", "name": "Sopot" }
+  ],
+  "description": "Profesjonalne lekcje fortepianu dla dzieci i dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do ucznia.",
+  "makesOffer": [
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Service", "name": "Lekcje pianina dla dzieci" },
+      "url": "https://lekcjepianinagdynia.pl/lekcje-dla-dzieci.html"
+    },
+    {
+      "@type": "Offer",
+      "itemOffered": { "@type": "Service", "name": "Lekcje pianina dla dorosłych" },
+      "url": "https://lekcjepianinagdynia.pl/lekcje-dla-doroslych.html"
+    }
+  ]
+}
+</script>
+
 <style>
-  :root{--gold:#d4af37;--navy:#1e3a8a;--navy-deep:#0f1e4a;}
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:radial-gradient(120% 140% at 50% -10%, #24408f 0%, var(--navy) 45%, var(--navy-deep) 100%);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    padding:32px 20px;
-    overflow:hidden;
-    position:relative;
+  :root {
+    --gold: #d4af37;
+    --navy: #1e3a8a;
+    --blue: #3b82f6;
+    --border: #f0f0f0;
+    --text: #334155;
   }
 
-  /* pływające nuty w tle */
-  .note{position:absolute;color:rgba(212,175,55,0.16);font-size:2.4rem;pointer-events:none;animation:drift 9s ease-in-out infinite;}
-  .note:nth-child(1){top:14%;left:8%;font-size:2rem;animation-duration:10s;}
-  .note:nth-child(2){top:70%;left:12%;font-size:3.2rem;animation-duration:12s;animation-delay:1s;}
-  .note:nth-child(3){top:20%;right:10%;font-size:2.6rem;animation-duration:11s;animation-delay:0.5s;}
-  .note:nth-child(4){top:75%;right:14%;font-size:1.8rem;animation-duration:8s;animation-delay:2s;}
-  @keyframes drift{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(6deg);}}
-  @media (prefers-reduced-motion: reduce){.note{animation:none;}}
+  * { box-sizing: border-box; }
 
-  .card{
-    position:relative;
-    z-index:1;
-    max-width:520px;
-    width:100%;
-    text-align:center;
+  body {
+    margin: 0; padding: 0;
+    background: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    overflow-x: hidden;
   }
 
-  .eyebrow{
-    display:inline-block;
-    background:rgba(212,175,55,0.14);
-    border:1px solid rgba(212,175,55,0.4);
-    color:var(--gold);
-    font-size:0.72rem;
-    font-weight:700;
-    letter-spacing:0.18em;
-    text-transform:uppercase;
-    padding:7px 18px;
-    border-radius:50px;
-    margin-bottom:26px;
-  }
+  .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 26px;display:flex;flex-wrap:wrap;justify-content:center;gap:18px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;max-width:90vw;}
+  .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;white-space:nowrap;}
+  .site-nav a:hover{color:var(--gold);}
+  .site-nav a.nav-highlight{background:var(--navy);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+  .site-nav a.nav-highlight:hover{background:var(--gold);}
+  @media(max-width:700px){.site-nav{display:none;}}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+  .mobile-nav a .mn-icon{font-size:1.15rem;}
+  .mobile-nav a:hover,.mobile-nav a.active{color:var(--navy);}
+  .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  .mobile-nav a.mn-cta:hover{background:var(--gold);}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
 
-  h1{
-    font-family:'Playfair Display',serif;
-    font-size:clamp(1.9rem,5.5vw,2.9rem);
-    line-height:1.2;
-    margin:0 0 16px;
-    color:white;
-  }
-  h1 em{font-style:italic;color:var(--gold);}
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;position:relative;background:white;}
+  .hero-badge{background:var(--gold);color:white;padding:6px 20px;border-radius:50px;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;display:inline-block;opacity:0;animation:fadeUp 0.8s ease forwards 0.2s;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,5rem);color:var(--navy);margin:0 0 20px 0;line-height:1.1;opacity:0;animation:fadeUp 0.8s ease forwards 0.4s;}
+  .hero h1 em{font-style:italic;color:var(--gold);}
+  .hero-sub{font-size:clamp(0.9rem,2.5vw,1.05rem);color:#64748b;max-width:520px;line-height:1.7;margin:0 auto 40px;opacity:0;animation:fadeUp 0.8s ease forwards 0.6s;padding:0 10px;}
+  .hero-btns{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp 0.8s ease forwards 0.8s;padding:0 20px;}
+  .btn-primary{background:var(--navy);color:white;padding:15px 35px;border-radius:50px;font-weight:700;text-decoration:none;font-size:0.9rem;transition:0.3s;display:inline-block;}
+  .btn-primary:hover{background:var(--gold);transform:translateY(-2px);}
+  .btn-outline{background:transparent;color:var(--navy);padding:15px 35px;border-radius:50px;font-weight:700;text-decoration:none;font-size:0.9rem;border:2px solid var(--navy);transition:0.3s;display:inline-block;}
+  .btn-outline:hover{background:var(--navy);color:white;transform:translateY(-2px);}
+  .scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#94a3b8;font-size:0.8rem;opacity:0;animation:bounce 2s infinite 1.5s,fadeUp 0.8s ease forwards 1.2s;}
 
-  p.sub{
-    font-size:0.98rem;
-    line-height:1.75;
-    color:rgba(255,255,255,0.68);
-    max-width:420px;
-    margin:0 auto 40px;
-  }
+  .section{padding:80px 5%;max-width:1200px;margin:0 auto;}
+  @media(max-width:600px){.section{padding:50px 4%;}}
+  .section-label{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;}
+  .section-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.8rem);color:var(--navy);margin:0 0 40px 0;}
 
-  /* sygnaturowy element: strojone pianino */
-  .keys{
-    display:flex;
-    justify-content:center;
-    gap:3px;
-    margin:0 auto 44px;
-    height:78px;
-    align-items:flex-end;
-  }
-  .key{
-    width:15px;
-    height:64px;
-    background:rgba(255,255,255,0.92);
-    border-radius:0 0 4px 4px;
-    box-shadow:0 4px 10px rgba(0,0,0,0.25);
-    animation:press 2.6s ease-in-out infinite;
-  }
-  .key:nth-child(1){animation-delay:0s;}
-  .key:nth-child(2){animation-delay:0.15s;background:#12162a;height:42px;margin:0 -9px;position:relative;z-index:2;}
-  .key:nth-child(3){animation-delay:0.3s;}
-  .key:nth-child(4){animation-delay:0.45s;background:#12162a;height:42px;margin:0 -9px;position:relative;z-index:2;}
-  .key:nth-child(5){animation-delay:0.6s;}
-  .key:nth-child(6){animation-delay:0.75s;}
-  .key:nth-child(7){animation-delay:0.9s;background:#12162a;height:42px;margin:0 -9px;position:relative;z-index:2;}
-  .key:nth-child(8){animation-delay:1.05s;}
-  .key:nth-child(9){animation-delay:1.2s;background:#12162a;height:42px;margin:0 -9px;position:relative;z-index:2;}
-  @keyframes press{
-    0%,100%{transform:translateY(0);filter:brightness(1);}
-    50%{transform:translateY(6px);filter:brightness(0.85);}
-  }
-  @media (prefers-reduced-motion: reduce){.key{animation:none;}}
+  .bento-container{display:grid;grid-template-columns:1.2fr 0.8fr;gap:25px;}
+  @media(max-width:850px){.bento-container{grid-template-columns:1fr;gap:16px;}}
+  .flip-card{background-color:transparent;perspective:1000px;min-height:320px;opacity:0;transform:translateY(40px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);}
+  @media(max-width:850px){.flip-card{min-height:260px;}}
+  .flip-card-inner{position:relative;width:100%;height:100%;transition:transform 0.8s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;}
+  .flip-card:hover .flip-card-inner{transform:rotateY(180deg);}
+  .card-front,.card-back{position:absolute;width:100%;height:100%;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:32px;box-sizing:border-box;border:1px solid var(--border);box-shadow:0 0 25px rgba(0,0,0,0.08);}
+  .card-front{background:white;z-index:2;padding:30px;display:flex;flex-direction:column;justify-content:center;}
+  .card-back{background:#f8fafc;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .card-back img{width:85%;height:auto;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.1);}
+  .card{background:white;border-radius:32px;padding:30px;border:1px solid var(--border);box-shadow:0 0 25px rgba(0,0,0,0.08);opacity:0;transform:translateY(40px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);}
+  .bento-container.active .card,.bento-container.active .flip-card{opacity:1;transform:translateY(0);}
+  .bento-container.active .card:nth-child(2){transition-delay:0.1s;}
+  .bento-container.active .card:nth-child(3){transition-delay:0.2s;}
+  .bento-container.active .card:nth-child(4){transition-delay:0.3s;}
+  .tags-container{display:flex;flex-wrap:wrap;gap:10px;margin-top:15px;}
+  .tag-wrapper{position:relative;display:inline-block;}
+  .tag{border:1px solid var(--gold);color:var(--gold);padding:8px 18px;border-radius:50px;font-size:0.75rem;font-weight:600;display:inline-block;transition:0.3s;cursor:help;}
+  .tag-note{visibility:hidden;width:220px;background:var(--navy);color:white;text-align:left;border-radius:15px;padding:15px;position:absolute;z-index:100;bottom:140%;left:50%;transform:translateX(-50%);box-shadow:0 10px 30px rgba(0,0,0,0.2);font-size:0.75rem;line-height:1.4;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;}
+  .tag-note::after{content:"";position:absolute;top:100%;left:50%;margin-left:-8px;border-width:8px;border-style:solid;border-color:var(--navy) transparent transparent transparent;}
+  .tag-wrapper:hover .tag-note{visibility:visible;opacity:1;transform:translateX(-50%) translateY(-10px);}
+  .tag-wrapper:hover .tag{background:white;color:var(--navy);border-color:white;}
+  .video-link{display:block;width:100%;max-width:320px;margin:0 auto 20px;aspect-ratio:16/9;border-radius:20px;overflow:hidden;position:relative;border:1px solid var(--border);}
+  .video-link img{width:100%;height:100%;object-fit:cover;transition:0.5s;}
+  .video-link:hover img{transform:scale(1.05);}
+  .badge{background:var(--gold);color:white;padding:6px 16px;border-radius:50px;font-size:0.75rem;font-weight:800;text-transform:uppercase;display:inline-block;margin-bottom:15px;}
+  .bento-container h2,.bento-container h3{font-family:'Playfair Display',serif;color:var(--navy);margin:0 0 15px 0;font-size:clamp(1.4rem,3vw,1.8rem);}
+  .bio-text{font-size:0.95rem;line-height:1.6;color:#475569;}
+  .links-list{list-style:none;padding:0;margin-top:15px;}
+  .links-list li{margin-bottom:10px;font-size:0.85rem;color:#64748b;}
+  .links-list a{color:var(--navy);text-decoration:none;font-weight:600;transition:0.3s;}
+  .links-list a:hover{color:var(--gold);}
+  .opinion-btn{display:block;background:#f8fafc;padding:12px 18px;border-radius:15px;margin-bottom:10px;text-decoration:none;color:#475569;font-size:0.85rem;border:1px solid var(--border);transition:0.3s;text-align:center;cursor:pointer;width:100%;font-family:'Poppins',sans-serif;}
+  .opinion-btn:hover{background:white;border-color:var(--gold);color:var(--navy);box-shadow:0 5px 15px rgba(0,0,0,0.05);}
 
-  .contact-box{
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.14);
-    border-radius:24px;
-    padding:26px 28px;
-    backdrop-filter:blur(8px);
-  }
-  .contact-box p{
-    font-size:0.8rem;
-    text-transform:uppercase;
-    letter-spacing:0.12em;
-    color:rgba(255,255,255,0.45);
-    margin:0 0 14px;
-    font-weight:700;
-  }
-  .contact-links{display:flex;flex-direction:column;gap:10px;}
-  .contact-links a{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    text-decoration:none;
-    color:white;
-    font-weight:600;
-    font-size:0.95rem;
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.14);
-    border-radius:50px;
-    padding:12px 20px;
-    transition:0.25s;
-  }
-  .contact-links a:hover{
-    background:var(--gold);
-    color:var(--navy);
-    border-color:var(--gold);
-    transform:translateY(-2px);
-  }
+  .terminy-section{padding:80px 5%;background:white;}
+  @media(max-width:600px){.terminy-section{padding:50px 4%;}}
+  .terminy-section .section-inner{max-width:640px;margin:0 auto;}
+  .apple-card{background:var(--navy);border-radius:40px;padding:50px 30px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.15);opacity:0;transform:translateY(30px);transition:all 1s ease-out;text-align:center;}
+  .apple-card.active{opacity:1;transform:translateY(0);}
+  .apple-card-title{font-family:'Playfair Display',serif;text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);color:var(--gold);margin-bottom:14px;}
+  .apple-card-sub{color:rgba(255,255,255,0.75);font-size:0.95rem;line-height:1.7;max-width:420px;margin:0 auto;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.7);}70%{box-shadow:0 0 0 15px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
+  .btn-open-form{display:block;width:fit-content;margin:30px auto 0;background:var(--gold);color:var(--navy);padding:16px 44px;border-radius:50px;font-weight:800;border:none;cursor:pointer;text-decoration:none;font-family:'Poppins',sans-serif;font-size:0.95rem;animation:pulse 2s infinite;transition:transform 0.3s;}
+  .btn-open-form:hover{transform:scale(1.05);}
+  .form-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:white;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;box-sizing:border-box;clip-path:circle(0% at 50% 90%);transition:clip-path 0.8s cubic-bezier(0.7,0,0.3,1);overflow-y:auto;}
+  .form-overlay.open{clip-path:circle(150% at 50% 90%);}
+  .close-btn{position:absolute;top:16px;right:20px;font-size:1.5rem;color:var(--navy);cursor:pointer;font-weight:bold;background:none;border:none;font-family:'Poppins',sans-serif;}
+  .form-content{width:100%;max-width:500px;text-align:center;color:var(--navy);}
+  .price-tag{background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:10px;margin-bottom:15px;}
+  .bento-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
+  .form-tile{background:#fff;border:1px solid #eee;border-radius:16px;padding:12px;text-align:left;cursor:pointer;transition:0.3s;font-size:0.85rem;}
+  .form-tile.selected{border-color:var(--blue);background:#f0f7ff;}
+  #piano-options{display:none;margin-top:-5px;margin-bottom:15px;animation:fadeIn 0.4s;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+  .contact-box{background:var(--navy);border-radius:20px;padding:18px;}
+  .contact-box input,.contact-box textarea{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.85rem;}
+  .contact-box textarea{height:70px;resize:none;}
+  .btn-submit{width:100%;background:#ccc;color:#666;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:not-allowed;transition:0.3s;font-family:'Poppins',sans-serif;font-size:0.9rem;}
+  .btn-submit.active{background:var(--gold);color:white;cursor:pointer;animation:pulse 2s infinite;}
 
-  .footer-note{
-    margin-top:28px;
-    font-size:0.78rem;
-    color:rgba(255,255,255,0.35);
+  .promo-section{padding:70px 5%;background:white;}
+  @media(max-width:600px){.promo-section{padding:48px 4%;}}
+  .promo-inner{max-width:1100px;margin:0 auto;}
+  .promo-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:36px;}
+  @media(max-width:700px){.promo-grid{grid-template-columns:1fr;gap:16px;}}
+  @media(min-width:701px){#promoGrid{grid-template-columns:repeat(3,1fr);}}
+  .promo-card{border-radius:28px;padding:36px 32px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:14px;text-decoration:none;opacity:0;transform:translateY(30px);transition:opacity 0.7s,transform 0.7s,box-shadow 0.3s;}
+  .promo-card.active{opacity:1;transform:translateY(0);}
+  .promo-card:hover{transform:translateY(-6px) !important;box-shadow:0 24px 56px rgba(0,0,0,0.14);}
+  .promo-card.fiszki{background:var(--navy);}
+  .promo-card.podrecznik{background:var(--gold);}
+  .promo-card::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;opacity:0.08;bottom:-40px;right:-40px;background:white;}
+  .promo-icon{font-size:2.4rem;line-height:1;}
+  .promo-badge{font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;}
+  .promo-card.fiszki .promo-badge{color:rgba(255,255,255,0.65);}
+  .promo-card.podrecznik .promo-badge{color:rgba(30,58,138,0.65);}
+  .promo-title{font-family:'Playfair Display',serif;font-size:clamp(1.3rem,2.5vw,1.8rem);line-height:1.2;}
+  .promo-card.fiszki .promo-title{color:white;}
+  .promo-card.podrecznik .promo-title{color:var(--navy);}
+  .promo-desc{font-size:0.85rem;line-height:1.65;}
+  .promo-card.fiszki .promo-desc{color:rgba(255,255,255,0.75);}
+  .promo-card.podrecznik .promo-desc{color:rgba(30,58,138,0.8);}
+  .promo-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.82rem;width:fit-content;margin-top:4px;}
+  .promo-card.fiszki .promo-cta{background:var(--gold);color:#1a1a2e;}
+  .promo-card.podrecznik .promo-cta{background:var(--navy);color:white;}
+
+  .briefy-section{padding:100px 5%;background:var(--navy);position:relative;overflow:hidden;}
+  @media(max-width:600px){.briefy-section{padding:60px 4%;}}
+  .briefy-watermark{position:absolute;inset:0;pointer-events:none;z-index:0;font-family:serif;color:rgba(212,175,55,0.07);font-size:18rem;line-height:1;display:flex;align-items:center;animation:watermarkDrift 22s linear infinite;white-space:nowrap;}
+  @keyframes watermarkDrift{0%{transform:translateX(-30%) rotate(-8deg);opacity:0.04;}40%{opacity:0.10;}60%{opacity:0.10;}100%{transform:translateX(110%) rotate(-8deg);opacity:0.04;}}
+  #briefyCanvas{position:absolute;inset:0;pointer-events:none;z-index:0;width:100%;height:100%;}
+  .briefy-inner{max-width:580px;margin:0 auto;text-align:center;position:relative;z-index:1;}
+  .briefy-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.2em;color:var(--gold);margin-bottom:12px;}
+  .briefy-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);color:white;margin:0 0 12px;line-height:1.2;}
+  .briefy-subtitle{font-size:0.95rem;color:rgba(255,255,255,0.55);margin:0 0 40px;line-height:1.7;font-weight:300;}
+  .briefy-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:28px;backdrop-filter:blur(10px);}
+  .briefy-input-row{display:flex;gap:10px;margin-bottom:16px;}
+  @media(max-width:400px){.briefy-input-row{flex-direction:column;}}
+  .briefy-input{flex:1;padding:14px 18px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.95rem;color:white;outline:none;transition:border-color 0.2s;}
+  .briefy-input::placeholder{color:rgba(255,255,255,0.35);}
+  .briefy-input:focus{border-color:var(--gold);background:rgba(255,255,255,0.12);}
+  .briefy-btn{padding:14px 24px;background:var(--gold);color:#1a1a2e;border:none;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;transition:0.3s;white-space:nowrap;}
+  .briefy-btn:hover{background:white;transform:translateY(-1px);}
+  #brief-result{display:none;}
+  .brief-card-link{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px 20px;text-decoration:none;text-align:left;transition:all 0.2s;margin-bottom:10px;}
+  .brief-card-link:hover{background:rgba(255,255,255,0.14);border-color:var(--gold);}
+  .brief-card-link:last-child{margin-bottom:0;}
+  .brief-card-icon{width:44px;height:44px;background:var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem;}
+  .brief-card-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:white;margin-bottom:3px;}
+  .brief-card-sub{font-family:'Poppins',sans-serif;font-size:0.8rem;color:rgba(255,255,255,0.5);}
+  .brief-card-arrow{color:var(--gold);font-size:1.1rem;flex-shrink:0;}
+  .brief-error{background:rgba(220,38,38,0.15);border:1.5px solid rgba(220,38,38,0.4);border-radius:16px;padding:14px 20px;font-family:'Poppins',sans-serif;font-size:0.9rem;color:#fca5a5;}
+  .brief-meta{font-family:'Poppins',sans-serif;font-size:0.72rem;color:rgba(255,255,255,0.3);margin-bottom:14px;text-align:left;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;}
+
+  .footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
+  .footer-modal-overlay.open{opacity:1;pointer-events:all;}
+  .footer-modal{background:white;border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
+  @media(max-width:600px){.footer-modal{grid-template-columns:1fr;padding:24px;}}
+  .footer-modal-overlay.open .footer-modal{transform:translateY(0);}
+  .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:1.4rem;color:var(--navy);cursor:pointer;font-weight:bold;}
+  .modal-left h3{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:0 0 14px;}
+  .modal-price{background:#f9fbfe;border:2px dashed var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;text-align:center;}
+  .modal-price span{font-weight:800;font-size:1.4rem;color:var(--navy);}
+  .m-tile{background:#fff;border:1px solid #eee;border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;transition:0.3s;font-size:0.85rem;color:var(--navy);}
+  .m-tile.selected{border-color:#3b82f6;background:#f0f7ff;}
+  #m-piano-box{display:none;margin-top:10px;}
+  .modal-right{background:var(--navy);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;}
+  .modal-right input,.modal-right textarea{width:100%;padding:11px 14px;border-radius:12px;border:none;font-family:'Poppins',sans-serif;font-size:0.85rem;box-sizing:border-box;}
+  .modal-right textarea{height:80px;resize:none;}
+  .modal-submit-btn{background:var(--gold);color:white;border:none;padding:14px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;font-size:0.9rem;transition:0.3s;text-transform:uppercase;}
+  .modal-submit-btn:hover{opacity:0.9;}
+  #modal-status{color:#22c55e;font-size:0.85rem;font-weight:600;text-align:center;min-height:20px;}
+
+  .site-footer{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:40px;}
+  .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
+  @media(max-width:900px){.footer-main{grid-template-columns:1fr 1fr;gap:2rem;}.footer-cta-col{grid-column:span 2;}}
+  @media(max-width:560px){.footer-main{grid-template-columns:1fr;padding:2rem 0;}.footer-cta-col{grid-column:span 1;}}
+  .footer-brand-row{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
+  .footer-logo{width:48px;height:48px;border-radius:8px;object-fit:cover;}
+  .footer-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tagline{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-rule{height:2px;background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px);margin-bottom:1.1rem;}
+  .footer-contacts{display:flex;flex-direction:column;gap:7px;}
+  .footer-contact-row{display:flex;align-items:baseline;gap:14px;}
+  .footer-contact-label{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;min-width:38px;}
+  .footer-contact-val{font-size:13px;color:var(--navy);text-decoration:none;}
+  .footer-contact-val:hover{color:var(--gold);}
+  .footer-col-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#aaa;margin-bottom:0.75rem;}
+  .footer-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-links a,.footer-links span{font-size:13.5px;color:#3d3d4a;text-decoration:none;transition:color 0.2s;}
+  .footer-links a:hover{color:var(--navy);}
+  .footer-links .disabled-link{color:#b8b8c2;cursor:not-allowed;}
+  .footer-cta-col{display:flex;flex-direction:column;align-items:flex-start;gap:12px;}
+  .footer-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:14px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-weight:700;font-size:0.85rem;text-decoration:none;transition:all 0.3s;white-space:nowrap;}
+  .footer-cta-btn:hover{background:var(--gold);transform:translateY(-2px);}
+  .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .footer-copy{font-size:11px;color:#c0c0cc;}
+  .footer-location{font-size:12px;color:#aaa;}
+
+  .pdf-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.85);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:12px;}
+  .pdf-modal-overlay.open{opacity:1;pointer-events:all;}
+  .pdf-modal{background:white;border-radius:20px;width:90%;max-width:860px;height:88vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px);transition:transform 0.3s;}
+  .pdf-modal-overlay.open .pdf-modal{transform:translateY(0);}
+  .pdf-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e8eaee;font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);}
+  .pdf-modal-close{background:none;border:none;font-size:1.4rem;color:#94a3b8;cursor:pointer;transition:color 0.2s;}
+  .pdf-modal-close:hover{color:var(--navy);}
+  .pdf-modal iframe{flex:1;border:none;width:100%;}
+
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#22c55e;color:white;padding:14px 28px;border-radius:50px;font-weight:700;font-size:0.9rem;z-index:9999;opacity:0;transition:all 0.4s;pointer-events:none;white-space:nowrap;box-shadow:0 10px 30px rgba(34,197,94,0.3);}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.error{background:#ef4444;}
+  @media(min-width:701px){.toast{bottom:30px;}}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-8px);}}
+  @media(max-width:850px){.tag-note{width:180px;left:0;transform:none;}.tag-wrapper:hover .tag-note{transform:translateY(-10px);}.tag-note::after{left:20px;}.flip-card{min-height:240px;}}
+
+  .game-card:hover{transform:translateY(-6px)!important;box-shadow:0 16px 48px rgba(0,0,0,0.13)!important;}
+  @media(max-width:700px){
+    section#gry>div>div.games-grid{grid-template-columns:1fr!important;}
   }
 </style>
 </head>
 <body>
 
-  <span class="note" aria-hidden="true">♪</span>
-  <span class="note" aria-hidden="true">♫</span>
-  <span class="note" aria-hidden="true">♩</span>
-  <span class="note" aria-hidden="true">♬</span>
+<nav class="site-nav">
+  <a href="/index.html">Strona główna</a>
+  <a href="/lekcje-dla-dzieci.html">Dla dzieci</a>
+  <a href="/lekcje-dla-doroslych.html">Dla dorosłych</a>
+  <a href="#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/fiszki/fiszki.html">Fiszki</a>
+  <a href="/index/podrecznik/podrecznik.html">Podręcznik</a>
+</nav>
 
-  <div class="card">
-    <span class="eyebrow">Przerwa techniczna</span>
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html" class="active"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="#oferta"><span class="mn-icon">🎯</span>Oferta</a>
+    <a href="#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="/index/fiszki/fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
 
-    <div class="keys" aria-hidden="true">
-      <div class="key"></div><div class="key"></div><div class="key"></div>
-      <div class="key"></div><div class="key"></div><div class="key"></div>
-      <div class="key"></div><div class="key"></div><div class="key"></div>
-    </div>
+<section class="hero">
+  <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
+  <h1>Lekcje pianina<br>z <em>pasją</em></h1>
+  <p class="hero-sub">Profesjonalne lekcje fortepianu dla dzieci i dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do Ciebie.</p>
+  <div class="hero-btns">
+    <a href="#terminy" class="btn-primary">Zarezerwuj termin</a>
+    <a href="#o-mnie" class="btn-outline">Poznaj nauczyciela</a>
+  </div>
+  <div class="scroll-hint">↓ Przewiń w dół</div>
+</section>
 
-    <h1>Strona nabiera <em>nowego brzmienia</em></h1>
-    <p class="sub">Pracujemy nad ulepszeniami i zaraz wracamy do gry. W pilnych sprawach — np. rezerwacji terminu — napisz lub zadzwoń bezpośrednio.</p>
-
-    <div class="contact-box">
-      <p>Kontakt bezpośredni</p>
-      <div class="contact-links">
-        <a href="tel:514338875">📞 514 338 875</a>
-        <a href="mailto:lukaszgkorepetycje@gmail.com">✉️ lukaszgkorepetycje@gmail.com</a>
+<section class="section" id="o-mnie">
+  <div class="section-label">Nauczyciel</div>
+  <h2 class="section-title">Poznajmy się</h2>
+  <div class="bento-container" id="bentoBox">
+    <div class="flip-card">
+      <div class="flip-card-inner">
+        <div class="card-front">
+          <span class="badge">Nauczyciel & Muzyk</span>
+          <h2>Łukasz Ganczarek</h2>
+          <div class="bio-text">
+            Ukończyłem Szkołę Muzyczną I i II stopnia im. Zygmunta Noskowskiego w Gdyni. Gram profesjonalnie na pianinie i oboju.
+           Obecnie od prawie dwóch lat uczę pianina. Dodatkowo uczę grupowo lekcji robotyki dla dzieci 8-10 lat. Jestem też wychowawcą wypoczynkowym.
+            <br><br>
+            <small style="color:var(--gold);font-weight:600;">Najedź kursorem na kartę ↺</small>
+          </div>
+        </div>
+        <div class="card-back">
+          <img src="/index/grafiki_index/wizytowka.png" alt="Wizytówka Łukasz Ganczarek">
+        </div>
       </div>
     </div>
-
-    <p class="footer-note">Łukasz Ganczarek · Lekcje Pianina Gdynia</p>
+    <div class="card">
+      <a href="https://www.youtube.com/watch?v=nvP6gnRWJ8c" target="_blank" class="video-link">
+        <img src="https://img.youtube.com/vi/nvP6gnRWJ8c/hqdefault.jpg" alt="Obejrzyj film">
+      </a>
+      <h3>Media</h3>
+      <ul class="links-list">
+        <li><span>🔗</span> <a href="https://www.gdynia.pl/mieszkaniec/aktualnosci,4018/gdynski-uczen-stypendysta-ministra-kultury,565730" target="_blank">Gdyńskie Aktualności</a></li>
+        <li><span>🔗</span> <a href="https://www.szkolamuzgdynia.pl/sukcesy/osiagniecia-uczniow-w-roku-szkolnym-2020-2021-ii-st/" target="_blank">Szkoła im. Z. Noskowskiego</a></li>
+        <li><span>🔗</span> <a href="https://nck.org.pl/pl/media/7929" target="_blank">Nadbałtyckie Centrum Kultury</a></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Opinie</h3>
+      <button onclick="openPDF('index/opinie/opinia-ratz.pdf','Opinia prof. J. Ratza')" class="opinion-btn">📄 Opinia prof. J. Ratza</button>
+      <button onclick="openPDF('index/opinie/opinia-miczka.pdf','Opinia prof. T. Miczki')" class="opinion-btn">📄 Opinia prof. T. Miczki</button>
+    </div>
+    <div class="card" style="background:var(--gold);border:none;box-shadow:0 10px 30px rgba(212,175,55,0.3);">
+      <h3 style="color:white;font-family:'Playfair Display',serif;">Edukacja</h3>
+      <p style="font-size:0.8rem;color:white;opacity:0.9;margin-bottom:15px;">Zakres lekcji (najedź na hasło):</p>
+      <div class="tags-container">
+        <div class="tag-wrapper"><span class="tag" style="color:white;border-color:white;">Formy muzyczne</span><div class="tag-note"><b>Formy muzyczne:</b> Nauka o budowie utworów.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color:white;border-color:white;">Harmonia</span><div class="tag-note"><b>Harmonia:</b> Sztuka łączenia akordów.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color:white;border-color:white;">Kształcenie słuchu</span><div class="tag-note"><b>Kształcenie słuchu:</b> Trening rozpoznawania dźwięków.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color:white;border-color:white;">Zasady muzyki</span><div class="tag-note"><b>Zasady muzyki:</b> Fundament każdego muzyka.</div></div>
+        <div class="tag-wrapper"><span class="tag" style="color:white;border-color:white;">Historia muzyki</span><div class="tag-note"><b>Historia muzyki:</b> Od baroku po współczesność.</div></div>
+      </div>
+    </div>
   </div>
+</section>
 
+<!-- ══ OFERTA — linki do podstron dzieci / dorośli ══ -->
+<section class="promo-section" id="oferta">
+  <div class="promo-inner">
+    <div class="section-label">Oferta</div>
+    <h2 class="section-title">Wybierz ścieżkę nauki</h2>
+    <div class="promo-grid" id="ofertaGrid">
+      <a href="/lekcje-dla-dzieci.html" class="promo-card fiszki">
+        <div class="promo-icon">🧒</div>
+        <div class="promo-badge">Od 6 roku życia</div>
+        <div class="promo-title">Lekcje dla dzieci</div>
+        <div class="promo-desc">Nauka przez zabawę — kolorowe ilustracje, proste utwory i interaktywne pianino online. Zobacz, jak wygląda pierwsza lekcja.</div>
+        <div class="promo-cta">Zobacz ofertę →</div>
+      </a>
+      <a href="/lekcje-dla-doroslych.html" class="promo-card podrecznik">
+        <div class="promo-icon">🎩</div>
+        <div class="promo-badge">Bez ograniczeń wiekowych</div>
+        <div class="promo-title">Lekcje dla dorosłych</div>
+        <div class="promo-desc">Indywidualne tempo, ulubione utwory i solidne podstawy teorii — niezależnie od tego, czy zaczynasz, czy wracasz do gry po latach.</div>
+        <div class="promo-cta">Zobacz ofertę →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TERMINY — uproszczone okno rezerwacji ══ -->
+<section class="terminy-section" id="terminy">
+  <div class="section-inner">
+    <div class="section-label">Rezerwacja</div>
+    <h2 class="section-title" style="text-align:center;">Umów lekcję</h2>
+    <div class="apple-card" id="appleLocation">
+      <h2 class="apple-card-title">Zarezerwuj swój termin</h2>
+      <p class="apple-card-sub">Wybierz dogodne miejsce, uzupełnij dane kontaktowe — odezwę się, aby potwierdzić termin lekcji.</p>
+      <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
+
+      <div class="form-overlay" id="formOverlay">
+        <button class="close-btn" onclick="toggleForm(false)">✕</button>
+        <div class="form-content">
+          <h3 style="margin-top:0;margin-bottom:10px;color:var(--navy);font-family:'Playfair Display',serif;">Szczegóły rezerwacji</h3>
+          <div class="price-tag"><span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span></div>
+          <div class="bento-grid">
+            <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+            <div class="form-tile" id="loc-uczen" onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+          </div>
+          <div id="piano-options">
+            <div class="bento-grid">
+              <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b><br><small>Standard</small></div>
+              <div class="form-tile" id="piano-no" onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu (+20 zł)</small></div>
+            </div>
+          </div>
+          <div class="contact-box">
+            <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()">
+            <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()">
+            <input type="email" id="res-email" placeholder="Adres email (do potwierdzenia)" oninput="val()">
+            <textarea id="res-msg" placeholder="Dodatkowe informacje (wiek, doświadczenie, preferowane godziny...)"></textarea>
+            <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
+          </div>
+          <div id="res-status" style="margin-top:12px;font-weight:600;font-size:0.85rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SEKCJA GIER + NARZĘDZI ══ -->
+<section id="gry" style="padding:80px 5%;background:white;">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-label">Wersje Alpha</div>
+    <h2 class="section-title">Gry edukacyjne</h2>
+    <p style="color:#64748b;font-size:0.95rem;max-width:580px;line-height:1.7;margin:0 0 36px;">
+      Eksperymentalne aplikacje przeglądarkowe do nauki muzyki. Ćwicz nuty i akordy — sterując mikrofonem, głosem lub klikając.
+    </p>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:36px;">
+      <div style="display:inline-block;background:#fef9e7;border:1.5px solid #d4af37;border-radius:50px;padding:5px 16px;font-size:0.72rem;font-weight:700;color:#92710a;letter-spacing:0.08em;">⚠ Alpha — w trakcie rozwoju</div>
+    </div>
+
+    <div class="games-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+
+      <!-- Piano Invaders -->
+      <a href="/index/gry/piano_invaders/piano_invaders.html" style="text-decoration:none;border-radius:28px;overflow:hidden;border:1.5px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.07);display:flex;flex-direction:column;transition:all 0.25s;background:white;" class="game-card">
+        <div style="position:relative;overflow:hidden;min-height:180px;">
+          <img src="/index/gry/piano_invaders/grafiki/miniatura gra music invaders.png" alt="Piano Invaders" style="width:100%;height:180px;object-fit:cover;display:block;">
+          <div style="position:absolute;top:14px;right:14px;background:rgba(13,17,23,0.55);border:1px solid rgba(125,211,252,0.5);border-radius:50px;padding:3px 10px;font-size:0.65rem;font-weight:700;color:#7dd3fc;letter-spacing:0.1em;backdrop-filter:blur(6px);">ALPHA</div>
+        </div>
+        <div style="padding:22px 24px 26px;flex:1;">
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:8px;">Gra zręcznościowa</div>
+          <h3 style="font-family:'Playfair Display',serif;color:#1e3a8a;font-size:1.3rem;margin:0 0 10px;">Piano Invaders</h3>
+          <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 16px;">Klasyczny Space Invaders sterowany dźwiękiem. Nuty małe = ruch pianina, jednokreślne = strzał. Mikrofon wykrywa zagraną nutę i reaguje w czasie rzeczywistym.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:#f0f7ff;color:#1e3a8a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;">🎤 Mikrofon</span>
+            <span style="background:#f0f7ff;color:#1e3a8a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;">c–h małe</span>
+            <span style="background:#f0f7ff;color:#1e3a8a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;">c¹–h¹</span>
+          </div>
+          <div style="margin-top:18px;display:inline-flex;align-items:center;gap:8px;background:#1e3a8a;color:white;padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.82rem;">Zagraj teraz →</div>
+        </div>
+      </a>
+
+      <!-- Piano Maze -->
+      <a href="/index/gry/piano_maze/piano_maze.html" style="text-decoration:none;border-radius:28px;overflow:hidden;border:1.5px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,0.07);display:flex;flex-direction:column;transition:all 0.25s;background:white;" class="game-card">
+        <div style="position:relative;overflow:hidden;min-height:180px;">
+          <img src="/index/gry/piano_maze/miniatura/miniatura music maze.png" alt="Muzyczny Labirynt" style="width:100%;height:180px;object-fit:cover;display:block;">
+          <div style="position:absolute;top:14px;right:14px;background:rgba(10,26,10,0.55);border:1px solid rgba(212,175,55,0.5);border-radius:50px;padding:3px 10px;font-size:0.65rem;font-weight:700;color:#fcd34d;letter-spacing:0.1em;backdrop-filter:blur(6px);">ALPHA</div>
+        </div>
+        <div style="padding:22px 24px 26px;flex:1;">
+          <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:#d4af37;margin-bottom:8px;">Gra logiczna</div>
+          <h3 style="font-family:'Playfair Display',serif;color:#1e3a8a;font-size:1.3rem;margin:0 0 10px;">Muzyczny Labirynt</h3>
+          <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 16px;">Przeprowadź postać przez labirynt grając odpowiednie nuty. Każdy kierunek to inna nuta jednokreślna. Sterowanie mikrofonem lub kliknięciem kafelka z nutą.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:#fef9e7;color:#92710a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #fde68a;">🎤 Mikrofon</span>
+            <span style="background:#fef9e7;color:#92710a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #fde68a;">🎹 Kafelki</span>
+            <span style="background:#fef9e7;color:#92710a;font-size:0.72rem;font-weight:600;padding:4px 12px;border-radius:50px;border:1px solid #fde68a;">c¹–h¹</span>
+          </div>
+          <div style="margin-top:18px;display:inline-flex;align-items:center;gap:8px;background:#d4af37;color:#1a1a2e;padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.82rem;">Zagraj teraz →</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ NARZĘDZIA DLA UCZNIÓW ══ -->
+<section class="promo-section">
+  <div class="promo-inner">
+    <div class="section-label">Narzędzia dla uczniów</div>
+    <h2 class="section-title">Ucz się z autorskimi aplikacjami</h2>
+    <div class="promo-grid" id="promoGrid">
+      <a href="/index/fiszki/fiszki.html" class="promo-card fiszki">
+        <div class="promo-icon">🎼</div>
+        <div class="promo-badge">Interaktywne ćwiczenia</div>
+        <div class="promo-title">Fiszki Nutowe</div>
+        <div class="promo-desc">Ćwicz czytanie nut w kluczu wiolinowym i basowym. Losuj nuty, ustaw timer, włącz mikrofon i graj — aplikacja sprawdzi czy zagrałeś poprawnie.</div>
+        <div class="promo-cta">Otwórz fiszki →</div>
+      </a>
+      <a href="/index/podrecznik/podrecznik.html" class="promo-card podrecznik">
+        <div class="promo-icon">📖</div>
+        <div class="promo-badge">E-book</div>
+        <div class="promo-title">Szkoła Gry na Fortepianie</div>
+        <div class="promo-desc">Autorski podręcznik do nauki gry na pianinie — ćwiczenia, ilustracje, zadania rytmiczne. Przeglądaj strona po stronie bezpośrednio w przeglądarce.</div>
+        <div class="promo-cta">Otwórz podręcznik →</div>
+      </a>
+      <div class="promo-card" style="background:linear-gradient(135deg,#0f172a,#1e3a8a);opacity:0.78;cursor:not-allowed;" aria-disabled="true">
+        <div style="position:absolute;top:18px;right:18px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.3);border-radius:50px;padding:4px 12px;font-size:0.66rem;font-weight:800;color:white;letter-spacing:0.06em;display:flex;align-items:center;gap:5px;z-index:2;">🔒 WKRÓTCE</div>
+        <div class="promo-icon">🤖</div>
+        <div class="promo-badge" style="color:rgba(212,175,55,0.75);">Wirtualny asystent</div>
+        <div class="promo-title" style="color:white;">Asystent Ćwiczeń</div>
+        <div class="promo-desc" style="color:rgba(255,255,255,0.7);">Wirtualny asystent oparty na AI, który prowadzi przez ćwiczenia pianistyczne, odpowiada na pytania i dostosowuje poziom trudności do Twoich postępów.</div>
+        <div class="promo-cta" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);cursor:not-allowed;">Niedostępne</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="briefy-section" id="briefy">
+  <div class="briefy-watermark" aria-hidden="true">♪</div>
+  <canvas id="briefyCanvas" aria-hidden="true"></canvas>
+  <div class="briefy-inner">
+    <div class="briefy-label">Strefa ucznia</div>
+    <h2 class="briefy-title">Materiały do lekcji</h2>
+    <p class="briefy-subtitle">Wpisz swój numer telefonu, aby uzyskać dostęp do swoich materiałów muzycznych.</p>
+    <div class="briefy-card">
+      <div class="briefy-input-row">
+        <input id="brief-code-input" type="tel" placeholder="Twój numer telefonu" class="briefy-input"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'">
+        <button onclick="sprawdzKod()" id="brief-btn" class="briefy-btn">Sprawdź</button>
+      </div>
+      <div id="brief-result"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-row">
+        <img src="/index/grafiki_index/logo bez numeru tel.png" alt="Logo" class="footer-logo">
+        <div><div class="footer-name">Łukasz Ganczarek</div><div class="footer-tagline">Nauka gry na pianinie</div></div>
+      </div>
+      <div class="footer-rule"></div>
+      <div class="footer-contacts">
+        <div class="footer-contact-row"><span class="footer-contact-label">Tel</span><a href="tel:514338875" class="footer-contact-val">514 338 875</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">Email</span><a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-contact-val">lukaszgkorepetycje@gmail.com</a></div>
+        <div class="footer-contact-row"><span class="footer-contact-label">WWW</span><a href="https://lekcjepianinagdynia.pl" class="footer-contact-val">lekcjepianinagdynia.pl</a></div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Nawigacja</div>
+      <ul class="footer-links">
+        <li><a href="/index.html">Strona główna</a></li>
+        <li><a href="/index.html#o-mnie">O mnie</a></li>
+        <li><a href="/lekcje-dla-dzieci.html">Lekcje dla dzieci</a></li>
+        <li><a href="/lekcje-dla-doroslych.html">Lekcje dla dorosłych</a></li>
+        <li><a href="/index.html#terminy">Wolne terminy</a></li>
+        <li><a href="/index/fiszki/fiszki.html">Fiszki nutowe</a></li>
+        <li><a href="/index/podrecznik/podrecznik.html">Podręcznik</a></li>
+        <li><span class="disabled-link">Asystent ćwiczeń (wkrótce)</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Ogłoszenia</div>
+      <ul class="footer-links">
+        <li><a href="https://buki.org.pl/user-123621/" target="_blank">Profil Buki.org</a></li>
+        <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">Profil Superprof</a></li>
+      </ul>
+    </div>
+    <div class="footer-cta-col">
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="footer-bottom">
+      <span class="footer-location">♪ Gdynia · online</span>
+      <span class="footer-copy">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
+  <div class="footer-modal">
+    <button class="modal-close" onclick="closeBookingModal()">✕</button>
+    <div class="modal-left">
+      <h3>Lekcja próbna</h3>
+      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
+      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
+      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
+      <div id="m-piano-box">
+        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
+          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-right">
+      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
+      <input type="tel" id="m-phone" placeholder="Numer telefonu">
+      <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
+      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
+      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
+      <div id="modal-status"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="pdf-modal-overlay" id="pdfModal" onclick="if(event.target===this)closePDF()">
+  <div class="pdf-modal">
+    <div class="pdf-modal-header">
+      <span id="pdf-title">Opinia</span>
+      <button class="pdf-modal-close" onclick="closePDF()">✕</button>
+    </div>
+    <iframe id="pdf-frame" src="" title="Opinia"></iframe>
+  </div>
+</div>
+
+<script>
+const FORM_WEBHOOK  = "https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6";
+const BRIEF_WEBHOOK = "https://hook.eu1.make.com/q71o8tfhdg3pj1nwe21t16dbkhoms4ye";
+const OWNER_EMAIL   = "lukaszgkorepetycje@gmail.com";
+
+function showToast(msg,isError=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);}
+async function sendToMake(payload){const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+
+const BAD_LIMIT=5,BLOCK_DURATION=300000;
+function getAttempts(){try{return JSON.parse(sessionStorage.getItem('brief_attempts'))||{bad:0,blockedUntil:null};}catch(e){return{bad:0,blockedUntil:null};}}
+function saveAttempts(d){try{sessionStorage.setItem('brief_attempts',JSON.stringify(d));}catch(e){}}
+function isBlocked(){const d=getAttempts();if(d.blockedUntil&&Date.now()<d.blockedUntil){const rem=Math.ceil((d.blockedUntil-Date.now())/1000);return`Zbyt wiele błędnych prób. Spróbuj za ${Math.floor(rem/60)}:${(rem%60).toString().padStart(2,'0')}.`;}if(d.blockedUntil&&Date.now()>=d.blockedUntil)saveAttempts({bad:0,blockedUntil:null});return false;}
+function recordBadAttempt(){const d=getAttempts();d.bad=(d.bad||0)+1;if(d.bad>=BAD_LIMIT){d.blockedUntil=Date.now()+BLOCK_DURATION;d.bad=0;}saveAttempts(d);}
+function recordGoodAttempt(){saveAttempts({bad:0,blockedUntil:null});}
+function showBriefError(msg){const r=document.getElementById('brief-result');r.style.display='block';r.innerHTML=`<div class="brief-error">✕ ${msg}</div>`;}
+
+async function sprawdzKod(){
+  const input=document.getElementById('brief-code-input');
+  const result=document.getElementById('brief-result');
+  const btn=document.getElementById('brief-btn');
+  const cleaned=input.value.trim().replace(/\D/g,'');
+  let telefon=cleaned;
+  if(cleaned.length===11&&cleaned.startsWith('48'))telefon=cleaned.slice(2);
+  if(telefon.length!==9){showBriefError('Podaj prawidłowy numer telefonu (9 cyfr).');return;}
+  const blocked=isBlocked();
+  if(blocked){showBriefError('⏳ '+blocked);return;}
+  btn.innerText='...';btn.style.opacity='0.6';btn.style.cursor='not-allowed';result.style.display='none';
+  try{
+    const response=await fetch(BRIEF_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({telefon})});
+    const data=await response.json();
+    btn.innerText='Sprawdź';btn.style.opacity='1';btn.style.cursor='pointer';
+    if(data.status==='ok'&&Array.isArray(data.briefy)&&data.briefy.length>0){
+      recordGoodAttempt();
+      const cards=data.briefy.map(b=>`<a href="${b.url}" target="_blank" class="brief-card-link"><div class="brief-card-icon">📄</div><div style="flex:1;"><div class="brief-card-title">${b.title}</div><div class="brief-card-sub">${b.subtitle||''}</div></div><div class="brief-card-arrow">→</div></a>`).join('');
+      result.style.display='block';result.innerHTML=`<div class="brief-meta">Twoje materiały (${data.briefy.length})</div>${cards}`;
+    }else if(data.status==='ok'&&Array.isArray(data.briefy)&&data.briefy.length===0){
+      recordGoodAttempt();result.style.display='block';
+      result.innerHTML='<div style="background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:16px;padding:20px 24px;text-align:center;color:rgba(255,255,255,0.55);font-size:0.9rem;line-height:1.6;">🎵 Brak dostępnych materiałów na ten moment.<br><span style="font-size:0.8rem;">Materiały pojawiają się wraz z kolejnymi lekcjami.</span></div>';
+    }else if(data.status==='not_found'){
+      recordBadAttempt();const d=getAttempts();const pozostalo=BAD_LIMIT-(d.bad||0);
+      if(d.blockedUntil)showBriefError('Numer nie jest przypisany do żadnego ucznia. Dostęp zablokowany na 5 minut.');
+      else showBriefError(`Numer nie jest przypisany do żadnego ucznia. Pozostało prób: ${pozostalo}`);
+    }else{recordBadAttempt();showBriefError('Nie rozpoznano odpowiedzi serwera. Spróbuj ponownie.');}
+  }catch(e){btn.innerText='Sprawdź';btn.style.opacity='1';btn.style.cursor='pointer';showBriefError('Błąd połączenia. Spróbuj ponownie.');}
+}
+document.getElementById('brief-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')sprawdzKod();});
+
+let isStudio=true,hasPiano=true;
+function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);}
+function setLoc(loc){isStudio=loc==='studio';document.getElementById('loc-studio').classList.toggle('selected',isStudio);document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);document.getElementById('piano-options').style.display=isStudio?'none':'block';updatePrice();}
+function setPiano(v){hasPiano=v;document.getElementById('piano-yes').classList.toggle('selected',hasPiano);document.getElementById('piano-no').classList.toggle('selected',!hasPiano);updatePrice();}
+function updatePrice(){document.getElementById('price-val').innerText=(!isStudio&&!hasPiano?119:99)+' zł / h';val();}
+function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;const e=document.getElementById('res-email').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9&&e.includes('@'));}
+async function wyslij(){
+  if(!document.getElementById('subBtn').classList.contains('active'))return;
+  const s=document.getElementById('res-status'),btn=document.getElementById('subBtn');
+  s.innerText='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),tresc:document.getElementById('res-msg').value.trim(),miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:isStudio?'—':(hasPiano?'Tak':'Nie — dowóz instrumentu'),cena:(!isStudio&&!hasPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  try{
+    const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
+    s.innerText='✅ Dziękujemy! Odezwiemy się wkrótce.';s.style.color='#22c55e';showToast('✅ Zgłoszenie wysłane!');
+    setTimeout(()=>{toggleForm(false);s.innerText='';['res-name','res-phone','res-email','res-msg'].forEach(id=>document.getElementById(id).value='');btn.disabled=false;},3000);
+  }catch(e){s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';btn.disabled=false;btn.classList.add('active');showToast('Błąd wysyłki.',true);}
+}
+
+function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
+function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
+let mLoc='s',mPiano=true;
+function mSetLoc(t){mLoc=t;document.getElementById('m-l-s').classList.toggle('selected',t==='s');document.getElementById('m-l-u').classList.toggle('selected',t==='u');document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';mUpdatePrice();}
+function mSetPiano(v){mPiano=v;document.getElementById('m-p-y').classList.toggle('selected',v);document.getElementById('m-p-n').classList.toggle('selected',!v);mUpdatePrice();}
+function mUpdatePrice(){document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
+async function wyslijModal(){
+  const s=document.getElementById('modal-status');
+  const submitBtn=document.querySelector('.modal-submit-btn');
+  const name=document.getElementById('m-name').value.trim();
+  const phone=document.getElementById('m-phone').value.trim();
+  const email=document.getElementById('m-email').value.trim();
+  if(name.length<2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
+  submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
+  const payload={typ:'lekcja-probna',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  try{
+    const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status+' '+text);
+    s.innerText='✅ Wysłano! Odezwiemy się wkrótce.';s.style.color='#22c55e';submitBtn.innerText='WYŚLIJ PROŚBĘ';
+    setTimeout(()=>{closeBookingModal();s.innerText='';document.getElementById('m-name').value='';document.getElementById('m-phone').value='';document.getElementById('m-email').value='';document.getElementById('m-msg').value='';submitBtn.disabled=false;},3000);
+  }catch(e){s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.innerText='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
+}
+
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('bentoBox'));
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('appleLocation'));
+const promoObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('active');}),{threshold:0.15});
+document.querySelectorAll('.promo-card').forEach((c,i)=>{c.style.transitionDelay=i*0.12+'s';promoObs.observe(c);});
+
+(function(){
+  const canvas=document.getElementById('briefyCanvas');
+  const section=document.querySelector('.briefy-section');
+  const EMOJIS=['🎵','🎶','🎼','🎹','🎸','🎺','🎻','🥁','♩','♪','♫','♬'];
+  const COUNT=30,SPEED=0.38;
+  let W,H,dpr,particles=[],inited=false,animId=null;
+  function resize(){dpr=window.devicePixelRatio||1;W=section.offsetWidth;H=section.offsetHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';if(inited)particles.forEach(p=>{p.x=Math.max(p.r,Math.min(W-p.r,p.x));p.y=Math.max(p.r,Math.min(H-p.r,p.y));});}
+  function init(){resize();particles=[];for(let i=0;i<COUNT;i++){const size=20+Math.random()*14,r=size*0.62,angle=Math.random()*Math.PI*2,spd=SPEED*(0.55+Math.random()*0.9);particles.push({x:r+Math.random()*(W-2*r),y:r+Math.random()*(H-2*r),vx:Math.cos(angle)*spd,vy:Math.sin(angle)*spd,size,r,ei:i%EMOJIS.length,alpha:0.30+Math.random()*0.42});}inited=true;}
+  function clampSpeed(p){const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy),max=SPEED*2.6,min=SPEED*0.28;if(spd>max){const f=max/spd;p.vx*=f;p.vy*=f;}if(spd>0&&spd<min){const f=min/spd;p.vx*=f;p.vy*=f;}}
+  function wallBounce(p){if(p.x-p.r<0){p.x=p.r;p.vx=Math.abs(p.vx);}if(p.x+p.r>W){p.x=W-p.r;p.vx=-Math.abs(p.vx);}if(p.y-p.r<0){p.y=p.r;p.vy=Math.abs(p.vy);}if(p.y+p.r>H){p.y=H-p.r;p.vy=-Math.abs(p.vy);}}
+  function separate(){for(let pass=0;pass<4;pass++){for(let i=0;i<particles.length;i++){const a=particles[i];for(let j=i+1;j<particles.length;j++){const b=particles[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,mn=a.r+b.r;if(d2>=mn*mn||d2<1e-6)continue;const d=Math.sqrt(d2),push=(mn-d)*0.5,nx=dx/d,ny=dy/d;a.x-=nx*push;a.y-=ny*push;b.x+=nx*push;b.y+=ny*push;}}}}
+  function resolveVelocities(){for(let i=0;i<particles.length;i++){const a=particles[i];for(let j=i+1;j<particles.length;j++){const b=particles[j],dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy,mn=a.r+b.r;if(d2>=mn*mn||d2<1e-6)continue;const d=Math.sqrt(d2),nx=dx/d,ny=dy/d,avn=a.vx*nx+a.vy*ny,bvn=b.vx*nx+b.vy*ny;if(avn-bvn<=0)continue;const e=0.88,newAvn=((1-e)*avn+(1+e)*bvn)*0.5,newBvn=((1-e)*bvn+(1+e)*avn)*0.5;a.vx+=(newAvn-avn)*nx;a.vy+=(newAvn-avn)*ny;b.vx+=(newBvn-bvn)*nx;b.vy+=(newBvn-bvn)*ny;if(a.y<b.y)b.ei=a.ei;else a.ei=b.ei;}}}
+  function loop(){particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;clampSpeed(p);wallBounce(p);});separate();resolveVelocities();const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);particles.forEach(p=>{ctx.globalAlpha=p.alpha;ctx.font=p.size+'px serif';ctx.fillText(EMOJIS[p.ei],p.x-p.r,p.y+p.r*0.45);});ctx.globalAlpha=1;animId=requestAnimationFrame(loop);}
+  window.addEventListener('resize',resize);
+  const obs=new IntersectionObserver(es=>{if(es[0].isIntersecting){if(!inited)init();if(!animId)animId=requestAnimationFrame(loop);}else{if(animId){cancelAnimationFrame(animId);animId=null;}}},{threshold:0.05});
+  obs.observe(section);
+})();
+
+function openPDF(url,title){document.getElementById('pdf-title').innerText=title;document.getElementById('pdf-frame').src=url;document.getElementById('pdfModal').classList.add('open');document.body.style.overflow='hidden';}
+function closePDF(){document.getElementById('pdfModal').classList.remove('open');document.getElementById('pdf-frame').src='';document.body.style.overflow='';}
+</script>
 </body>
 </html>
