@@ -212,6 +212,27 @@ function clampP(p){
   const minP=Math.min(...filteredPool.map(n=>n.p));const maxP=Math.max(...filteredPool.map(n=>n.p));
   return Math.max(minP,Math.min(maxP,p));
 }
+
+/* ── Strzałki ▲▼ – przesuwanie nuty krok po kroku ── */
+function nudgePlace(delta){
+  if(mode!=='place'||!placeTargetNote)return;
+  const pool2=getPlacePool();
+  const filteredPool=(clef==='both'&&placeInteractClef)?pool2.filter(n=>n.ct===placeInteractClef):pool2;
+  let base=placeCurrentP;
+  if(base===null||base===undefined){
+    if(filteredPool.length){
+      const minP=Math.min(...filteredPool.map(n=>n.p));
+      const maxP=Math.max(...filteredPool.map(n=>n.p));
+      base=Math.round((minP+maxP)/2);
+    }else base=0;
+  }
+  placeConfirmed=false;
+  placeCurrentP=clampP(base+delta);
+  const hint=document.getElementById('place-hint-text');
+  if(hint)hint.style.display='none';
+  renderPlace(placeCurrentP);
+}
+
 let isDragging=false;
 cvP.addEventListener('mousedown',startDrag);
 cvP.addEventListener('touchstart',startDragTouch,{passive:false});
