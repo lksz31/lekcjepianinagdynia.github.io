@@ -1132,23 +1132,39 @@ setInterval(rotateReco,8000);
 
 /* ══ LATAJĄCE STATKI W SEKCJI GIER ══ */
 const SHIP_TYPES=['statek-dobry.png','statek-neutralny.png','statek-zly.png'];
-function spawnShip(){
+function spawnSingleShip(size,top,fromLeft,duration,delay){
   const section=document.getElementById('gry');
   if(!section)return;
   const ship=document.createElement('img');
   ship.src='/index/grafiki-index/'+SHIP_TYPES[Math.floor(Math.random()*SHIP_TYPES.length)];
   ship.alt='';
   ship.setAttribute('aria-hidden','true');
-  const fromLeft=Math.random()>0.5;
-  const top=8+Math.random()*70;
-  const duration=6+Math.random()*5;
-  const size=50+Math.random()*45;
   ship.className='flying-ship '+(fromLeft?'ship-ltr':'ship-rtl');
   ship.style.top=top+'%';
   ship.style.width=size+'px';
   ship.style.animationDuration=duration+'s';
+  ship.style.animationDelay=delay+'s';
   section.appendChild(ship);
-  setTimeout(()=>ship.remove(),duration*1000+300);
+  setTimeout(()=>ship.remove(),(duration+delay)*1000+300);
+}
+function spawnShip(){
+  const fromLeft=Math.random()>0.5;
+  const duration=6+Math.random()*5;
+  const isGroup=Math.random()<0.5;
+  if(isGroup){
+    const count=3+Math.floor(Math.random()*3);
+    const baseTop=10+Math.random()*50;
+    for(let i=0;i<count;i++){
+      const size=20+Math.random()*14;
+      const top=baseTop+(Math.random()*12-6)+i*5;
+      const delay=i*0.3+Math.random()*0.15;
+      spawnSingleShip(size,top,fromLeft,duration,delay);
+    }
+  }else{
+    const size=55+Math.random()*45;
+    const top=8+Math.random()*70;
+    spawnSingleShip(size,top,fromLeft,duration,0);
+  }
 }
 function scheduleNextShip(){
   const delay=14000+Math.random()*16000;
