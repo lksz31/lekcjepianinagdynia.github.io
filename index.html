@@ -300,8 +300,24 @@
   @media(max-width:700px){.deco-flower{opacity:0.09;transform:scale(0.75);}}
   @media(max-width:480px){.deco-flower{display:none;}}
   .flying-ship{position:absolute;pointer-events:none;z-index:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.15));}
-  @keyframes shipLTR{0%{transform:translateX(0);}100%{transform:translateX(calc(100vw + 200px));}}
-  @keyframes shipRTL{0%{transform:translateX(0) scaleX(-1);}100%{transform:translateX(calc(-100vw - 200px)) scaleX(-1);}}
+  @keyframes shipLTR{
+    0%{transform:translate(0,0) scaleX(-1);}
+    18%{transform:translate(18vw,-18px) scaleX(-1);}
+    36%{transform:translate(36vw,14px) scaleX(-1);}
+    54%{transform:translate(54vw,-16px) scaleX(-1);}
+    72%{transform:translate(72vw,12px) scaleX(-1);}
+    88%{transform:translate(88vw,-8px) scaleX(-1);}
+    100%{transform:translate(calc(100vw + 200px),0) scaleX(-1);}
+  }
+  @keyframes shipRTL{
+    0%{transform:translate(0,0);}
+    18%{transform:translate(-18vw,14px);}
+    36%{transform:translate(-36vw,-16px);}
+    54%{transform:translate(-54vw,12px);}
+    72%{transform:translate(-72vw,-14px);}
+    88%{transform:translate(-88vw,10px);}
+    100%{transform:translate(calc(-100vw - 200px),0);}
+  }
   .ship-ltr{left:-150px;animation-name:shipLTR;animation-timing-function:linear;animation-fill-mode:forwards;}
   .ship-rtl{right:-150px;animation-name:shipRTL;animation-timing-function:linear;animation-fill-mode:forwards;}
   @media(prefers-reduced-motion:reduce){.flying-ship{display:none;}}
@@ -1125,7 +1141,7 @@ function spawnShip(){
   ship.setAttribute('aria-hidden','true');
   const fromLeft=Math.random()>0.5;
   const top=8+Math.random()*70;
-  const duration=14+Math.random()*10;
+  const duration=6+Math.random()*5;
   const size=50+Math.random()*45;
   ship.className='flying-ship '+(fromLeft?'ship-ltr':'ship-rtl');
   ship.style.top=top+'%';
