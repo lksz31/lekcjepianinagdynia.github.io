@@ -18,7 +18,7 @@
 
 <nav class="site-nav">
   <a href="/index.html">Strona główna</a>
-  <a href="/index/fiszki.html">Fiszki</a>
+  <a href="/index/fiszki/fiszki.html">Fiszki</a>
   <a href="/index.html#terminy" class="nav-highlight">🎹 Umów</a>
   <a href="/index/podrecznik/podrecznik.html">Podręcznik</a>
   <a href="/index.html#briefy">Materiały</a>
@@ -29,7 +29,7 @@
     <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
     <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
     <a href="#" class="mn-cta" onclick="openBookingModal();return false;">🎹 Umów</a>
-    <a href="/index/fiszki.html" class="active"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/fiszki/fiszki.html" class="active"><span class="mn-icon">🎼</span>Fiszki</a>
     <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
   </div>
 </nav>
@@ -249,11 +249,15 @@
       <div class="staff-wrap" style="flex:1;min-width:0;overflow:hidden;position:relative;cursor:crosshair;">
         <canvas id="Cplace" width="900" height="280" style="width:100%;height:auto;display:block;border-radius:10px;"></canvas>
       </div>
+      <div class="place-arrows-col">
+        <button class="place-arrow-btn" onclick="nudgePlace(1)" title="Przesuń nutę w górę">▲</button>
+        <button class="place-arrow-btn" onclick="nudgePlace(-1)" title="Przesuń nutę w dół">▼</button>
+      </div>
       <div class="draw-col">
         <button class="draw-btn" onclick="go()">🎲<br>Losuj</button>
       </div>
     </div>
-    <div id="place-hint-text" style="font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:2px;">👆 Kliknij lub przeciągnij nutę na właściwą pozycję</div>
+    <div id="place-hint-text" style="font-size:0.75rem;color:#94a3b8;text-align:center;margin-bottom:2px;">👆 Kliknij lub przeciągnij nutę na właściwą pozycję — możesz też użyć strzałek ▲▼</div>
     <button class="confirm-btn" id="confirmBtn" onclick="confirmPlace()" style="width:200px;padding:12px 24px;font-size:0.8rem;">Zatwierdź</button>
 
     <!-- ── POPRZEDNIE ZAGRANIE ── -->
@@ -345,7 +349,7 @@
         <li><a href="">Strona główna</a></li>
         <li><a href="#o-mnie">O mnie</a></li>
         <li><a href="#terminy">Wolne terminy</a></li>
-        <li><a href="/index/fiszki.html">Fiszki nutowe</a></li>
+        <li><a href="/index/fiszki/fiszki.html">Fiszki nutowe</a></li>
         <li><a href="/index/podrecznik/podrecznik.html">Podręcznik</a></li>
       </ul>
     </div>
