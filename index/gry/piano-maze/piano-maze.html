@@ -440,84 +440,82 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 'use strict';
 
 /* ══ BASE URL ══ */
-const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano_maze/';
-const SITE_BASE = '/index/gry/piano_maze/';
-const BG_GAME_SRC = SITE_BASE + 'loading_screen/loading screen maze.png';
+const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano-maze/';
+const SITE_BASE = '/index/gry/piano-maze/';
+const BG_GAME_SRC = SITE_BASE + 'concept-art/loading-screen-maze.webp';
 
 /* ══ TILE SOURCES ══ */
 const TILE_SRCS = {
-  'NESW_1': SITE_BASE + 'objekty/mapa/NESW 1.png',
-  'NESW_2': SITE_BASE + 'objekty/mapa/NESW 2.png',
-  'NESW_3': SITE_BASE + 'objekty/mapa/NESW 3.png',
-  'NESW_4': SITE_BASE + 'objekty/mapa/NESW 4.png',
-  'NESW_5': SITE_BASE + 'objekty/mapa/NESW 5.png',
-  'NES_1':  SITE_BASE + 'objekty/mapa/NES 1.png',
-  'NES_2':  SITE_BASE + 'objekty/mapa/NES 2.png',
-  'NEW_1':  SITE_BASE + 'objekty/mapa/NEW 1.png',
-  'NEW_2':  SITE_BASE + 'objekty/mapa/NEW 2.png',
-  'NSW_1':  SITE_BASE + 'objekty/mapa/NSW 1.png',
-  'ESW_1':  SITE_BASE + 'objekty/mapa/ESW 1.png',
-  'ESW_2':  SITE_BASE + 'objekty/mapa/ESW 2.png',
-  'NS_2':   SITE_BASE + 'objekty/mapa/NS 2.png',
-  'NS_3':   SITE_BASE + 'objekty/mapa/NS 3.png',
-  'N_S_1':  SITE_BASE + 'objekty/mapa/N S 1.png',
-  'EW_2':   SITE_BASE + 'objekty/mapa/EW 2.png',
-  'E_W_1':  SITE_BASE + 'objekty/mapa/E W 1.png',
-  'NE_2':   SITE_BASE + 'objekty/mapa/NE 2.png',
-  'N_E_1':  SITE_BASE + 'objekty/mapa/N E 1.png',
-  'N_E_2':  SITE_BASE + 'objekty/mapa/N E 2.png',
-  'NW_2':   SITE_BASE + 'objekty/mapa/NW 2.png',
-  'N_W_1':  SITE_BASE + 'objekty/mapa/N W 1.png',
-  'N_W_2':  SITE_BASE + 'objekty/mapa/N W 2.png',
-  'E_S_1':  SITE_BASE + 'objekty/mapa/E S 1.png',
-  'E_S_2':  SITE_BASE + 'objekty/mapa/E S 2.png',
-  'E_S_3':  SITE_BASE + 'objekty/mapa/E S 3.png',
-  'S_W_1':  SITE_BASE + 'objekty/mapa/S W 1.png',
-  'S_W_2':  SITE_BASE + 'objekty/mapa/S W 2.png',
-  'S_W_3':  SITE_BASE + 'objekty/mapa/S W 3.png',
-  'N_1':    SITE_BASE + 'objekty/mapa/N 1.png',
-  'E_1':    SITE_BASE + 'objekty/mapa/E 1.png',
-  'E_2':    SITE_BASE + 'objekty/mapa/E 2.png',
-  'S_1':    SITE_BASE + 'objekty/mapa/S 1.png',
-  'W_1':    SITE_BASE + 'objekty/mapa/W 1.png',
-  'filler_1': SITE_BASE + 'objekty/mapa/filler 1.png',
-  'filler_2': SITE_BASE + 'objekty/mapa/filler 2.png',
-  'filler_3': SITE_BASE + 'objekty/mapa/filler 3.png',
-  'filler_4': SITE_BASE + 'objekty/mapa/filler 4.png',
-  'filler_5': SITE_BASE + 'objekty/mapa/filler 5.png',
-  'exit_1':   SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
+  'NESW_1': SITE_BASE + 'objekty/mapa/nesw-1.png',
+  'NESW_2': SITE_BASE + 'objekty/mapa/nesw-2.png',
+  'NESW_3': SITE_BASE + 'objekty/mapa/nesw-3.png',
+  'NESW_4': SITE_BASE + 'objekty/mapa/nesw-4.png',
+  'NESW_5': SITE_BASE + 'objekty/mapa/nesw-5.png',
+  'NES_1':  SITE_BASE + 'objekty/mapa/nes-1.png',
+  'NES_2':  SITE_BASE + 'objekty/mapa/nes-2.png',
+  'NEW_1':  SITE_BASE + 'objekty/mapa/new-1.png',
+  'NEW_2':  SITE_BASE + 'objekty/mapa/new-2.png',
+  'NSW_1':  SITE_BASE + 'objekty/mapa/nsw-1.png',
+  'ESW_1':  SITE_BASE + 'objekty/mapa/esw-1.png',
+  'ESW_2':  SITE_BASE + 'objekty/mapa/esw-2.png',
+  'NS_1':   SITE_BASE + 'objekty/mapa/ns-1.png',
+  'NS_2':   SITE_BASE + 'objekty/mapa/ns-2.png',
+  'NS_3':   SITE_BASE + 'objekty/mapa/ns-3.png',
+  'EW_1':   SITE_BASE + 'objekty/mapa/ew-1.png',
+  'EW_2':   SITE_BASE + 'objekty/mapa/ew-2.png',
+  'NE_1':   SITE_BASE + 'objekty/mapa/ne-1.png',
+  'NE_2':   SITE_BASE + 'objekty/mapa/ne-2.png',
+  'NW_1':   SITE_BASE + 'objekty/mapa/nw-1.png',
+  'NW_2':   SITE_BASE + 'objekty/mapa/nw-2.png',
+  'ES_1':   SITE_BASE + 'objekty/mapa/es-1.png',
+  'ES_2':   SITE_BASE + 'objekty/mapa/es-2.png',
+  'ES_3':   SITE_BASE + 'objekty/mapa/es-3.png',
+  'SW_1':   SITE_BASE + 'objekty/mapa/sw-1.png',
+  'SW_2':   SITE_BASE + 'objekty/mapa/s-w-2.png',
+  'SW_3':   SITE_BASE + 'objekty/mapa/sw-3.png',
+  'N_1':    SITE_BASE + 'objekty/mapa/n-1.png',
+  'E_1':    SITE_BASE + 'objekty/mapa/e-1.png',
+  'E_2':    SITE_BASE + 'objekty/mapa/e-2.png',
+  'S_1':    SITE_BASE + 'objekty/mapa/s-1.png',
+  'W_1':    SITE_BASE + 'objekty/mapa/w-1.png',
+  'filler_1': SITE_BASE + 'objekty/mapa/filler-1.png',
+  'filler_2': SITE_BASE + 'objekty/mapa/filler-2.png',
+  'filler_3': SITE_BASE + 'objekty/mapa/filler-3.png',
+  'filler_4': SITE_BASE + 'objekty/mapa/filler-4.png',
+  'filler_5': SITE_BASE + 'objekty/mapa/filler-5.png',
+  'exit_1':   SITE_BASE + 'objekty/przedmioty/drzwi-labiryntu.png',
 };
 
 /* ══ IMAGES ══ */
 const IMGS = {
-  'poszukiwaczka': SITE_BASE + 'objekty/postacie/gracz/poszukiwaczka przyg\u00f3d.png',
+  'poszukiwaczka': SITE_BASE + 'objekty/postacie/gracz/poszukiwaczka-przygod.png',
   'odkrywca':      SITE_BASE + 'objekty/postacie/gracz/odkrywca.png',
-  'pies':          SITE_BASE + 'objekty/postacie/gracz/pies poszukiwacz.png',
-  'kot':           SITE_BASE + 'objekty/postacie/gracz/kot poszukiwacz.png',
-  'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi wyj\u015bcia z labiryntu.png',
-  'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/po\u0142owa drzwei wyj\u015bcia z labiryntu.png',
+  'pies':          SITE_BASE + 'objekty/postacie/gracz/pies-poszukiwacz.png',
+  'kot':           SITE_BASE + 'objekty/postacie/gracz/kot-poszukiwacz.png',
+  'drzwi':         SITE_BASE + 'objekty/przedmioty/drzwi-labiryntu.png',
+  'polowaDrzwi':   SITE_BASE + 'objekty/przedmioty/połowa-drzwi-labiryntu.png',
   'bgs': [
-    SITE_BASE + 'loading_screen/t\u0142o maze i tutorial maze.png',
-    SITE_BASE + 'loading_screen/loading screen maze.png',
+    SITE_BASE + 'concept-art/music-maze-okladka.webp',
+    SITE_BASE + 'concept-art/loading-screen-maze.webp',
   ],
 };
 
 /* ══ CREATURE IMAGES ══ */
 const CREATURE_IMGS = {
-  'biedronka':  SITE_BASE + 'objekty/postacie/zwierzeta/biedronka maze.png',
-  'chomik':     SITE_BASE + 'objekty/postacie/zwierzeta/chomik maze.png',
-  'dzdz':       SITE_BASE + 'objekty/postacie/zwierzeta/d\u017cd\u017cownica maze.png',
-  'jaszczurka': SITE_BASE + 'objekty/postacie/zwierzeta/jaszczurka maze.png',
-  'jez':        SITE_BASE + 'objekty/postacie/zwierzeta/je\u017c maze.png',
-  'kameleon':   SITE_BASE + 'objekty/postacie/zwierzeta/kameleon maze.png',
-  'sowa':       SITE_BASE + 'objekty/postacie/zwierzeta/sowa maze.png',
-  'swinka':     SITE_BASE + 'objekty/postacie/zwierzeta/swinka m maze.png',
-  'szynszyla':  SITE_BASE + 'objekty/postacie/zwierzeta/szynszyla maze.png',
-  'wiewiorka':  SITE_BASE + 'objekty/postacie/zwierzeta/wiewi\u00f3rka maze.png',
-  'winniczek':  SITE_BASE + 'objekty/postacie/zwierzeta/winniczek maze.png',
-  'wrobel':     SITE_BASE + 'objekty/postacie/zwierzeta/wr\u00f3bel maze.png',
-  'zabka':      SITE_BASE + 'objekty/postacie/zwierzeta/\u017cabka maze.png',
-  'zolw':       SITE_BASE + 'objekty/postacie/zwierzeta/\u017c\u00f3\u0142w maze.png',
+  'biedronka':  SITE_BASE + 'objekty/postacie/zwierzeta/biedronka-maze.png',
+  'chomik':     SITE_BASE + 'objekty/postacie/zwierzeta/chomik-maze.png',
+  'dzdz':       SITE_BASE + 'objekty/postacie/zwierzeta/dzdzownica-maze.png',
+  'jaszczurka': SITE_BASE + 'objekty/postacie/zwierzeta/jaszczurka-maze.png',
+  'jez':        SITE_BASE + 'objekty/postacie/zwierzeta/jez-maze.png',
+  'kameleon':   SITE_BASE + 'objekty/postacie/zwierzeta/kameleon-maze.png',
+  'sowa':       SITE_BASE + 'objekty/postacie/zwierzeta/sowa-maze.png',
+  'swinka':     SITE_BASE + 'objekty/postacie/zwierzeta/swinka-m-maze.png',
+  'szynszyla':  SITE_BASE + 'objekty/postacie/zwierzeta/szynszyla-maze.png',
+  'wiewiorka':  SITE_BASE + 'objekty/postacie/zwierzeta/wiewiorka-maze.png',
+  'winniczek':  SITE_BASE + 'objekty/postacie/zwierzeta/winniczek-maze.png',
+  'wrobel':     SITE_BASE + 'objekty/postacie/zwierzeta/wrobel-maze.png',
+  'zabka':      SITE_BASE + 'objekty/postacie/zwierzeta/zaba-maze.png',
+  'zolw':       SITE_BASE + 'objekty/postacie/zwierzeta/zolw-maze.png',
 };
 
 /* ══ LOADING SCREEN ══ */
@@ -526,10 +524,8 @@ const CREATURE_IMGS = {
   bgEl.style.background = 'radial-gradient(ellipse at 50% 40%, #1a2a0a 0%, #0a120a 60%, #050a05 100%)';
 
   const bgSrcs = [
-    SITE_BASE + 'loading_screen/t\u0142o_Music_maze_ok\u0142adka.png',
-    SITE_BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
-    BASE + 'loading_screen/t\u0142o_Music_maze_ok\u0142adka.png',
-    BASE + 'loading_screen/t\u0142o Music maze ok\u0142adka.png',
+    SITE_BASE + 'concept-art/music-maze-okladka.webp',
+    BASE + 'concept-art/music-maze-okladka.webp',
   ];
   const imgStyle = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0;transition:opacity 0.8s;';
 
@@ -549,8 +545,8 @@ const CREATURE_IMGS = {
   allUrls.push(IMGS.drzwi, IMGS.polowaDrzwi);
   IMGS.bgs.forEach(u => allUrls.push(u));
   Object.values(CREATURE_IMGS).forEach(u => allUrls.push(u));
-  allUrls.push(SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png');
-  allUrls.push(SITE_BASE + 'loading_screen/loading screen maze.png');
+  allUrls.push(SITE_BASE + 'objekty/mapa/mgła-tlo-maze-piano.png');
+  allUrls.push(SITE_BASE + 'concept-art/loading-screen-maze.webp');
 
   const total = allUrls.length;
   let loaded = 0;
@@ -626,9 +622,9 @@ if(rBg){
 const TILES_BY_PATH = {
   'ENSW':['NESW_1','NESW_2','NESW_3','NESW_4','NESW_5'],
   'ENS':['NES_1','NES_2'],'ENW':['NEW_1','NEW_2'],'NSW':['NSW_1'],'ESW':['ESW_1','ESW_2'],
-  'NS':['NS_2','NS_3','N_S_1'],'EW':['EW_2','E_W_1'],
-  'EN':['NE_2','N_E_1','N_E_2'],'NW':['NW_2','N_W_1','N_W_2'],
-  'ES':['E_S_1','E_S_2','E_S_3'],'SW':['S_W_1','S_W_2','S_W_3'],
+  'NS':['NS_1','NS_2','NS_3'],'EW':['EW_1','EW_2'],
+  'EN':['NE_1','NE_2'],'NW':['NW_1','NW_2'],
+  'ES':['ES_1','ES_2','ES_3'],'SW':['SW_1','SW_2','SW_3'],
   'N':['N_1'],'E':['E_1','E_2'],'S':['S_1'],'W':['W_1'],
   'WALL':['filler_1','filler_2','filler_3','filler_4','filler_5'],'EXIT':['exit_1'],
 };
@@ -862,7 +858,7 @@ let fogBlurPhase=0;
 
 /* ══ FOG IMAGE ══ */
 const FOGIMG=new Image();
-FOGIMG.src = SITE_BASE + 'objekty/mapa/mg\u0142a t\u0142o maze piano.png';
+FOGIMG.src = SITE_BASE + 'objekty/mapa/mgła-tlo-maze-piano.png';
 const DRZWIIMG=new Image();
 const POLOWINADRZWIIMG=new Image();
 if(IMGS.drzwi)DRZWIIMG.src=IMGS.drzwi;
@@ -2119,19 +2115,17 @@ function micLoop(){
   requestAnimationFrame(micLoop);
 }
 function acorr(buf,sr){
-  let rms=0;for(const v of buf)rms+=v*v;rms=Math.sqrt(rms/buf.length);if(rms<0.0005)return-1;
-  const H=buf.length>>1;let r1=0;
-  for(let i=0;i<H;i++){if(Math.abs(buf[i])<0.04){r1=i;break;}}
-  const s=buf.subarray(r1,r1+H),L=s.length;
-  const c2=new Float32Array(L);
-  for(let i=0;i<L;i++)for(let j=0;j<L-i;j++)c2[i]+=s[j]*s[j+i];
-  let d=0;while(d<L-1&&c2[d]>c2[d+1])d++;
-  let mv=-1,mp=-1;for(let i=d;i<L;i++){if(c2[i]>mv){mv=c2[i];mp=i;}}
-  if(mp<1)return-1;
-  let T=mp;
-  if(mp>0&&mp<L-1){const a=(c2[mp-1]+c2[mp+1]-2*c2[mp])/2,b=(c2[mp+1]-c2[mp-1])/2;if(a)T-=b/(2*a);}
-  const f=sr/T;
-  return(f<55||f>1100)?-1:f;
+  let rms=0;for(let i=0;i<buf.length;i++)rms+=buf[i]*buf[i];rms=Math.sqrt(rms/buf.length);
+  if(rms<0.0005)return -1;
+  const H=buf.length>>1,r1=0;
+  for(let i=0;i<H;i++){ if(Math.abs(buf[i])<0.04){r1=i;break;} }
+  const s=buf.subarray(r1,r1+H),L=s.length,c=new Float32Array(L);
+  for(let i=0;i<L;i++)for(let j=0;j<L-i;j++)c[i]+=s[j]*s[j+i];
+  let d=0;while(d<L-1&&c[d]>c[d+1])d++;
+  let mv=-1,mp=-1;for(let i=d;i<L;i++){ if(c[i]>mv){mv=c[i];mp=i;} }
+  if(mp<1)return -1;
+  let T=mp; if(mp>0&&mp<L-1){ const a=(c[mp-1]+c[mp+1]-2*c[mp])/2,b=(c[mp+1]-c[mp-1])/2; if(a)T-=b/(2*a); }
+  const f=sr/T; return(f<55||f>1100)?-1:f;
 }
 
 /* ══ KEYBOARD ══ */
