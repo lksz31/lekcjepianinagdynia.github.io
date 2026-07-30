@@ -1,12 +1,12 @@
 /* ══ notes.js – Muzyczny Labirynt ══
    Klucze muzyczne: obrazy PNG/JPG zamiast tekstu
-   Klucz basowy:    zapis_nutowy/piano_maze_klucz.png  (302×362, F line ≈ 33.6 % od góry)
-   Klucz wiolinowy: zapis_nutowy/wiolinowy_maze_bez_tla.jpg (183×399, G line ≈ 56 % od góry)
+   Klucz basowy:    zapis-nutowy/piano-maze-klucz.png  (302×362, F line ≈ 33.6 % od góry)
+   Klucz wiolinowy: zapis-nutowy/wiolinowy-maze-bez-tla.jpg (183×399, G line ≈ 56 % od góry)
    ══════════════════════════════════════════════════════════════════════════════════════ */
 
-/* ── URL-e do obrazów kluczy (ścieżka względem katalogu piano_maze/) ── */
-const CLEF_BASS_URL   = '/index/gry/piano_maze/zapis_nutowy/piano_maze_klucz.png';
-const CLEF_TREBLE_URL = '/index/gry/piano_maze/zapis_nutowy/wiolinowy_maze_bez_tla.jpg';
+/* ── URL-e do obrazów kluczy (ścieżka względem katalogu piano-maze/) ── */
+const CLEF_BASS_URL   = '/index/gry/piano-maze/zapis-nutowy/piano-maze-klucz.png';
+const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
 
 /* ── Proporcje obrazów (szerokość/wysokość) ── */
 const CLEF_BASS_RATIO   = 302 / 362;  /* 0.834 */
@@ -119,8 +119,8 @@ function updateRangeInfoBox() {
 /* ══════════════════════════════════════════════════════════════════════════
    noteSVG – generuje SVG dla kafelka nuty
    Klucze rysowane jako <image> (PNG/JPG) zamiast fontów muzycznych:
-     • Klucz basowy  – piano_maze_klucz.png  – linia F na 33.6 % od góry
-     • Klucz wiolinowy – wiolinowy_maze_bez_tla.jpg – linia G na 56 % od góry
+     • Klucz basowy  – piano-maze-klucz.png  – linia F na 33.6 % od góry
+     • Klucz wiolinowy – wiolinowy-maze-bez-tla.jpg – linia G na 56 % od góry
        (JPG ma ciemne tło → mix-blend-mode:screen usuwa tło wizualnie)
    ══════════════════════════════════════════════════════════════════════════ */
 function noteSVG(n, W, H, showLabel) {
