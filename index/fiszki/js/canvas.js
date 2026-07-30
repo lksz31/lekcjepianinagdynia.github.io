@@ -12,25 +12,25 @@ function ny(st,p){return st+4*STEP-p*(STEP/2);}
 /* Czcionka muzyczna (tylko dla klucza wiolinowego) */
 /* NotoMusic nie jest już potrzebny – oba klucze to PNG */
 
-/* Klucz basowy – PNG bez tła (concept_art/klucz_beztla.png)
+/* Klucz basowy – PNG bez tła (concept-art/klucz-bez-tla.png)
    Kalibracja pikseli (148×231): górna kropka→st+10, dolna→st+30, linia F→st+20 ✓ */
 const BASS_CLF_IMG=new Image();
 BASS_CLF_IMG.onload=()=>{render([]);renderPlace();};
-BASS_CLF_IMG.src='concept_art/klucz_beztla.png';
+BASS_CLF_IMG.src='concept-art/klucz-bez-tla.png';
 
-/* Klucz wiolinowy – PNG bez tła (concept_art/wiolinowy_fiszki_bez_tla.png)
+/* Klucz wiolinowy – PNG bez tła (concept-art/wiolinowy-fiszki-bez-tla.png)
    Kalibracja pikseli (581×1361): linia G (4. od góry) na 70% → st+3*STEP ✓
    h=STEP*8, w=h*(581/1361), topY=st-STEP*2.6                                  */
 const TREBLE_CLF_IMG=new Image();
 TREBLE_CLF_IMG.onload=()=>{render([]);renderPlace();};
-TREBLE_CLF_IMG.src='concept_art/wiolinowy_fiszki_bez_tla.png';
+TREBLE_CLF_IMG.src='concept-art/wiolinowy-fiszki-bez-tla.png';
 
-/* Klamra – PNG bez tła (concept_art/klamra_bez_tla.png)
+/* Klamra – PNG bez tła (concept-art/klamra-bez-tla.png)
    Czarny PNG koloryzowany na #1e3a8a techniką destination-in.
    Wysokość = dynamicznie (tops[1]+4*STEP - tops[0]), szerokość ∝ 115/950.    */
 const BRACE_IMG=new Image();
 BRACE_IMG.onload=()=>{render([]);renderPlace();};
-BRACE_IMG.src='concept_art/klamra_bez_tla.png';
+BRACE_IMG.src='concept-art/klamra-bez-tla.png';
 
 /* Koloryzacja: zamienia ciemne piksele PNG na docelowy kolor (#1e3a8a) */
 function _drawColorized(ctx,img,dx,dy,dw,dh){
@@ -59,7 +59,7 @@ function computeNotePositions(items,tops,clefs,ns,nw){
   });
 }
 
-/* ── Klamra Grand Staff – PNG klamra_bez_tla.png ── */
+/* ── Klamra Grand Staff – PNG klamra-bez-tla.png ── */
 function _drawBrace(ctxR,tops){
   const ty=tops[0], by=tops[1]+4*STEP;
   const bh=by-ty;                       /* pełna wysokość grand staff */
@@ -74,11 +74,11 @@ function _drawBrace(ctxR,tops){
 }
 
 /* ── Klucze ──
-   Klucz wiolinowy: PNG wiolinowy_fiszki_bez_tla.png
+   Klucz wiolinowy: PNG wiolinowy-fiszki-bez-tla.png
      Kalibracja piks. (581×1361): linia G na 64% od góry PNG (nie 70% jak wcześniej)
      h=STEP*6.5, w=h*(581/1361), topY=st-STEP*1.16
      → linia G trafia na st+3*STEP (4. linia od góry) ✓
-   Klucz basowy: PNG klucz_beztla.png
+   Klucz basowy: PNG klucz-bez-tla.png
      h=STEP*6.24, w=h*(148/231), topY=st-STEP*1.284
      → linia F trafia na st+STEP, kropki na st+10 i st+30 ✓ */
 function _drawClef(ctx,which,st){
