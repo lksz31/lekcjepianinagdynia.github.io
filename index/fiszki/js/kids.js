@@ -7,7 +7,7 @@
 /* ── Pszczółka ── */
 let kidMode = false;
 const BEE_IMG = new Image();
-BEE_IMG.src = 'concept_art/' + encodeURIComponent('pszczoła.png');
+BEE_IMG.src = 'concept-art/pszczola.png';
 
 let beeOpacity = 0.30;
 let _beeAnimPhase = 0;
@@ -16,8 +16,8 @@ let _beeAnimFrame = null;
 /* ── Lista kwiatów ── */
 const KID_FLOWERS = [
   'aster.png','dzwonek.png','frezja.png','gerbera.png',
-  'groszek_pachnacy.png','hibiskus.png','lilia.png','mak.png',
-  'ostrożeń_chaber_kulkowy.png','piwonia.png','roza1.png',
+  'groszek-pachnacy.png','hibiskus.png','lilia.png','mak.png',
+  'ostrozen.png','piwonia.png','roza.png',
   'slonecznik.png','stokrotka.png','szafirek.png','tulipan.png'
 ];
 const MAX_FLOWERS = 60;
@@ -77,7 +77,7 @@ function getFlowerPos(size) {
    ───────────────────────────────────── */
 function bloomFlower(bg, flower, pos, size, rot, swayDelay) {
   const img = document.createElement('img');
-  img.src = 'concept_art/' + encodeURIComponent(flower);
+  img.src = 'concept-art/' + flower;
   img.alt = '';
   img.className = 'kid-flower';
   img.draggable = false;
