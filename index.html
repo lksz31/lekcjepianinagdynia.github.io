@@ -26,6 +26,35 @@
   "telephone": "+48514338875",
   "email": "lukaszgkorepetycje@gmail.com",
   "priceRange": "99-119 PLN",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "bestRating": "5",
+    "reviewCount": "8"
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Magda" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Łukasz jest bardzo dobrym nauczycielem – zaangażowany, spokojny i zawsze dobrze przygotowany. Polecam każdemu, kto chce uczyć się gry na pianinie w miłej i bezstresowej atmosferze."
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Julia" },
+      "reviewBody": "Pan Łukasz to świetny nauczyciel gry na pianinie. Ma doskonałe podejście do uczniów, potrafi zmotywować i sprawia, że nauka jest prawdziwą przyjemnością. Z nim każdy postęp daje ogromną satysfakcję."
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Zuzanna" },
+      "reviewBody": "Łukasz jest naprawdę godny polecenia! Lekcje bez stresu, bardzo miła atmosfera oraz przede wszystkim obszerna wiedza!"
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Nadia" },
+      "reviewBody": "Uważam, że nie ma drugiej tak delikatnej w słowie jak i w geście osoby. Łukasz jest jedną z mądrzejszych i kreatywniejszych osób jakie znam."
+    }
+  ],
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Gdynia",
@@ -190,6 +219,8 @@
   .links-list a:hover{color:var(--gold);}
   .opinion-btn{display:block;background:#f8fafc;padding:12px 18px;border-radius:15px;margin-bottom:10px;text-decoration:none;color:#475569;font-size:0.85rem;border:1px solid var(--border);transition:0.3s;text-align:center;cursor:pointer;width:100%;font-family:'Poppins',sans-serif;}
   .opinion-btn:hover{background:white;border-color:var(--gold);color:var(--navy);box-shadow:0 5px 15px rgba(0,0,0,0.05);}
+  .rating-badge{display:flex;align-items:center;gap:10px;background:#fef9e7;border:1px solid #f7ecc8;border-radius:15px;padding:12px 16px;margin-bottom:14px;text-decoration:none;transition:0.3s;}
+  .rating-badge:hover{background:white;border-color:var(--gold);box-shadow:0 5px 15px rgba(0,0,0,0.05);transform:translateY(-2px);}
 
   .terminy-section{padding:80px 5%;background:white;}
   @media(max-width:600px){.terminy-section{padding:50px 4%;}}
@@ -465,6 +496,10 @@
     </div>
     <div class="card">
       <h3>Opinie</h3>
+      <a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank" class="rating-badge">
+        <span style="font-size:1.1rem;letter-spacing:1px;color:var(--gold);">★★★★★</span>
+        <span style="font-size:0.85rem;color:var(--navy);font-weight:700;">5.0 <span style="font-weight:500;color:#64748b;">(8 ocen na Superprof)</span></span>
+      </a>
       <button onclick="openPDF('index/opinie/opinia-ratz.pdf','Opinia prof. J. Ratza')" class="opinion-btn">📄 Opinia prof. J. Ratza</button>
       <button onclick="openPDF('index/opinie/opinia-miczka.pdf','Opinia prof. T. Miczki')" class="opinion-btn">📄 Opinia prof. T. Miczki</button>
     </div>
