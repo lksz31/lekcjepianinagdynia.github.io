@@ -47,6 +47,20 @@
       "@type": "Offer",
       "itemOffered": { "@type": "Service", "name": "Lekcje pianina dla osób dorosłych" },
       "url": "https://lekcjepianinagdynia.pl/index/lekcje/dorosli.html"
+    },
+    {
+      "@type": "Offer",
+      "name": "Rabat na pierwszą lekcję pianina",
+      "description": "Pierwsza lekcja pianina 60% taniej z kodem rabatowym LekcjaProbna.",
+      "priceCurrency": "PLN",
+      "price": "39.60",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "priceCurrency": "PLN",
+        "price": "39.60",
+        "referenceQuantity": { "@type": "QuantitativeValue", "value": 1, "unitText": "lekcja" }
+      },
+      "url": "https://lekcjepianinagdynia.pl/#terminy"
     }
   ]
 }
@@ -191,7 +205,11 @@
   .form-overlay.open{clip-path:circle(150% at 50% 90%);pointer-events:auto;}
   .close-btn{position:absolute;top:16px;right:20px;font-size:1.5rem;color:var(--navy);cursor:pointer;font-weight:bold;background:none;border:none;font-family:'Poppins',sans-serif;}
   .form-content{width:100%;max-width:500px;text-align:center;color:var(--navy);}
-  .price-tag{background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:10px;margin-bottom:15px;}
+  .price-tag{background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:14px 10px;margin-bottom:15px;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
+  .price-tag:hover{background:#fdf8ec;border-color:#e8c766;}
+  .price-old{text-decoration:line-through;color:#94a3b8;font-size:1.05rem;font-weight:600;margin-right:8px;}
+  .price-new{color:#16a34a;font-size:1.55rem;font-weight:800;}
+  .price-hint{display:block;margin-top:6px;font-size:0.72rem;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
   .bento-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
   .form-tile{background:#fff;border:1px solid #eee;border-radius:16px;padding:12px;text-align:left;cursor:pointer;transition:0.3s;font-size:0.85rem;}
   .form-tile.selected{border-color:var(--blue);background:#f0f7ff;}
@@ -275,7 +293,8 @@
   .footer-modal-overlay.open .footer-modal{transform:translateY(0);}
   .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:1.4rem;color:var(--navy);cursor:pointer;font-weight:bold;}
   .modal-left h3{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:0 0 14px;}
-  .modal-price{background:#f9fbfe;border:2px dashed var(--gold);border-radius:12px;padding:10px 14px;margin-bottom:14px;text-align:center;}
+  .modal-price{background:#f9fbfe;border:2px dashed var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:center;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
+  .modal-price:hover{background:#fdf8ec;border-color:#e8c766;}
   .modal-price span{font-weight:800;font-size:1.4rem;color:var(--navy);}
   .m-tile{background:#fff;border:1px solid #eee;border-radius:14px;padding:12px;margin-bottom:10px;cursor:pointer;transition:0.3s;font-size:0.85rem;color:var(--navy);}
   .m-tile.selected{border-color:#3b82f6;background:#f0f7ff;}
@@ -332,13 +351,13 @@
   @media(max-width:700px){.promo-popup-wrap{bottom:82px;left:12px;}}
   .promo-popup{background:white;border:2px solid var(--gold);border-radius:18px;box-shadow:0 14px 34px rgba(0,0,0,0.22);padding:14px 34px 14px 14px;max-width:230px;display:flex;align-items:center;gap:10px;position:relative;cursor:pointer;animation:promoWiggle 2.8s ease-in-out infinite;}
   @keyframes promoWiggle{0%,100%{transform:translate(0,0) rotate(0deg);}12%{transform:translate(-3px,-4px) rotate(-2deg);}26%{transform:translate(3px,1px) rotate(1.5deg);}40%{transform:translate(-2px,3px) rotate(-1.5deg);}55%{transform:translate(2px,-3px) rotate(2deg);}70%{transform:translate(-3px,0px) rotate(-1deg);}85%{transform:translate(1px,2px) rotate(1deg);}}
-  .promo-popup-icon{font-size:1.05rem;position:relative;z-index:1;}
-  .promo-popup-timer{position:relative;width:36px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-  .promo-popup-timer svg{position:absolute;inset:0;}
-  .promo-timer-ring{stroke-dasharray:94.2;stroke-dashoffset:0;transition:stroke-dashoffset 40s linear;}
-  .promo-popup-wrap.show .promo-timer-ring{stroke-dashoffset:94.2;}
-  .promo-popup-text{font-size:0.78rem;color:var(--navy);line-height:1.4;font-weight:600;}
-  .promo-popup-text b{background:var(--gold);color:white;padding:1px 7px;border-radius:50px;white-space:nowrap;}
+  .promo-popup-icon{font-size:1.35rem;position:relative;z-index:1;flex-shrink:0;}
+  .promo-popup-text{font-size:0.8rem;color:var(--navy);line-height:1.5;}
+  .promo-eyebrow{font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:2px;}
+  .promo-main{font-weight:700;font-size:0.92rem;}
+  .promo-sub{font-size:0.74rem;color:#64748b;margin-top:3px;}
+  .promo-popup-text .promo-code{background:var(--gold);color:white;padding:1px 7px;border-radius:50px;white-space:nowrap;font-weight:700;}
+  .promo-popup-text .promo-percent{background:var(--navy);color:white;padding:1px 8px;border-radius:50px;white-space:nowrap;}
   .promo-popup-close{position:absolute;top:5px;right:7px;background:none;border:none;font-size:1rem;color:#94a3b8;cursor:pointer;line-height:1;padding:3px;}
   .promo-popup-close:hover{color:var(--navy);}
 
@@ -504,7 +523,9 @@
   <button class="close-btn" onclick="toggleForm(false)">✕</button>
   <div class="form-content">
     <h3 style="margin-top:0;margin-bottom:10px;color:var(--navy);font-family:'Playfair Display',serif;">Szczegóły rezerwacji</h3>
-    <div class="price-tag"><span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span></div>
+    <div class="price-tag" onclick="document.getElementById('res-name').focus();document.getElementById('res-name').scrollIntoView({behavior:'smooth',block:'center'});">
+      <span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span>
+    </div>
     <div class="bento-grid">
       <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
       <div class="form-tile" id="loc-uczen" onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
@@ -518,8 +539,8 @@
     <div class="contact-box">
       <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()">
       <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()">
-      <input type="email" id="res-email" placeholder="Adres email (do potwierdzenia)" oninput="val()">
-      <input type="text" id="res-rabat" placeholder="Kod rabatowy (opcjonalnie)">
+      <input type="email" id="res-email" placeholder="Adres email" oninput="val()">
+      <input type="text" id="res-rabat" placeholder="Kod rabatowy (opcjonalnie)" oninput="updatePrice()">
       <textarea id="res-msg" placeholder="Dodatkowe informacje (wiek, doświadczenie, preferowane godziny...)"></textarea>
       <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
     </div>
@@ -705,7 +726,9 @@
     <button class="modal-close" onclick="closeBookingModal()">✕</button>
     <div class="modal-left">
       <h3>Lekcja próbna</h3>
-      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <div class="modal-price" onclick="document.getElementById('m-name').focus();document.getElementById('m-name').scrollIntoView({behavior:'smooth',block:'center'});">
+        <span id="m-price">99 zł / h</span>
+      </div>
       <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
       <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
       <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
@@ -720,8 +743,8 @@
     <div class="modal-right">
       <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
       <input type="tel" id="m-phone" placeholder="Numer telefonu">
-      <input type="email" id="m-email" placeholder="Adres email (do potwierdzenia)">
-      <input type="text" id="m-rabat" placeholder="Kod rabatowy (opcjonalnie)">
+      <input type="email" id="m-email" placeholder="Adres email">
+      <input type="text" id="m-rabat" placeholder="Kod rabatowy (opcjonalnie)" oninput="mUpdatePrice()">
       <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
       <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
       <div id="modal-status"></div>
@@ -734,14 +757,12 @@
 <div class="promo-popup-wrap" id="promoPopup">
   <div class="promo-popup" onclick="promoPopupClick()">
     <button class="promo-popup-close" onclick="event.stopPropagation();closePromoPopup()">✕</button>
-    <div class="promo-popup-timer" aria-hidden="true">
-      <svg width="36" height="36" viewBox="0 0 36 36">
-        <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(212,175,55,0.22)" stroke-width="3"/>
-        <circle class="promo-timer-ring" cx="18" cy="18" r="15" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" transform="rotate(-90 18 18)"/>
-      </svg>
-      <span class="promo-popup-icon">🎉</span>
-    </div>
-    <span class="promo-popup-text">Kod <b>LekcjaProbna</b> = -20% na lekcję próbną!</span>
+    <span class="promo-popup-icon">🎉</span>
+    <span class="promo-popup-text">
+      <span class="promo-eyebrow">Rabat</span>
+      <span class="promo-main">pierwsza lekcja o <b class="promo-percent">60%</b> taniej</span>
+      <span class="promo-sub">z kodem <b class="promo-code">LekcjaProbna</b>.</span>
+    </span>
   </div>
 </div>
 
@@ -806,7 +827,20 @@ let isStudio=true,hasPiano=true;
 function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);document.body.style.overflow=show?'hidden':'';}
 function setLoc(loc){isStudio=loc==='studio';document.getElementById('loc-studio').classList.toggle('selected',isStudio);document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);document.getElementById('piano-options').style.display=isStudio?'none':'block';updatePrice();}
 function setPiano(v){hasPiano=v;document.getElementById('piano-yes').classList.toggle('selected',hasPiano);document.getElementById('piano-no').classList.toggle('selected',!hasPiano);updatePrice();}
-function updatePrice(){document.getElementById('price-val').innerText=(!isStudio&&!hasPiano?119:99)+' zł / h';val();}
+const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
+function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
+function updatePrice(){
+  const base=(!isStudio&&!hasPiano?119:99);
+  const codeOk=document.getElementById('res-rabat').value.trim().toLowerCase()===PROMO_CODE;
+  const priceEl=document.getElementById('price-val');
+  if(codeOk){
+    const discounted=base*(1-PROMO_DISCOUNT);
+    priceEl.innerHTML=`<span class="price-old">${base} zł</span><span class="price-new">${formatPLN(discounted)} zł</span>`;
+  }else{
+    priceEl.innerText=base+' zł / h';
+  }
+  val();
+}
 function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;const e=document.getElementById('res-email').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9&&e.includes('@'));}
 async function wyslij(){
   if(!document.getElementById('subBtn').classList.contains('active'))return;
@@ -827,7 +861,17 @@ function closeBookingModal(){document.getElementById('bookingModal').classList.r
 let mLoc='s',mPiano=true;
 function mSetLoc(t){mLoc=t;document.getElementById('m-l-s').classList.toggle('selected',t==='s');document.getElementById('m-l-u').classList.toggle('selected',t==='u');document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';mUpdatePrice();}
 function mSetPiano(v){mPiano=v;document.getElementById('m-p-y').classList.toggle('selected',v);document.getElementById('m-p-n').classList.toggle('selected',!v);mUpdatePrice();}
-function mUpdatePrice(){document.getElementById('m-price').innerText=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
+function mUpdatePrice(){
+  const base=(mLoc==='u'&&!mPiano?119:99);
+  const codeOk=document.getElementById('m-rabat').value.trim().toLowerCase()===PROMO_CODE;
+  const priceEl=document.getElementById('m-price');
+  if(codeOk){
+    const discounted=base*(1-PROMO_DISCOUNT);
+    priceEl.innerHTML=`<span class="price-old">${base} zł</span><span class="price-new">${formatPLN(discounted)} zł</span>`;
+  }else{
+    priceEl.innerText=base+' zł / h';
+  }
+}
 async function wyslijModal(){
   const s=document.getElementById('modal-status');
   const submitBtn=document.querySelector('.modal-submit-btn');
@@ -874,16 +918,11 @@ document.querySelectorAll('.promo-card').forEach((c,i)=>{c.style.transitionDelay
 function openPDF(url,title){document.getElementById('pdf-title').innerText=title;document.getElementById('pdf-frame').src=url;document.getElementById('pdfModal').classList.add('open');document.body.style.overflow='hidden';}
 function closePDF(){document.getElementById('pdfModal').classList.remove('open');document.getElementById('pdf-frame').src='';document.body.style.overflow='';}
 
-let promoAutoHideTimer=null;
 function showPromoPopup(){
-  const el=document.getElementById('promoPopup');
-  el.classList.add('show');
-  promoAutoHideTimer=setTimeout(()=>{el.classList.remove('show');},40000);
+  document.getElementById('promoPopup').classList.add('show');
 }
 function closePromoPopup(){
-  const el=document.getElementById('promoPopup');
-  el.classList.remove('show');
-  clearTimeout(promoAutoHideTimer);
+  document.getElementById('promoPopup').classList.remove('show');
 }
 function promoPopupClick(){
   closePromoPopup();
