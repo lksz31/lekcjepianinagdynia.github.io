@@ -85,15 +85,35 @@
   .pomoce-section{padding:70px 5%;background:var(--bg-alt);}
   @media(max-width:600px){.pomoce-section{padding:44px 4%;}}
   .pomoce-section .section-inner{max-width:1100px;margin:0 auto;}
-  .pomoce-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px;}
-  @media(max-width:850px){.pomoce-grid{grid-template-columns:1fr 1fr;}}
-  @media(max-width:550px){.pomoce-grid{grid-template-columns:1fr;gap:14px;}}
-  .pomoce-card{background:var(--card-bg);border-radius:24px;padding:26px 22px;border:1px solid var(--border);box-shadow:0 0 20px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:10px;}
-  .pomoce-card:hover{box-shadow:0 12px 40px rgba(30,58,138,0.1);transform:translateY(-4px);transition:0.3s;}
-  .pomoce-icon{font-size:1.8rem;line-height:1;margin-bottom:4px;}
-  .pomoce-card h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.05rem;margin:0;}
-  .pomoce-card p{color:#64748b;font-size:0.85rem;line-height:1.6;margin:0;}
-  .pomoce-card .tag-pill{display:inline-block;background:#f0f7ff;color:var(--navy);font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;width:fit-content;}
+
+  .tag-pill{display:inline-block;background:#f0f7ff;color:var(--navy);font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;width:fit-content;}
+  :root.dark-mode .tag-pill{background:rgba(127,168,255,0.12);border-color:rgba(127,168,255,0.25);}
+
+  .mini-row{display:flex;flex-wrap:wrap;gap:16px;margin:32px 0 48px;}
+  .mini-card{flex:1 1 240px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 3px rgba(30,41,59,0.03);}
+  .mini-card .mini-icon{width:44px;height:44px;flex-shrink:0;border-radius:13px;background:linear-gradient(135deg,#fdf8ec,#f7ecc8);display:flex;align-items:center;justify-content:center;font-size:1.25rem;}
+  .mini-card h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;margin:0 0 4px;}
+  .mini-card p{color:#64748b;font-size:0.83rem;line-height:1.55;margin:0;}
+
+  .pile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:56px 30px;margin-top:10px;}
+  .pile{position:relative;padding-top:6px;}
+  .pile:hover,.pile:focus-within,.pile.is-open{z-index:30;}
+  .pile-stack{position:relative;height:210px;transition:height 0.55s cubic-bezier(0.2,0.8,0.2,1),background 0.4s,box-shadow 0.4s;border-radius:24px;}
+  .pile:hover .pile-stack,.pile:focus-within .pile-stack,.pile.is-open .pile-stack{height:var(--open-h,210px);background:var(--card-bg);box-shadow:0 22px 50px rgba(15,23,42,0.16);}
+  .pile-photo{position:absolute;top:50%;left:50%;width:126px;aspect-ratio:4/5;border-radius:11px;overflow:hidden;background:#e2e8f0;border:4px solid var(--card-bg);box-shadow:0 10px 22px rgba(15,23,42,0.18);transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.55s cubic-bezier(0.2,0.8,0.2,1),box-shadow 0.35s;cursor:pointer;}
+  .pile-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .pile-photo figcaption{position:absolute;inset:auto 0 0 0;padding:20px 8px 7px;font-size:0.66rem;line-height:1.25;font-weight:600;color:#fff;background:linear-gradient(0deg,rgba(10,15,26,0.88),rgba(10,15,26,0));opacity:0;transition:opacity 0.35s 0.1s;}
+  .pile:hover .pile-photo,.pile:focus-within .pile-photo,.pile.is-open .pile-photo{transform:translate(-50%,-50%) translate(var(--ox),var(--oy)) rotate(0deg);z-index:var(--oz);box-shadow:0 14px 26px rgba(15,23,42,0.22);}
+  .pile:hover .pile-photo figcaption,.pile:focus-within .pile-photo figcaption,.pile.is-open .pile-photo figcaption{opacity:1;}
+  .pile-label{position:absolute;left:10px;bottom:10px;z-index:40;display:inline-flex;align-items:center;gap:8px;background:var(--navy-solid);color:#fff;padding:8px 16px 8px 12px;border-radius:50px;font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;box-shadow:0 8px 20px rgba(30,58,138,0.35);transition:opacity 0.35s,transform 0.45s cubic-bezier(0.2,0.8,0.2,1);pointer-events:none;white-space:nowrap;}
+  .pile-label .pile-icon{font-size:1rem;}
+  .pile:hover .pile-label,.pile:focus-within .pile-label,.pile.is-open .pile-label{opacity:0;transform:translateY(8px) scale(0.92);}
+  .pile-info{margin-top:14px;}
+  .pile-info h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.02rem;margin:8px 0 6px;}
+  .pile-info p{color:#64748b;font-size:0.84rem;line-height:1.6;margin:0;}
+  .pile:focus-visible{outline:2px solid var(--gold);outline-offset:8px;border-radius:20px;}
+  @media(max-width:600px){.pile-grid{gap:48px 20px;}}
+  @media(prefers-reduced-motion:reduce){.pile-photo,.pile-stack,.pile-label{transition:none!important;}}
 
   .piano-section{background:var(--card-bg);padding:70px 5%;}
   @media(max-width:600px){.piano-section{padding:44px 4%;}}
@@ -260,15 +280,14 @@
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
     <h2 class="section-title">Autorskie pomoce dydaktyczne</h2>
-    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje dla dzieci prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii, dopasowanych do wieku ucznia.</p>
-    <div class="pomoce-grid">
-      <div class="pomoce-card"><div class="pomoce-icon">📚</div><span class="tag-pill">Tradycyjne</span><h4>Książki i podręczniki</h4><p>Starannie dobrane pozycje dostosowane do poziomu ucznia.</p></div>
-      <div class="pomoce-card"><div class="pomoce-icon">📱</div><span class="tag-pill">Technologia</span><h4>Tablet i aplikacje</h4><p>Simply Piano i forScore — nauka ze słuchu i cyfrowe nuty.</p></div>
-      <div class="pomoce-card"><div class="pomoce-icon">✉️</div><span class="tag-pill">Co miesiąc</span><h4>Briefy — wiedza co miesiąc</h4><p>Autorskie opracowania: historia muzyki, teoria, ciekawostki.</p></div>
-      <div class="pomoce-card"><div class="pomoce-icon">🎨</div><span class="tag-pill">Bez nut</span><h4>Ilustracje do nauki beznutowej</h4><p>Kolory i obrazki zamiast pięciolinii — idealne dla najmłodszych.</p></div>
-      <div class="pomoce-card"><div class="pomoce-icon">🎹</div><span class="tag-pill">Autorski</span><h4>Podręcznik do gry na pianinie</h4><p>Od pierwszego dźwięku do samodzielnej gry.</p></div>
-      <div class="pomoce-card"><div class="pomoce-icon">🚗</div><span class="tag-pill">Dojazd</span><h4>Dowóz instrumentu na zajęcia</h4><p>Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.</p></div>
+    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje dla dzieci prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii, dopasowanych do wieku ucznia. Najedź na dowolną stertę zdjęć, żeby zobaczyć, co się w niej kryje.</p>
+
+    <div class="mini-row">
+      <div class="mini-card"><div class="mini-icon">📱</div><div><h4>Tablet i aplikacje</h4><p>Simply Piano i forScore — nauka ze słuchu i cyfrowe nuty.</p></div></div>
+      <div class="mini-card"><div class="mini-icon">🚗</div><div><h4>Dowóz instrumentu na zajęcia</h4><p>Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.</p></div></div>
     </div>
+
+    <div class="pile-grid" id="pileGrid"></div>
   </div>
 </section>
 
@@ -368,6 +387,150 @@ function toggleDarkMode(){
   const btn=document.getElementById("darkModeToggle");
   if(btn&&document.documentElement.classList.contains("dark-mode"))btn.textContent="☀️";
 })();
+
+/* ══ STERTY ZDJĘĆ — AUTORSKIE POMOCE DYDAKTYCZNE ══ */
+const materialCategories = [
+  {
+    icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc',
+    desc:'Autorskie opracowania: historia muzyki, teoria i ciekawostki, z krótkim quizem na koniec każdego wydania.',
+    photos:[
+      {src:'zdjecia-briefy/strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
+      {src:'zdjecia-briefy/strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
+    ]
+  },
+  {
+    icon:'🎨', tag:'Bez nut', title:'Ilustracje do nauki beznutowej',
+    desc:'Kolory i obrazki zamiast pięciolinii — oryginalne ilustracje, które towarzyszą najmłodszym od pierwszej lekcji.',
+    photos:[
+      {src:'zdjecia-ilustracje/woz_w_lesie.webp', caption:'Wóz w lesie'},
+      {src:'zdjecia-ilustracje/sad_lato.webp', caption:'Sad latem'},
+      {src:'zdjecia-ilustracje/orka_paleta_zwykla.webp', caption:'Orka na polu'}
+    ]
+  },
+  {
+    icon:'📚', tag:'Materiały źródłowe', title:'Biblioteka teorii muzyki',
+    desc:'Podręczniki harmonii, historii muzyki i instrumentoznawstwa wykorzystywane do przygotowania lekcji.',
+    photos:[
+      {src:'zdjecia-ksiazki-strona-okladki/harmonia-cz-i.webp', caption:'Harmonia, cz. I'},
+      {src:'zdjecia-ksiazki-strona-okladki/harmonia-cz-ii.webp', caption:'Harmonia, cz. II'},
+      {src:'zdjecia-ksiazki-strona-okladki/historia-muzyki-cz-i.webp', caption:'Historia muzyki, cz. I'},
+      {src:'zdjecia-ksiazki-strona-okladki/historia-muzyki-cz-ii.webp', caption:'Historia muzyki, cz. II'},
+      {src:'zdjecia-ksiazki-strona-okladki/historia-harmonii-i-kontrapunktu-1.webp', caption:'Historia harmonii i kontrapunktu'},
+      {src:'zdjecia-ksiazki-strona-okladki/instrumentoznawstwo.webp', caption:'Instrumentoznawstwo'},
+      {src:'zdjecia-ksiazki-strona-okladki/literatura-muzyczna.webp', caption:'Literatura muzyczna'},
+      {src:'zdjecia-ksiazki-strona-okladki/male-formy-instrumentalne.webp', caption:'Małe formy instrumentalne'},
+      {src:'zdjecia-ksiazki-strona-okladki/nauka-o-rytmie-muzycznym-cz-ii.webp', caption:'Nauka o rytmie muzycznym, cz. II'},
+      {src:'zdjecia-ksiazki-strona-okladki/podstawy-harmoniki-nowoczesnej.webp', caption:'Podstawy harmoniki nowoczesnej'},
+      {src:'zdjecia-ksiazki-strona-okladki/wielkie-formy-wokalne.webp', caption:'Wielkie formy wokalne'},
+      {src:'zdjecia-ksiazki-strona-okladki/zasady-muzyki.webp', caption:'Zasady muzyki'}
+    ]
+  },
+  {
+    icon:'🎼', tag:'Repertuar', title:'Zbiór nut i etiud',
+    desc:'Klasyczne wydania etiud, szkół gry i utworów — od Chopina po polskie podręczniki fortepianowe.',
+    photos:[
+      {src:'zdjecia-nuty/nuty-podreczniki-1.webp', caption:'Chopin — Impromptus'},
+      {src:'zdjecia-nuty/nuty-podreczniki-5.webp', caption:'Chopin — Ballades'},
+      {src:'zdjecia-nuty/nuty-podreczniki-6.webp', caption:'Chopin — Studies'},
+      {src:'zdjecia-nuty/nuty-podreczniki-2.webp', caption:'Duvernoy — Etiudy elementarne'},
+      {src:'zdjecia-nuty/nuty-podreczniki-4.webp', caption:'Raube — Etiudy dla dzieci I'},
+      {src:'zdjecia-nuty/nuty-podreczniki-3.webp', caption:'Garścia — Obrazki muzyczne'},
+      {src:'zdjecia-nuty/nuty-podreczniki-7.webp', caption:'Longchamps-Druszkiewiczowa — Podręcznik początkowy'},
+      {src:'zdjecia-nuty/nuty-podreczniki-8.webp', caption:'Niemira — Szkoła na fortepian'},
+      {src:'zdjecia-nuty/nuty-podreczniki-9.webp', caption:'Gamy i pasaże na fortepian'}
+    ]
+  },
+  {
+    icon:'🎹', tag:'Autorski', title:'Podręcznik do gry na pianinie',
+    desc:'Materiał tworzony od podstaw — od pierwszego dźwięku do samodzielnej gry.',
+    photos:[
+      {src:'zdjecia-podrecznik/nauka-gry-okladka.webp', caption:'Okładka podręcznika'},
+      {src:'zdjecia-podrecznik/nauka-gry-6.webp', caption:'Strona 6'},
+      {src:'zdjecia-podrecznik/nauka-gry-8.webp', caption:'Strona 8'},
+      {src:'zdjecia-podrecznik/nauka-gry-10.webp', caption:'Strona 10'},
+      {src:'zdjecia-podrecznik/nauka-gry-17.webp', caption:'Strona 17'}
+    ]
+  },
+  {
+    icon:'🗂️', tag:'Interaktywne', title:'Fiszki nutowe',
+    desc:'Ćwicz czytanie nut w kluczu wiolinowym i basowym we własnym tempie — online.',
+    photos:[
+      {src:'zdjecia-strona-fiszki/fiszki-8.webp', caption:'Widok fiszek'},
+      {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'}
+    ]
+  },
+  {
+    icon:'🎮', tag:'Nauka przez zabawę', title:'Gry dydaktyczne',
+    desc:'Interaktywne gry utrwalające znajomość nut i klawiatury.',
+    photos:[
+      {src:'zdjecia-strona-gry/strona-invaders-4.webp', caption:'Nutowy Invaders'},
+      {src:'zdjecia-strona-gry/strona-maze-6.webp', caption:'Labirynt nutowy'},
+      {src:'zdjecia-strona-gry/strona-postacie-maze-5.webp', caption:'Postacie z labiryntu'}
+    ]
+  }
+];
+
+function buildPileGrid(containerId, categories, basePath){
+  const grid=document.getElementById(containerId);
+  if(!grid)return;
+  const restOffsets=[[-14,9,-8],[13,-7,6],[-6,-13,-4],[15,6,10],[-17,-3,-7],[5,14,5],[-10,-9,9],[9,-4,-6],[-4,12,-10],[-15,-6,3],[7,10,-5],[-9,4,8]];
+  const thumbW=126,thumbH=158,gapX=14,gapY=34;
+  categories.forEach(cat=>{
+    const pile=document.createElement('div');
+    pile.className='pile';
+    pile.tabIndex=0;
+    const stack=document.createElement('div');
+    stack.className='pile-stack';
+    const n=cat.photos.length;
+    const cols=Math.min(3,n);
+    const rows=Math.ceil(n/cols);
+    const openH=rows*thumbH+(rows-1)*gapY+16;
+    stack.style.setProperty('--open-h',openH+'px');
+    cat.photos.forEach((ph,i)=>{
+      const fig=document.createElement('figure');
+      fig.className='pile-photo';
+      const off=restOffsets[i%restOffsets.length];
+      fig.style.setProperty('--rx',off[0]+'px');
+      fig.style.setProperty('--ry',off[1]+'px');
+      fig.style.setProperty('--rr',off[2]+'deg');
+      fig.style.setProperty('--rz',String(n-i));
+      const col=i%cols,row=Math.floor(i/cols);
+      const ox=(col-(cols-1)/2)*(thumbW+gapX);
+      const oy=(row-(rows-1)/2)*(thumbH+gapY);
+      fig.style.setProperty('--ox',ox+'px');
+      fig.style.setProperty('--oy',oy+'px');
+      fig.style.setProperty('--oz',String(i+1));
+      const img=document.createElement('img');
+      img.src=basePath+ph.src;
+      img.alt=ph.caption;
+      img.loading='lazy';
+      const cap=document.createElement('figcaption');
+      cap.textContent=ph.caption;
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      stack.appendChild(fig);
+    });
+    const label=document.createElement('span');
+    label.className='pile-label';
+    label.innerHTML='<span class="pile-icon">'+cat.icon+'</span>'+cat.title;
+    stack.appendChild(label);
+    const info=document.createElement('div');
+    info.className='pile-info';
+    info.innerHTML='<span class="tag-pill">'+cat.tag+'</span><h4>'+cat.title+'</h4><p>'+cat.desc+'</p>';
+    pile.appendChild(stack);
+    pile.appendChild(info);
+    grid.appendChild(pile);
+  });
+  grid.querySelectorAll('.pile').forEach(p=>{
+    p.addEventListener('click',function(){
+      if(window.matchMedia('(hover: hover)').matches)return;
+      const wasOpen=p.classList.contains('is-open');
+      grid.querySelectorAll('.pile.is-open').forEach(o=>o.classList.remove('is-open'));
+      if(!wasOpen)p.classList.add('is-open');
+    });
+  });
+}
+buildPileGrid('pileGrid', materialCategories, '/index/lekcje/grafiki-materialy/');
 </script>
 </body>
 </html>
