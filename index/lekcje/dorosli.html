@@ -124,12 +124,8 @@
   .cluster-explain .tag-pill{margin-bottom:10px;}
   .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.15rem;margin:0 0 8px;}
   .cluster-explain p{color:#64748b;font-size:0.86rem;line-height:1.6;max-width:420px;margin:0;}
-  .mystery-cluster{width:min(460px,94%);}
-  .mystery-card{position:relative;border:2px dashed var(--gold);border-radius:24px;padding:36px 30px;text-align:center;background:var(--card-bg);transition:transform 0.3s,box-shadow 0.3s;}
-  .mystery-card:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(30,58,138,0.1);}
-  .mystery-mark{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold);line-height:1;margin-bottom:10px;}
-  .mystery-card h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.1rem;margin:0 0 8px;}
-  .mystery-card p{color:#64748b;font-size:0.86rem;line-height:1.65;margin:0 auto;max-width:380px;}
+  .cl-photo.mystery{background:#0c1220;display:flex;align-items:center;justify-content:center;}
+  .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold);line-height:1;}
   @media(max-width:700px){.cl-photo{width:124px;}}
   @media(max-width:600px){.materials-flow{gap:54px;}}
   @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
@@ -337,6 +333,7 @@ const materialCategories = [
     icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc',
     desc:'Autorskie opracowania: historia muzyki, teoria i ciekawostki, z krótkim quizem na koniec każdego wydania.',
     photos:[
+      {src:'zdjecia-briefy/zdjedcia-briefy01a.webp', caption:'Brief nr 4 — Tajemnica litery H'},
       {src:'zdjecia-briefy/strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
       {src:'zdjecia-briefy/strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
     ]
@@ -399,7 +396,11 @@ const materialCategories = [
     desc:'Ćwicz czytanie nut w kluczu wiolinowym i basowym we własnym tempie — online.',
     photos:[
       {src:'zdjecia-strona-fiszki/fiszki-8.webp', caption:'Widok fiszek'},
-      {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'}
+      {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-1a.webp', caption:'Zgadnij nutę — ćwiczenie'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-2a.webp', caption:'Rozpoznawanie zagranego dźwięku'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-3a.webp', caption:'Klucz wiolinowy i basowy razem'},
+      {src:'zdjecia-strona-fiszki/metronom-tuner.webp', caption:'Metronom i tuner'}
     ]
   },
   {
@@ -409,6 +410,13 @@ const materialCategories = [
       {src:'zdjecia-strona-gry/strona-invaders-4.webp', caption:'Nutowy Invaders'},
       {src:'zdjecia-strona-gry/strona-maze-6.webp', caption:'Labirynt nutowy'},
       {src:'zdjecia-strona-gry/strona-postacie-maze-5.webp', caption:'Postacie z labiryntu'}
+    ]
+  },
+  {
+    icon:'❓', tag:'W przygotowaniu', title:'To dopiero początek',
+    desc:'Materiałów wciąż przybywa — a w przygotowaniu są też media społecznościowe z filmami dydaktycznymi, które wkrótce dołączą do tej listy.',
+    photos:[
+      {mystery:true, caption:'Więcej wkrótce'}
     ]
   }
 ];
@@ -436,7 +444,7 @@ function buildClusterFlow(containerId, categories, basePath){
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
-      fig.className='cl-photo';
+      fig.className='cl-photo'+(ph.mystery?' mystery':'');
       const off=restOffsets[i%restOffsets.length];
       fig.style.setProperty('--rx',off[0]+'px');
       fig.style.setProperty('--ry',off[1]+'px');
@@ -448,11 +456,18 @@ function buildClusterFlow(containerId, categories, basePath){
       fig.style.setProperty('--ox',ox+'px');
       fig.style.setProperty('--oy',oy+'px');
       fig.style.setProperty('--oz',String(i+1));
-      const img=document.createElement('img');
-      img.src=basePath+ph.src;
-      img.alt=ph.caption;
-      img.loading='lazy';
-      fig.appendChild(img);
+      if(ph.mystery){
+        const mark=document.createElement('span');
+        mark.className='cl-mark';
+        mark.textContent='?';
+        fig.appendChild(mark);
+      }else{
+        const img=document.createElement('img');
+        img.src=basePath+ph.src;
+        img.alt=ph.caption;
+        img.loading='lazy';
+        fig.appendChild(img);
+      }
       const cap=document.createElement('span');
       cap.className='cl-caption';
       cap.textContent=ph.caption;
@@ -469,13 +484,7 @@ function buildClusterFlow(containerId, categories, basePath){
     flow.appendChild(cluster);
   });
 
-  const mystery=document.createElement('div');
-  mystery.className='cluster mystery-cluster '+(categories.length%2===0?'align-left':'align-right');
-  mystery.innerHTML='<div class="mystery-card"><div class="mystery-mark">?</div><h4>To dopiero początek</h4><p>Materiałów wciąż przybywa — a w przygotowaniu są też media społecznościowe z filmami dydaktycznymi, które wkrótce dołączą do tej listy.</p></div>';
-  flow.appendChild(mystery);
-
   flow.querySelectorAll('.cluster').forEach(c=>{
-    if(c.classList.contains('mystery-cluster'))return;
     c.addEventListener('click',function(){
       if(window.matchMedia('(hover: hover)').matches)return;
       const wasOpen=c.classList.contains('is-open');
