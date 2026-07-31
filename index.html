@@ -204,7 +204,16 @@
   .mobile-nav a.mn-cta:hover{background:var(--gold);}
   @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
 
-  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;position:relative;background:var(--card-bg);}
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px;position:relative;background:var(--card-bg);overflow:hidden;}
+  .hero-bg-slideshow{position:absolute;inset:0;z-index:0;}
+  .hero-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;opacity:0;transition:opacity 2s ease;}
+  .hero-bg-img.active{opacity:1;}
+  .hero-bg-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(255,255,255,0.28),rgba(255,255,255,0.12) 40%,rgba(255,255,255,0.35));}
+  :root.dark-mode .hero-bg-overlay{background:linear-gradient(180deg,rgba(15,20,32,0.45),rgba(15,20,32,0.25) 40%,rgba(15,20,32,0.5));}
+  .hero-content-card,.hero .scroll-hint{position:relative;z-index:2;}
+  .hero-content-card{position:relative;z-index:2;background:rgba(255,255,255,0.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:32px;padding:48px 40px;box-shadow:0 20px 60px rgba(0,0,0,0.12);display:flex;flex-direction:column;align-items:center;max-width:640px;margin:0 auto;}
+  :root.dark-mode .hero-content-card{background:rgba(15,20,32,0.72);}
+  @media(max-width:600px){.hero-content-card{padding:32px 22px;border-radius:24px;}}
   .hero-badge{background:var(--gold);color:white;padding:6px 20px;border-radius:50px;font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;display:inline-block;opacity:0;animation:fadeUp 0.8s ease forwards 0.2s;}
   .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,5rem);color:var(--navy);margin:0 0 20px 0;line-height:1.1;opacity:0;animation:fadeUp 0.8s ease forwards 0.4s;}
   .hero h1 em{font-style:italic;color:var(--gold);}
@@ -554,12 +563,21 @@
 </nav>
 
 <section class="hero">
-  <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
-  <h1>Lekcje pianina<br>z <em>pasją</em></h1>
-  <p class="hero-sub">Profesjonalne lekcje fortepianu dla dzieci i osób dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do Ciebie.</p>
-  <div class="hero-btns">
-    <a href="#terminy" class="btn-primary">Zarezerwuj termin</a>
-    <a href="#o-mnie" class="btn-outline">Poznaj nauczyciela</a>
+  <div class="hero-bg-slideshow" id="heroBgSlideshow" aria-hidden="true">
+    <img class="hero-bg-img active" src="/index/grafiki-index/img-1009.webp" alt="">
+    <img class="hero-bg-img" src="/index/grafiki-index/img-1022.webp" alt="">
+    <img class="hero-bg-img" src="/index/grafiki-index/img-1036.webp" alt="">
+    <img class="hero-bg-img" src="/index/grafiki-index/img-1075.webp" alt="">
+  </div>
+  <div class="hero-bg-overlay" aria-hidden="true"></div>
+  <div class="hero-content-card">
+    <span class="hero-badge">Gdynia · Sopot · Dojazd</span>
+    <h1>Lekcje pianina<br>z <em>pasją</em></h1>
+    <p class="hero-sub">Profesjonalne lekcje fortepianu dla dzieci i osób dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do Ciebie.</p>
+    <div class="hero-btns">
+      <a href="#terminy" class="btn-primary">Zarezerwuj termin</a>
+      <a href="#o-mnie" class="btn-outline">Poznaj nauczyciela</a>
+    </div>
   </div>
   <div class="scroll-hint">↓ Przewiń w dół</div>
 </section>
@@ -1184,6 +1202,18 @@ function toggleDarkMode(){
 (function(){
   const btn=document.getElementById('darkModeToggle');
   if(btn&&document.documentElement.classList.contains('dark-mode'))btn.textContent='☀️';
+})();
+
+/* ══ SLIDESHOW W TLE HERO ══ */
+(function(){
+  const imgs=document.querySelectorAll('#heroBgSlideshow .hero-bg-img');
+  if(!imgs.length)return;
+  let idx=0;
+  setInterval(()=>{
+    imgs[idx].classList.remove('active');
+    idx=(idx+1)%imgs.length;
+    imgs[idx].classList.add('active');
+  },5500);
 })();
 </script>
 </body>
