@@ -395,7 +395,7 @@ const materialCategories = [
       {src:'zdjecia-aplikacje-tablet/zdjecie-forscore-1.webp', caption:'forScore'},
       {src:'zdjecia-aplikacje-tablet/zdjecia-musescore-1.webp', caption:'MuseScore'},
       {src:'zdjecia-aplikacje-tablet/zdjecie-flowkey-1.webp', caption:'flowkey'},
-      {src:'zdjecia-aplikacje-tablet/zdjecie-tablet-1.webp', caption:'Tablet', noLabel:true}
+      {src:'zdjecia-aplikacje-tablet/zdjecie-tablet-1.webp', caption:'Tablet', noLabel:true, noBg:true}
     ]
   },
   {
@@ -508,7 +508,7 @@ function buildClusterFlow(containerId, categories, basePath){
   const iconW=narrow?130:190;
   const maxCascadeW=narrow?460:900;
   const stepCap=narrow?80:125;
-  const iconStepCap=narrow?30:48;
+  const iconStepCap=narrow?105:170;
   const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
   const pushAmount=narrow?95:170;
 
@@ -533,7 +533,7 @@ function buildClusterFlow(containerId, categories, basePath){
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
-      fig.className='cl-photo'+(ph.mystery?' mystery':'')+(cat.iconSet?' icon-tile':'');
+      fig.className='cl-photo'+(ph.mystery?' mystery':'')+(cat.iconSet&&!ph.noBg?' icon-tile':'');
       const centeredX=i*step-(n-1)*step/2;
       const rx=dir*centeredX;
       const ry=yJitter[i%yJitter.length];
