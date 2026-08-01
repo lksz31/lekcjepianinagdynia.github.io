@@ -108,25 +108,23 @@
   .mini-card p{color:#64748b;font-size:0.83rem;line-height:1.55;margin:0;}
 
   .materials-flow{display:flex;flex-direction:column;gap:70px;margin-top:14px;}
-  .cluster{position:relative;width:min(720px,94%);}
+  .cluster{position:relative;width:min(760px,94%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
   .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
   .cluster:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:20px;}
-  .cluster-photos{position:relative;height:260px;transition:height 0.6s cubic-bezier(0.2,0.8,0.2,1);}
-  .cluster:hover .cluster-photos,.cluster:focus-within .cluster-photos,.cluster.is-open .cluster-photos{height:var(--open-h,260px);}
-  .cl-photo{position:absolute;top:50%;left:50%;width:168px;aspect-ratio:4/5;border-radius:13px;overflow:hidden;background:#e2e8f0;border:4px solid var(--card-bg);box-shadow:0 12px 26px rgba(15,23,42,0.2);transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.6s cubic-bezier(0.2,0.8,0.2,1),box-shadow 0.4s;cursor:pointer;}
-  .cl-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-  .cl-caption{position:absolute;left:9px;right:9px;bottom:9px;background:rgba(12,17,28,0.82);color:#fff;font-size:0.66rem;font-weight:700;letter-spacing:0.01em;padding:4px 10px;border-radius:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
-  .cluster:hover .cl-photo,.cluster:focus-within .cl-photo,.cluster.is-open .cl-photo{transform:translate(-50%,-50%) translate(var(--ox),var(--oy)) rotate(0deg);z-index:var(--oz);box-shadow:0 18px 34px rgba(15,23,42,0.26);}
-  .cluster-explain{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;transition:opacity 0.45s 0.12s;pointer-events:none;z-index:1;}
-  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;}
+  .cluster-photos{position:relative;height:340px;}
+  .cl-photo{position:absolute;top:50%;left:50%;width:190px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.6s cubic-bezier(0.2,0.8,0.2,1),filter 0.4s;cursor:pointer;}
+  .cl-photo img{width:100%;height:auto;display:block;}
+  .cluster:hover .cl-photo,.cluster:focus-within .cl-photo,.cluster.is-open .cl-photo{transform:translate(-50%,-50%) translate(var(--ox),var(--oy)) rotate(var(--rr));filter:drop-shadow(0 16px 28px rgba(15,23,42,0.34));}
+  .cluster-explain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.94);width:min(320px,84%);background:var(--card-bg);border-radius:20px;box-shadow:0 18px 44px rgba(15,23,42,0.24);padding:22px 24px;text-align:center;opacity:0;z-index:50;transition:opacity 0.4s 0.15s,transform 0.4s 0.15s;pointer-events:none;}
+  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;transform:translate(-50%,-50%) scale(1);}
   .cluster-explain .tag-pill{margin-bottom:10px;}
-  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.15rem;margin:0 0 8px;}
-  .cluster-explain p{color:#64748b;font-size:0.86rem;line-height:1.6;max-width:420px;margin:0;}
-  .cl-photo.mystery{background:#0c1220;display:flex;align-items:center;justify-content:center;}
+  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.1rem;margin:0 0 8px;}
+  .cluster-explain p{color:#64748b;font-size:0.85rem;line-height:1.6;margin:0;}
+  .cl-photo.mystery{width:190px;height:238px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
   .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold);line-height:1;}
-  @media(max-width:700px){.cl-photo{width:124px;}}
+  @media(max-width:700px){.cl-photo{width:140px;}.cl-photo.mystery{width:140px;height:175px;}.cluster-photos{height:250px;}}
   @media(max-width:600px){.materials-flow{gap:54px;}}
   @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
 
@@ -425,37 +423,39 @@ function buildClusterFlow(containerId, categories, basePath){
   const flow=document.getElementById(containerId);
   if(!flow)return;
   const narrow=window.matchMedia('(max-width:700px)').matches;
-  const thumbW=narrow?124:168, thumbH=narrow?155:210, gapX=narrow?12:20, gapY=narrow?18:30;
-  const maxCols=narrow?2:4;
-  const restOffsets=[[-20,12,-9],[18,-10,7],[-9,-18,-5],[21,8,11],[-24,-4,-8],[7,19,6],[-14,-13,10],[13,-6,-7],[-6,16,-11],[-21,-8,4],[10,14,-6],[-12,6,9]];
+  const imgW=narrow?140:190;
+  const maxCascadeW=narrow?300:560;
+  const stepCap=narrow?58:78;
+  const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
+  const maxShift=narrow?70:120;
 
   categories.forEach((cat,ci)=>{
+    const align=ci%2===0?'align-left':'align-right';
+    const dir=align==='align-left'?1:-1;
     const cluster=document.createElement('div');
-    cluster.className='cluster '+(ci%2===0?'align-left':'align-right');
+    cluster.className='cluster '+align;
     cluster.tabIndex=0;
 
     const photosWrap=document.createElement('div');
     photosWrap.className='cluster-photos';
     const n=cat.photos.length;
-    const cols=Math.min(maxCols,n);
-    const rows=Math.ceil(n/cols);
-    const openH=rows*thumbH+(rows-1)*gapY+20;
-    photosWrap.style.setProperty('--open-h',openH+'px');
+    const step=n>1?Math.min(stepCap,(maxCascadeW-imgW)/(n-1)):0;
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
       fig.className='cl-photo'+(ph.mystery?' mystery':'');
-      const off=restOffsets[i%restOffsets.length];
-      fig.style.setProperty('--rx',off[0]+'px');
-      fig.style.setProperty('--ry',off[1]+'px');
-      fig.style.setProperty('--rr',off[2]+'deg');
-      fig.style.setProperty('--rz',String(n-i));
-      const col=i%cols,row=Math.floor(i/cols);
-      const ox=(col-(cols-1)/2)*(thumbW+gapX);
-      const oy=(row-(rows-1)/2)*(thumbH+gapY);
-      fig.style.setProperty('--ox',ox+'px');
-      fig.style.setProperty('--oy',oy+'px');
-      fig.style.setProperty('--oz',String(i+1));
+      const centeredX=i*step-(n-1)*step/2;
+      const rx=dir*centeredX;
+      const ry=yJitter[i%yJitter.length];
+      const rr=n>1?(i-(n-1)/2)*2.4:0;
+      fig.style.setProperty('--rx',rx+'px');
+      fig.style.setProperty('--ry',ry+'px');
+      fig.style.setProperty('--rr',rr+'deg');
+      fig.style.setProperty('--rz',String(i+1));
+      const depthFactor=n>1?i/(n-1):1;
+      const shiftX=dir*maxShift*depthFactor;
+      fig.style.setProperty('--ox',(rx+shiftX)+'px');
+      fig.style.setProperty('--oy',ry+'px');
       if(ph.mystery){
         const mark=document.createElement('span');
         mark.className='cl-mark';
@@ -468,10 +468,6 @@ function buildClusterFlow(containerId, categories, basePath){
         img.loading='lazy';
         fig.appendChild(img);
       }
-      const cap=document.createElement('span');
-      cap.className='cl-caption';
-      cap.textContent=ph.caption;
-      fig.appendChild(cap);
       photosWrap.appendChild(fig);
     });
 
