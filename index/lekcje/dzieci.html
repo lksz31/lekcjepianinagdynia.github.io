@@ -93,7 +93,7 @@
   .cl-photo.icon-tile{background:var(--card-bg);border-radius:16px;overflow:hidden;}
   .cl-app-label{position:absolute;right:7px;bottom:7px;background:rgba(12,17,28,0.78);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.01em;padding:3px 9px;border-radius:50px;pointer-events:none;z-index:2;}
   .materials-flow{display:flex;flex-direction:column;gap:26px;margin-top:14px;}
-  .cluster{position:relative;width:min(1160px,98%);}
+  .cluster{position:relative;width:min(680px,58%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
   .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
@@ -103,18 +103,17 @@
   .cl-photo img{width:100%;height:auto;display:block;}
   .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
   .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
-  .cluster-title{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,0.5);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:14px;padding:9px 18px;z-index:950;pointer-events:none;}
+  .cluster-title{position:absolute;left:50%;bottom:0;transform:translateX(-50%);max-width:92%;background:rgba(255,255,255,0.5);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,0.45);border-radius:50px;padding:9px 18px;z-index:950;pointer-events:none;display:flex;align-items:center;gap:0;opacity:0;transition:opacity 0.3s,gap 0.4s ease;}
   :root.dark-mode .cluster-title{background:rgba(26,35,51,0.5);border-color:rgba(127,168,255,0.16);}
-  .cluster-title h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;font-weight:700;margin:0;}
-  .cluster-explain{position:absolute;left:0;right:0;bottom:46px;background:rgba(255,255,255,0.42);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:16px;box-shadow:0 -6px 30px rgba(15,23,42,0.14);padding:12px 18px;text-align:left;opacity:0;z-index:940;pointer-events:none;transition:opacity 0.35s;}
-  :root.dark-mode .cluster-explain{background:rgba(26,35,51,0.4);border-color:rgba(127,168,255,0.16);}
-  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;}
-  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.45;margin:0;}
+  .cluster:hover .cluster-title,.cluster:focus-within .cluster-title,.cluster.is-open .cluster-title{opacity:1;gap:14px;}
+  .cluster-title h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;font-weight:700;margin:0;white-space:nowrap;flex-shrink:0;}
+  .cluster-title p{color:#334155;font-size:0.84rem;line-height:1.3;margin:0;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width 0.45s ease,opacity 0.3s ease;}
+  .cluster:hover .cluster-title p,.cluster:focus-within .cluster-title p,.cluster.is-open .cluster-title p{max-width:420px;opacity:1;white-space:normal;transition:max-width 0.45s ease,opacity 0.35s ease 0.1s;}
   .cl-photo.mystery{width:300px;height:375px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
   .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
-  @media(max-width:700px){.cl-photo{width:210px;}.cl-photo.mystery{width:210px;height:263px;}.cluster-photos{height:400px;}}
+  @media(max-width:700px){.cl-photo{width:210px;}.cl-photo.mystery{width:210px;height:263px;}.cluster-photos{height:400px;}.cluster{width:94%;}}
   @media(max-width:600px){.materials-flow{gap:20px;}}
-  @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
+  @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-title,.cluster-title p{transition:none!important;}}
 
 
   .piano-section{background:var(--card-bg);padding:70px 5%;}
@@ -566,13 +565,8 @@ function buildClusterFlow(containerId, categories, basePath){
 
     const titleBar=document.createElement('div');
     titleBar.className='cluster-title';
-    titleBar.innerHTML='<h4>'+cat.title+'</h4>';
+    titleBar.innerHTML='<h4>'+cat.title+'</h4><p>'+cat.desc+'</p>';
     photosWrap.appendChild(titleBar);
-
-    const explain=document.createElement('div');
-    explain.className='cluster-explain';
-    explain.innerHTML='<p>'+cat.desc+'</p>';
-    photosWrap.appendChild(explain);
 
     cluster.appendChild(photosWrap);
     flow.appendChild(cluster);
