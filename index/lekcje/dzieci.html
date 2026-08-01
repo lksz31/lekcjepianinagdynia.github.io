@@ -92,26 +92,27 @@
 
   .cl-photo.icon-tile{background:var(--card-bg);border-radius:16px;overflow:hidden;}
   .cl-app-label{position:absolute;right:7px;bottom:7px;background:rgba(12,17,28,0.78);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.01em;padding:3px 9px;border-radius:50px;pointer-events:none;z-index:2;}
-  .materials-flow{display:flex;flex-direction:column;gap:30px;margin-top:14px;}
-  .cluster{position:relative;width:min(1040px,97%);}
+  .materials-flow{display:flex;flex-direction:column;gap:16px;margin-top:14px;}
+  .cluster{position:relative;width:min(1160px,98%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
   .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
   .cluster:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:20px;}
-  .cluster-photos{position:relative;height:480px;}
-  .cl-photo{position:absolute;top:50%;left:50%;width:260px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
+  .cluster-photos{position:relative;height:540px;}
+  .cl-photo{position:absolute;top:50%;left:50%;width:300px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
   .cl-photo img{width:100%;height:auto;display:block;}
   .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
   .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
-  .cluster-explain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.94);width:min(300px,82%);background:rgba(255,255,255,0.4);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,0.45);border-radius:20px;box-shadow:0 18px 44px rgba(15,23,42,0.18);padding:20px 22px;text-align:center;opacity:0;z-index:1000;transition:opacity 0.4s 0.15s,transform 0.4s 0.15s;pointer-events:none;}
+  .cluster-explain{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,0.42);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:16px;box-shadow:0 -6px 30px rgba(15,23,42,0.14);padding:14px 20px;text-align:left;opacity:0;z-index:1000;pointer-events:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transition:opacity 0.35s;}
   :root.dark-mode .cluster-explain{background:rgba(26,35,51,0.4);border-color:rgba(127,168,255,0.16);}
-  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;transform:translate(calc(-50% + var(--dir)*-34px),-50%) scale(1);}
-  .cluster-explain .tag-pill{margin-bottom:10px;}
-  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0 0 8px;}
-  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.55;margin:0;}
-  .cl-photo.mystery{width:260px;height:325px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
+  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;}
+  
+  .cluster-explain .tag-pill{margin-bottom:0;flex-shrink:0;}
+  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0;flex-shrink:0;}
+  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.4;margin:0;flex:1;min-width:180px;}
+  .cl-photo.mystery{width:300px;height:375px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
   .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
-  @media(max-width:700px){.cl-photo{width:180px;}.cl-photo.mystery{width:180px;height:225px;}.cluster-photos{height:320px;}}
+  @media(max-width:700px){.cl-photo{width:210px;}.cl-photo.mystery{width:210px;height:263px;}.cluster-photos{height:400px;}}
   @media(max-width:600px){.materials-flow{gap:20px;}}
   @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
 
@@ -280,7 +281,7 @@
 <section class="pomoce-section" id="pomoce">
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
-    <h2 class="section-title">Autorskie pomoce dydaktyczne</h2>
+    <h2 class="section-title">Pomoce dydaktyczne</h2>
     <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje dla dzieci prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii, dopasowanych do wieku ucznia. Najedź na dowolną grupę zdjęć, żeby zobaczyć więcej.</p>
 
     <div class="materials-flow" id="materialsFlow"></div>
@@ -393,11 +394,12 @@ const materialCategories = [
       {src:'zdjecia-aplikacje-tablet/zdjecie-simply-piano-1.webp', caption:'Simply Piano'},
       {src:'zdjecia-aplikacje-tablet/zdjecie-forscore-1.webp', caption:'forScore'},
       {src:'zdjecia-aplikacje-tablet/zdjecia-musescore-1.webp', caption:'MuseScore'},
-      {src:'zdjecia-aplikacje-tablet/zdjecie-flowkey-1.webp', caption:'flowkey'}
+      {src:'zdjecia-aplikacje-tablet/zdjecie-flowkey-1.webp', caption:'flowkey'},
+      {src:'zdjecia-aplikacje-tablet/zdjecie-tablet-1.webp', caption:'Tablet'}
     ]
   },
   {
-    icon:'🚗', tag:'Dojazd', title:'Dowóz instrumentu na zajęcia', wide:true,
+    icon:'🚗', tag:'Dojazd', title:'Dowóz instrumentu na zajęcia', wide:true, noOverlap:true,
     desc:'Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.',
     photos:[
       {src:'zdjecia-dojazd-auto-pianino/zdjecia-fiat-1.webp', caption:'Dojazd na zajęcia'},
@@ -487,10 +489,12 @@ const materialCategories = [
     ]
   },
   {
-    icon:'❓', tag:'W przygotowaniu', title:'To dopiero początek',
+    icon:'❓', tag:'W przygotowaniu', title:'Jeszcze wiele więcej',
     desc:'Materiałów wciąż przybywa — a w przygotowaniu są też media społecznościowe z filmami dydaktycznymi, które wkrótce dołączą do tej listy.',
     photos:[
-      {mystery:true, caption:'Więcej wkrótce'}
+      {mystery:true, caption:'Więcej wkrótce'},
+      {mystery:true, caption:'W przygotowaniu'},
+      {mystery:true, caption:'Wkrótce dostępne'}
     ]
   }
 ];
@@ -499,13 +503,14 @@ function buildClusterFlow(containerId, categories, basePath){
   const flow=document.getElementById(containerId);
   if(!flow)return;
   const narrow=window.matchMedia('(max-width:700px)').matches;
-  const normalW=narrow?180:260;
-  const wideW=narrow?290:430;
-  const iconW=narrow?110:160;
-  const maxCascadeW=narrow?420:820;
-  const stepCap=narrow?90:150;
+  const normalW=narrow?210:300;
+  const wideW=narrow?340:520;
+  const iconW=narrow?130:190;
+  const maxCascadeW=narrow?460:900;
+  const stepCap=narrow?65:100;
+  const iconStepCap=narrow?24:36;
   const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
-  const pushAmount=narrow?80:140;
+  const pushAmount=narrow?95:170;
 
   categories.forEach((cat,ci)=>{
     const align=ci%2===0?'align-left':'align-right';
@@ -520,7 +525,11 @@ function buildClusterFlow(containerId, categories, basePath){
     photosWrap.className='cluster-photos';
     const n=cat.photos.length;
     const photoW=cat.wide?wideW:(cat.iconSet?iconW:normalW);
-    const step=n>1?Math.min(stepCap,(maxCascadeW-photoW)/(n-1)):0;
+    const step=cat.noOverlap?(photoW+26):(n>1?Math.min(cat.iconSet?iconStepCap:stepCap,(maxCascadeW-photoW)/(n-1)):0);
+    const estPhotoH=cat.wide?photoW*0.65:(cat.iconSet?photoW*1.0:photoW*1.35);
+    const jitterRange=Math.max.apply(null,yJitter.map(Math.abs));
+    const boxH=Math.round(Math.max(narrow?200:240,estPhotoH+jitterRange*2+40));
+    photosWrap.style.height=boxH+'px';
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
@@ -557,7 +566,7 @@ function buildClusterFlow(containerId, categories, basePath){
 
     const explain=document.createElement('div');
     explain.className='cluster-explain';
-    explain.innerHTML='<span class="tag-pill">'+cat.tag+'</span><h4>'+cat.icon+' '+cat.title+'</h4><p>'+cat.desc+'</p>';
+    explain.innerHTML='<h4>'+cat.title+'</h4><p>'+cat.desc+'</p>';
     photosWrap.appendChild(explain);
 
     cluster.appendChild(photosWrap);
