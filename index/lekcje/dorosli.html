@@ -104,7 +104,7 @@
 
   .cl-photo.icon-tile{background:var(--card-bg);border-radius:16px;overflow:hidden;}
   .cl-app-label{position:absolute;right:7px;bottom:7px;background:rgba(12,17,28,0.78);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.01em;padding:3px 9px;border-radius:50px;pointer-events:none;z-index:2;}
-  .materials-flow{display:flex;flex-direction:column;gap:16px;margin-top:14px;}
+  .materials-flow{display:flex;flex-direction:column;gap:26px;margin-top:14px;}
   .cluster{position:relative;width:min(1160px,98%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
@@ -115,13 +115,13 @@
   .cl-photo img{width:100%;height:auto;display:block;}
   .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
   .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
-  .cluster-explain{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,0.42);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:16px;box-shadow:0 -6px 30px rgba(15,23,42,0.14);padding:14px 20px;text-align:left;opacity:0;z-index:1000;pointer-events:none;display:flex;align-items:center;gap:14px;flex-wrap:wrap;transition:opacity 0.35s;}
+  .cluster-title{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,0.5);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:14px;padding:9px 18px;z-index:950;pointer-events:none;}
+  :root.dark-mode .cluster-title{background:rgba(26,35,51,0.5);border-color:rgba(127,168,255,0.16);}
+  .cluster-title h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;font-weight:700;margin:0;}
+  .cluster-explain{position:absolute;left:0;right:0;bottom:46px;background:rgba(255,255,255,0.42);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border-top:1px solid rgba(255,255,255,0.45);border-radius:16px;box-shadow:0 -6px 30px rgba(15,23,42,0.14);padding:12px 18px;text-align:left;opacity:0;z-index:940;pointer-events:none;transition:opacity 0.35s;}
   :root.dark-mode .cluster-explain{background:rgba(26,35,51,0.4);border-color:rgba(127,168,255,0.16);}
   .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;}
-  
-  .cluster-explain .tag-pill{margin-bottom:0;flex-shrink:0;}
-  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0;flex-shrink:0;}
-  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.4;margin:0;flex:1;min-width:180px;}
+  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.45;margin:0;}
   .cl-photo.mystery{width:300px;height:375px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
   .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
   @media(max-width:700px){.cl-photo{width:210px;}.cl-photo.mystery{width:210px;height:263px;}.cluster-photos{height:400px;}}
@@ -331,7 +331,7 @@ const materialCategories = [
       {src:'zdjecia-aplikacje-tablet/zdjecie-forscore-1.webp', caption:'forScore'},
       {src:'zdjecia-aplikacje-tablet/zdjecia-musescore-1.webp', caption:'MuseScore'},
       {src:'zdjecia-aplikacje-tablet/zdjecie-flowkey-1.webp', caption:'flowkey'},
-      {src:'zdjecia-aplikacje-tablet/zdjecie-tablet-1.webp', caption:'Tablet'}
+      {src:'zdjecia-aplikacje-tablet/zdjecie-tablet-1.webp', caption:'Tablet', noLabel:true}
     ]
   },
   {
@@ -443,8 +443,8 @@ function buildClusterFlow(containerId, categories, basePath){
   const wideW=narrow?340:520;
   const iconW=narrow?130:190;
   const maxCascadeW=narrow?460:900;
-  const stepCap=narrow?65:100;
-  const iconStepCap=narrow?24:36;
+  const stepCap=narrow?80:125;
+  const iconStepCap=narrow?30:48;
   const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
   const pushAmount=narrow?95:170;
 
@@ -462,9 +462,9 @@ function buildClusterFlow(containerId, categories, basePath){
     const n=cat.photos.length;
     const photoW=cat.wide?wideW:(cat.iconSet?iconW:normalW);
     const step=cat.noOverlap?(photoW+26):(n>1?Math.min(cat.iconSet?iconStepCap:stepCap,(maxCascadeW-photoW)/(n-1)):0);
-    const estPhotoH=cat.wide?photoW*0.65:(cat.iconSet?photoW*1.0:photoW*1.35);
+    const estPhotoH=cat.wide?photoW*0.9:(cat.iconSet?photoW*1.0:photoW*1.35);
     const jitterRange=Math.max.apply(null,yJitter.map(Math.abs));
-    const boxH=Math.round(Math.max(narrow?200:240,estPhotoH+jitterRange*2+40));
+    const boxH=Math.round(Math.max(narrow?220:260,estPhotoH+jitterRange*2+80));
     photosWrap.style.height=boxH+'px';
 
     cat.photos.forEach((ph,i)=>{
@@ -490,7 +490,7 @@ function buildClusterFlow(containerId, categories, basePath){
         img.alt=ph.caption;
         img.loading='lazy';
         fig.appendChild(img);
-        if(cat.iconSet&&ph.caption){
+        if(cat.iconSet&&ph.caption&&!ph.noLabel){
           const label=document.createElement('span');
           label.className='cl-app-label';
           label.textContent=ph.caption;
@@ -500,9 +500,14 @@ function buildClusterFlow(containerId, categories, basePath){
       photosWrap.appendChild(fig);
     });
 
+    const titleBar=document.createElement('div');
+    titleBar.className='cluster-title';
+    titleBar.innerHTML='<h4>'+cat.title+'</h4>';
+    photosWrap.appendChild(titleBar);
+
     const explain=document.createElement('div');
     explain.className='cluster-explain';
-    explain.innerHTML='<h4>'+cat.title+'</h4><p>'+cat.desc+'</p>';
+    explain.innerHTML='<p>'+cat.desc+'</p>';
     photosWrap.appendChild(explain);
 
     cluster.appendChild(photosWrap);
