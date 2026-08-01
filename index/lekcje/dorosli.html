@@ -105,13 +105,13 @@
   .cl-photo.icon-tile{background:var(--card-bg);border-radius:16px;overflow:hidden;}
   .cl-app-label{position:absolute;right:7px;bottom:7px;background:rgba(12,17,28,0.78);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.01em;padding:3px 9px;border-radius:50px;pointer-events:none;z-index:2;}
   .materials-flow{display:flex;flex-direction:column;gap:30px;margin-top:14px;}
-  .cluster{position:relative;width:min(1040px,97%);}
+  .cluster{position:relative;width:min(1160px,98%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
   .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
   .cluster:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:20px;}
-  .cluster-photos{position:relative;height:480px;}
-  .cl-photo{position:absolute;top:50%;left:50%;width:260px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
+  .cluster-photos{position:relative;height:540px;}
+  .cl-photo{position:absolute;top:50%;left:50%;width:300px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
   .cl-photo img{width:100%;height:auto;display:block;}
   .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
   .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
@@ -121,9 +121,9 @@
   .cluster-explain .tag-pill{margin-bottom:0;flex-shrink:0;}
   .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0;flex-shrink:0;}
   .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.4;margin:0;flex:1;min-width:180px;}
-  .cl-photo.mystery{width:260px;height:325px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
+  .cl-photo.mystery{width:300px;height:375px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
   .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
-  @media(max-width:700px){.cl-photo{width:180px;}.cl-photo.mystery{width:180px;height:225px;}.cluster-photos{height:320px;}}
+  @media(max-width:700px){.cl-photo{width:210px;}.cl-photo.mystery{width:210px;height:263px;}.cluster-photos{height:400px;}}
   @media(max-width:600px){.materials-flow{gap:20px;}}
   @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
 
@@ -248,7 +248,7 @@
 <section class="pomoce-section" id="pomoce">
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
-    <h2 class="section-title">Autorskie pomoce dydaktyczne</h2>
+    <h2 class="section-title">Pomoce dydaktyczne</h2>
     <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii. Najedź na dowolną grupę zdjęć, żeby zobaczyć więcej.</p>
 
     <div class="materials-flow" id="materialsFlow"></div>
@@ -426,7 +426,9 @@ const materialCategories = [
     icon:'❓', tag:'W przygotowaniu', title:'To dopiero początek',
     desc:'Materiałów wciąż przybywa — a w przygotowaniu są też media społecznościowe z filmami dydaktycznymi, które wkrótce dołączą do tej listy.',
     photos:[
-      {mystery:true, caption:'Więcej wkrótce'}
+      {mystery:true, caption:'Więcej wkrótce'},
+      {mystery:true, caption:'W przygotowaniu'},
+      {mystery:true, caption:'Wkrótce dostępne'}
     ]
   }
 ];
@@ -435,14 +437,14 @@ function buildClusterFlow(containerId, categories, basePath){
   const flow=document.getElementById(containerId);
   if(!flow)return;
   const narrow=window.matchMedia('(max-width:700px)').matches;
-  const normalW=narrow?180:260;
-  const wideW=narrow?290:430;
-  const iconW=narrow?110:160;
-  const maxCascadeW=narrow?420:820;
-  const stepCap=narrow?90:150;
-  const iconStepCap=narrow?46:66;
+  const normalW=narrow?210:300;
+  const wideW=narrow?340:520;
+  const iconW=narrow?130:190;
+  const maxCascadeW=narrow?460:900;
+  const stepCap=narrow?65:100;
+  const iconStepCap=narrow?24:36;
   const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
-  const pushAmount=narrow?80:140;
+  const pushAmount=narrow?95:170;
 
   categories.forEach((cat,ci)=>{
     const align=ci%2===0?'align-left':'align-right';
@@ -457,7 +459,7 @@ function buildClusterFlow(containerId, categories, basePath){
     photosWrap.className='cluster-photos';
     const n=cat.photos.length;
     const photoW=cat.wide?wideW:(cat.iconSet?iconW:normalW);
-    const step=cat.noOverlap?(photoW+22):(n>1?Math.min(cat.iconSet?iconStepCap:stepCap,(maxCascadeW-photoW)/(n-1)):0);
+    const step=cat.noOverlap?(photoW+26):(n>1?Math.min(cat.iconSet?iconStepCap:stepCap,(maxCascadeW-photoW)/(n-1)):0);
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
