@@ -107,26 +107,29 @@
   .mini-card h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;margin:0 0 4px;}
   .mini-card p{color:#64748b;font-size:0.83rem;line-height:1.55;margin:0;}
 
-  .materials-flow{display:flex;flex-direction:column;gap:70px;margin-top:14px;}
-  .cluster{position:relative;width:min(760px,94%);}
+  .materials-flow{display:flex;flex-direction:column;gap:30px;margin-top:14px;}
+  .cluster{position:relative;width:min(920px,96%);}
   .cluster.align-left{margin-right:auto;}
   .cluster.align-right{margin-left:auto;}
   .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
   .cluster:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:20px;}
-  .cluster-photos{position:relative;height:340px;}
-  .cl-photo{position:absolute;top:50%;left:50%;width:190px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.6s cubic-bezier(0.2,0.8,0.2,1),filter 0.4s;cursor:pointer;}
+  .cluster-photos{position:relative;height:430px;}
+  .cl-photo{position:absolute;top:50%;left:50%;width:260px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
   .cl-photo img{width:100%;height:auto;display:block;}
-  .cluster:hover .cl-photo,.cluster:focus-within .cl-photo,.cluster.is-open .cl-photo{transform:translate(-50%,-50%) translate(var(--ox),var(--oy)) rotate(var(--rr));filter:drop-shadow(0 16px 28px rgba(15,23,42,0.34));}
-  .cluster-explain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.94);width:min(320px,84%);background:var(--card-bg);border-radius:20px;box-shadow:0 18px 44px rgba(15,23,42,0.24);padding:22px 24px;text-align:center;opacity:0;z-index:50;transition:opacity 0.4s 0.15s,transform 0.4s 0.15s;pointer-events:none;}
+  .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:999!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
+  .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
+  .cluster-explain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.94);width:min(300px,82%);background:rgba(255,255,255,0.62);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,0.5);border-radius:20px;box-shadow:0 18px 44px rgba(15,23,42,0.22);padding:20px 22px;text-align:center;opacity:0;z-index:900;transition:opacity 0.4s 0.15s,transform 0.4s 0.15s;pointer-events:none;}
+  :root.dark-mode .cluster-explain{background:rgba(26,35,51,0.6);border-color:rgba(127,168,255,0.18);}
   .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;transform:translate(-50%,-50%) scale(1);}
   .cluster-explain .tag-pill{margin-bottom:10px;}
-  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.1rem;margin:0 0 8px;}
-  .cluster-explain p{color:#64748b;font-size:0.85rem;line-height:1.6;margin:0;}
-  .cl-photo.mystery{width:190px;height:238px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
-  .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold);line-height:1;}
-  @media(max-width:700px){.cl-photo{width:140px;}.cl-photo.mystery{width:140px;height:175px;}.cluster-photos{height:250px;}}
-  @media(max-width:600px){.materials-flow{gap:54px;}}
+  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0 0 8px;}
+  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.55;margin:0;}
+  .cl-photo.mystery{width:260px;height:325px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
+  .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
+  @media(max-width:700px){.cl-photo{width:180px;}.cl-photo.mystery{width:180px;height:225px;}.cluster-photos{height:320px;}}
+  @media(max-width:600px){.materials-flow{gap:20px;}}
   @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
+
 
   .benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px;}
   @media(max-width:850px){.benefits-grid{grid-template-columns:1fr 1fr;}}
@@ -328,16 +331,16 @@ function toggleDarkMode(){
 /* ══ STERTY ZDJĘĆ — AUTORSKIE POMOCE DYDAKTYCZNE ══ */
 const materialCategories = [
   {
-    icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc',
+    icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc', wide:true,
     desc:'Autorskie opracowania: historia muzyki, teoria i ciekawostki, z krótkim quizem na koniec każdego wydania.',
     photos:[
-      {src:'zdjecia-briefy/zdjedcia-briefy01a.webp', caption:'Brief nr 4 — Tajemnica litery H'},
-      {src:'zdjecia-briefy/strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
-      {src:'zdjecia-briefy/strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
+      {src:'zdjedcia-briefy01a.webp', caption:'Brief nr 4 — Tajemnica litery H'},
+      {src:'strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
+      {src:'strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
     ]
   },
   {
-    icon:'🎨', tag:'Autorskie', title:'Ilustracje do materiałów',
+    icon:'🎨', tag:'Autorskie', title:'Ilustracje do materiałów', wide:true,
     desc:'Oryginalne ilustracje towarzyszące briefom i materiałom — zwierzęta w scenach z życia wsi i lasu.',
     photos:[
       {src:'zdjecia-ilustracje/woz_w_lesie.webp', caption:'Wóz w lesie'},
@@ -390,19 +393,18 @@ const materialCategories = [
     ]
   },
   {
-    icon:'🗂️', tag:'Interaktywne', title:'Fiszki nutowe',
+    icon:'🗂️', tag:'Interaktywne', title:'Fiszki nutowe', wide:true,
     desc:'Ćwicz czytanie nut w kluczu wiolinowym i basowym we własnym tempie — online.',
     photos:[
       {src:'zdjecia-strona-fiszki/fiszki-8.webp', caption:'Widok fiszek'},
       {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'},
       {src:'zdjecia-strona-fiszki/zdjecia-fiszki-1a.webp', caption:'Zgadnij nutę — ćwiczenie'},
       {src:'zdjecia-strona-fiszki/zdjecia-fiszki-2a.webp', caption:'Rozpoznawanie zagranego dźwięku'},
-      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-3a.webp', caption:'Klucz wiolinowy i basowy razem'},
-      {src:'zdjecia-strona-fiszki/metronom-tuner.webp', caption:'Metronom i tuner'}
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-3a.webp', caption:'Klucz wiolinowy i basowy razem'}
     ]
   },
   {
-    icon:'🎮', tag:'Nauka przez zabawę', title:'Gry dydaktyczne',
+    icon:'🎮', tag:'Nauka przez zabawę', title:'Gry dydaktyczne', wide:true,
     desc:'Interaktywne gry utrwalające znajomość nut i klawiatury.',
     photos:[
       {src:'zdjecia-strona-gry/strona-invaders-4.webp', caption:'Nutowy Invaders'},
@@ -423,11 +425,12 @@ function buildClusterFlow(containerId, categories, basePath){
   const flow=document.getElementById(containerId);
   if(!flow)return;
   const narrow=window.matchMedia('(max-width:700px)').matches;
-  const imgW=narrow?140:190;
-  const maxCascadeW=narrow?300:560;
-  const stepCap=narrow?58:78;
+  const normalW=narrow?180:260;
+  const wideW=narrow?230:340;
+  const maxCascadeW=narrow?360:700;
+  const stepCap=narrow?76:120;
   const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
-  const maxShift=narrow?70:120;
+  const pushAmount=narrow?170:280;
 
   categories.forEach((cat,ci)=>{
     const align=ci%2===0?'align-left':'align-right';
@@ -435,11 +438,14 @@ function buildClusterFlow(containerId, categories, basePath){
     const cluster=document.createElement('div');
     cluster.className='cluster '+align;
     cluster.tabIndex=0;
+    cluster.style.setProperty('--dir',String(dir));
+    cluster.style.setProperty('--push',pushAmount+'px');
 
     const photosWrap=document.createElement('div');
     photosWrap.className='cluster-photos';
     const n=cat.photos.length;
-    const step=n>1?Math.min(stepCap,(maxCascadeW-imgW)/(n-1)):0;
+    const photoW=cat.wide?wideW:normalW;
+    const step=n>1?Math.min(stepCap,(maxCascadeW-photoW)/(n-1)):0;
 
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
@@ -452,10 +458,7 @@ function buildClusterFlow(containerId, categories, basePath){
       fig.style.setProperty('--ry',ry+'px');
       fig.style.setProperty('--rr',rr+'deg');
       fig.style.setProperty('--rz',String(i+1));
-      const depthFactor=n>1?i/(n-1):1;
-      const shiftX=dir*maxShift*depthFactor;
-      fig.style.setProperty('--ox',(rx+shiftX)+'px');
-      fig.style.setProperty('--oy',ry+'px');
+      if(!ph.mystery)fig.style.width=photoW+'px';
       if(ph.mystery){
         const mark=document.createElement('span');
         mark.className='cl-mark';
@@ -480,12 +483,19 @@ function buildClusterFlow(containerId, categories, basePath){
     flow.appendChild(cluster);
   });
 
-  flow.querySelectorAll('.cluster').forEach(c=>{
-    c.addEventListener('click',function(){
+  // touch fallback: tap a photo to focus it (siblings after it slide away), tap again to close
+  flow.querySelectorAll('.cl-photo').forEach(p=>{
+    p.addEventListener('click',function(e){
       if(window.matchMedia('(hover: hover)').matches)return;
-      const wasOpen=c.classList.contains('is-open');
+      e.stopPropagation();
+      const cluster=p.closest('.cluster');
+      const wasOpen=p.classList.contains('is-open');
+      flow.querySelectorAll('.cl-photo.is-open').forEach(o=>o.classList.remove('is-open'));
       flow.querySelectorAll('.cluster.is-open').forEach(o=>o.classList.remove('is-open'));
-      if(!wasOpen)c.classList.add('is-open');
+      if(!wasOpen){
+        p.classList.add('is-open');
+        cluster.classList.add('is-open');
+      }
     });
   });
 }
