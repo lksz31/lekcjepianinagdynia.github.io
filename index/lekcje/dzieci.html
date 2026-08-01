@@ -89,31 +89,32 @@
   .tag-pill{display:inline-block;background:#f0f7ff;color:var(--navy);font-size:0.72rem;font-weight:700;padding:4px 12px;border-radius:50px;border:1px solid #dbeafe;width:fit-content;}
   :root.dark-mode .tag-pill{background:rgba(127,168,255,0.12);border-color:rgba(127,168,255,0.25);}
 
-  .mini-row{display:flex;flex-wrap:wrap;gap:16px;margin:32px 0 48px;}
-  .mini-card{flex:1 1 240px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;padding:20px 22px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 3px rgba(30,41,59,0.03);}
-  .mini-card .mini-icon{width:44px;height:44px;flex-shrink:0;border-radius:13px;background:linear-gradient(135deg,#fdf8ec,#f7ecc8);display:flex;align-items:center;justify-content:center;font-size:1.25rem;}
-  .mini-card h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1rem;margin:0 0 4px;}
-  .mini-card p{color:#64748b;font-size:0.83rem;line-height:1.55;margin:0;}
 
-  .pile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:56px 30px;margin-top:10px;}
-  .pile{position:relative;padding-top:6px;}
-  .pile:hover,.pile:focus-within,.pile.is-open{z-index:30;}
-  .pile-stack{position:relative;height:210px;transition:height 0.55s cubic-bezier(0.2,0.8,0.2,1),background 0.4s,box-shadow 0.4s;border-radius:24px;}
-  .pile:hover .pile-stack,.pile:focus-within .pile-stack,.pile.is-open .pile-stack{height:var(--open-h,210px);background:var(--card-bg);box-shadow:0 22px 50px rgba(15,23,42,0.16);}
-  .pile-photo{position:absolute;top:50%;left:50%;width:126px;aspect-ratio:4/5;border-radius:11px;overflow:hidden;background:#e2e8f0;border:4px solid var(--card-bg);box-shadow:0 10px 22px rgba(15,23,42,0.18);transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.55s cubic-bezier(0.2,0.8,0.2,1),box-shadow 0.35s;cursor:pointer;}
-  .pile-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-  .pile-photo figcaption{position:absolute;inset:auto 0 0 0;padding:20px 8px 7px;font-size:0.66rem;line-height:1.25;font-weight:600;color:#fff;background:linear-gradient(0deg,rgba(10,15,26,0.88),rgba(10,15,26,0));opacity:0;transition:opacity 0.35s 0.1s;}
-  .pile:hover .pile-photo,.pile:focus-within .pile-photo,.pile.is-open .pile-photo{transform:translate(-50%,-50%) translate(var(--ox),var(--oy)) rotate(0deg);z-index:var(--oz);box-shadow:0 14px 26px rgba(15,23,42,0.22);}
-  .pile:hover .pile-photo figcaption,.pile:focus-within .pile-photo figcaption,.pile.is-open .pile-photo figcaption{opacity:1;}
-  .pile-label{position:absolute;left:10px;bottom:10px;z-index:40;display:inline-flex;align-items:center;gap:8px;background:var(--navy-solid);color:#fff;padding:8px 16px 8px 12px;border-radius:50px;font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;box-shadow:0 8px 20px rgba(30,58,138,0.35);transition:opacity 0.35s,transform 0.45s cubic-bezier(0.2,0.8,0.2,1);pointer-events:none;white-space:nowrap;}
-  .pile-label .pile-icon{font-size:1rem;}
-  .pile:hover .pile-label,.pile:focus-within .pile-label,.pile.is-open .pile-label{opacity:0;transform:translateY(8px) scale(0.92);}
-  .pile-info{margin-top:14px;}
-  .pile-info h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.02rem;margin:8px 0 6px;}
-  .pile-info p{color:#64748b;font-size:0.84rem;line-height:1.6;margin:0;}
-  .pile:focus-visible{outline:2px solid var(--gold);outline-offset:8px;border-radius:20px;}
-  @media(max-width:600px){.pile-grid{gap:48px 20px;}}
-  @media(prefers-reduced-motion:reduce){.pile-photo,.pile-stack,.pile-label{transition:none!important;}}
+  .cl-photo.icon-tile{background:var(--card-bg);border-radius:16px;overflow:hidden;}
+  .cl-app-label{position:absolute;right:7px;bottom:7px;background:rgba(12,17,28,0.78);color:#fff;font-size:0.62rem;font-weight:700;letter-spacing:0.01em;padding:3px 9px;border-radius:50px;pointer-events:none;z-index:2;}
+  .materials-flow{display:flex;flex-direction:column;gap:30px;margin-top:14px;}
+  .cluster{position:relative;width:min(1040px,97%);}
+  .cluster.align-left{margin-right:auto;}
+  .cluster.align-right{margin-left:auto;}
+  .cluster:hover,.cluster:focus-within,.cluster.is-open{z-index:30;}
+  .cluster:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:20px;}
+  .cluster-photos{position:relative;height:480px;}
+  .cl-photo{position:absolute;top:50%;left:50%;width:260px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
+  .cl-photo img{width:100%;height:auto;display:block;}
+  .cl-photo:hover,.cl-photo.is-open{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
+  .cl-photo:hover~.cl-photo,.cl-photo.is-open~.cl-photo{transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--dir)*var(--push)),var(--ry)) rotate(var(--rr));}
+  .cluster-explain{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.94);width:min(300px,82%);background:rgba(255,255,255,0.4);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,0.45);border-radius:20px;box-shadow:0 18px 44px rgba(15,23,42,0.18);padding:20px 22px;text-align:center;opacity:0;z-index:1000;transition:opacity 0.4s 0.15s,transform 0.4s 0.15s;pointer-events:none;}
+  :root.dark-mode .cluster-explain{background:rgba(26,35,51,0.4);border-color:rgba(127,168,255,0.16);}
+  .cluster:hover .cluster-explain,.cluster:focus-within .cluster-explain,.cluster.is-open .cluster-explain{opacity:1;transform:translate(calc(-50% + var(--dir)*-34px),-50%) scale(1);}
+  .cluster-explain .tag-pill{margin-bottom:10px;}
+  .cluster-explain h4{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.08rem;margin:0 0 8px;}
+  .cluster-explain p{color:#334155;font-size:0.84rem;line-height:1.55;margin:0;}
+  .cl-photo.mystery{width:260px;height:325px;background:#0c1220;border-radius:6px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));}
+  .cl-photo.mystery .cl-mark{font-family:'Playfair Display',serif;font-size:2.8rem;color:var(--gold);line-height:1;}
+  @media(max-width:700px){.cl-photo{width:180px;}.cl-photo.mystery{width:180px;height:225px;}.cluster-photos{height:320px;}}
+  @media(max-width:600px){.materials-flow{gap:20px;}}
+  @media(prefers-reduced-motion:reduce){.cl-photo,.cluster-photos,.cluster-explain{transition:none!important;}}
+
 
   .piano-section{background:var(--card-bg);padding:70px 5%;}
   @media(max-width:600px){.piano-section{padding:44px 4%;}}
@@ -280,14 +281,9 @@
   <div class="section-inner">
     <div class="section-label">Warsztat pracy</div>
     <h2 class="section-title">Autorskie pomoce dydaktyczne</h2>
-    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje dla dzieci prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii, dopasowanych do wieku ucznia. Najedź na dowolną stertę zdjęć, żeby zobaczyć, co się w niej kryje.</p>
+    <p style="color:#64748b;font-size:0.95rem;max-width:600px;line-height:1.7;margin:0;">Lekcje dla dzieci prowadzę z wykorzystaniem sprawdzonych narzędzi — zarówno tradycyjnych, jak i nowoczesnych technologii, dopasowanych do wieku ucznia. Najedź na dowolną grupę zdjęć, żeby zobaczyć więcej.</p>
 
-    <div class="mini-row">
-      <div class="mini-card"><div class="mini-icon">📱</div><div><h4>Tablet i aplikacje</h4><p>Simply Piano i forScore — nauka ze słuchu i cyfrowe nuty.</p></div></div>
-      <div class="mini-card"><div class="mini-icon">🚗</div><div><h4>Dowóz instrumentu na zajęcia</h4><p>Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.</p></div></div>
-    </div>
-
-    <div class="pile-grid" id="pileGrid"></div>
+    <div class="materials-flow" id="materialsFlow"></div>
   </div>
 </section>
 
@@ -391,15 +387,34 @@ function toggleDarkMode(){
 /* ══ STERTY ZDJĘĆ — AUTORSKIE POMOCE DYDAKTYCZNE ══ */
 const materialCategories = [
   {
-    icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc',
-    desc:'Autorskie opracowania: historia muzyki, teoria i ciekawostki, z krótkim quizem na koniec każdego wydania.',
+    icon:'📱', tag:'Technologia', title:'Tablet i aplikacje', iconSet:true,
+    desc:'Simply Piano i forScore — nauka ze słuchu i cyfrowe nuty. MuseScore i flowkey pomagają w czytaniu nut i śledzeniu postępów.',
     photos:[
-      {src:'zdjecia-briefy/strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
-      {src:'zdjecia-briefy/strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
+      {src:'zdjecia-aplikacje-tablet/zdjecie-simply-piano-1.webp', caption:'Simply Piano'},
+      {src:'zdjecia-aplikacje-tablet/zdjecie-forscore-1.webp', caption:'forScore'},
+      {src:'zdjecia-aplikacje-tablet/zdjecia-musescore-1.webp', caption:'MuseScore'},
+      {src:'zdjecia-aplikacje-tablet/zdjecie-flowkey-1.webp', caption:'flowkey'}
     ]
   },
   {
-    icon:'🎨', tag:'Bez nut', title:'Ilustracje do nauki beznutowej',
+    icon:'🚗', tag:'Dojazd', title:'Dowóz instrumentu na zajęcia', wide:true,
+    desc:'Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.',
+    photos:[
+      {src:'zdjecia-dojazd-auto-pianino/zdjecia-fiat-1.webp', caption:'Dojazd na zajęcia'},
+      {src:'zdjecia-dojazd-auto-pianino/zdjecia-pianino-do-dojazdow-1.webp', caption:'Przenośne pianino w pokrowcu'}
+    ]
+  },
+  {
+    icon:'✉️', tag:'Co miesiąc', title:'Briefy — wiedza co miesiąc', wide:true,
+    desc:'Autorskie opracowania: historia muzyki, teoria i ciekawostki, z krótkim quizem na koniec każdego wydania.',
+    photos:[
+      {src:'zdjedcia-briefy01a.webp', caption:'Brief nr 4 — Tajemnica litery H'},
+      {src:'strona-mnaterialy-ucznia2.webp', caption:'Strona z materiałami dla ucznia'},
+      {src:'strona-testy-3.webp', caption:'Quiz sprawdzający wiedzę'}
+    ]
+  },
+  {
+    icon:'🎨', tag:'Bez nut', title:'Ilustracje do nauki beznutowej', wide:true,
     desc:'Kolory i obrazki zamiast pięciolinii — oryginalne ilustracje, które towarzyszą najmłodszym od pierwszej lekcji.',
     photos:[
       {src:'zdjecia-ilustracje/woz_w_lesie.webp', caption:'Wóz w lesie'},
@@ -441,7 +456,7 @@ const materialCategories = [
     ]
   },
   {
-    icon:'🎹', tag:'Autorski', title:'Podręcznik do gry na pianinie',
+    icon:'🎹', tag:'Autorski', title:'Podręcznik do gry na pianinie', wide:true,
     desc:'Materiał tworzony od podstaw — od pierwszego dźwięku do samodzielnej gry.',
     photos:[
       {src:'zdjecia-podrecznik/nauka-gry-okladka.webp', caption:'Okładka podręcznika'},
@@ -452,85 +467,120 @@ const materialCategories = [
     ]
   },
   {
-    icon:'🗂️', tag:'Interaktywne', title:'Fiszki nutowe',
+    icon:'🗂️', tag:'Interaktywne', title:'Fiszki nutowe', wide:true,
     desc:'Ćwicz czytanie nut w kluczu wiolinowym i basowym we własnym tempie — online.',
     photos:[
       {src:'zdjecia-strona-fiszki/fiszki-8.webp', caption:'Widok fiszek'},
-      {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'}
+      {src:'zdjecia-strona-fiszki/strona-dzieciecy-7.webp', caption:'Wersja dla najmłodszych'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-1a.webp', caption:'Zgadnij nutę — ćwiczenie'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-2a.webp', caption:'Rozpoznawanie zagranego dźwięku'},
+      {src:'zdjecia-strona-fiszki/zdjecia-fiszki-3a.webp', caption:'Klucz wiolinowy i basowy razem'}
     ]
   },
   {
-    icon:'🎮', tag:'Nauka przez zabawę', title:'Gry dydaktyczne',
+    icon:'🎮', tag:'Nauka przez zabawę', title:'Gry dydaktyczne', wide:true,
     desc:'Interaktywne gry utrwalające znajomość nut i klawiatury.',
     photos:[
       {src:'zdjecia-strona-gry/strona-invaders-4.webp', caption:'Nutowy Invaders'},
       {src:'zdjecia-strona-gry/strona-maze-6.webp', caption:'Labirynt nutowy'},
       {src:'zdjecia-strona-gry/strona-postacie-maze-5.webp', caption:'Postacie z labiryntu'}
     ]
+  },
+  {
+    icon:'❓', tag:'W przygotowaniu', title:'To dopiero początek',
+    desc:'Materiałów wciąż przybywa — a w przygotowaniu są też media społecznościowe z filmami dydaktycznymi, które wkrótce dołączą do tej listy.',
+    photos:[
+      {mystery:true, caption:'Więcej wkrótce'}
+    ]
   }
 ];
 
-function buildPileGrid(containerId, categories, basePath){
-  const grid=document.getElementById(containerId);
-  if(!grid)return;
-  const restOffsets=[[-14,9,-8],[13,-7,6],[-6,-13,-4],[15,6,10],[-17,-3,-7],[5,14,5],[-10,-9,9],[9,-4,-6],[-4,12,-10],[-15,-6,3],[7,10,-5],[-9,4,8]];
-  const thumbW=126,thumbH=158,gapX=14,gapY=34;
-  categories.forEach(cat=>{
-    const pile=document.createElement('div');
-    pile.className='pile';
-    pile.tabIndex=0;
-    const stack=document.createElement('div');
-    stack.className='pile-stack';
+function buildClusterFlow(containerId, categories, basePath){
+  const flow=document.getElementById(containerId);
+  if(!flow)return;
+  const narrow=window.matchMedia('(max-width:700px)').matches;
+  const normalW=narrow?180:260;
+  const wideW=narrow?290:430;
+  const iconW=narrow?110:160;
+  const maxCascadeW=narrow?420:820;
+  const stepCap=narrow?90:150;
+  const yJitter=narrow?[0,-11,8,-6,13,-4,10,-8,5,-13,6,-5]:[0,-16,12,-9,18,-6,14,-12,7,-18,9,-7];
+  const pushAmount=narrow?80:140;
+
+  categories.forEach((cat,ci)=>{
+    const align=ci%2===0?'align-left':'align-right';
+    const dir=align==='align-left'?1:-1;
+    const cluster=document.createElement('div');
+    cluster.className='cluster '+align;
+    cluster.tabIndex=0;
+    cluster.style.setProperty('--dir',String(dir));
+    cluster.style.setProperty('--push',pushAmount+'px');
+
+    const photosWrap=document.createElement('div');
+    photosWrap.className='cluster-photos';
     const n=cat.photos.length;
-    const cols=Math.min(3,n);
-    const rows=Math.ceil(n/cols);
-    const openH=rows*thumbH+(rows-1)*gapY+16;
-    stack.style.setProperty('--open-h',openH+'px');
+    const photoW=cat.wide?wideW:(cat.iconSet?iconW:normalW);
+    const step=n>1?Math.min(stepCap,(maxCascadeW-photoW)/(n-1)):0;
+
     cat.photos.forEach((ph,i)=>{
       const fig=document.createElement('figure');
-      fig.className='pile-photo';
-      const off=restOffsets[i%restOffsets.length];
-      fig.style.setProperty('--rx',off[0]+'px');
-      fig.style.setProperty('--ry',off[1]+'px');
-      fig.style.setProperty('--rr',off[2]+'deg');
-      fig.style.setProperty('--rz',String(n-i));
-      const col=i%cols,row=Math.floor(i/cols);
-      const ox=(col-(cols-1)/2)*(thumbW+gapX);
-      const oy=(row-(rows-1)/2)*(thumbH+gapY);
-      fig.style.setProperty('--ox',ox+'px');
-      fig.style.setProperty('--oy',oy+'px');
-      fig.style.setProperty('--oz',String(i+1));
-      const img=document.createElement('img');
-      img.src=basePath+ph.src;
-      img.alt=ph.caption;
-      img.loading='lazy';
-      const cap=document.createElement('figcaption');
-      cap.textContent=ph.caption;
-      fig.appendChild(img);
-      fig.appendChild(cap);
-      stack.appendChild(fig);
+      fig.className='cl-photo'+(ph.mystery?' mystery':'')+(cat.iconSet?' icon-tile':'');
+      const centeredX=i*step-(n-1)*step/2;
+      const rx=dir*centeredX;
+      const ry=yJitter[i%yJitter.length];
+      const rr=n>1?(i-(n-1)/2)*2.4:0;
+      fig.style.setProperty('--rx',rx+'px');
+      fig.style.setProperty('--ry',ry+'px');
+      fig.style.setProperty('--rr',rr+'deg');
+      fig.style.setProperty('--rz',String(i+1));
+      if(!ph.mystery)fig.style.width=photoW+'px';
+      if(ph.mystery){
+        const mark=document.createElement('span');
+        mark.className='cl-mark';
+        mark.textContent='?';
+        fig.appendChild(mark);
+      }else{
+        const img=document.createElement('img');
+        img.src=basePath+ph.src;
+        img.alt=ph.caption;
+        img.loading='lazy';
+        fig.appendChild(img);
+        if(cat.iconSet&&ph.caption){
+          const label=document.createElement('span');
+          label.className='cl-app-label';
+          label.textContent=ph.caption;
+          fig.appendChild(label);
+        }
+      }
+      photosWrap.appendChild(fig);
     });
-    const label=document.createElement('span');
-    label.className='pile-label';
-    label.innerHTML='<span class="pile-icon">'+cat.icon+'</span>'+cat.title;
-    stack.appendChild(label);
-    const info=document.createElement('div');
-    info.className='pile-info';
-    info.innerHTML='<span class="tag-pill">'+cat.tag+'</span><h4>'+cat.title+'</h4><p>'+cat.desc+'</p>';
-    pile.appendChild(stack);
-    pile.appendChild(info);
-    grid.appendChild(pile);
+
+    const explain=document.createElement('div');
+    explain.className='cluster-explain';
+    explain.innerHTML='<span class="tag-pill">'+cat.tag+'</span><h4>'+cat.icon+' '+cat.title+'</h4><p>'+cat.desc+'</p>';
+    photosWrap.appendChild(explain);
+
+    cluster.appendChild(photosWrap);
+    flow.appendChild(cluster);
   });
-  grid.querySelectorAll('.pile').forEach(p=>{
-    p.addEventListener('click',function(){
+
+  // touch fallback: tap a photo to focus it (siblings after it slide away), tap again to close
+  flow.querySelectorAll('.cl-photo').forEach(p=>{
+    p.addEventListener('click',function(e){
       if(window.matchMedia('(hover: hover)').matches)return;
+      e.stopPropagation();
+      const cluster=p.closest('.cluster');
       const wasOpen=p.classList.contains('is-open');
-      grid.querySelectorAll('.pile.is-open').forEach(o=>o.classList.remove('is-open'));
-      if(!wasOpen)p.classList.add('is-open');
+      flow.querySelectorAll('.cl-photo.is-open').forEach(o=>o.classList.remove('is-open'));
+      flow.querySelectorAll('.cluster.is-open').forEach(o=>o.classList.remove('is-open'));
+      if(!wasOpen){
+        p.classList.add('is-open');
+        cluster.classList.add('is-open');
+      }
     });
   });
 }
-buildPileGrid('pileGrid', materialCategories, '/index/lekcje/grafiki-materialy/');
+buildClusterFlow('materialsFlow', materialCategories, '/index/lekcje/grafiki-materialy/');
 </script>
 </body>
 </html>
