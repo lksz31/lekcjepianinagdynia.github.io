@@ -158,9 +158,16 @@
     --blue: #3b82f6;
     --border: #f0f0f0;
     --text: #334155;
+    --text-mid: #64748b;
     --bg: #ffffff;
     --bg-alt: #f8fafc;
     --card-bg: #ffffff;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --gray-border: #e2e8f0;
   }
 
   :root.dark-mode {
@@ -169,9 +176,16 @@
     --blue: #6ea8ff;
     --border: #2a3548;
     --text: #c7d0e0;
+    --text-mid: #94a3b8;
     --bg: #0f1420;
     --bg-alt: #161d2e;
     --card-bg: #1a2333;
+    --green: #4ade80;
+    --green-bg: rgba(74,222,128,0.12);
+    --green-border: rgba(74,222,128,0.32);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.12);
+    --gray-border: #2a3548;
   }
 
   .dark-toggle-btn{position:fixed;top:18px;right:18px;z-index:2100;width:42px;height:42px;border-radius:50%;border:1px solid var(--border);background:var(--card-bg);color:var(--navy);font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.12);transition:transform 0.2s,box-shadow 0.2s;}
@@ -543,11 +557,76 @@
   }
 
   /* ══ KALENDARZ W SEKCJI TERMINY ══ */
-  .cal-wrap{max-width:640px;margin:36px auto 0;}
-  .cal-inner{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:24px;backdrop-filter:blur(10px);}
-  .cal-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:14px;display:block;text-align:center;}
-  .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;}
-  @media(max-width:500px){.cal-inner iframe{height:260px;}}
+  .cal-widget-wrap{max-width:640px;margin:36px auto 0;background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.06);padding:26px 24px;text-align:left;}
+  .cal-widget-header{margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .cal-widget-title{font-family:'Playfair Display',serif;font-size:1.12rem;font-weight:700;color:var(--navy);}
+  .cal-widget-range{font-size:0.76rem;color:var(--text-mid);margin-top:2px;}
+  .cal-widget-nav{display:flex;gap:8px;flex-shrink:0;}
+  .cal-widget-nav button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gray-border);background:var(--card-bg);color:var(--navy);font-size:1rem;cursor:pointer;transition:0.2s;}
+  .cal-widget-nav button:hover:not(:disabled){border-color:var(--gold);color:var(--gold);}
+  .cal-widget-nav button:disabled{opacity:0.3;cursor:not-allowed;}
+
+  .weekday-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px;}
+  .weekday-row span{text-align:center;font-size:0.64rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.05em;}
+  .days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .days-grid.week2{margin-top:6px;}
+  .day-cell{aspect-ratio:1;border-radius:12px;border:1.5px solid var(--gray-border);background:var(--bg-alt);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:default;position:relative;transition:0.15s;padding:4px 2px;}
+  .day-cell.past{opacity:0.35;}
+  .day-cell.closed{background:var(--bg-alt);}
+  .day-cell.available{background:var(--green-bg);border-color:var(--green-border);cursor:pointer;}
+  .day-cell.available:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(22,163,74,0.15);}
+  .day-cell.full{background:var(--red-bg);border-color:#fecaca;}
+  .day-cell.selected{outline:2px solid var(--navy);outline-offset:1px;}
+  .day-cell.today{border-width:2px;border-color:var(--navy);}
+  .day-num{font-size:0.86rem;font-weight:700;color:var(--text);line-height:1;}
+  .day-cell.closed .day-num,.day-cell.past .day-num{color:var(--text-mid);}
+  .day-sun{width:22px;height:22px;}
+  .cal-loading{text-align:center;padding:30px 0;color:var(--text-mid);font-size:0.85rem;}
+  .cal-error{text-align:center;padding:16px;color:var(--red);font-size:0.8rem;background:var(--red-bg);border-radius:12px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:0.7rem;color:var(--text-mid);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;}
+  .leg-avail{background:var(--green-bg);border:1.5px solid var(--green-border);}
+  .leg-full{background:var(--red-bg);border:1.5px solid #fecaca;}
+  .leg-closed{background:var(--bg-alt);border:1.5px solid var(--gray-border);}
+
+  .detail-panel{margin-top:18px;padding-top:18px;border-top:1px solid var(--border);display:none;}
+  .detail-panel.show{display:block;}
+  .detail-date{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:700;color:var(--navy);margin-bottom:4px;text-transform:capitalize;}
+  .detail-sub{font-size:0.74rem;color:var(--text-mid);margin-bottom:12px;}
+  .slots-grid{display:flex;flex-wrap:wrap;gap:9px;}
+  .slot-pill{padding:9px 16px 9px 13px;border-radius:14px;font-size:0.84rem;font-weight:700;border:none;background:linear-gradient(135deg,var(--green-bg),var(--green-border));color:var(--green);cursor:pointer;transition:0.2s cubic-bezier(0.2,0.8,0.2,1);box-shadow:0 2px 6px rgba(22,163,74,0.12);display:inline-flex;align-items:center;gap:6px;}
+  .slot-pill svg{width:13px;height:13px;flex-shrink:0;}
+  .slot-pill svg circle,.slot-pill svg path{stroke:var(--green);}
+  .slot-pill:hover{background:linear-gradient(135deg,#16a34a,#0d8a3e);color:#fff;transform:translateY(-3px) scale(1.04);box-shadow:0 8px 18px rgba(22,163,74,0.32);}
+  .slot-pill:hover svg circle,.slot-pill:hover svg path{stroke:#fff;}
+  .slot-pill:active{transform:translateY(-1px) scale(1.01);}
+  .no-slots{color:var(--text-mid);font-size:0.82rem;}
+
+  .book-panel{margin-top:18px;padding:20px;border-radius:16px;background:var(--navy-solid);display:none;}
+  .book-panel.show{display:block;}
+  .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;margin:0 0 4px;}
+  .book-when{color:rgba(255,255,255,0.65);font-size:0.78rem;margin-bottom:12px;}
+  .disclaimer{background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:10px 14px;font-size:0.72rem;color:#fdf0c8;line-height:1.55;margin-bottom:14px;}
+  .mode-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;background:rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;}
+  .mode-row input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--gold);cursor:pointer;}
+  .mode-row input[type=checkbox]:disabled{cursor:not-allowed;opacity:0.5;}
+  .mode-row span{font-size:0.76rem;color:rgba(255,255,255,0.85);}
+  .mode-locked{font-size:0.72rem;color:rgba(255,255,255,0.55);margin-bottom:10px;}
+  .book-panel input,.book-panel textarea{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.83rem;}
+  .book-panel textarea{height:50px;resize:none;}
+  .book-panel input#bAddr:disabled{background:#f1f5f9;color:#64748b;cursor:not-allowed;}
+  .book-submit{width:100%;background:var(--gold);color:#fff;border:none;padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
+  .book-submit:hover{opacity:0.9;}
+  .book-submit:disabled{opacity:0.4;cursor:not-allowed;}
+  .book-status{margin-top:10px;font-size:0.8rem;text-align:center;color:#4ade80;}
+  .book-error{color:#fca5a5;font-size:0.76rem;margin:-2px 0 10px;}
+  .close-book{background:none;border:none;color:rgba(255,255,255,0.5);font-size:0.74rem;cursor:pointer;float:right;text-decoration:underline;}
+
+  @media(max-width:420px){
+    .day-num{font-size:0.78rem;}
+    .day-sun{width:18px;height:18px;}
+  }
 </style>
 </head>
 <body>
@@ -686,11 +765,58 @@
       <h2 class="apple-card-title">Zarezerwuj swój termin</h2>
       <p class="apple-card-sub">Wybierz dogodne miejsce, uzupełnij dane kontaktowe — odezwę się, aby potwierdzić termin lekcji.</p>
       <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
-      <div class="cal-wrap">
-        <div class="cal-inner">
-          <span class="cal-label">📅 Wolne terminy zajęć</span>
-          <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
+    </div>
+
+    <div class="cal-widget-wrap">
+      <div class="cal-widget-header">
+        <div>
+          <div class="cal-widget-title">Najbliższe terminy</div>
+          <div class="cal-widget-range" id="calRange">—</div>
         </div>
+        <div class="cal-widget-nav">
+          <button id="prevBtn" onclick="shiftCalWeeks(-14)" aria-label="Poprzednie dwa tygodnie">‹</button>
+          <button id="nextBtn" onclick="shiftCalWeeks(14)" aria-label="Następne dwa tygodnie">›</button>
+        </div>
+      </div>
+
+      <div class="weekday-row">
+        <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
+      </div>
+
+      <div id="calWarning"></div>
+      <div id="calBody">
+        <div class="cal-loading">Ładowanie kalendarza…</div>
+      </div>
+
+      <div class="legend">
+        <span><i class="leg-avail"></i>Wolne terminy</span>
+        <span><i class="leg-full"></i>Brak wolnych</span>
+        <span><i class="leg-closed"></i>Nieczynne</span>
+      </div>
+
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-date" id="detailDate"></div>
+        <div class="detail-sub" id="detailSub"></div>
+        <div class="slots-grid" id="slotsGrid"></div>
+      </div>
+
+      <div class="book-panel" id="calBookPanel">
+        <button class="close-book" onclick="closeCalBook()">✕ zamknij</button>
+        <h3>Zarezerwuj termin</h3>
+        <div class="book-when" id="calBookWhen"></div>
+        <div class="disclaimer">⚠ To są propozycje terminów. Zanim potwierdzę na 100%, oddzwonię i sprawdzę, czy rzeczywiście zdążę dojechać na wybraną godzinę.</div>
+
+        <div id="calModeArea"></div>
+
+        <input type="text" id="calName" placeholder="Twoje imię i nazwisko" oninput="recalcCalBooking()">
+        <input type="tel" id="calPhone" placeholder="Numer telefonu" oninput="recalcCalBooking()">
+        <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
+        <input type="text" id="calAddr" placeholder="Adres, pod który mam przyjechać" oninput="recalcCalBooking()">
+        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)">
+        <textarea id="calMsg"></textarea>
+        <div class="book-error" id="calBookError"></div>
+        <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">WYŚLIJ ZGŁOSZENIE</button>
+        <div class="book-status" id="calBookStatus"></div>
       </div>
     </div>
   </div>
@@ -1230,5 +1356,486 @@ function toggleDarkMode(){
   },5500);
 })();
 </script>
+
+<script>
+/* ══════════════════ WIDGET KALENDARZA DOSTĘPNOŚCI ══════════════════ */
+const CAL_API_KEY = 'AIzaSyCTvjSUJmUqU5maY-0TyYT8aVi5Yu2jIWk';
+/* Sprawdzamy WYŁĄCZNIE kalendarz zajętości nauczyciela */
+const CALENDAR_IDS = [
+  'c665a3faafe4bd078333ac7d55a5b2e13a042fc246cceb43e8e3af111ed2394b@group.calendar.google.com'
+];
+const TEACHER_ADDRESS = 'Lipnowska 17/2, Gdynia';
+const DAYS_AHEAD = 14;
+
+const MNIE_DURATION = 60;
+const MNIE_BUFFER = 5;
+const UCZEN_DURATIONS = [60,75,90];
+const UCZEN_BUFFER = 25;
+
+const MONTH_NAMES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
+const WEEKDAY_FULL = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
+
+let busyIntervals = [];
+let dayStates = {};
+let dayList = [];
+let selectedDateKey = null;
+let lastCalErrors = [];
+let bookCtx = null;
+let currentStartMonday = null;
+
+const WEEKS_AHEAD_LIMIT = 8; /* jak daleko w przyszłość można przewinąć (8 x 2 tygodnie = ok. 4 miesiące) */
+
+const calToday = new Date();
+calToday.setHours(0,0,0,0);
+
+function mondayOf(date){
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = (day===0 ? -6 : 1-day);
+  d.setDate(d.getDate()+diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+
+function buildDayList(){
+  dayList = [];
+  for(let i=0;i<DAYS_AHEAD;i++){
+    const d = new Date(currentStartMonday);
+    d.setDate(d.getDate()+i);
+    dayList.push(d);
+  }
+  const first = dayList[0], last = dayList[dayList.length-1];
+  document.getElementById('calRange').textContent =
+    first.getDate()+' '+MONTH_NAMES[first.getMonth()]+' – '+last.getDate()+' '+MONTH_NAMES[last.getMonth()]+' '+last.getFullYear();
+
+  const baseMonday = mondayOf(calToday);
+  document.getElementById('prevBtn').disabled = currentStartMonday.getTime() <= baseMonday.getTime();
+  const maxMonday = new Date(baseMonday); maxMonday.setDate(maxMonday.getDate()+WEEKS_AHEAD_LIMIT*14);
+  document.getElementById('nextBtn').disabled = currentStartMonday.getTime() >= maxMonday.getTime();
+}
+
+function shiftCalWeeks(deltaDays){
+  const d = new Date(currentStartMonday);
+  d.setDate(d.getDate()+deltaDays);
+  currentStartMonday = d;
+  buildDayList();
+  renderCalDays();
+}
+
+function initCalWidget(){
+  if(!document.getElementById('calBody')) return;
+  currentStartMonday = mondayOf(calToday);
+  buildDayList();
+  renderCalDays();
+}
+
+function calDateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+
+function getDayWindows(weekday){
+  if(weekday===3){
+    return [
+      {mode:'uczen', start:8, end:16},
+      {mode:'mnie', start:16, end:21}
+    ];
+  }
+  if(weekday===4){
+    return [
+      {mode:'both', start:8, end:15},
+      {mode:'uczen', start:15, end:21}
+    ];
+  }
+  if(weekday===1 || weekday===2 || weekday===5){
+    return [{mode:'uczen', start:8, end:21}];
+  }
+  return [];
+}
+
+async function fetchBusyForRange(rangeStart, rangeEnd){
+  const timeMin = rangeStart.toISOString();
+  const timeMax = rangeEnd.toISOString();
+
+  const url = 'https://www.googleapis.com/calendar/v3/freeBusy?key='+CAL_API_KEY;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      timeMin: timeMin,
+      timeMax: timeMax,
+      items: CALENDAR_IDS.map(id=>({id}))
+    })
+  });
+
+  if(!res.ok){
+    const body = await res.text();
+    throw new Error('HTTP '+res.status+' '+body.slice(0,200));
+  }
+
+  const data = await res.json();
+  const intervals = [];
+  const calErrors = [];
+
+  for(const calId of CALENDAR_IDS){
+    const calData = data.calendars && data.calendars[calId];
+    if(!calData){ calErrors.push(calId+': brak odpowiedzi'); continue; }
+    if(calData.errors && calData.errors.length){
+      calErrors.push(calId.slice(0,10)+'…: '+calData.errors[0].reason);
+      continue;
+    }
+    (calData.busy||[]).forEach(b=>{
+      intervals.push({start:new Date(b.start), end:new Date(b.end)});
+    });
+  }
+
+  if(calErrors.length){
+    console.warn('Niektóre kalendarze zwróciły błąd:', calErrors);
+  }
+  lastCalErrors = calErrors;
+  return intervals;
+}
+
+function isCandidateValid(start, end, mode, windows, busy){
+  const buffer = mode==='mnie' ? MNIE_BUFFER : UCZEN_BUFFER;
+  const fitsWindow = windows.some(w=>{
+    const wStart = new Date(start); wStart.setHours(w.start,0,0,0);
+    const wEnd = new Date(start); wEnd.setHours(w.end,0,0,0);
+    const modeOk = mode==='mnie' ? (w.mode==='mnie'||w.mode==='both') : (w.mode==='uczen'||w.mode==='both');
+    return modeOk && start>=wStart && end<=wEnd;
+  });
+  if(!fitsWindow) return false;
+  for(const iv of busy){
+    const bufStart = new Date(iv.start.getTime() - buffer*60000);
+    const bufEnd = new Date(iv.end.getTime() + buffer*60000);
+    if(start < bufEnd && end > bufStart) return false;
+  }
+  return true;
+}
+
+function hourHasOption(dayDate, hour, windows, busy){
+  const slotStart = new Date(dayDate); slotStart.setHours(hour,0,0,0);
+  const mnieEnd = new Date(slotStart.getTime()+MNIE_DURATION*60000);
+  if(isCandidateValid(slotStart, mnieEnd, 'mnie', windows, busy)) return true;
+  const uczenEnd = new Date(slotStart.getTime()+UCZEN_DURATIONS[0]*60000);
+  if(isCandidateValid(slotStart, uczenEnd, 'uczen', windows, busy)) return true;
+  return false;
+}
+
+function modesAtHour(windows, hour){
+  const modes = new Set();
+  windows.forEach(w=>{
+    if(hour>=w.start && hour<w.end){
+      if(w.mode==='mnie') modes.add('mnie');
+      else if(w.mode==='uczen') modes.add('uczen');
+      else if(w.mode==='both'){ modes.add('mnie'); modes.add('uczen'); }
+    }
+  });
+  return modes;
+}
+
+function computeDayState(dayDate){
+  const isPast = dayDate < calToday;
+  if(isPast) return {status:'past', slots:[], windows:[]};
+
+  const weekday = dayDate.getDay();
+  const windows = getDayWindows(weekday);
+  const isToday = dayDate.getTime() === calToday.getTime();
+  const nowHour = new Date().getHours();
+
+  if(windows.length===0) return {status:'closed', slots:[], windows:[]};
+
+  const rangeStart = Math.min.apply(null, windows.map(w=>w.start));
+  const rangeEnd = Math.max.apply(null, windows.map(w=>w.end));
+
+  const slots = [];
+  for(let h=rangeStart; h<rangeEnd; h++){
+    if(isToday && h <= nowHour) continue;
+    slots.push({hour:h, free: hourHasOption(dayDate, h, windows, busyIntervals)});
+  }
+  if(slots.length===0) return {status:'closed', slots:[], windows};
+  const freeCount = slots.filter(s=>s.free).length;
+  return {status: freeCount>0 ? 'available' : 'full', slots, windows};
+}
+
+function calSunSVG(slots){
+  const size=24, cx=size/2, cy=size/2;
+  if(slots.length===0){
+    return '<svg class="day-sun" viewBox="0 0 '+size+' '+size+'"><circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="#e2e8f0"/></svg>';
+  }
+
+  /* Model tarczy zegarowej: 12:00 na górze, godziny różniące się o 12h
+     (np. 8:00 i 20:00) dzielą ten sam promień. Promień świeci się
+     tylko jeśli WSZYSTKIE godziny na nim są wolne. */
+  const posMap = {};
+  slots.forEach(s=>{
+    const pos = s.hour % 12;
+    (posMap[pos] = posMap[pos]||[]).push(s.free);
+  });
+
+  const rays_data = [];
+  let anyFree = false;
+  for(let p=0;p<12;p++){
+    if(!posMap[p]) continue;
+    const free = posMap[p].every(f=>f);
+    rays_data.push({pos:p, free});
+    if(free) anyFree = true;
+  }
+
+  if(!anyFree){
+    return calMoonSVG(size,cx,cy);
+  }
+
+  const rCenter = 5, r1=7, r2=10.5;
+  let rays='';
+  rays_data.forEach(rd=>{
+    const angle = (-90 + rd.pos*30) * Math.PI/180;
+    const x1 = cx + r1*Math.cos(angle), y1 = cy + r1*Math.sin(angle);
+    const x2 = cx + r2*Math.cos(angle), y2 = cy + r2*Math.sin(angle);
+    const color = rd.free ? '#d4af37' : '#e2e8f0';
+    rays += '<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+color+'" stroke-width="2" stroke-linecap="round"/>';
+  });
+  return '<svg class="day-sun" viewBox="0 0 '+size+' '+size+'">'+rays+'<circle cx="'+cx+'" cy="'+cy+'" r="'+rCenter+'" fill="#fdf6e3" stroke="#d4af37" stroke-width="1.5"/></svg>';
+}
+
+function calMoonSVG(size,cx,cy){
+  const r = 6.5;
+  const bodyId = 'moonMask'+Math.random().toString(36).slice(2,9);
+  return '<svg class="day-sun" viewBox="0 0 '+size+' '+size+'">'
+    + '<defs><mask id="'+bodyId+'"><rect x="0" y="0" width="'+size+'" height="'+size+'" fill="white"/>'
+    + '<circle cx="'+(cx+3)+'" cy="'+(cy-2)+'" r="'+r+'" fill="black"/></mask></defs>'
+    + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#cbd5e1" mask="url(#'+bodyId+')"/>'
+    + '</svg>';
+}
+
+async function renderCalDays(){
+  const body = document.getElementById('calBody');
+  body.innerHTML = '<div class="cal-loading">Ładowanie kalendarza…</div>';
+  document.getElementById('detailPanel').classList.remove('show');
+  document.getElementById('calBookPanel').classList.remove('show');
+  selectedDateKey = null;
+
+  document.getElementById('calWarning').innerHTML = '';
+  const rangeStart = dayList[0];
+  const rangeEnd = new Date(dayList[dayList.length-1]);
+  rangeEnd.setHours(23,59,59);
+
+  try{
+    busyIntervals = await fetchBusyForRange(rangeStart, rangeEnd);
+  }catch(err){
+    body.innerHTML = '<div class="cal-error">Nie udało się pobrać kalendarza.<br>'+err.message+'</div>';
+    return;
+  }
+
+  if(lastCalErrors.length){
+    document.getElementById('calWarning').innerHTML = '<div class="cal-error" style="margin-bottom:14px;">⚠ Kalendarz nie odpowiedział poprawnie: '+lastCalErrors.join('; ')+'. Widoczna dostępność może być niepełna.</div>';
+  }
+
+  dayStates = {};
+  let html = '';
+  for(let w=0; w<2; w++){
+    html += '<div class="days-grid'+(w===1?' week2':'')+'">';
+    for(let i=0;i<7;i++){
+      const idx = w*7+i;
+      const d = dayList[idx];
+      const y=d.getFullYear(), m=d.getMonth(), dd=d.getDate();
+      const key = calDateKey(y,m,dd);
+      const state = computeDayState(d);
+      dayStates[key] = state;
+      const isToday = d.getTime()===calToday.getTime();
+      const clickable = state.status==='available';
+      html += '<div class="day-cell '+state.status+(isToday?' today':'')+'" '
+        + (clickable ? 'onclick="selectCalDay(\''+key+'\')"' : '')
+        + '><span class="day-num">'+dd+'</span>'
+        + (state.status==='available'||state.status==='full' ? calSunSVG(state.slots) : '')
+        + '</div>';
+    }
+    html += '</div>';
+  }
+  body.innerHTML = html;
+}
+
+function selectCalDay(key){
+  selectedDateKey = key;
+  document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  const state = dayStates[key];
+  const [y,m,d] = key.split('-').map(Number);
+  const dateObj = new Date(y,m-1,d);
+  const label = WEEKDAY_FULL[dateObj.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y;
+  document.getElementById('detailDate').textContent = label;
+  document.getElementById('detailSub').textContent = dateObj.getDay()===3
+    ? 'Do 16:00 tylko u ucznia, od 16:00 do 21:00 wyłącznie u nauczyciela.'
+    : (dateObj.getDay()===4 ? 'Do 15:00 do wyboru (u nauczyciela lub u ucznia), później tylko u ucznia.' : 'Lekcje z dojazdem do ucznia.');
+
+  const grid = document.getElementById('slotsGrid');
+  const freeSlots = state.slots.filter(s=>s.free);
+  if(freeSlots.length===0){
+    grid.innerHTML = '<span class="no-slots">Brak dostępnych godzin tego dnia.</span>';
+  }else{
+    grid.innerHTML = freeSlots.map(s=>{
+      const label = String(s.hour).padStart(2,'0')+':00';
+      return '<button class="slot-pill" onclick="openCalBook(\''+key+'\','+s.hour+')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
+    }).join('');
+  }
+  document.getElementById('detailPanel').classList.add('show');
+  document.getElementById('calBookPanel').classList.remove('show');
+}
+
+function openCalBook(key, hour){
+  const state = dayStates[key];
+  const [y,m,d] = key.split('-').map(Number);
+  const dayDate = new Date(y,m-1,d,0,0,0);
+  const avail = modesAtHour(state.windows, hour);
+  const bothAvailable = avail.has('mnie') && avail.has('uczen');
+  const defaultMode = avail.has('mnie') ? 'mnie' : 'uczen';
+
+  bookCtx = {
+    key, hour, dayDate, windows: state.windows,
+    mode: defaultMode, bothAvailable,
+    duration: MNIE_DURATION
+  };
+
+  const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':00';
+  document.getElementById('calBookWhen').textContent = label;
+  document.getElementById('calMsg').value = 'Propozycja terminu: '+label;
+  document.getElementById('calBookStatus').textContent = '';
+
+  const modeArea = document.getElementById('calModeArea');
+  if(bothAvailable){
+    modeArea.innerHTML = '<label class="mode-row"><input type="checkbox" id="calModeMnie" checked onchange="calOnModeToggle()"><span>U nauczyciela ('+TEACHER_ADDRESS+')</span></label>';
+  }else if(defaultMode==='mnie'){
+    modeArea.innerHTML = '<div class="mode-locked">📍 Ta godzina jest dostępna wyłącznie u nauczyciela ('+TEACHER_ADDRESS+').</div>';
+  }else{
+    modeArea.innerHTML = '<div class="mode-locked">📍 Ta godzina wymaga dojazdu do ucznia — podaj adres poniżej.</div>';
+  }
+
+  calApplyModeToUI();
+  recalcCalBooking();
+  document.getElementById('calBookPanel').classList.add('show');
+  document.getElementById('calBookPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function calOnModeToggle(){
+  const checked = document.getElementById('calModeMnie').checked;
+  bookCtx.mode = checked ? 'mnie' : 'uczen';
+  bookCtx.duration = MNIE_DURATION;
+  calApplyModeToUI();
+  recalcCalBooking();
+}
+
+function calApplyModeToUI(){
+  const addrInput = document.getElementById('calAddr');
+  bookCtx.duration = MNIE_DURATION;
+  if(bookCtx.mode==='mnie'){
+    addrInput.value = TEACHER_ADDRESS;
+    addrInput.disabled = true;
+  }else{
+    if(addrInput.value===TEACHER_ADDRESS) addrInput.value='';
+    addrInput.disabled = false;
+  }
+}
+
+function recalcCalBooking(){
+  if(!bookCtx) return true;
+  const start = new Date(bookCtx.dayDate); start.setHours(bookCtx.hour,0,0,0);
+  const end = new Date(start.getTime() + bookCtx.duration*60000);
+  bookCtx.start = start; bookCtx.end = end;
+
+  const valid = isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
+  const errEl = document.getElementById('calBookError');
+  const btn = document.getElementById('calBookSubmitBtn');
+
+  if(!valid){
+    errEl.textContent = bookCtx.mode==='mnie'
+      ? 'Ta godzina nie mieści się z zachowaniem 5-minutowego odstępu od sąsiednich lekcji.'
+      : 'Ta godzina nie mieści się z zachowaniem 25-minutowego odstępu (czas na dojazd).';
+    btn.disabled = true;
+    return false;
+  }
+  errEl.textContent = '';
+  btn.disabled = false;
+
+  const endLabel = String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
+  const startLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
+  document.getElementById('calBookWhen').textContent =
+    WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear()
+    +', godz. '+startLabel+'–'+endLabel+' ('+(bookCtx.mode==='mnie'?'u nauczyciela':'u ucznia')+')';
+
+  return true;
+}
+
+function closeCalBook(){
+  document.getElementById('calBookPanel').classList.remove('show');
+  bookCtx = null;
+}
+
+async function submitCalBooking(){
+  if(!bookCtx) return;
+  const name = document.getElementById('calName').value.trim();
+  const phone = document.getElementById('calPhone').value.trim();
+  const email = document.getElementById('calEmail').value.trim();
+  const address = document.getElementById('calAddr').value.trim();
+  const status = document.getElementById('calBookStatus');
+  const errEl = document.getElementById('calBookError');
+  const submitBtn = document.getElementById('calBookSubmitBtn');
+
+  if(name.length<2 || phone.length<9 || !email.includes('@')){
+    errEl.textContent = 'Wypełnij imię, telefon i email.';
+    return;
+  }
+  if(bookCtx.mode==='uczen' && address.length<5){
+    errEl.textContent = 'Wpisz adres, pod który mam przyjechać.';
+    return;
+  }
+  if(!recalcCalBooking()){
+    return;
+  }
+  errEl.textContent = '';
+
+  const eventTitle = 'pianino — '+name+' — prośba o lekcję';
+  const payload = {
+    typ: 'rezerwacja-kalendarz',
+    imie_nazwisko: name,
+    telefon: phone,
+    email: email,
+    miejsce: bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd',
+    adres: address,
+    kod_rabatowy: document.getElementById('calPromo').value.trim(),
+    data_start: bookCtx.start.toISOString(),
+    data_koniec: bookCtx.end.toISOString(),
+    tytul_wydarzenia: eventTitle,
+    opis_wydarzenia: 'Adres: '+address+'\nTel: '+phone+'\nEmail: '+email,
+    tresc: document.getElementById('calMsg').value.trim(),
+    data: new Date().toLocaleString('pl-PL'),
+    owner_email: OWNER_EMAIL
+  };
+
+  submitBtn.disabled = true;
+  status.style.color = 'var(--text-mid)';
+  status.textContent = '⏳ Wysyłanie...';
+
+  try{
+    const r = await fetch(FORM_WEBHOOK, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+    const text = await r.text();
+    if(!r.ok && !text.toLowerCase().includes('accepted')) throw new Error('HTTP '+r.status);
+    status.style.color = '#4ade80';
+    status.innerHTML = '✓ Zgłoszenie wysłane! To jeszcze nie jest ostateczne potwierdzenie — oddzwonię telefonicznie, żeby potwierdzić ten termin lekcji.';
+    showToast('✅ Zgłoszenie wysłane!');
+    setTimeout(()=>{
+      closeCalBook();
+      status.textContent = '';
+      ['calName','calPhone','calEmail','calPromo'].forEach(id=>document.getElementById(id).value='');
+      renderCalDays();
+    }, 3500);
+  }catch(e){
+    status.style.color = '#f87171';
+    status.textContent = '❌ Błąd wysyłki. Zadzwoń: 514 338 875';
+    showToast('Błąd wysyłki.', true);
+    submitBtn.disabled = false;
+  }
+}
+
+initCalWidget();
+</script>
+
 </body>
 </html>
