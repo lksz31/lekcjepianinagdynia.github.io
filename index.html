@@ -541,6 +541,13 @@
   @media(max-width:700px){
     section#gry>div>div.games-grid{grid-template-columns:1fr!important;}
   }
+
+  /* ══ KALENDARZ W SEKCJI TERMINY ══ */
+  .cal-wrap{max-width:640px;margin:36px auto 0;}
+  .cal-inner{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:24px;backdrop-filter:blur(10px);}
+  .cal-label{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:14px;display:block;text-align:center;}
+  .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;}
+  @media(max-width:500px){.cal-inner iframe{height:260px;}}
 </style>
 </head>
 <body>
@@ -550,8 +557,8 @@
 <nav class="site-nav">
   <a href="/index.html">Strona główna</a>
   <a href="/index/lekcje/dzieci.html">Dla dzieci</a>
-  <a href="/index/lekcje/dorosli.html">Dla osób dorosłych</a>
   <a href="#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/lekcje/dorosli.html">Dla osób dorosłych</a>
   <a href="/index/fiszki/fiszki.html">Fiszki</a>
 </nav>
 
@@ -679,6 +686,12 @@
       <h2 class="apple-card-title">Zarezerwuj swój termin</h2>
       <p class="apple-card-sub">Wybierz dogodne miejsce, uzupełnij dane kontaktowe — odezwę się, aby potwierdzić termin lekcji.</p>
       <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
+      <div class="cal-wrap">
+        <div class="cal-inner">
+          <span class="cal-label">📅 Wolne terminy zajęć</span>
+          <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
+        </div>
+      </div>
     </div>
   </div>
 </section>
