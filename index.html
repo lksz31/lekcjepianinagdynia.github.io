@@ -607,12 +607,10 @@
   .book-panel.show{display:block;}
   .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;margin:0 0 4px;}
   .book-when{color:rgba(255,255,255,0.65);font-size:0.78rem;margin-bottom:12px;}
-  .disclaimer{background:rgba(212,175,55,0.14);border:1px solid rgba(212,175,55,0.4);border-radius:12px;padding:10px 14px;font-size:0.72rem;color:#fdf0c8;line-height:1.55;margin-bottom:14px;}
   .mode-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;background:rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;}
   .mode-row input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--gold);cursor:pointer;}
   .mode-row input[type=checkbox]:disabled{cursor:not-allowed;opacity:0.5;}
   .mode-row span{font-size:0.76rem;color:rgba(255,255,255,0.85);}
-  .mode-locked{font-size:0.72rem;color:rgba(255,255,255,0.55);margin-bottom:10px;}
   .book-panel input,.book-panel textarea{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.83rem;}
   .book-panel textarea{height:50px;resize:none;}
   .book-panel input#bAddr:disabled{background:#f1f5f9;color:#64748b;cursor:not-allowed;}
@@ -771,15 +769,15 @@
     <div class="section-label">Rezerwacja</div>
     <h2 class="section-title" style="text-align:center;">Umów lekcję</h2>
     <div class="apple-card" id="appleLocation">
-      <h2 class="apple-card-title">Zarezerwuj swój termin</h2>
-      <p class="apple-card-sub">Wybierz dogodne miejsce, uzupełnij dane kontaktowe — odezwę się, aby potwierdzić termin lekcji.</p>
-      <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
+      <h2 class="apple-card-title">Poproś o kontakt</h2>
+      <p class="apple-card-sub">Nie widzisz pasującej godziny w kalendarzu poniżej albo wolisz, żebym się do Ciebie odezwał? Zostaw swoje dane — skontaktuję się, żeby ustalić termin.</p>
+      <button class="btn-open-form" onclick="toggleForm(true)">POPROŚ O KONTAKT</button>
     </div>
 
     <div class="cal-widget-wrap">
       <div class="cal-widget-header">
         <div>
-          <div class="cal-widget-title">Najbliższe terminy</div>
+          <div class="cal-widget-title">Umów się na wolny termin</div>
           <div class="cal-widget-range" id="calRange">—</div>
         </div>
         <div class="cal-widget-nav">
@@ -813,20 +811,20 @@
         <button class="close-book" onclick="closeCalBook()">✕ zamknij</button>
         <h3>Zarezerwuj termin</h3>
         <div class="book-when" id="calBookWhen"></div>
-        <div class="disclaimer">⚠ To są propozycje terminów. Zanim potwierdzę na 100%, oddzwonię i sprawdzę, czy rzeczywiście zdążę dojechać na wybraną godzinę.</div>
 
         <div id="calModeArea"></div>
         <div id="calPianoArea"></div>
         <div id="calPriceArea"></div>
 
-        <input type="text" id="calName" placeholder="Twoje imię i nazwisko" oninput="recalcCalBooking()">
+        <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
         <input type="tel" id="calPhone" placeholder="Numer telefonu" oninput="recalcCalBooking()">
         <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
-        <input type="text" id="calAddr" placeholder="Adres, pod który mam przyjechać" oninput="recalcCalBooking()">
+        <div id="calAddrWrap">
+          <input type="text" id="calAddr" placeholder="Dzielnica" oninput="recalcCalBooking()">
+        </div>
         <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="calUpdatePrice()">
-        <textarea id="calMsg"></textarea>
         <div class="book-error" id="calBookError"></div>
-        <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">WYŚLIJ ZGŁOSZENIE</button>
+        <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">ZAREZERWUJ TERMIN</button>
         <div class="book-status" id="calBookStatus"></div>
       </div>
     </div>
@@ -1709,16 +1707,13 @@ function openCalBook(key, hour){
 
   const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':00';
   document.getElementById('calBookWhen').textContent = label;
-  document.getElementById('calMsg').value = 'Propozycja terminu: '+label;
   document.getElementById('calBookStatus').textContent = '';
 
   const modeArea = document.getElementById('calModeArea');
   if(bothAvailable){
     modeArea.innerHTML = '<label class="mode-row"><input type="checkbox" id="calModeMnie" checked onchange="calOnModeToggle()"><span>U nauczyciela ('+TEACHER_ADDRESS+')</span></label>';
-  }else if(defaultMode==='mnie'){
-    modeArea.innerHTML = '<div class="mode-locked">📍 Ta godzina jest dostępna wyłącznie u nauczyciela ('+TEACHER_ADDRESS+').</div>';
   }else{
-    modeArea.innerHTML = '<div class="mode-locked">📍 Ta godzina wymaga dojazdu do ucznia — podaj adres poniżej.</div>';
+    modeArea.innerHTML = '';
   }
 
   calApplyModeToUI();
@@ -1736,14 +1731,13 @@ function calOnModeToggle(){
 }
 
 function calApplyModeToUI(){
-  const addrInput = document.getElementById('calAddr');
+  const addrWrap = document.getElementById('calAddrWrap');
   bookCtx.duration = MNIE_DURATION;
   if(bookCtx.mode==='mnie'){
-    addrInput.value = TEACHER_ADDRESS;
-    addrInput.disabled = true;
+    addrWrap.style.display = 'none';
+    document.getElementById('calAddr').value = '';
   }else{
-    if(addrInput.value===TEACHER_ADDRESS) addrInput.value='';
-    addrInput.disabled = false;
+    addrWrap.style.display = 'block';
   }
   calRenderPianoArea();
   calUpdatePrice();
@@ -1827,7 +1821,7 @@ async function submitCalBooking(){
   const name = document.getElementById('calName').value.trim();
   const phone = document.getElementById('calPhone').value.trim();
   const email = document.getElementById('calEmail').value.trim();
-  const address = document.getElementById('calAddr').value.trim();
+  const district = document.getElementById('calAddr').value.trim();
   const status = document.getElementById('calBookStatus');
   const errEl = document.getElementById('calBookError');
   const submitBtn = document.getElementById('calBookSubmitBtn');
@@ -1836,8 +1830,8 @@ async function submitCalBooking(){
     errEl.textContent = 'Wypełnij imię, telefon i email.';
     return;
   }
-  if(bookCtx.mode==='uczen' && address.length<5){
-    errEl.textContent = 'Wpisz adres, pod który mam przyjechać.';
+  if(bookCtx.mode==='uczen' && district.length<2){
+    errEl.textContent = 'Wpisz dzielnicę.';
     return;
   }
   if(!recalcCalBooking()){
@@ -1850,6 +1844,7 @@ async function submitCalBooking(){
   const promoCode = document.getElementById('calPromo').value.trim();
   const promoOk = promoCode.toLowerCase() === PROMO_CODE;
   const priceFinal = promoOk ? priceBase*(1-PROMO_DISCOUNT) : priceBase;
+  const miejsceLabel = bookCtx.mode==='mnie' ? ('U nauczyciela ('+TEACHER_ADDRESS+')') : ('U ucznia — dojazd, dzielnica: '+district);
   const payload = {
     typ: 'rezerwacja-kalendarz',
     imie_nazwisko: name,
@@ -1857,14 +1852,13 @@ async function submitCalBooking(){
     email: email,
     miejsce: bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd',
     pianino: bookCtx.mode==='mnie' ? '—' : (calHasPiano ? 'Tak' : 'Nie — dowóz instrumentu'),
-    adres: address,
+    dzielnica: bookCtx.mode==='mnie' ? '—' : district,
     kod_rabatowy: promoCode,
     cena: formatPLN(priceFinal)+' zł'+(promoOk?' (rabat 60% na lekcję próbną)':''),
     data_start: bookCtx.start.toISOString(),
     data_koniec: bookCtx.end.toISOString(),
     tytul_wydarzenia: eventTitle,
-    opis_wydarzenia: 'Adres: '+address+'\nTel: '+phone+'\nEmail: '+email,
-    tresc: document.getElementById('calMsg').value.trim(),
+    opis_wydarzenia: 'Miejsce: '+miejsceLabel+'\nTel: '+phone+'\nEmail: '+email,
     data: new Date().toLocaleString('pl-PL'),
     owner_email: OWNER_EMAIL
   };
@@ -1878,12 +1872,12 @@ async function submitCalBooking(){
     const text = await r.text();
     if(!r.ok && !text.toLowerCase().includes('accepted')) throw new Error('HTTP '+r.status);
     status.style.color = '#4ade80';
-    status.innerHTML = '✓ Zgłoszenie wysłane! To jeszcze nie jest ostateczne potwierdzenie — oddzwonię telefonicznie, żeby potwierdzić ten termin lekcji.';
-    showToast('✅ Zgłoszenie wysłane!');
+    status.innerHTML = '✓ Zarezerwowano! Dostaniesz ode mnie telefon z potwierdzeniem tej lekcji.';
+    showToast('✅ Zarezerwowano!');
     setTimeout(()=>{
       closeCalBook();
       status.textContent = '';
-      ['calName','calPhone','calEmail','calPromo'].forEach(id=>document.getElementById(id).value='');
+      ['calName','calPhone','calEmail','calAddr','calPromo'].forEach(id=>document.getElementById(id).value='');
       renderCalDays();
     }, 3500);
   }catch(e){
