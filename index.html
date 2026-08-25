@@ -621,7 +621,16 @@
   .book-submit:disabled{opacity:0.4;cursor:not-allowed;}
   .book-status{margin-top:10px;font-size:0.8rem;text-align:center;color:#4ade80;}
   .book-error{color:#fca5a5;font-size:0.76rem;margin:-2px 0 10px;}
-  .close-book{background:none;border:none;color:rgba(255,255,255,0.5);font-size:0.74rem;cursor:pointer;float:right;text-decoration:underline;}
+  .cw-piano-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .cw-piano-tile{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;transition:0.2s;font-size:0.78rem;color:rgba(255,255,255,0.85);}
+  .cw-piano-tile b{display:block;font-size:0.82rem;color:#fff;}
+  .cw-piano-tile.selected{border-color:var(--gold);background:rgba(212,175,55,0.16);}
+  .cw-price-box{background:rgba(255,255,255,0.06);border:2px dashed var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:12px;text-align:center;}
+  .cw-price-old{text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:1rem;font-weight:600;margin-right:8px;}
+  .cw-price-new{color:#4ade80;font-size:1.4rem;font-weight:800;}
+  .cw-price-plain{color:#fff;font-size:1.3rem;font-weight:800;}
+  .cw-price-note{font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:6px;line-height:1.5;}
+  .cw-price-lowest{font-size:0.68rem;color:rgba(255,255,255,0.55);margin-top:4px;}
 
   @media(max-width:420px){
     .day-num{font-size:0.78rem;}
@@ -807,12 +816,14 @@
         <div class="disclaimer">⚠ To są propozycje terminów. Zanim potwierdzę na 100%, oddzwonię i sprawdzę, czy rzeczywiście zdążę dojechać na wybraną godzinę.</div>
 
         <div id="calModeArea"></div>
+        <div id="calPianoArea"></div>
+        <div id="calPriceArea"></div>
 
         <input type="text" id="calName" placeholder="Twoje imię i nazwisko" oninput="recalcCalBooking()">
         <input type="tel" id="calPhone" placeholder="Numer telefonu" oninput="recalcCalBooking()">
         <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
         <input type="text" id="calAddr" placeholder="Adres, pod który mam przyjechać" oninput="recalcCalBooking()">
-        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)">
+        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="calUpdatePrice()">
         <textarea id="calMsg"></textarea>
         <div class="book-error" id="calBookError"></div>
         <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">WYŚLIJ ZGŁOSZENIE</button>
@@ -1381,6 +1392,7 @@ let dayList = [];
 let selectedDateKey = null;
 let lastCalErrors = [];
 let bookCtx = null;
+let calHasPiano = true;
 let currentStartMonday = null;
 
 const WEEKS_AHEAD_LIMIT = 8; /* jak daleko w przyszłość można przewinąć (8 x 2 tygodnie = ok. 4 miesiące) */
@@ -1693,6 +1705,7 @@ function openCalBook(key, hour){
     mode: defaultMode, bothAvailable,
     duration: MNIE_DURATION
   };
+  calHasPiano = true;
 
   const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':00';
   document.getElementById('calBookWhen').textContent = label;
@@ -1731,6 +1744,47 @@ function calApplyModeToUI(){
   }else{
     if(addrInput.value===TEACHER_ADDRESS) addrInput.value='';
     addrInput.disabled = false;
+  }
+  calRenderPianoArea();
+  calUpdatePrice();
+}
+
+function calSetPiano(v){
+  calHasPiano = v;
+  const yesTile = document.getElementById('cw-piano-yes');
+  const noTile = document.getElementById('cw-piano-no');
+  if(yesTile) yesTile.classList.toggle('selected', v);
+  if(noTile) noTile.classList.toggle('selected', !v);
+  calUpdatePrice();
+}
+
+function calRenderPianoArea(){
+  const area = document.getElementById('calPianoArea');
+  if(!bookCtx || bookCtx.mode!=='uczen'){
+    area.innerHTML = '';
+    return;
+  }
+  area.innerHTML = '<div class="cw-piano-row">'
+    + '<div class="cw-piano-tile'+(calHasPiano?' selected':'')+'" id="cw-piano-yes" onclick="calSetPiano(true)"><b>Mam pianino</b>Standard</div>'
+    + '<div class="cw-piano-tile'+(!calHasPiano?' selected':'')+'" id="cw-piano-no" onclick="calSetPiano(false)"><b>Nie mam</b>Dowóz instrumentu (+20 zł)</div>'
+    + '</div>';
+}
+
+function calUpdatePrice(){
+  if(!bookCtx) return;
+  const base = (bookCtx.mode==='uczen' && !calHasPiano) ? 119 : 99;
+  const codeVal = document.getElementById('calPromo').value.trim().toLowerCase();
+  const codeOk = codeVal === PROMO_CODE;
+  const priceArea = document.getElementById('calPriceArea');
+  if(codeOk){
+    const discounted = base*(1-PROMO_DISCOUNT);
+    priceArea.innerHTML = '<div class="cw-price-box">'
+      + '<span class="cw-price-old">'+base+' zł</span><span class="cw-price-new">'+formatPLN(discounted)+' zł</span>'
+      + '<div class="cw-price-lowest">Najniższa cena w ciągu ostatnich 30 dni: '+base+' zł</div>'
+      + '<div class="cw-price-note">* Rabat obowiązuje jednorazowo — jedna osoba może wykorzystać kod tylko na jedną lekcję próbną. Kolejne zamówienia — cena standardowa.</div>'
+      + '</div>';
+  }else{
+    priceArea.innerHTML = '<div class="cw-price-box"><span class="cw-price-plain">'+base+' zł / h</span></div>';
   }
 }
 
@@ -1792,14 +1846,20 @@ async function submitCalBooking(){
   errEl.textContent = '';
 
   const eventTitle = 'pianino — '+name+' — prośba o lekcję';
+  const priceBase = (bookCtx.mode==='uczen' && !calHasPiano) ? 119 : 99;
+  const promoCode = document.getElementById('calPromo').value.trim();
+  const promoOk = promoCode.toLowerCase() === PROMO_CODE;
+  const priceFinal = promoOk ? priceBase*(1-PROMO_DISCOUNT) : priceBase;
   const payload = {
     typ: 'rezerwacja-kalendarz',
     imie_nazwisko: name,
     telefon: phone,
     email: email,
     miejsce: bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd',
+    pianino: bookCtx.mode==='mnie' ? '—' : (calHasPiano ? 'Tak' : 'Nie — dowóz instrumentu'),
     adres: address,
-    kod_rabatowy: document.getElementById('calPromo').value.trim(),
+    kod_rabatowy: promoCode,
+    cena: formatPLN(priceFinal)+' zł'+(promoOk?' (rabat 60% na lekcję próbną)':''),
     data_start: bookCtx.start.toISOString(),
     data_koniec: bookCtx.end.toISOString(),
     tytul_wydarzenia: eventTitle,
