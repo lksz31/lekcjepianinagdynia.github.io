@@ -148,19 +148,17 @@
         <div class="b-label">Dopasuj nutkę</div>
       </div>
 
-      <div class="building b2 soon" onclick="openGame(2)">
+      <div class="building b2" onclick="openGame(2)">
         <div class="b-roof"></div>
         <span class="b-num">2</span>
-        <span class="b-lock">🔒</span>
         <div class="b-icon">✏️</div>
         <div class="b-windows"><span></span><span></span></div>
         <div class="b-label">Narysuj nutę</div>
       </div>
 
-      <div class="building b3 soon" onclick="openGame(3)">
+      <div class="building b3" onclick="openGame(3)">
         <div class="b-roof"></div>
         <span class="b-num">3</span>
-        <span class="b-lock">🔒</span>
         <div class="b-icon">⭕</div>
         <div class="b-windows"><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <div class="b-label">Zaznacz nutę</div>
@@ -191,10 +189,9 @@
         <div class="b-label">Klucz z puzzli</div>
       </div>
 
-      <div class="building b7 soon" onclick="openGame(7)">
+      <div class="building b7" onclick="openGame(7)">
         <div class="b-roof"></div>
         <span class="b-num">7</span>
-        <span class="b-lock">🔒</span>
         <div class="b-icon">🔗</div>
         <div class="b-windows"><span></span><span></span></div>
         <div class="b-label">Dopasuj nazwę</div>
@@ -248,12 +245,12 @@
 <script>
 const GAMES = {
   1: {title:'🎯 Dopasuj nutkę do literki', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nute.html'},
-  2: {title:'✏️ Narysuj nutę', ready:false},
-  3: {title:'⭕ Zaznacz właściwą nutę', ready:false},
+  2: {title:'✏️ Narysuj nutę', ready:true, url:'/index/gry/zagrajkowo/gra-narysuj-nute.html'},
+  3: {title:'⭕ Zaznacz właściwą nutę', ready:true, url:'/index/gry/zagrajkowo/gra-zaznacz-nute.html'},
   4: {title:'🐶 Piesek i nuty', ready:false},
   5: {title:'✉️ Napisz list nutami', ready:false},
   6: {title:'🧩 Ułóż klucz wiolinowy', ready:false},
-  7: {title:'🔗 Dopasuj nazwę do obrazka', ready:false},
+  7: {title:'🔗 Dopasuj nazwę do obrazka', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
 };
 
 function openGame(id){
