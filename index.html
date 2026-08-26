@@ -638,6 +638,9 @@
   .mode-check-locked.off{background:#ef4444;color:#fff;}
   .mode-note{font-size:0.7rem;color:rgba(255,255,255,0.55);margin:-4px 0 10px;line-height:1.5;}
   .book-panel input,.book-panel textarea,.book-panel select{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.83rem;background:#fff;color:var(--text);}
+  .phone-row{display:flex;gap:8px;margin-bottom:10px;}
+  .phone-prefix{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 12px;border-radius:12px;background:rgba(255,255,255,0.1);color:#fff;font-weight:700;font-size:0.83rem;}
+  .phone-row input{margin-bottom:0;}
   .book-panel textarea{height:50px;resize:none;}
   .book-panel input#bAddr:disabled{background:#f1f5f9;color:#64748b;cursor:not-allowed;}
   .book-submit{width:100%;background:var(--gold);color:#fff;border:none;padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
@@ -841,7 +844,10 @@
         <div id="calModeArea"></div>
 
         <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
-        <input type="tel" id="calPhone" placeholder="Numer telefonu" oninput="recalcCalBooking()">
+        <div class="phone-row">
+          <span class="phone-prefix">+48</span>
+          <input type="tel" id="calPhone" placeholder="123 456 789" oninput="calPhoneInput(this)">
+        </div>
         <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
         <div id="calAddrWrap">
           <select id="calCity" onchange="recalcCalBooking()">
@@ -1798,6 +1804,25 @@ function calApplyModeToUI(){
   }
 }
 
+function calPhoneInput(el){
+  el.value = el.value.replace(/\D/g,'').slice(0,9);
+  recalcCalBooking();
+}
+
+function calFormComplete(){
+  const name = document.getElementById('calName').value.trim();
+  const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
+  const email = document.getElementById('calEmail').value.trim();
+  if(name.length<2) return false;
+  if(phoneDigits.length!==9) return false;
+  if(!email.includes('@') || !email.includes('.')) return false;
+  if(bookCtx && bookCtx.mode==='uczen'){
+    const street = document.getElementById('calStreet').value.trim();
+    if(street.length<3) return false;
+  }
+  return true;
+}
+
 function recalcCalBooking(){
   if(!bookCtx) return true;
   const start = new Date(bookCtx.dayDate); start.setHours(bookCtx.hour, bookCtx.minute||0, 0, 0);
@@ -1816,7 +1841,6 @@ function recalcCalBooking(){
     return false;
   }
   errEl.textContent = '';
-  btn.disabled = false;
 
   const endLabel = String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
   const startLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
@@ -1824,6 +1848,7 @@ function recalcCalBooking(){
     WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear()
     +', godz. '+startLabel+'–'+endLabel+' ('+(bookCtx.mode==='mnie'?'u nauczyciela':'u ucznia')+')';
 
+  btn.disabled = !calFormComplete();
   return true;
 }
 
@@ -1836,7 +1861,8 @@ function closeCalBook(){
 async function submitCalBooking(){
   if(!bookCtx) return;
   const name = document.getElementById('calName').value.trim();
-  const phone = document.getElementById('calPhone').value.trim();
+  const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
+  const phone = '+48 '+phoneDigits;
   const email = document.getElementById('calEmail').value.trim();
   const city = document.getElementById('calCity').value;
   const street = document.getElementById('calStreet').value.trim();
@@ -1845,8 +1871,8 @@ async function submitCalBooking(){
   const errEl = document.getElementById('calBookError');
   const submitBtn = document.getElementById('calBookSubmitBtn');
 
-  if(name.length<2 || phone.length<9 || !email.includes('@')){
-    errEl.textContent = 'Wypełnij imię, telefon i email.';
+  if(name.length<2 || phoneDigits.length!==9 || !email.includes('@')){
+    errEl.textContent = 'Wypełnij imię, telefon (9 cyfr) i email.';
     return;
   }
   if(bookCtx.mode==='uczen' && street.length<3){
@@ -1860,19 +1886,19 @@ async function submitCalBooking(){
 
   const eventTitle = 'pianino — '+name+' — prośba o lekcję';
   const promoCode = document.getElementById('calPromo').value.trim();
-  const miejsceLabel = bookCtx.mode==='mnie' ? ('U nauczyciela ('+TEACHER_ADDRESS+')') : ('U ucznia — dojazd, adres: '+fullAddress);
+  const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
+  const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
   const payload = {
-    typ: 'rezerwacja-terminy',
+    typ: 'rezerwacja-kalendarz',
     imie_nazwisko: name,
     telefon: phone,
     email: email,
-    miejsce: bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd',
-    tresc: bookCtx.mode==='mnie' ? '' : ('Adres: '+fullAddress),
+    miejsce: address,
+    tresc: modeLabel+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
     kod_rabatowy: promoCode,
     data_start: bookCtx.start.toISOString(),
     data_koniec: bookCtx.end.toISOString(),
     tytul_wydarzenia: eventTitle,
-    opis_wydarzenia: 'Miejsce: '+miejsceLabel+'\nTel: '+phone+'\nEmail: '+email,
     data: new Date().toLocaleString('pl-PL'),
     owner_email: OWNER_EMAIL
   };
