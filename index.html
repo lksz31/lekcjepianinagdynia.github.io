@@ -1856,7 +1856,7 @@ async function submitCalBooking(){
   const promoCode = document.getElementById('calPromo').value.trim();
   const miejsceLabel = bookCtx.mode==='mnie' ? ('U nauczyciela ('+TEACHER_ADDRESS+')') : ('U ucznia — dojazd, dzielnica: '+district);
   const payload = {
-    typ: 'rezerwacja-kalendarz',
+    typ: 'rezerwacja-terminy',
     imie_nazwisko: name,
     telefon: phone,
     email: email,
