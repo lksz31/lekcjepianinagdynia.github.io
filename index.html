@@ -637,7 +637,7 @@
   .mode-check-locked.on{background:#22c55e;color:#fff;}
   .mode-check-locked.off{background:#ef4444;color:#fff;}
   .mode-note{font-size:0.7rem;color:rgba(255,255,255,0.55);margin:-4px 0 10px;line-height:1.5;}
-  .book-panel input,.book-panel textarea{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.83rem;}
+  .book-panel input,.book-panel textarea,.book-panel select{width:100%;padding:10px 14px;margin-bottom:10px;border-radius:12px;border:1px solid #ddd;font-family:'Poppins',sans-serif;box-sizing:border-box;font-size:0.83rem;background:#fff;color:var(--text);}
   .book-panel textarea{height:50px;resize:none;}
   .book-panel input#bAddr:disabled{background:#f1f5f9;color:#64748b;cursor:not-allowed;}
   .book-submit{width:100%;background:var(--gold);color:#fff;border:none;padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
@@ -844,7 +844,11 @@
         <input type="tel" id="calPhone" placeholder="Numer telefonu" oninput="recalcCalBooking()">
         <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
         <div id="calAddrWrap">
-          <input type="text" id="calAddr" placeholder="Dzielnica" oninput="recalcCalBooking()">
+          <select id="calCity" onchange="recalcCalBooking()">
+            <option value="Gdynia" selected>Gdynia</option>
+            <option value="Sopot">Sopot</option>
+          </select>
+          <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()">
         </div>
         <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)">
         <div class="book-error" id="calBookError"></div>
@@ -1788,7 +1792,7 @@ function calApplyModeToUI(){
   bookCtx.duration = MNIE_DURATION;
   if(bookCtx.mode==='mnie'){
     addrWrap.style.display = 'none';
-    document.getElementById('calAddr').value = '';
+    document.getElementById('calStreet').value = '';
   }else{
     addrWrap.style.display = 'block';
   }
@@ -1834,7 +1838,9 @@ async function submitCalBooking(){
   const name = document.getElementById('calName').value.trim();
   const phone = document.getElementById('calPhone').value.trim();
   const email = document.getElementById('calEmail').value.trim();
-  const district = document.getElementById('calAddr').value.trim();
+  const city = document.getElementById('calCity').value;
+  const street = document.getElementById('calStreet').value.trim();
+  const fullAddress = street ? (street+', '+city) : city;
   const status = document.getElementById('calBookStatus');
   const errEl = document.getElementById('calBookError');
   const submitBtn = document.getElementById('calBookSubmitBtn');
@@ -1843,8 +1849,8 @@ async function submitCalBooking(){
     errEl.textContent = 'Wypełnij imię, telefon i email.';
     return;
   }
-  if(bookCtx.mode==='uczen' && district.length<2){
-    errEl.textContent = 'Wpisz dzielnicę.';
+  if(bookCtx.mode==='uczen' && street.length<3){
+    errEl.textContent = 'Wpisz ulicę i numer mieszkania.';
     return;
   }
   if(!recalcCalBooking()){
@@ -1854,14 +1860,14 @@ async function submitCalBooking(){
 
   const eventTitle = 'pianino — '+name+' — prośba o lekcję';
   const promoCode = document.getElementById('calPromo').value.trim();
-  const miejsceLabel = bookCtx.mode==='mnie' ? ('U nauczyciela ('+TEACHER_ADDRESS+')') : ('U ucznia — dojazd, dzielnica: '+district);
+  const miejsceLabel = bookCtx.mode==='mnie' ? ('U nauczyciela ('+TEACHER_ADDRESS+')') : ('U ucznia — dojazd, adres: '+fullAddress);
   const payload = {
     typ: 'rezerwacja-terminy',
     imie_nazwisko: name,
     telefon: phone,
     email: email,
     miejsce: bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd',
-    tresc: bookCtx.mode==='mnie' ? '' : ('Dzielnica: '+district),
+    tresc: bookCtx.mode==='mnie' ? '' : ('Adres: '+fullAddress),
     kod_rabatowy: promoCode,
     data_start: bookCtx.start.toISOString(),
     data_koniec: bookCtx.end.toISOString(),
@@ -1885,7 +1891,8 @@ async function submitCalBooking(){
     setTimeout(()=>{
       closeCalBook();
       status.textContent = '';
-      ['calName','calPhone','calEmail','calAddr','calPromo'].forEach(id=>document.getElementById(id).value='');
+      ['calName','calPhone','calEmail','calStreet','calPromo'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('calCity').value = 'Gdynia';
       renderCalDays();
     }, 3500);
   }catch(e){
