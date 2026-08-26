@@ -1040,7 +1040,7 @@
       </ul>
     </div>
     <div class="footer-cta-col">
-      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję próbną</a>
+      <a href="#" class="footer-cta-btn" onclick="openBookingModal();return false;">🎹 Umów lekcję</a>
     </div>
   </div>
   <div style="max-width:1100px;margin:0 auto;">
@@ -1055,7 +1055,7 @@
   <div class="footer-modal">
     <button class="modal-close" onclick="closeBookingModal()">✕</button>
     <div class="modal-left">
-      <h3>Lekcja próbna</h3>
+      <h3>Umów lekcję</h3>
       <div class="modal-price" onclick="document.getElementById('m-name').focus();document.getElementById('m-name').scrollIntoView({behavior:'smooth',block:'center'});">
         <span id="m-price">99 zł / h</span>
       </div>
@@ -1210,7 +1210,7 @@ async function wyslijModal(){
   const email=document.getElementById('m-email').value.trim();
   if(name.length<2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
   submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
-  const payload={typ:'lekcja-probna',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();
