@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dopasuj Nazwę do Obrazka | Zagrajkowo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:20px;}
+  .instructions{text-align:center;max-width:440px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
+  .instructions strong{color:var(--navy);}
+
+  .match-board{display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:560px;width:100%;}
+  @media(max-width:520px){.match-board{grid-template-columns:1fr;gap:14px;}}
+  .match-col{display:flex;flex-direction:column;gap:10px;}
+  .match-item{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:0.2s;font-weight:700;color:var(--navy);text-align:center;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;}
+  .match-item:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .match-item.selected{border-color:var(--navy);background:#f0f4ff;box-shadow:0 0 0 3px rgba(30,58,138,0.15);}
+  .match-item.matched{border-color:var(--green);background:#f0fdf4;color:var(--green);cursor:default;opacity:0.75;}
+  .match-item.wrong{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+  .match-item svg{width:38px;height:38px;flex-shrink:0;}
+
+  .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
+  .feedback-msg.ok{color:var(--green);}
+  .feedback-msg.bad{color:var(--red);}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">🔗 Dopasuj nazwę do obrazka</span>
+  <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">5</span></span>
+</div>
+
+<div class="game-area">
+  <p class="instructions">Kliknij <strong>nazwę</strong> po lewej, a potem <strong>symbol</strong> po prawej, który do niej pasuje.</p>
+
+  <div class="match-board">
+    <div class="match-col" id="namesCol"></div>
+    <div class="match-col" id="symbolsCol"></div>
+  </div>
+
+  <div class="feedback-msg" id="feedbackMsg"></div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🏆</div>
+  <h2>Brawo!</h2>
+  <p id="winText"></p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+const PAIRS = [
+  {
+    id:'staccato', name:'Staccato',
+    svg:'<svg viewBox="0 0 40 40"><ellipse cx="18" cy="26" rx="7" ry="5.5" fill="#1e3a8a" transform="rotate(-15,18,26)"/><line x1="25" y1="26" x2="25" y2="6" stroke="#1e3a8a" stroke-width="2"/><circle cx="18" cy="14" r="2.2" fill="#1e3a8a"/></svg>',
+    desc:'Krótka kropka nad nutą — dźwięk krótki, odbity.'
+  },
+  {
+    id:'legato', name:'Legato',
+    svg:'<svg viewBox="0 0 40 40"><ellipse cx="9" cy="28" rx="6" ry="4.5" fill="#1e3a8a" transform="rotate(-15,9,28)"/><ellipse cx="30" cy="20" rx="6" ry="4.5" fill="#1e3a8a" transform="rotate(-15,30,20)"/><path d="M8 18 Q20 6 31 12" stroke="#1e3a8a" stroke-width="2" fill="none"/></svg>',
+    desc:'Łuk nad nutami — grać płynnie, bez przerwy między dźwiękami.'
+  },
+  {
+    id:'forte', name:'Forte',
+    svg:'<svg viewBox="0 0 40 40"><text x="20" y="28" font-size="26" font-family="Georgia,serif" font-style="italic" font-weight="bold" fill="#1e3a8a" text-anchor="middle">f</text></svg>',
+    desc:'Litera „f" — graj głośno.'
+  },
+  {
+    id:'piano_dyn', name:'Piano (cicho)',
+    svg:'<svg viewBox="0 0 40 40"><text x="20" y="28" font-size="24" font-family="Georgia,serif" font-style="italic" font-weight="bold" fill="#1e3a8a" text-anchor="middle">p</text></svg>',
+    desc:'Litera „p" — graj cicho.'
+  },
+  {
+    id:'crescendo', name:'Crescendo',
+    svg:'<svg viewBox="0 0 40 40"><path d="M4 14 L34 20 L4 26" stroke="#1e3a8a" stroke-width="2" fill="none"/></svg>',
+    desc:'„Widelec" rozszerzający się — stopniowo coraz głośniej.'
+  },
+];
+
+const TOTAL_ROUNDS = PAIRS.length;
+let matchedCount = 0, selectedName = null, selectedSymbol = null, wrongCount = 0;
+
+function shuffled(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function renderBoard(){
+  const namesCol = document.getElementById('namesCol');
+  const symbolsCol = document.getElementById('symbolsCol');
+  const namesOrder = shuffled(PAIRS);
+  const symbolsOrder = shuffled(PAIRS);
+
+  namesCol.innerHTML = namesOrder.map(p =>
+    '<div class="match-item" data-id="'+p.id+'" data-type="name" onclick="selectItem(this)">'+p.name+'</div>'
+  ).join('');
+
+  symbolsCol.innerHTML = symbolsOrder.map(p =>
+    '<div class="match-item" data-id="'+p.id+'" data-type="symbol" onclick="selectItem(this)">'+p.svg+'</div>'
+  ).join('');
+}
+
+function selectItem(el){
+  if(el.classList.contains('matched')) return;
+  const type = el.dataset.type;
+
+  if(type === 'name'){
+    if(selectedName) selectedName.classList.remove('selected');
+    selectedName = el;
+    el.classList.add('selected');
+  }else{
+    if(selectedSymbol) selectedSymbol.classList.remove('selected');
+    selectedSymbol = el;
+    el.classList.add('selected');
+  }
+
+  if(selectedName && selectedSymbol){
+    checkPair();
+  }
+}
+
+function checkPair(){
+  const feedback = document.getElementById('feedbackMsg');
+  if(selectedName.dataset.id === selectedSymbol.dataset.id){
+    selectedName.classList.remove('selected');
+    selectedSymbol.classList.remove('selected');
+    selectedName.classList.add('matched');
+    selectedSymbol.classList.add('matched');
+    matchedCount++;
+    document.getElementById('scoreVal').textContent = matchedCount;
+    const pair = PAIRS.find(p=>p.id===selectedName.dataset.id);
+    feedback.textContent = '✓ ' + pair.desc;
+    feedback.className = 'feedback-msg ok';
+    selectedName = null; selectedSymbol = null;
+    if(matchedCount >= TOTAL_ROUNDS){
+      setTimeout(showWin, 700);
+    }
+  }else{
+    selectedName.classList.add('wrong');
+    selectedSymbol.classList.add('wrong');
+    feedback.textContent = 'To nie ta para — spróbuj ponownie.';
+    feedback.className = 'feedback-msg bad';
+    wrongCount++;
+    const n = selectedName, s = selectedSymbol;
+    setTimeout(function(){
+      n.classList.remove('selected','wrong');
+      s.classList.remove('selected','wrong');
+      feedback.textContent = '';
+      feedback.className = 'feedback-msg';
+    }, 700);
+    selectedName = null; selectedSymbol = null;
+  }
+}
+
+function showWin(){
+  document.getElementById('winText').textContent =
+    'Dopasowano wszystkie ' + TOTAL_ROUNDS + ' par' + (wrongCount===0 ? ' bez pomyłki! 🌟' : ' (pomyłek: ' + wrongCount + ').');
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function restartGame(){
+  matchedCount = 0; wrongCount = 0; selectedName = null; selectedSymbol = null;
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('winOverlay').classList.remove('show');
+  renderBoard();
+}
+
+document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+restartGame();
+</script>
+</body>
+</html>

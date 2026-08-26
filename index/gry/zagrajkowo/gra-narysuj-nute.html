@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Narysuj Nutę | Zagrajkowo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
+
+  .task-box{background:var(--navy);color:white;border-radius:16px;padding:14px 26px;text-align:center;max-width:420px;}
+  .task-box .t-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);margin-bottom:4px;}
+  .task-box .t-text{font-weight:800;font-size:1.15rem;}
+  .task-box .t-text b{color:var(--gold);}
+
+  .duration-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  .dur-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:10px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;}
+  .dur-btn:hover{border-color:var(--gold);}
+  .dur-btn.active{border-color:var(--navy);background:#f0f4ff;}
+  .dur-btn svg{width:30px;height:40px;}
+  .dur-btn span{font-size:0.66rem;font-weight:700;color:var(--text-mid);}
+
+  .staff-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:16px;}
+  #staffWrap{width:min(92vw,420px);}
+  .slot-hit{cursor:pointer;}
+  .slot-hit rect{fill:transparent;}
+  .slot-hit:hover .ghost-note{opacity:0.35;}
+
+  .check-btn{background:var(--gold);color:white;border:none;padding:13px 32px;border-radius:50px;font-weight:800;font-size:0.9rem;cursor:pointer;transition:0.2s;}
+  .check-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .check-btn:hover:not(:disabled){transform:translateY(-2px);}
+
+  .feedback-msg{min-height:28px;font-weight:800;font-size:1rem;text-align:center;}
+  .feedback-msg.ok{color:var(--green);}
+  .feedback-msg.bad{color:var(--red);}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">✏️ Narysuj nutę</span>
+  <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">8</span></span>
+</div>
+
+<div class="game-area">
+  <div class="task-box">
+    <div class="t-label">Zadanie</div>
+    <div class="t-text" id="taskText">Narysuj <b>ćwierćnutę</b> na dźwięku <b>C</b></div>
+  </div>
+
+  <div class="duration-row" id="durationRow"></div>
+
+  <div class="staff-card">
+    <div id="staffWrap"></div>
+  </div>
+
+  <button class="check-btn" id="checkBtn" disabled onclick="checkAnswer()">Sprawdź</button>
+
+  <div class="feedback-msg" id="feedbackMsg"></div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🏆</div>
+  <h2>Brawo!</h2>
+  <p id="winText"></p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
+const CLEF_TREBLE_RATIO = 183 / 399;
+const CLEF_TREBLE_G_PCT = 0.560;
+
+const GAME_NOTES = [
+  {id:'c1', letter:'C', staffY:10},
+  {id:'d1', letter:'D', staffY:9},
+  {id:'e1', letter:'E', staffY:8},
+  {id:'f1', letter:'F', staffY:7},
+  {id:'g1', letter:'G', staffY:6},
+  {id:'a1', letter:'A', staffY:5},
+  {id:'h1', letter:'H', staffY:4},
+];
+
+const DURATIONS = [
+  {id:'whole',  label:'Cała nuta',   nazwa:'całą nutę'},
+  {id:'half',   label:'Półnuta',     nazwa:'półnutę'},
+  {id:'quarter',label:'Ćwierćnuta',  nazwa:'ćwierćnutę'},
+];
+
+function durIcon(id, filled){
+  filled = filled !== false;
+  const headFill = (id==='whole') ? 'none' : (filled ? '#d4af37' : 'none');
+  const stroke = '#8a6d1a';
+  let s = '<svg viewBox="0 0 30 40">';
+  s += '<ellipse cx="15" cy="30" rx="8" ry="6" fill="'+headFill+'" stroke="'+stroke+'" stroke-width="2" transform="rotate(-15,15,30)"/>';
+  if(id !== 'whole'){
+    s += '<line x1="22" y1="30" x2="22" y2="4" stroke="'+stroke+'" stroke-width="2.2"/>';
+  }
+  s += '</svg>';
+  return s;
+}
+
+const TOTAL_ROUNDS = 8;
+let round = 0, score = 0;
+let targetNote = null, targetDuration = null;
+let chosenSlot = null, chosenDuration = null;
+
+function pickTask(){
+  targetNote = GAME_NOTES[Math.floor(Math.random()*GAME_NOTES.length)];
+  targetDuration = DURATIONS[Math.floor(Math.random()*DURATIONS.length)];
+}
+
+function renderDurationButtons(){
+  const row = document.getElementById('durationRow');
+  row.innerHTML = DURATIONS.map(d =>
+    '<div class="dur-btn" data-id="'+d.id+'" onclick="chooseDuration(\''+d.id+'\')">'+durIcon(d.id)+'<span>'+d.label+'</span></div>'
+  ).join('');
+}
+
+function chooseDuration(id){
+  chosenDuration = id;
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+  updateCheckBtn();
+  if(chosenSlot !== null) renderStaff();
+}
+
+function renderStaff(){
+  const W = 300, H = 200;
+  const sg = 16;
+  const staffTop = 40;
+  const c = '#1e3a8a';
+
+  let s = '<svg id="staffSvg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+
+  for(let i=0;i<5;i++){
+    const ly = staffTop + i*sg;
+    s += '<line x1="20" y1="'+ly+'" x2="'+(W-20)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.55"/>';
+  }
+
+  const ch = sg * 6.0;
+  const cw = ch * CLEF_TREBLE_RATIO;
+  const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
+  s += '<image href="'+CLEF_TREBLE_URL+'" x="24" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>';
+
+  const topLine = staffTop, botLine = staffTop + 4*sg;
+  const noteX = W*0.72;
+  const ledW = 12;
+
+  GAME_NOTES.forEach((n, i) => {
+    const noteY = staffTop + (n.staffY * sg / 2);
+    const isChosen = chosenSlot === i;
+
+    if(noteY > botLine + sg*0.5){
+      let ly = botLine + sg;
+      while(ly <= noteY + sg*0.3){
+        s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.5"/>';
+        ly += sg;
+      }
+    }
+    if(noteY < topLine - sg*0.5){
+      let ly = topLine - sg;
+      while(ly >= noteY - sg*0.3){
+        s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.5"/>';
+        ly -= sg;
+      }
+    }
+
+    s += '<g class="slot-hit" data-idx="'+i+'" onclick="chooseSlot('+i+')">';
+    s += '<rect x="'+(noteX-16)+'" y="'+(noteY-50)+'" width="32" height="70"/>';
+
+    if(isChosen && chosenDuration){
+      const headFill = chosenDuration==='whole' ? 'none' : '#d4af37';
+      s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="11" ry="8" fill="'+headFill+'" stroke="#8a6d1a" stroke-width="2" transform="rotate(-15,'+noteX+','+noteY+')"/>';
+      if(chosenDuration !== 'whole'){
+        const stemUp = noteY > staffTop + sg*2;
+        const sx = stemUp ? noteX+9 : noteX-9;
+        const sy2 = stemUp ? noteY-42 : noteY+42;
+        s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="2.4"/>';
+      }
+    }else{
+      s += '<circle class="ghost-note" cx="'+noteX+'" cy="'+noteY+'" r="9" fill="'+c+'" opacity="0"/>';
+    }
+    s += '</g>';
+  });
+
+  s += '</svg>';
+  document.getElementById('staffWrap').innerHTML = s;
+}
+
+function chooseSlot(i){
+  chosenSlot = i;
+  renderStaff();
+  updateCheckBtn();
+}
+
+function updateCheckBtn(){
+  document.getElementById('checkBtn').disabled = !(chosenSlot !== null && chosenDuration);
+}
+
+function checkAnswer(){
+  const feedback = document.getElementById('feedbackMsg');
+  const chosenNote = GAME_NOTES[chosenSlot];
+  const correctPitch = chosenNote.letter === targetNote.letter;
+  const correctDur = chosenDuration === targetDuration.id;
+
+  if(correctPitch && correctDur){
+    feedback.textContent = '✓ Idealnie!';
+    feedback.className = 'feedback-msg ok';
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+    setTimeout(nextRound, 800);
+  }else{
+    let msg = 'Prawie! ';
+    if(!correctPitch) msg += 'Zła wysokość dźwięku. ';
+    if(!correctDur) msg += 'Zła wartość rytmiczna.';
+    feedback.textContent = msg;
+    feedback.className = 'feedback-msg bad';
+  }
+}
+
+function nextRound(){
+  round++;
+  document.getElementById('feedbackMsg').textContent = '';
+  document.getElementById('feedbackMsg').className = 'feedback-msg';
+  if(round >= TOTAL_ROUNDS){ showWin(); return; }
+  chosenSlot = null; chosenDuration = null;
+  pickTask();
+  document.getElementById('taskText').innerHTML = 'Narysuj <b>'+targetDuration.nazwa+'</b> na dźwięku <b>'+targetNote.letter+'</b>';
+  renderDurationButtons();
+  renderStaff();
+  updateCheckBtn();
+}
+
+function showWin(){
+  document.getElementById('winText').textContent =
+    'Wynik: ' + score + ' / ' + TOTAL_ROUNDS + ' — ' +
+    (score === TOTAL_ROUNDS ? 'komplet! 🌟' : score >= TOTAL_ROUNDS*0.7 ? 'bardzo dobrze!' : 'ćwicz dalej!');
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function restartGame(){
+  round = 0; score = 0;
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('winOverlay').classList.remove('show');
+  nextRound();
+}
+
+document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+restartGame();
+</script>
+</body>
+</html>
