@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Napisz List Nutami | Zagrajkowo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
+  .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
+  .instructions strong{color:var(--navy);}
+
+  .letter-card{background:var(--card-bg);border-radius:20px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:30px 28px;max-width:540px;width:100%;font-family:'Playfair Display',serif;font-size:1.08rem;line-height:2.1;color:var(--text);}
+  .blank-note{display:inline-flex;align-items:center;justify-content:center;width:34px;height:44px;vertical-align:middle;margin:0 2px;cursor:pointer;border-radius:8px;transition:0.2s;}
+  .blank-note.active{background:#fffbf0;outline:2px dashed var(--gold);}
+  .blank-note svg{width:100%;height:100%;}
+  .blank-letter-filled{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;vertical-align:middle;margin:0 2px;background:#f0fdf4;border:2px solid var(--green);border-radius:8px;font-weight:900;color:var(--green);font-family:'Nunito',sans-serif;}
+
+  .keyboard-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .key-btn{width:44px;height:44px;border-radius:12px;background:var(--card-bg);border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .key-btn:hover{border-color:var(--gold);}
+
+  .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
+  .feedback-msg.ok{color:var(--green);}
+  .feedback-msg.bad{color:var(--red);}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;max-width:420px;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">✉️ Napisz list nutami</span>
+  <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
+</div>
+
+<div class="game-area">
+  <p class="instructions">Kliknij nutkę w liście, a potem literkę na klawiaturze poniżej, żeby ją uzupełnić. Odczytaj cały list!</p>
+
+  <div class="letter-card" id="letterCard"></div>
+
+  <div class="keyboard-row" id="keyboardRow"></div>
+
+  <div class="feedback-msg" id="feedbackMsg"></div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">💌</div>
+  <h2>List gotowy!</h2>
+  <p id="winText"></p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
+const CLEF_TREBLE_RATIO = 183 / 399;
+const CLEF_TREBLE_G_PCT = 0.560;
+const STAFF_Y = {C:10, D:9, E:8, F:7, G:6, A:5, H:4};
+const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
+
+const LETTER_TEMPLATE = [
+  {t:'Drogi Muzyku! '},
+  {b:'C'}, {t:'ieszę się, że uczysz się grać na pianinie. '},
+  {b:'D'}, {t:'źwięki, które poznajesz, mają swoje nazwy: '},
+  {b:'E'}, {t:', '},
+  {b:'F'}, {t:', '},
+  {b:'G'}, {t:', '},
+  {b:'A'}, {t:' i '},
+  {b:'H'}, {t:'. Poćwicz je wszystkie na pianinie — do zobaczenia na lekcji!'},
+];
+
+function miniNoteSVG(letter){
+  const W=34,H=44,sg=6.5,staffTop=8;
+  const c='#1e3a8a';
+  let s = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+  for(let i=0;i<5;i++){
+    const ly = staffTop + i*sg;
+    s += '<line x1="2" y1="'+ly+'" x2="'+(W-2)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1" opacity="0.5"/>';
+  }
+  const ch = sg*4.2, cw = ch*CLEF_TREBLE_RATIO;
+  const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT*ch;
+  s += '<image href="'+CLEF_TREBLE_URL+'" x="0" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>';
+  const noteX = W*0.72;
+  const noteY = staffTop + (STAFF_Y[letter]*sg/2);
+  s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="4.2" ry="3.2" fill="#d4af37" stroke="#8a6d1a" stroke-width="0.8" transform="rotate(-15,'+noteX+','+noteY+')"/>';
+  const stemUp = noteY > staffTop+sg*2;
+  const sx = stemUp? noteX+3.5: noteX-3.5;
+  const sy2 = stemUp? noteY-16: noteY+16;
+  s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="1"/>';
+  s += '</svg>';
+  return s;
+}
+
+let blanks = [], solvedCount = 0, activeBlankId = null;
+
+function renderLetter(){
+  const card = document.getElementById('letterCard');
+  let html = '';
+  let bi = 0;
+  blanks = [];
+  LETTER_TEMPLATE.forEach(part => {
+    if(part.t){ html += part.t; }
+    else if(part.b){
+      const id = bi++;
+      blanks.push({id:id, letter:part.b, solved:false});
+      html += '<span class="blank-note" data-id="'+id+'" onclick="selectBlank('+id+')">'+miniNoteSVG(part.b)+'</span>';
+    }
+  });
+  card.innerHTML = html;
+}
+
+function renderKeyboard(){
+  const row = document.getElementById('keyboardRow');
+  row.innerHTML = LETTERS_ORDER.map(function(l){
+    return '<button class="key-btn" onclick="pressKey(\''+l+'\')">'+l+'</button>';
+  }).join('');
+}
+
+function selectBlank(id){
+  const b = blanks.find(function(x){return x.id===id;});
+  if(b.solved) return;
+  activeBlankId = id;
+  document.querySelectorAll('.blank-note').forEach(function(el){el.classList.remove('active');});
+  const el = document.querySelector('.blank-note[data-id="'+id+'"]');
+  if(el) el.classList.add('active');
+}
+
+function pressKey(letter){
+  if(activeBlankId === null){
+    document.getElementById('feedbackMsg').textContent = 'Najpierw kliknij nutkę w liście.';
+    document.getElementById('feedbackMsg').className = 'feedback-msg bad';
+    return;
+  }
+  const b = blanks.find(function(x){return x.id===activeBlankId;});
+  const el = document.querySelector('.blank-note[data-id="'+activeBlankId+'"]');
+  const feedback = document.getElementById('feedbackMsg');
+
+  if(letter === b.letter){
+    b.solved = true;
+    el.outerHTML = '<span class="blank-letter-filled">'+letter+'</span>';
+    solvedCount++;
+    document.getElementById('scoreVal').textContent = solvedCount;
+    feedback.textContent = '✓ To był dźwięk ' + letter + '!';
+    feedback.className = 'feedback-msg ok';
+    activeBlankId = null;
+    if(solvedCount >= blanks.length){
+      setTimeout(showWin, 600);
+    }
+  }else{
+    feedback.textContent = 'To nie ' + letter + ' — spójrz jeszcze raz na pięciolinię.';
+    feedback.className = 'feedback-msg bad';
+  }
+}
+
+function showWin(){
+  document.getElementById('winText').textContent = 'Uzupełniłeś/aś cały list poprawnie! Teraz możesz go swobodnie przeczytać.';
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function restartGame(){
+  solvedCount = 0; activeBlankId = null;
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('feedbackMsg').textContent = '';
+  document.getElementById('winOverlay').classList.remove('show');
+  renderLetter();
+  renderKeyboard();
+}
+
+document.getElementById('totalVal').textContent = LETTER_TEMPLATE.filter(function(p){return p.b;}).length;
+restartGame();
+</script>
+</body>
+</html>
