@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dopasuj Nutkę do Literki | Nauka Nut</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 16px 50px;gap:34px;}
+
+  .instructions{text-align:center;max-width:420px;color:var(--text-mid);font-size:0.88rem;line-height:1.6;}
+  .instructions strong{color:var(--navy);}
+
+  .staff-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:20px;}
+  #staffSvgWrap{width:min(90vw,340px);}
+
+  .note-token{cursor:grab;touch-action:none;user-select:none;}
+  .note-token:active{cursor:grabbing;}
+  .note-token.correct-pop{animation:pop 0.5s ease;}
+  @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.4);opacity:0.6;}100%{transform:scale(0);opacity:0;}}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
+
+  .letters-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:520px;}
+  .letter-target{width:56px;height:56px;border-radius:16px;background:var(--card-bg);border:3px dashed var(--border);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--navy);transition:0.2s;}
+  .letter-target.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
+  .letter-target.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
+  .letter-target.correct-flash{border-color:var(--green);background:#f0fdf4;}
+
+  .feedback-msg{min-height:28px;font-weight:800;font-size:1rem;text-align:center;}
+  .feedback-msg.ok{color:var(--green);}
+  .feedback-msg.bad{color:var(--red);}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+
+  @media(max-width:420px){
+    .letter-target{width:46px;height:46px;font-size:1.25rem;border-radius:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">🎯 Dopasuj nutkę do literki</span>
+  <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">10</span></span>
+</div>
+
+<div class="game-area">
+  <p class="instructions">Na pięciolinii widzisz nutkę. <strong>Przeciągnij ją</strong> (albo dotknij i przenieś na telefonie) do literki, która odpowiada jej nazwie.</p>
+
+  <div class="staff-card">
+    <div id="staffSvgWrap"></div>
+  </div>
+
+  <div class="letters-row" id="lettersRow"></div>
+
+  <div class="feedback-msg" id="feedbackMsg"></div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🏆</div>
+  <h2>Brawo!</h2>
+  <p id="winText">Dopasowałeś/aś wszystkie nutki poprawnie!</p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+/* ══ Te same ścieżki i dane pozycjonowania co w notes.js (Muzyczny Labirynt) ══ */
+const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
+const CLEF_TREBLE_RATIO = 183 / 399;
+const CLEF_TREBLE_G_PCT = 0.560;
+
+/* Nuty do gry: c¹–h¹ (jak zakres G_small w notes.js), staffY_G z ALL_NOTE_DEFS */
+const GAME_NOTES = [
+  {id:'c1', letter:'C', name:'c\u00b9', staffY:10},
+  {id:'d1', letter:'D', name:'d\u00b9', staffY:9},
+  {id:'e1', letter:'E', name:'e\u00b9', staffY:8},
+  {id:'f1', letter:'F', name:'f\u00b9', staffY:7},
+  {id:'g1', letter:'G', name:'g\u00b9', staffY:6},
+  {id:'a1', letter:'A', name:'a\u00b9', staffY:5},
+  {id:'h1', letter:'H', name:'h\u00b9', staffY:4},
+];
+const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
+
+const TOTAL_ROUNDS = 10;
+let round = 0, score = 0, currentNote = null, recentIds = [];
+
+function pickNote(){
+  let pool = GAME_NOTES.filter(n => !recentIds.includes(n.id));
+  if(pool.length === 0) pool = GAME_NOTES;
+  const n = pool[Math.floor(Math.random()*pool.length)];
+  recentIds.push(n.id);
+  if(recentIds.length > 2) recentIds.shift();
+  return n;
+}
+
+/* ══ Rysowanie pięciolinii + nutki (uproszczona wersja noteSVG z notes.js) ══ */
+function renderStaff(note){
+  const W = 300, H = 200;
+  const sg = 16;
+  const staffTop = 40;
+  const c = '#1e3a8a';
+
+  let s = `<svg id="noteSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="touch-action:none;">`;
+
+  for(let i=0;i<5;i++){
+    const ly = staffTop + i*sg;
+    s += `<line x1="20" y1="${ly}" x2="${W-20}" y2="${ly}" stroke="${c}" stroke-width="1.4" opacity="0.55"/>`;
+  }
+
+  const ch = sg * 6.0;
+  const cw = ch * CLEF_TREBLE_RATIO;
+  const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
+  s += `<image href="${CLEF_TREBLE_URL}" x="24" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>`;
+
+  const topLine = staffTop, botLine = staffTop + 4*sg;
+  const noteX = W*0.72;
+  const noteY = staffTop + (note.staffY * sg / 2);
+  const ledW = 12;
+
+  if(noteY > botLine + sg*0.5){
+    let ly = botLine + sg;
+    while(ly <= noteY + sg*0.3){
+      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.6"/>`;
+      ly += sg;
+    }
+  }
+  if(noteY < topLine - sg*0.5){
+    let ly = topLine - sg;
+    while(ly >= noteY - sg*0.3){
+      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.6"/>`;
+      ly -= sg;
+    }
+  }
+
+  s += `<g id="noteToken" class="note-token" transform="translate(${noteX},${noteY})">`;
+  s += `<ellipse cx="0" cy="0" rx="11" ry="8" fill="#d4af37" stroke="#8a6d1a" stroke-width="1" transform="rotate(-15)"/>`;
+  const stemUp = noteY > staffTop + sg*2;
+  const sx = stemUp ? 9 : -9;
+  const stemLen = 42;
+  const sy2 = stemUp ? -stemLen : stemLen;
+  s += `<line x1="${sx}" y1="0" x2="${sx}" y2="${sy2}" stroke="#8a6d1a" stroke-width="2.4"/>`;
+  s += `</g>`;
+
+  s += '</svg>';
+  document.getElementById('staffSvgWrap').innerHTML = s;
+  attachDrag();
+}
+
+function renderLetters(){
+  const row = document.getElementById('lettersRow');
+  row.innerHTML = LETTERS_ORDER.map(l =>
+    `<div class="letter-target" data-letter="${l}">${l}</div>`
+  ).join('');
+}
+
+let dragEl = null, dragging = false, dragStartClient = {x:0,y:0}, dragOrigin = {x:0,y:0};
+
+function attachDrag(){
+  const token = document.getElementById('noteToken');
+  if(!token) return;
+  token.addEventListener('mousedown', onDragStart);
+  token.addEventListener('touchstart', onDragStart, {passive:false});
+}
+
+function getPoint(e){
+  const t = e.touches ? e.touches[0] : e;
+  return {x:t.clientX, y:t.clientY};
+}
+
+function onDragStart(e){
+  e.preventDefault();
+  dragging = true;
+  dragEl = e.currentTarget;
+  const p = getPoint(e);
+  dragStartClient = p;
+  const m = /translate\(([-\d.]+),([-\d.]+)\)/.exec(dragEl.getAttribute('transform')||'');
+  dragOrigin = m ? {x:parseFloat(m[1]), y:parseFloat(m[2])} : {x:0,y:0};
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('touchmove', onDragMove, {passive:false});
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchend', onDragEnd);
+}
+
+function onDragMove(e){
+  if(!dragging) return;
+  e.preventDefault();
+  const p = getPoint(e);
+  const svg = document.getElementById('noteSvg');
+  const rect = svg.getBoundingClientRect();
+  const scaleX = 300 / rect.width;
+  document.querySelectorAll('.letter-target').forEach(t=>t.classList.remove('dragover'));
+  const target = document.elementFromPoint(p.x, p.y);
+  const letterTarget = target && target.closest ? target.closest('.letter-target') : null;
+  if(letterTarget) letterTarget.classList.add('dragover');
+
+  const dx = (p.x - dragStartClient.x) * scaleX;
+  const dy = (p.y - dragStartClient.y) * scaleX;
+  dragEl.setAttribute('transform', `translate(${dragOrigin.x+dx},${dragOrigin.y+dy})`);
+}
+
+function onDragEnd(e){
+  if(!dragging) return;
+  dragging = false;
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
+  document.removeEventListener('touchend', onDragEnd);
+
+  const p = getPoint(e.changedTouches ? {touches:e.changedTouches} : e);
+  const target = document.elementFromPoint(p.x, p.y);
+  const letterTarget = target && target.closest ? target.closest('.letter-target') : null;
+  document.querySelectorAll('.letter-target').forEach(t=>t.classList.remove('dragover'));
+
+  if(letterTarget){
+    checkAnswer(letterTarget.dataset.letter, letterTarget);
+  }else{
+    if(dragEl) dragEl.setAttribute('transform', `translate(${dragOrigin.x},${dragOrigin.y})`);
+  }
+}
+
+function checkAnswer(letter, targetEl){
+  const feedback = document.getElementById('feedbackMsg');
+  if(letter === currentNote.letter){
+    targetEl.classList.add('correct-flash');
+    if(dragEl) dragEl.classList.add('correct-pop');
+    feedback.textContent = '✓ Świetnie! To był dźwięk ' + currentNote.letter + '.';
+    feedback.className = 'feedback-msg ok';
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+    setTimeout(()=>{
+      targetEl.classList.remove('correct-flash');
+      nextRound();
+    }, 700);
+  }else{
+    targetEl.classList.add('wrong-flash');
+    if(dragEl) dragEl.setAttribute('transform', `translate(${dragOrigin.x},${dragOrigin.y})`);
+    feedback.textContent = 'Spróbuj jeszcze raz — to nie ' + letter + '.';
+    feedback.className = 'feedback-msg bad';
+    setTimeout(()=>targetEl.classList.remove('wrong-flash'), 400);
+  }
+}
+
+function nextRound(){
+  round++;
+  document.getElementById('feedbackMsg').textContent = '';
+  document.getElementById('feedbackMsg').className = 'feedback-msg';
+  if(round >= TOTAL_ROUNDS){
+    showWin();
+    return;
+  }
+  currentNote = pickNote();
+  renderStaff(currentNote);
+}
+
+function showWin(){
+  document.getElementById('winText').textContent =
+    'Wynik: ' + score + ' / ' + TOTAL_ROUNDS + ' — ' +
+    (score === TOTAL_ROUNDS ? 'komplet! 🌟' : score >= TOTAL_ROUNDS*0.7 ? 'bardzo dobrze!' : 'ćwicz dalej, będzie coraz lepiej!');
+  document.getElementById('winOverlay').classList.add('show');
+}
+
+function restartGame(){
+  round = 0; score = 0; recentIds = [];
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('winOverlay').classList.remove('show');
+  currentNote = pickNote();
+  renderStaff(currentNote);
+}
+
+document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+renderLetters();
+restartGame();
+</script>
+</body>
+</html>

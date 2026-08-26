@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nauka Nut – Gry Edukacyjne | Łukasz Ganczarek</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--navy-solid:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;}
+  *,*::before,*::after{box-sizing:border-box;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;}
+
+  .site-nav{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:50px;padding:10px 26px;display:flex;flex-wrap:wrap;justify-content:center;gap:18px;z-index:1000;box-shadow:0 5px 20px rgba(0,0,0,0.08);font-size:0.85rem;font-weight:600;max-width:90vw;}
+  .site-nav a{color:var(--navy);text-decoration:none;transition:0.3s;white-space:nowrap;}
+  .site-nav a:hover{color:var(--gold);}
+  .site-nav a.nav-highlight{background:var(--navy-solid);color:white;padding:4px 16px;border-radius:50px;font-size:0.8rem;}
+  @media(max-width:700px){.site-nav{display:none;}}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;flex:1;max-width:72px;}
+  .mobile-nav a.mn-cta{background:var(--navy-solid);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+
+  .hero{background:var(--navy);padding:110px 5% 40px;position:relative;overflow:hidden;text-align:center;}
+  .hero::before{content:'♪';position:absolute;font-size:22rem;font-family:serif;color:rgba(255,255,255,0.03);top:-60px;right:-40px;pointer-events:none;line-height:1;}
+  .hero-inner{max-width:760px;margin:0 auto;position:relative;z-index:1;}
+  .hero-badge{display:inline-block;background:var(--gold);color:white;padding:6px 20px;border-radius:50px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4.6vw,2.7rem);color:white;line-height:1.2;margin-bottom:12px;}
+  .hero h1 em{font-style:italic;color:var(--gold);}
+  .hero p{color:rgba(255,255,255,0.65);font-size:0.95rem;line-height:1.7;max-width:500px;margin:0 auto;}
+
+  /* ══ MIASTECZKO ══ */
+  .city-wrap{max-width:1000px;margin:0 auto;padding:44px 4% 70px;}
+  .city-scene{position:relative;background:linear-gradient(to bottom,#bfdcf5 0%,#e8f3fc 55%,#d9ecd4 55%,#c3dfba 100%);border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(30,58,138,0.16);border:1px solid rgba(30,58,138,0.08);}
+  .city-sun{position:absolute;top:22px;right:34px;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle,#fff6d8,var(--gold));box-shadow:0 0 30px rgba(212,175,55,0.5);}
+  .city-cloud{position:absolute;background:rgba(255,255,255,0.85);border-radius:50px;filter:blur(0.5px);}
+  .city-cloud::before,.city-cloud::after{content:'';position:absolute;background:rgba(255,255,255,0.85);border-radius:50%;}
+  .cloud1{width:70px;height:22px;top:38px;left:8%;}
+  .cloud1::before{width:34px;height:34px;top:-16px;left:8px;}
+  .cloud1::after{width:26px;height:26px;top:-10px;left:36px;}
+  .cloud2{width:56px;height:18px;top:70px;left:32%;opacity:0.8;}
+  .cloud2::before{width:26px;height:26px;top:-12px;left:6px;}
+  .cloud2::after{width:20px;height:20px;top:-8px;left:28px;}
+
+  .buildings-row{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:clamp(6px,1.6vw,18px);padding:130px 3% 0;z-index:2;flex-wrap:nowrap;overflow-x:auto;}
+  .building{position:relative;cursor:pointer;flex-shrink:0;width:clamp(64px,10.5vw,100px);border-radius:14px 14px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:14px;transition:transform 0.25s cubic-bezier(0.2,0.8,0.2,1),filter 0.25s;border:2px solid rgba(0,0,0,0.06);border-bottom:none;}
+  .building:hover{transform:translateY(-8px);}
+  .building:hover .b-label{opacity:1;transform:translateY(0);}
+  .b-icon{font-size:clamp(1.5rem,3.6vw,2.1rem);filter:drop-shadow(0 2px 3px rgba(0,0,0,0.15));}
+  .b-num{position:absolute;top:6px;left:8px;font-family:'Nunito',sans-serif;font-weight:900;font-size:0.62rem;color:rgba(255,255,255,0.75);}
+  .b-windows{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px;padding:0 8px;}
+  .b-windows span{width:8px;height:8px;background:rgba(255,255,255,0.55);border-radius:2px;}
+  .b-label{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:var(--navy);color:white;font-size:0.68rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.2);}
+  .b-label::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
+  .b-lock{position:absolute;top:6px;right:8px;font-size:0.85rem;}
+  .building.b1{height:150px;background:linear-gradient(180deg,#f0d060,var(--gold));}
+  .building.b2{height:120px;background:linear-gradient(180deg,#8fb8f5,#4d7fd8);}
+  .building.b3{height:170px;background:linear-gradient(180deg,#f5a3a3,#e35c5c);}
+  .building.b4{height:100px;background:linear-gradient(180deg,#c9a876,#a5794a);border-radius:50% 50% 14px 14px / 60% 60% 14px 14px;}
+  .building.b5{height:140px;background:linear-gradient(180deg,#f5b56b,#e08a2e);}
+  .building.b6{height:160px;background:linear-gradient(180deg,#a3d9c9,#4fae8e);}
+  .building.b7{height:130px;background:linear-gradient(180deg,#c3a3e0,#8b5cc7);}
+  .building.soon{filter:grayscale(0.35) brightness(0.92);}
+  .b-roof{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:16px solid #6b4a2e;}
+  .building.b4 .b-roof{display:none;}
+
+  .street{height:16px;background:linear-gradient(180deg,#b5a894,#9c8d76);position:relative;z-index:1;}
+
+  .city-legend{text-align:center;color:var(--text-mid);font-size:0.8rem;margin-top:18px;}
+
+  /* ══ POPUP GRY ══ */
+  .popup-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
+  .popup-overlay.show{display:flex;}
+  .popup-box{background:white;border-radius:20px;width:100%;max-width:840px;height:min(88vh,760px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.4);}
+  .popup-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--navy);color:white;flex-shrink:0;}
+  .popup-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;}
+  .popup-close-btn{background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:0.2s;flex-shrink:0;}
+  .popup-close-btn:hover{background:rgba(255,255,255,0.3);}
+  .popup-body{flex:1;overflow:hidden;position:relative;background:var(--bg);}
+  .popup-body iframe{width:100%;height:100%;border:none;}
+  .popup-soon{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;}
+  .popup-soon .ps-icon{font-size:3.6rem;}
+  .popup-soon h3{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.3rem;margin:0;}
+  .popup-soon p{color:var(--text-mid);font-size:0.9rem;max-width:340px;margin:0;line-height:1.6;}
+
+  /* ══ POTWIERDZENIE WYJŚCIA ══ */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:3100;display:none;align-items:center;justify-content:center;padding:16px;}
+  .confirm-overlay.show{display:flex;}
+  .confirm-box{background:white;border-radius:18px;padding:28px 26px;max-width:320px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+  .confirm-box .c-icon{font-size:2.2rem;margin-bottom:10px;}
+  .confirm-box h4{font-family:'Playfair Display',serif;color:var(--navy);margin:0 0 8px;font-size:1.1rem;}
+  .confirm-box p{color:var(--text-mid);font-size:0.85rem;margin:0 0 20px;line-height:1.5;}
+  .confirm-btns{display:flex;gap:10px;}
+  .confirm-btns button{flex:1;padding:11px;border-radius:50px;font-weight:700;font-size:0.82rem;cursor:pointer;border:none;}
+  .btn-stay{background:var(--bg);color:var(--navy);border:1.5px solid var(--border)!important;}
+  .btn-exit{background:#dc2626;color:white;}
+
+  .site-footer{background:var(--card-bg);border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:20px;}
+  .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;padding:2.4rem 0;align-items:start;}
+  .footer-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tagline{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-links a{font-size:13.5px;color:#3d3d4a;text-decoration:none;}
+  .footer-links a:hover{color:var(--navy);}
+  .footer-bottom{border-top:1px solid #e8eaee;padding:0.85rem 0;max-width:1100px;margin:0 auto;text-align:center;font-size:11px;color:#c0c0cc;}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <a href="/index.html">Strona główna</a>
+  <a href="/index/lekcje/dzieci.html">Dla dzieci</a>
+  <a href="/index.html#terminy" class="nav-highlight">🎹 Umów</a>
+  <a href="/index/lekcje/dorosli.html">Dla osób dorosłych</a>
+  <a href="/index/fiszki/fiszki.html">Fiszki</a>
+</nav>
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span>🏠</span>Główna</a>
+    <a href="/index/gry/zagrajkowo/zagrajkowo.html"><span>🎼</span>Nauka nut</a>
+    <a href="/index.html#terminy" class="mn-cta">🎹 Umów</a>
+    <a href="/index/fiszki/fiszki.html"><span>🎼</span>Fiszki</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <span class="hero-badge">Gry edukacyjne</span>
+    <h1>Miasteczko <em>nut</em></h1>
+    <p>Każdy budynek to inna gra. Kliknij, żeby wejść — a żeby wyjść, wystarczy potwierdzić.</p>
+  </div>
+</section>
+
+<div class="city-wrap">
+  <div class="city-scene">
+    <div class="city-sun"></div>
+    <div class="city-cloud cloud1"></div>
+    <div class="city-cloud cloud2"></div>
+
+    <div class="buildings-row">
+      <div class="building b1" onclick="openGame(1)">
+        <div class="b-roof"></div>
+        <span class="b-num">1</span>
+        <div class="b-icon">🎯</div>
+        <div class="b-windows"><span></span><span></span><span></span><span></span></div>
+        <div class="b-label">Dopasuj nutkę</div>
+      </div>
+
+      <div class="building b2 soon" onclick="openGame(2)">
+        <div class="b-roof"></div>
+        <span class="b-num">2</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">✏️</div>
+        <div class="b-windows"><span></span><span></span></div>
+        <div class="b-label">Narysuj nutę</div>
+      </div>
+
+      <div class="building b3 soon" onclick="openGame(3)">
+        <div class="b-roof"></div>
+        <span class="b-num">3</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">⭕</div>
+        <div class="b-windows"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="b-label">Zaznacz nutę</div>
+      </div>
+
+      <div class="building b4 soon" onclick="openGame(4)">
+        <span class="b-num">4</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">🐶</div>
+        <div class="b-label">Piesek i nuty</div>
+      </div>
+
+      <div class="building b5 soon" onclick="openGame(5)">
+        <div class="b-roof"></div>
+        <span class="b-num">5</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">✉️</div>
+        <div class="b-windows"><span></span><span></span><span></span></div>
+        <div class="b-label">List nutami</div>
+      </div>
+
+      <div class="building b6 soon" onclick="openGame(6)">
+        <div class="b-roof"></div>
+        <span class="b-num">6</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">🧩</div>
+        <div class="b-windows"><span></span><span></span><span></span><span></span></div>
+        <div class="b-label">Klucz z puzzli</div>
+      </div>
+
+      <div class="building b7 soon" onclick="openGame(7)">
+        <div class="b-roof"></div>
+        <span class="b-num">7</span>
+        <span class="b-lock">🔒</span>
+        <div class="b-icon">🔗</div>
+        <div class="b-windows"><span></span><span></span></div>
+        <div class="b-label">Dopasuj nazwę</div>
+      </div>
+    </div>
+
+    <div class="street"></div>
+  </div>
+  <p class="city-legend">🔒 = gra w budowie, wkrótce dostępna</p>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <div>
+      <div class="footer-name">Łukasz Ganczarek</div>
+      <div class="footer-tagline">Nauka gry na pianinie</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="/index.html">Strona główna</a></li>
+      <li><a href="/index/fiszki/fiszki.html">Fiszki nutowe</a></li>
+      <li><a href="/index.html#terminy">Wolne terminy</a></li>
+    </ul>
+  </div>
+  <div class="footer-bottom">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</div>
+</footer>
+
+<!-- POPUP GRY -->
+<div class="popup-overlay" id="popupOverlay" onclick="if(event.target===this)requestClose()">
+  <div class="popup-box">
+    <div class="popup-header">
+      <span class="popup-title" id="popupTitle">Gra</span>
+      <button class="popup-close-btn" onclick="requestClose()" aria-label="Zamknij">✕</button>
+    </div>
+    <div class="popup-body" id="popupBody"></div>
+  </div>
+</div>
+
+<!-- POTWIERDZENIE WYJŚCIA -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="c-icon">🤔</div>
+    <h4>Na pewno wyjść?</h4>
+    <p>Twój postęp w tej grze zostanie utracony.</p>
+    <div class="confirm-btns">
+      <button class="btn-stay" onclick="cancelClose()">Zostań</button>
+      <button class="btn-exit" onclick="confirmClose()">Tak, wyjdź</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAMES = {
+  1: {title:'🎯 Dopasuj nutkę do literki', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nute.html'},
+  2: {title:'✏️ Narysuj nutę', ready:false},
+  3: {title:'⭕ Zaznacz właściwą nutę', ready:false},
+  4: {title:'🐶 Piesek i nuty', ready:false},
+  5: {title:'✉️ Napisz list nutami', ready:false},
+  6: {title:'🧩 Ułóż klucz wiolinowy', ready:false},
+  7: {title:'🔗 Dopasuj nazwę do obrazka', ready:false},
+};
+
+function openGame(id){
+  const g = GAMES[id];
+  if(!g) return;
+  document.getElementById('popupTitle').textContent = g.title;
+  const body = document.getElementById('popupBody');
+  if(g.ready){
+    body.innerHTML = '<iframe src="'+g.url+'" title="'+g.title+'"></iframe>';
+  }else{
+    body.innerHTML = '<div class="popup-soon"><div class="ps-icon">🚧</div><h3>Ta gra jest w budowie</h3><p>Pracuję nad nią — wróć tu za jakiś czas, powinna się wkrótce pojawić!</p></div>';
+  }
+  document.getElementById('popupOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function requestClose(){
+  document.getElementById('confirmOverlay').classList.add('show');
+}
+
+function cancelClose(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+}
+
+function confirmClose(){
+  document.getElementById('confirmOverlay').classList.remove('show');
+  document.getElementById('popupOverlay').classList.remove('show');
+  document.getElementById('popupBody').innerHTML = '';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    if(document.getElementById('confirmOverlay').classList.contains('show')){
+      cancelClose();
+    }else if(document.getElementById('popupOverlay').classList.contains('show')){
+      requestClose();
+    }
+  }
+});
+</script>
+
+</body>
+</html>
