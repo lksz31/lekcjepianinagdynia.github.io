@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Zasady na moich lekcjach pianina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 10mm; }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:0;
+    font-family:'Nunito',sans-serif;
+    color:#2d3142;
+    background:#fdfbf6;
+  }
+  .sheet{ max-width:194mm; margin:0 auto; position:relative; }
+
+  .header{
+    position:relative;
+    background:linear-gradient(140deg,#3a0ca3 0%,#4361ee 50%,#4cc9f0 100%);
+    border-radius:32px;
+    padding:22px 24px 24px;
+    text-align:center;
+    color:white;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .confetti{ position:absolute; font-size:1.1rem; opacity:0.55; }
+  .header .mascot-wrap{ position:relative; display:flex; justify-content:center; margin-bottom:2px; }
+  .header h1{
+    position:relative;
+    font-family:'Baloo 2',sans-serif; font-weight:800;
+    font-size:1.55rem; margin:2px 0 4px;
+    text-shadow:0 2px 0 rgba(0,0,0,0.12);
+  }
+  .header .sub{ position:relative; margin:0; font-size:0.85rem; color:rgba(255,255,255,0.85); font-weight:700; }
+
+  .speech-bubble{
+    position:relative;
+    background:white;
+    border-radius:20px;
+    padding:14px 20px;
+    margin:14px auto 0;
+    max-width:150mm;
+    font-size:0.9rem;
+    line-height:1.55;
+    color:#2d3142;
+    font-weight:600;
+  }
+  .speech-bubble::before{
+    content:''; position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+    border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:12px solid white;
+  }
+
+  .rules{ display:grid; grid-template-columns:1fr 1fr; gap:11px; margin:18px 0; }
+  @media(max-width:480px){ .rules{ grid-template-columns:1fr; } }
+  .rule{
+    position:relative;
+    border-radius:20px;
+    padding:16px 16px 14px 16px;
+    border:3px solid;
+    background:white;
+  }
+  .rule .r-num{
+    position:absolute; top:-13px; left:14px;
+    width:28px; height:28px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:0.85rem; color:white;
+    box-shadow:0 2px 4px rgba(0,0,0,0.15);
+  }
+  .rule .r-icon{ font-size:1.9rem; margin:6px 0 8px; display:block; }
+  .rule .r-title{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:0.95rem; margin-bottom:5px; line-height:1.25; }
+  .rule .r-text{ font-size:0.82rem; line-height:1.5; color:#555b6e; }
+  .rule .r-check{ position:absolute; top:12px; right:12px; font-size:1.1rem; opacity:0.35; }
+
+  .rule.c1{ border-color:#4361ee; } .rule.c1 .r-num{ background:#4361ee; } .rule.c1 .r-title{ color:#3a0ca3; }
+  .rule.c2{ border-color:#f4a261; } .rule.c2 .r-num{ background:#f4a261; } .rule.c2 .r-title{ color:#c2410c; }
+  .rule.c3{ border-color:#2dc653; } .rule.c3 .r-num{ background:#2dc653; } .rule.c3 .r-title{ color:#15803d; }
+  .rule.c4{ border-color:#c77dff; } .rule.c4 .r-num{ background:#c77dff; } .rule.c4 .r-title{ color:#7b2cbf; }
+  .rule.c5{ border-color:#ffca3a; } .rule.c5 .r-num{ background:#ffca3a; } .rule.c5 .r-title{ color:#b45309; }
+  .rule.c6{ border-color:#2ec4b6; } .rule.c6 .r-num{ background:#2ec4b6; } .rule.c6 .r-title{ color:#0f766e; }
+  .rule.c7{ border-color:#ff5d8f; } .rule.c7 .r-num{ background:#ff5d8f; } .rule.c7 .r-title{ color:#be123c; }
+  .rule.c8{ border-color:#0ea5e9; } .rule.c8 .r-num{ background:#0ea5e9; } .rule.c8 .r-title{ color:#0369a1; }
+
+  .helpline{
+    position:relative;
+    background:repeating-linear-gradient(135deg,#fff0f3,#fff0f3 10px,#ffe4ea 10px,#ffe4ea 20px);
+    border:3px solid #ff5d8f;
+    border-radius:22px;
+    padding:16px 20px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .helpline .h-icon{ font-size:1.7rem; }
+  .helpline .h-title{ font-family:'Baloo 2',sans-serif; font-weight:700; color:#be123c; font-size:0.95rem; margin:4px 0 6px; }
+  .helpline .h-num{ font-family:'Baloo 2',sans-serif; font-size:2rem; font-weight:800; color:#e11d48; letter-spacing:0.06em; }
+  .helpline .h-sub{ font-size:0.75rem; color:#9f1239; margin-top:4px; font-weight:700; }
+
+  .badge-row{ display:flex; align-items:center; gap:14px; background:#fff8e1; border:2.5px dashed #ffca3a; border-radius:20px; padding:14px 18px; margin-bottom:16px; }
+  .badge-star{ font-size:2.4rem; flex-shrink:0; }
+  .badge-text{ font-size:0.85rem; color:#7a5c00; font-weight:700; line-height:1.4; }
+  .badge-text b{ font-family:'Baloo 2',sans-serif; color:#b45309; }
+
+  .footer-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .sign-box{
+    background:white; border:2px solid #eef1f5; border-radius:18px; padding:14px 16px;
+    font-size:0.78rem; color:#94a3b8;
+  }
+  .sign-box b{ display:block; font-family:'Baloo 2',sans-serif; font-weight:700; color:#3a0ca3; font-size:0.82rem; margin-bottom:22px; }
+  .sign-line{ border-top:2px dashed #cbd5e1; margin-top:4px; }
+
+  .doc-footer{
+    text-align:center; margin-top:16px; padding-top:12px; border-top:1px solid #eef1f5;
+    font-size:0.7rem; color:#a3a9b7; font-weight:700;
+  }
+
+  @media print{
+    body{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="header">
+    <span class="confetti" style="top:10px;left:8%;">🎵</span>
+    <span class="confetti" style="top:26px;left:20%;">⭐</span>
+    <span class="confetti" style="top:14px;right:22%;">🎶</span>
+    <span class="confetti" style="top:32px;right:8%;">✨</span>
+    <span class="confetti" style="bottom:10px;left:14%;">♪</span>
+    <span class="confetti" style="bottom:16px;right:16%;">🎵</span>
+
+    <div class="mascot-wrap">
+      <svg width="92" height="92" viewBox="0 0 100 100">
+        <ellipse cx="50" cy="60" rx="26" ry="22" fill="#ffca3a" transform="rotate(-12,50,60)"/>
+        <rect x="70" y="14" width="7" height="48" rx="3.5" fill="#ffca3a" transform="rotate(-12,50,60)"/>
+        <path d="M74 16 Q92 10 90 26 Q88 34 74 30 Z" fill="#ffca3a" transform="rotate(-12,50,60)"/>
+        <circle cx="41" cy="57" r="4.2" fill="#2d3142"/>
+        <circle cx="59" cy="57" r="4.2" fill="#2d3142"/>
+        <circle cx="42.4" cy="55.5" r="1.3" fill="#fff"/>
+        <circle cx="60.4" cy="55.5" r="1.3" fill="#fff"/>
+        <path d="M40 68 Q50 76 60 68" stroke="#2d3142" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="30" cy="64" rx="5" ry="3.2" fill="#ff9eb5" opacity="0.7"/>
+        <ellipse cx="70" cy="64" rx="5" ry="3.2" fill="#ff9eb5" opacity="0.7"/>
+      </svg>
+    </div>
+    <h1>Zasady na moich lekcjach pianina 🎹</h1>
+    <p class="sub">Poznaj je razem z Nutką! — Łukasz Ganczarek</p>
+
+    <div class="speech-bubble">
+      Cześć! Jestem Nutka 🎶 Cieszę się, że uczysz się grać na pianinie! Przygotowaliśmy dla Ciebie
+      8 fajnych zasad, żebyś zawsze czuł/a się bezpiecznie i swobodnie na naszych zajęciach.
+      Przeczytaj je razem z rodzicem albo opiekunem — gotowy/a? Zaczynamy! 🚀
+    </div>
+  </div>
+
+  <div class="rules">
+
+    <div class="rule c1">
+      <span class="r-num">1</span><span class="r-check">☑</span>
+      <span class="r-icon">🙅</span>
+      <div class="r-title">Zawsze możesz powiedzieć „nie"</div>
+      <div class="r-text">Jeśli czegoś nie chcesz robić albo coś Ci nie odpowiada — po prostu mi powiedz. Nie musisz się tłumaczyć.</div>
+    </div>
+
+    <div class="rule c2">
+      <span class="r-num">2</span><span class="r-check">☑</span>
+      <span class="r-icon">👨‍👩‍👧</span>
+      <div class="r-title">Rodzic zawsze wie, gdzie jesteś</div>
+      <div class="r-text">Może być blisko podczas zajęć albo w każdej chwili do mnie zadzwonić.</div>
+    </div>
+
+    <div class="rule c3">
+      <span class="r-num">3</span><span class="r-check">☑</span>
+      <span class="r-icon">✋</span>
+      <div class="r-title">Nauczyciel dotyka tylko dłoni i palców</div>
+      <div class="r-text">I tylko po to, żeby pokazać Ci, jak ułożyć rękę na klawiaturze. Zawsze najpierw pyta, czy może.</div>
+    </div>
+
+    <div class="rule c4">
+      <span class="r-num">4</span><span class="r-check">☑</span>
+      <span class="r-icon">❓</span>
+      <div class="r-title">Możesz pytać o wszystko</div>
+      <div class="r-text">Jeśli czegoś nie rozumiesz albo chcesz wiedzieć, dlaczego robimy coś w dany sposób — pytaj śmiało.</div>
+    </div>
+
+    <div class="rule c5">
+      <span class="r-num">5</span><span class="r-check">☑</span>
+      <span class="r-icon">📸</span>
+      <div class="r-title">Bez zdjęć bez zgody</div>
+      <div class="r-text">Nie publikuję Twoich zdjęć ani nagrań bez wcześniejszej zgody Twojego rodzica lub opiekuna.</div>
+    </div>
+
+    <div class="rule c6">
+      <span class="r-num">6</span><span class="r-check">☑</span>
+      <span class="r-icon">💬</span>
+      <div class="r-title">Powiedz, jeśli coś Cię zaniepokoi</div>
+      <div class="r-text">Cokolwiek, nawet drobnostka — powiedz o tym od razu rodzicowi, opiekunowi albo innej zaufanej osobie.</div>
+    </div>
+
+    <div class="rule c7">
+      <span class="r-num">7</span><span class="r-check">☑</span>
+      <span class="r-icon">🚪</span>
+      <div class="r-title">Masz prawo przerwać zajęcia</div>
+      <div class="r-text">Jeśli poczujesz się niekomfortowo, możesz wyjść — Twoje samopoczucie jest najważniejsze.</div>
+    </div>
+
+    <div class="rule c8">
+      <span class="r-num">8</span><span class="r-check">☑</span>
+      <span class="r-icon">📵</span>
+      <div class="r-title">Kontaktujemy się tylko przez rodzica</div>
+      <div class="r-text">Rozmawiam o zajęciach zawsze z Twoim rodzicem albo opiekunem — nie piszę do Ciebie prywatnie ani przez media społecznościowe.</div>
+    </div>
+
+  </div>
+
+  <div class="badge-row">
+    <span class="badge-star">🏅</span>
+    <span class="badge-text">Przeczytałeś/aś wszystkie <b>8 zasad Nutki</b>? Super! Zaznacz ☑ przy każdej, którą znasz, i podpiszcie się razem z rodzicem poniżej. 🎉</span>
+  </div>
+
+  <div class="helpline">
+    <div class="h-icon">☎️</div>
+    <div class="h-title">Możesz też zadzwonić tutaj — zawsze, za darmo, anonimowo:</div>
+    <div class="h-num">116 111</div>
+    <div class="h-sub">Telefon Zaufania dla Dzieci i Młodzieży (Fundacja Dajemy Dzieciom Siłę) — czynny całą dobę</div>
+  </div>
+
+  <div class="footer-row">
+    <div class="sign-box">
+      <b>✏️ Podpis ucznia / uczennicy</b>
+      <div class="sign-line">&nbsp;</div>
+    </div>
+    <div class="sign-box">
+      <b>✏️ Podpis rodzica / opiekuna</b>
+      <div class="sign-line">&nbsp;</div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    🎹 Łukasz Ganczarek · Nauka gry na pianinie · Gdynia · 514 338 875 · lukaszgkorepetycje@gmail.com
+  </div>
+
+</div>
+</body>
+</html>
