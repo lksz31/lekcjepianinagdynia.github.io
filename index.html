@@ -1887,8 +1887,18 @@ async function submitCalBooking(){
 
   const eventTitle = 'pianino — '+name+' — prośba o lekcję';
   const promoCode = document.getElementById('calPromo').value.trim();
+  const promoOk = promoCode.toLowerCase() === PROMO_CODE;
   const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
   const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
+
+  /* Cena: baza 99 zł (-60% jeśli poprawny kod), dowóz +20 zł ZAWSZE bez rabatu */
+  const baseBefore = 99;
+  const baseAfter = promoOk ? baseBefore*(1-PROMO_DISCOUNT) : baseBefore;
+  const dojazdFee = bookCtx.mode==='uczen' ? 20 : 0;
+  const totalPrice = baseAfter + dojazdFee;
+  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza 99 zł -60% rabat)' : '99 zł (cena bazowa)')
+    + (dojazdFee ? ' + 20 zł (dowóz, bez rabatu)' : '');
+
   const payload = {
     typ: 'rezerwacja-kalendarz',
     imie_nazwisko: name,
@@ -1897,6 +1907,7 @@ async function submitCalBooking(){
     miejsce: address,
     tresc: modeLabel+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
     kod_rabatowy: promoCode,
+    cena: formatPLN(totalPrice)+' zł łącznie — '+priceBreakdown,
     data_start: bookCtx.start.toISOString(),
     data_koniec: bookCtx.end.toISOString(),
     tytul_wydarzenia: eventTitle,
