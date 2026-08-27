@@ -302,7 +302,7 @@
       <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.1rem;">Zasady dla najmłodszych</div>
       <p style="font-size:0.82rem;color:#64748b;line-height:1.6;margin:0;flex:1;">Duże obrazki, mało tekstu — do czytania na głos razem z rodzicem, dla dzieci które jeszcze nie czytają.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="/index/dzieci/dokumenty/zasady-dla-najmlodszych.html" target="_blank" rel="noopener" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Zobacz</a>
+        <button onclick="openDocModal('/index/lekcje/dokumenty/zasady-dla-najmlodszych.html','Zasady dla najmłodszych')" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;border:none;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:'Poppins',sans-serif;">Zobacz</button>
         <a href="https://drive.google.com/uc?export=download&id=1xHuYBFd6CqmfYBKOVx6cBia8U2pNAsX4" style="flex:1;text-align:center;background:var(--bg-alt);color:var(--navy);border:1.5px solid var(--border);padding:9px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Pobierz</a>
       </div>
     </div>
@@ -311,7 +311,7 @@
       <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.1rem;">Zasady dla dziecka</div>
       <p style="font-size:0.82rem;color:#64748b;line-height:1.6;margin:0;flex:1;">Kolorowa, przyjazna wersja z prostym językiem — dla młodszych uczniów, którzy już czytają.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="/index/dzieci/dokumenty/zasady-dla-dziecka.html" target="_blank" rel="noopener" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Zobacz</a>
+        <button onclick="openDocModal('/index/lekcje/dokumenty/zasady-dla-dziecka.html','Zasady dla dziecka')" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;border:none;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:'Poppins',sans-serif;">Zobacz</button>
         <a href="https://drive.google.com/uc?export=download&id=1_V2tn6hutGQaXSmrkKUwfI-5H7ceN6rs" style="flex:1;text-align:center;background:var(--bg-alt);color:var(--navy);border:1.5px solid var(--border);padding:9px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Pobierz</a>
       </div>
     </div>
@@ -320,7 +320,7 @@
       <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.1rem;">Zasady dla nastolatka</div>
       <p style="font-size:0.82rem;color:#64748b;line-height:1.6;margin:0;flex:1;">Rzeczowa, dojrzalsza wersja — dla starszych uczniów i nastolatków.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="/index/dzieci/dokumenty/zasady-dla-nastolatka.html" target="_blank" rel="noopener" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Zobacz</a>
+        <button onclick="openDocModal('/index/lekcje/dokumenty/zasady-dla-nastolatka.html','Zasady dla nastolatka')" style="flex:1;text-align:center;background:var(--navy-solid);color:white;padding:10px 14px;border-radius:50px;border:none;cursor:pointer;font-weight:700;font-size:0.78rem;font-family:'Poppins',sans-serif;">Zobacz</button>
         <a href="https://drive.google.com/uc?export=download&id=1FZaqUY8ve7LFxAIt9V0bB-9RLaEZ-NYc" style="flex:1;text-align:center;background:var(--bg-alt);color:var(--navy);border:1.5px solid var(--border);padding:9px 14px;border-radius:50px;text-decoration:none;font-weight:700;font-size:0.78rem;">Pobierz</a>
       </div>
     </div>
@@ -650,6 +650,34 @@ function buildClusterFlow(containerId, categories, basePath){
   });
 }
 buildClusterFlow('materialsFlow', materialCategories, '/index/lekcje/grafiki-materialy/');
+
+function openDocModal(url, title){
+  document.getElementById('docModalTitle').textContent = title;
+  document.getElementById('docModalFrame').src = url;
+  document.getElementById('docModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDocModal(){
+  document.getElementById('docModalOverlay').classList.remove('open');
+  document.getElementById('docModalFrame').src = '';
+  document.body.style.overflow = '';
+}
 </script>
+
+<div id="docModalOverlay" style="position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;" onclick="if(event.target===this)closeDocModal()">
+  <div style="background:white;border-radius:20px;width:100%;max-width:700px;height:min(88vh,820px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.4);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--navy-solid);color:white;flex-shrink:0;">
+      <span id="docModalTitle" style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;">Dokument</span>
+      <button onclick="closeDocModal()" aria-label="Zamknij" style="background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;flex-shrink:0;">✕</button>
+    </div>
+    <div style="flex:1;overflow:hidden;background:var(--bg-alt);">
+      <iframe id="docModalFrame" src="" title="Dokument" style="width:100%;height:100%;border:none;"></iframe>
+    </div>
+  </div>
+</div>
+
+<style>
+  #docModalOverlay.open{ display:flex !important; }
+</style>
 </body>
 </html>
