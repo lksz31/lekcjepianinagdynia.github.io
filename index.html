@@ -369,6 +369,18 @@
   .bento-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;}
   .form-tile{background:var(--card-bg);border:1px solid #eee;border-radius:16px;padding:12px;text-align:left;cursor:pointer;transition:0.3s;font-size:0.85rem;}
   .form-tile.selected{border-color:var(--blue);background:#f0f7ff;}
+  .form-tile.tile-gold,.m-tile.tile-gold{background:linear-gradient(135deg,#fdf6e3,#f5e4a8);border:1.5px solid var(--gold);box-shadow:0 2px 10px rgba(212,175,55,0.22);}
+  .form-tile.tile-gold b,.m-tile.tile-gold b{color:#8a6d1a;}
+  .form-tile.tile-gold.selected,.m-tile.tile-gold.selected{border-color:var(--gold);background:linear-gradient(135deg,var(--gold),#e8c766);box-shadow:0 6px 18px rgba(212,175,55,0.4);}
+  .form-tile.tile-gold.selected b,.m-tile.tile-gold.selected b,.form-tile.tile-gold.selected small,.m-tile.tile-gold.selected small{color:#fff;}
+
+  .pd-info-wrap{position:relative;display:inline-flex;vertical-align:middle;margin-left:6px;}
+  .pd-info-icon{width:15px;height:15px;border-radius:50%;background:var(--navy-solid);color:#fff;font-size:0.6rem;font-weight:800;font-style:italic;display:inline-flex;align-items:center;justify-content:center;cursor:help;line-height:1;flex-shrink:0;}
+  .tile-gold .pd-info-icon{background:#8a6d1a;}
+  .pd-info-tooltip{visibility:hidden;opacity:0;position:absolute;z-index:60;bottom:135%;left:50%;transform:translateX(-50%) translateY(-6px);width:190px;background:var(--navy-solid);color:#fff;text-align:left;border-radius:12px;padding:10px 12px;font-size:0.68rem;line-height:1.55;font-weight:400;text-transform:none;letter-spacing:normal;box-shadow:0 10px 28px rgba(0,0,0,0.28);transition:opacity 0.2s,transform 0.2s;pointer-events:none;}
+  .pd-info-tooltip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-6px;border-width:6px;border-style:solid;border-color:var(--navy-solid) transparent transparent transparent;}
+  .pd-info-wrap:hover .pd-info-tooltip{visibility:visible;opacity:1;transform:translateX(-50%) translateY(-10px);}
+  @media(max-width:500px){.pd-info-tooltip{width:150px;left:auto;right:-10px;transform:translateY(-6px);}.pd-info-wrap:hover .pd-info-tooltip{transform:translateY(-10px);}.pd-info-tooltip::after{left:auto;right:14px;margin-left:0;}}
   #piano-options{display:none;margin-top:-5px;margin-bottom:15px;animation:fadeIn 0.4s;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
   .contact-box{background:var(--navy-solid);border-radius:20px;padding:18px;}
@@ -655,6 +667,11 @@
   .cw-piano-tile{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;transition:0.2s;font-size:0.78rem;color:rgba(255,255,255,0.85);}
   .cw-piano-tile b{display:block;font-size:0.82rem;color:#fff;}
   .cw-piano-tile.selected{border-color:var(--gold);background:rgba(212,175,55,0.16);}
+  .cw-piano-tile.tile-gold{background:linear-gradient(135deg,rgba(212,175,55,0.22),rgba(212,175,55,0.08));border-color:rgba(212,175,55,0.6);}
+  .cw-piano-tile.tile-gold b{color:var(--gold);}
+  .cw-piano-tile.tile-gold.selected{background:linear-gradient(135deg,var(--gold),#b8912c);border-color:var(--gold);box-shadow:0 6px 18px rgba(212,175,55,0.4);}
+  .cw-piano-tile.tile-gold.selected b{color:#1a1a2e;}
+  .cw-piano-tile.tile-gold.selected{color:#3a2e08;}
   .cw-price-box{background:rgba(255,255,255,0.06);border:2px dashed var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:12px;text-align:center;}
   .cw-price-old{text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:1rem;font-weight:600;margin-right:8px;}
   .cw-price-new{color:#4ade80;font-size:1.4rem;font-weight:800;}
@@ -852,11 +869,11 @@
           </div>
           <div id="calInstrumentArea" style="display:none;">
             <div class="cw-piano-row">
-              <div class="cw-piano-tile selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX</b>20 zł</div>
-              <div class="cw-piano-tile" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525</b>60 zł (stojak w cenie)</div>
+              <div class="cw-piano-tile selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b>20 zł</div>
+              <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b>60 zł (stojak w cenie)</div>
             </div>
             <label id="calStandWrap" style="display:flex;align-items:center;gap:8px;font-size:0.76rem;color:rgba(255,255,255,0.8);margin:-2px 0 12px;cursor:pointer;">
-              <input type="checkbox" id="calStandAddon" onchange="recalcCalBooking()"> Dołóż stojak pod keyboard (+5 zł)
+              <input type="checkbox" id="calStandAddon" onchange="recalcCalBooking()"> Dołóż stojak pod keyboard
             </label>
           </div>
         </div>
@@ -902,11 +919,11 @@
       <div id="delivery-options" style="display:none;">
         <p style="font-size:0.78rem;font-weight:700;margin:2px 0 8px;color:var(--navy);text-align:left;">Wybierz instrument do dowozu:</p>
         <div class="bento-grid">
-          <div class="form-tile selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX</b><br><small>20 zł</small></div>
-          <div class="form-tile" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525</b><br><small>60 zł (stojak w cenie)</small></div>
+          <div class="form-tile selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b><br><small>20 zł</small></div>
+          <div class="form-tile tile-gold" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b><br><small>60 zł (stojak w cenie)</small></div>
         </div>
         <label id="stand-option-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-mid);margin:-4px 0 12px;text-align:left;cursor:pointer;">
-          <input type="checkbox" id="standAddon" onchange="updatePrice()"> Dołóż stojak pod keyboard (+5 zł)
+          <input type="checkbox" id="standAddon" onchange="updatePrice()"> Dołóż stojak pod keyboard
         </label>
         <div style="font-size:0.7rem;color:var(--text-mid);margin:-6px 0 14px;text-align:left;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
       </div>
@@ -1110,11 +1127,11 @@
         <div id="m-delivery-options" style="display:none;">
           <p style="font-size:0.76rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Wybierz instrument do dowozu:</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div class="m-tile selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX</b><br><small>20 zł</small></div>
-            <div class="m-tile" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525</b><br><small>60 zł (stojak w cenie)</small></div>
+            <div class="m-tile selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b><br><small>20 zł</small></div>
+            <div class="m-tile tile-gold" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b><br><small>60 zł (stojak w cenie)</small></div>
           </div>
           <label id="m-stand-option-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--navy);margin:10px 0 4px;cursor:pointer;">
-            <input type="checkbox" id="mStandAddon" onchange="mUpdatePrice()"> Dołóż stojak pod keyboard (+5 zł)
+            <input type="checkbox" id="mStandAddon" onchange="mUpdatePrice()"> Dołóż stojak pod keyboard
           </label>
           <div style="font-size:0.68rem;color:#8a8a9a;margin:2px 0 4px;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
         </div>
@@ -1232,8 +1249,7 @@ function setDelivery(type){
 function calcDeliveryFee(){
   if(isStudio||hasPiano) return 0;
   if(deliveryType==='premium') return 60;
-  const standChecked=document.getElementById('standAddon')&&document.getElementById('standAddon').checked;
-  return 20+(standChecked?5:0);
+  return 20;
 }
 const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
@@ -1267,7 +1283,7 @@ async function wyslij(){
   if(!isStudio){
     if(hasPiano) pianinoOpis='Tak';
     else if(deliveryType==='premium') pianinoOpis='Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
-    else pianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+delFee+' zł';
+    else pianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak':' (bez stojaka)')+', łącznie '+delFee+' zł';
   }
   const cenaOpis=formatPLN(totalPrice)+' zł łącznie (lekcja: '+formatPLN(lessonPrice)+' zł'+(delFee?' + dowóz '+delFee+' zł, bez rabatu':'')+')';
   const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),kod_rabatowy:document.getElementById('res-rabat').value.trim(),tresc:document.getElementById('res-msg').value.trim(),miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:pianinoOpis,cena:cenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
@@ -1310,8 +1326,7 @@ function mSetDelivery(type){
 function mCalcDeliveryFee(){
   if(mLoc==='s'||mPiano) return 0;
   if(mDeliveryType==='premium') return 60;
-  const standChecked=document.getElementById('mStandAddon')&&document.getElementById('mStandAddon').checked;
-  return 20+(standChecked?5:0);
+  return 20;
 }
 function mUpdatePrice(){
   const lessonBase=99;
@@ -1345,7 +1360,7 @@ async function wyslijModal(){
   if(mLoc==='u'){
     if(mPiano) mPianinoOpis='Tak';
     else if(mDeliveryType==='premium') mPianinoOpis='Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
-    else mPianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(mStandChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+mDelFee+' zł';
+    else mPianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(mStandChecked?' + stojak':' (bez stojaka)')+', łącznie '+mDelFee+' zł';
   }
   const mCenaOpis=formatPLN(mTotalPrice)+' zł łącznie (lekcja: '+formatPLN(mLessonPrice)+' zł'+(mDelFee?' + dowóz '+mDelFee+' zł, bez rabatu':'')+')';
   const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mPianinoOpis,cena:mCenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
@@ -1950,8 +1965,7 @@ function calDeliveryFee(){
   if(!bookCtx || bookCtx.mode!=='uczen') return 0;
   if(calPianoHas) return 0;
   if(calInstrumentType==='premium') return 60;
-  const standChecked = document.getElementById('calStandAddon') && document.getElementById('calStandAddon').checked;
-  return 20 + (standChecked?5:0);
+  return 20;
 }
 
 function calUpdatePriceBox(){
@@ -2095,7 +2109,7 @@ async function submitCalBooking(){
     else if(calInstrumentType==='premium') pianoOpis = 'Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
     else{
       const standChecked = document.getElementById('calStandAddon').checked;
-      pianoOpis = 'Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+deliveryFee+' zł';
+      pianoOpis = 'Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak':' (bez stojaka)')+', łącznie '+deliveryFee+' zł';
     }
   }
 
