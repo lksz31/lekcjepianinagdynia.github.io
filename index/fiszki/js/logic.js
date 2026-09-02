@@ -245,7 +245,18 @@ document.addEventListener('touchend',function(){isDragging=false;});
 
 function confirmPlace(){
   if(placeCurrentP===null||!placeTargetNote)return;
-  const correct=(placeCurrentP===placeTargetNote.p);
+  /* W trybie dwóch kluczy ta sama nuta (np. c¹) może leżeć poprawnie
+     zarówno na wiolinowym, jak i na basowym — liczy się nuta, na którą
+     faktycznie wskazał użytkownik (placeInteractClef), nie ta losowo
+     wylosowana jako "karta". */
+  let correct;
+  if(clef==='both'){
+    const pool2=getPlacePool();
+    const matchClef=placeInteractClef||placeTargetNote.ct;
+    correct=pool2.some(n=>n.l===placeTargetNote.l&&n.ct===matchClef&&n.p===placeCurrentP);
+  }else{
+    correct=(placeCurrentP===placeTargetNote.p);
+  }
   cnt++;document.getElementById('sCnt').textContent=cnt;
   const btn=document.getElementById('confirmBtn');
   if(correct){ok++;btn.classList.add('flash-good');if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);flyPlaceEmoji(true);if(kidMode)spawnKidFlower();}

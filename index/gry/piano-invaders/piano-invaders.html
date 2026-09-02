@@ -34,7 +34,12 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 .row-label{position:absolute;left:0;top:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;font-size:8px;letter-spacing:2px;text-transform:uppercase;opacity:0.75;pointer-events:none;z-index:2;writing-mode:vertical-rl;text-orientation:mixed;background:inherit;}
 .shoot-zone .row-label{color:#ffdd00;border-right:1px solid rgba(255,221,0,0.2);}
 .move-zone .row-label{color:#44aaff;border-right:1px solid rgba(68,170,255,0.2);}
-.fcard{position:absolute;background:rgba(8,8,32,0.95);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;touch-action:manipulation;backdrop-filter:blur(3px);}
+.fcard{position:absolute;background:rgba(8,8,32,0.95);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;touch-action:manipulation;backdrop-filter:blur(3px);overflow:hidden;}
+.move-cooldown-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.72);transform-origin:bottom;transform:scaleY(0);pointer-events:none;z-index:6;}
+#tile-size-ctrl{position:absolute;right:5px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;z-index:8;}
+.tsize-btn{width:30px;height:30px;border-radius:7px;border:1px solid #2a2a4a;background:rgba(8,8,32,0.92);color:#99b;font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;}
+.tsize-btn:hover{border-color:#44aaff;color:#44aaff;}
+.tsize-btn:active{transform:scale(.92);}
 .fcard.move-card{border:1.5px solid rgba(68,170,255,0.55);box-shadow:0 0 10px rgba(68,170,255,0.12);}
 .fcard.shoot-card{border:1.5px solid rgba(255,221,0,0.55);box-shadow:0 0 10px rgba(255,221,0,0.12);}
 .fcard.pressed,.fcard:active{transform:scale(0.91)!important;transition:transform .06s!important;}
@@ -151,6 +156,10 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
 <div id="col-labels"></div>
 
 <div id="tile-wrap">
+  <div id="tile-size-ctrl">
+    <button type="button" class="tsize-btn" onclick="adjustTileScale(0.15)" aria-label="Powiększ kafelki">+</button>
+    <button type="button" class="tsize-btn" onclick="adjustTileScale(-0.15)" aria-label="Zmniejsz kafelki">−</button>
+  </div>
   <div class="tile-row-zone shoot-zone" id="zone-shoot">
     <div class="row-label">STRZAŁ c¹–h¹</div>
   </div>
@@ -487,6 +496,39 @@ function updatePlayerSize(){
   playerH=Math.min(PH*0.14,100); playerW=playerH;
   var staffLabelH = (colLabelMode==='staff') ? Math.min(COL_W*0.82,68) : 0;
   playerY = PH - playerH - 8 - staffLabelH;
+}
+
+// ══ PIANO FLIGHT (glide between columns) ══
+// Pressing a move tile makes the piano glide to the target column instead of
+// teleporting. While it's mid-flight, shooting and further moves are locked
+// out — visualized on the move tiles by a dark layer receding from the top.
+var FLIGHT_MS = 420;
+var isFlying = false, flightFrom = playerCol, flightTo = playerCol, flightStart = 0;
+function requestMove(col){
+  if(col === playerCol && !isFlying) return false;
+  if(isFlying) return false;
+  flightFrom = playerCol; flightTo = col; flightStart = performance.now(); isFlying = true;
+  playerCol = col;
+  startMoveCooldownVisual(FLIGHT_MS);
+  return true;
+}
+function getDisplayCol(){
+  if(!isFlying) return playerCol;
+  var t = (performance.now() - flightStart) / FLIGHT_MS;
+  if(t >= 1){ isFlying = false; return flightTo; }
+  var eased = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+  return flightFrom + (flightTo-flightFrom)*eased;
+}
+function startMoveCooldownVisual(durationMs){
+  moveCards.forEach(function(c){
+    var ov = c.el.querySelector('.move-cooldown-overlay');
+    if(!ov) return;
+    ov.style.transition = 'none';
+    ov.style.transform = 'scaleY(1)';
+    void ov.offsetHeight;
+    ov.style.transition = 'transform '+durationMs+'ms linear';
+    ov.style.transform = 'scaleY(0)';
+  });
 }
 
 // ══ DIFFICULTY ══
@@ -967,6 +1009,7 @@ function buildMonsters(){
 // ══ BULLETS ══
 var bullets=[], BULLET_SPEED=10, SHOT_CD=300, lastShot={};
 function shoot(letter){
+  if(isFlying) return;
   var now=performance.now(); if(now-(lastShot[letter]||0)<SHOT_CD) return;
   lastShot[letter]=now; bullets.push({x:colX(playerCol),y:playerY,letter:letter});
 }
@@ -1039,8 +1082,10 @@ function draw(){
   for(var i=1;i<COLS;i++){ cx.beginPath(); cx.moveTo(i*COL_W,0); cx.lineTo(i*COL_W,PH); cx.stroke(); }
 
   if(colLabelMode==='off'){
-    cx.textAlign='center'; cx.textBaseline='middle'; cx.font='bold 12px Courier New';
-    for(var i=0;i<COLS;i++){ cx.fillStyle='rgba(68,170,255,0.45)'; cx.fillText(MOVE_NOTES[i].label,colX(i),PH-18); }
+    cx.textAlign='center'; cx.textBaseline='middle';
+    var colLblFont = Math.max(22, Math.round(COL_W*0.24));
+    cx.font='bold '+colLblFont+'px Courier New';
+    for(var i=0;i<COLS;i++){ cx.fillStyle='rgba(68,170,255,0.8)'; cx.fillText(MOVE_NOTES[i].label,colX(i),PH-24); }
   }
 
   // Monsters, bullets & particles — wrapped so a glitch here (e.g. right
@@ -1094,7 +1139,7 @@ function draw(){
 
   // Piano
   updatePlayerSize();
-  var px = colX(playerCol);
+  var px = colX(getDisplayCol());
   if(pianoLoaded){
     cx.shadowColor='#44aaff'; cx.shadowBlur=22;
     cx.drawImage(PIANO_IMG, px - playerW/2, playerY, playerW, playerH);
@@ -1217,7 +1262,11 @@ function setCardDisplay(mode){
 }
 
 // ══ TILE CARDS ══
-var inputMode = 'tiles', moveCards = [], shootCards = [];
+var inputMode = 'tiles', moveCards = [], shootCards = [], tileScale = 1;
+function adjustTileScale(delta){
+  tileScale = Math.max(0.6, Math.min(1.6, +(tileScale+delta).toFixed(2)));
+  buildTileCards();
+}
 
 function buildTileCards(){
   var wrap = document.getElementById('tile-wrap');
@@ -1228,11 +1277,12 @@ function buildTileCards(){
   moveCards=[]; shootCards=[];
   if(inputMode === 'mic'){ wrap.classList.remove('visible'); resize(); return; }
   wrap.classList.add('visible'); resize();
-  var rH = getTileH() / 2, cardSz = Math.min(rH * 0.82, 72);
+  var rH = getTileH() / 2, baseSz = Math.min(rH * 0.90, 84);
+  var cardSz = Math.max(38, Math.round(baseSz * tileScale));
   MOVE_NOTES.forEach(function(n){
     var card = makeCard(n, 'move', cardSz, zoneMove, function(){
       if(!gameRunning) return;
-      playerCol = n.col;
+      if(!requestMove(n.col)) return;
       sfxTilePress();
       triggerShuffle('move', card.el);
     });
@@ -1269,6 +1319,11 @@ function makeCard(note, type, sz, zone, onPress){
     if(!showStaff) label.style.fontSize = Math.round(sz*0.32)+'px';
     el.appendChild(label);
   }
+  if(type==='move'){
+    var overlay = document.createElement('div');
+    overlay.className = 'move-cooldown-overlay';
+    el.appendChild(overlay);
+  }
   el.addEventListener('pointerdown', function(e){ e.preventDefault(); el.classList.add('pressed'); onPress(); });
   el.addEventListener('pointerup', function(){ el.classList.remove('pressed'); });
   el.addEventListener('pointerleave', function(){ el.classList.remove('pressed'); });
@@ -1276,12 +1331,13 @@ function makeCard(note, type, sz, zone, onPress){
   return {el:el, note:note, pos:{x:0,y:0}};
 }
 
+var TILE_RIGHT_OFF = 46;
 function repositionCards(cards, zone){
   var W = window.innerWidth, H = zone.getBoundingClientRect().height || getTileH()/2;
   var sz = cards.length > 0 ? parseFloat(cards[0].el.style.width) : 60;
   var pad=6, gap=5, leftOff=56, placed=[];
   cards.forEach(function(c){
-    var pos = findFreePos(W, H, sz, pad, gap, placed, leftOff);
+    var pos = findFreePos(W, H, sz, pad, gap, placed, leftOff, TILE_RIGHT_OFF);
     placed.push(pos); c.pos = pos;
     c.el.style.left = pos.x+'px'; c.el.style.top = pos.y+'px';
   });
@@ -1290,9 +1346,9 @@ function repositionAllCards(){
   if(moveCards.length)  repositionCards(moveCards,  document.getElementById('zone-move'));
   if(shootCards.length) repositionCards(shootCards, document.getElementById('zone-shoot'));
 }
-function findFreePos(W, H, sz, pad, gap, placed, leftOff){
-  leftOff = leftOff || 0;
-  var xMin=leftOff+pad, xMax=W-sz-pad, yMin=pad, yMax=H-sz-pad;
+function findFreePos(W, H, sz, pad, gap, placed, leftOff, rightOff){
+  leftOff = leftOff || 0; rightOff = rightOff || 0;
+  var xMin=leftOff+pad, xMax=W-rightOff-sz-pad, yMin=pad, yMax=H-sz-pad;
   if(xMax<xMin) xMax=xMin; if(yMax<yMin) yMax=yMin;
   for(var tries=0; tries<90; tries++){
     var x=xMin+Math.random()*(xMax-xMin), y=yMin+Math.random()*(yMax-yMin), ok=true;
@@ -1313,7 +1369,7 @@ function triggerShuffle(rowType, pressedEl){
   if(pressedCard) placed.push(pressedCard.pos);
   cards.forEach(function(c){
     if(c.el===pressedEl) return;
-    var pos=findFreePos(W,H,sz,pad,gap,placed,leftOff);
+    var pos=findFreePos(W,H,sz,pad,gap,placed,leftOff,TILE_RIGHT_OFF);
     placed.push(pos); c.pos=pos;
     c.el.classList.remove('shuffling'); void c.el.offsetWidth; c.el.classList.add('shuffling');
     c.el.style.left=pos.x+'px'; c.el.style.top=pos.y+'px';
@@ -1383,7 +1439,7 @@ function detect(){
     var ok=fH.filter(function(f){ var n=closest(f); return n&&n.id===note.id; }).length;
     if(ok>=1&&dCD===0){
       dCD=7;
-      if(note.col!==undefined){ playerCol=note.col; triggerShuffle('move',null); }
+      if(note.col!==undefined){ if(requestMove(note.col)) triggerShuffle('move',null); }
       else { shoot(note.letter); triggerShuffle('shoot',null); }
     }
   }
@@ -1437,6 +1493,7 @@ var tutSlide=0, TOTAL_SLIDES=3, gameRunning=false;
 function tutNav(dir){ tutSlide=Math.max(0,Math.min(TOTAL_SLIDES-1,tutSlide+dir)); renderTut(); }
 function startGame(){
   document.getElementById('tut').style.display='none'; stopDemoAnim();
+  isFlying=false; flightFrom=playerCol; flightTo=playerCol;
   resize(); buildMonsters(); buildTileCards(); gameRunning=true;
   if(inputMode!=='tiles') startMic();
   updateColLabels();
