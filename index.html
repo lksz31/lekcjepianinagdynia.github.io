@@ -373,6 +373,14 @@
   .form-tile.tile-gold b,.m-tile.tile-gold b{color:#8a6d1a;}
   .form-tile.tile-gold.selected,.m-tile.tile-gold.selected{border-color:var(--gold);background:linear-gradient(135deg,var(--gold),#e8c766);box-shadow:0 6px 18px rgba(212,175,55,0.4);}
   .form-tile.tile-gold.selected b,.m-tile.tile-gold.selected b,.form-tile.tile-gold.selected small,.m-tile.tile-gold.selected small{color:#fff;}
+  .form-tile.tile-silver,.m-tile.tile-silver{background:linear-gradient(135deg,#f6f8fa,#dde3ea);border:1.5px solid #b8c0cc;box-shadow:0 2px 10px rgba(100,116,139,0.18);}
+  .form-tile.tile-silver b,.m-tile.tile-silver b{color:#4a5568;}
+  .form-tile.tile-silver.selected,.m-tile.tile-silver.selected{border-color:#b8c0cc;background:linear-gradient(135deg,#c4ccd6,#98a3b2);box-shadow:0 6px 18px rgba(100,116,139,0.32);}
+  .form-tile.tile-silver.selected b,.m-tile.tile-silver.selected b,.form-tile.tile-silver.selected small,.m-tile.tile-silver.selected small{color:#fff;}
+  .tile-silver .pd-info-icon{background:#4a5568;}
+  .tile-gold,.tile-silver{position:relative;overflow:hidden;}
+  .tile-gold::after,.tile-silver::after{content:'';position:absolute;top:0;left:-150%;width:55%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,0.65),transparent);transform:skewX(-20deg);animation:tileShine 3.4s ease-in-out infinite;pointer-events:none;}
+  @keyframes tileShine{0%{left:-150%;}55%{left:150%;}100%{left:150%;}}
 
   .pd-info-wrap{position:relative;display:inline-flex;vertical-align:middle;margin-left:6px;}
   .pd-info-icon{width:15px;height:15px;border-radius:50%;background:var(--navy-solid);color:#fff;font-size:0.6rem;font-weight:800;font-style:italic;display:inline-flex;align-items:center;justify-content:center;cursor:help;line-height:1;flex-shrink:0;}
@@ -661,6 +669,19 @@
   .book-submit:disabled{opacity:0.4;cursor:not-allowed;}
   .book-status{margin-top:10px;font-size:0.8rem;text-align:center;color:#4ade80;}
   .book-error{color:#fca5a5;font-size:0.76rem;margin:-2px 0 10px;}
+  .cal-step{display:none;}
+  .cal-step.show{display:block;}
+  .book-step-nav{display:flex;gap:10px;}
+  .book-step-nav .book-submit,.book-step-nav .book-btn-outline{margin-bottom:0;}
+  .book-btn-outline{flex:1;background:transparent;color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.35);padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
+  .book-btn-outline:hover{border-color:#fff;color:#fff;}
+  .pd-instr-note{font-size:0.72rem;color:rgba(255,255,255,0.6);margin:2px 0 8px;}
+  .book-summary{background:rgba(255,255,255,0.06);border-radius:12px;padding:4px 14px;margin-bottom:14px;font-size:0.8rem;color:rgba(255,255,255,0.85);}
+  .book-summary .bs-row{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 0;}
+  .book-summary .bs-row:last-child{border-bottom:none;}
+  .book-summary .bs-row span:first-child{color:rgba(255,255,255,0.55);flex-shrink:0;}
+  .book-summary .bs-row b{color:#fff;text-align:right;}
+  .slots-heading{font-size:0.82rem;font-weight:700;color:var(--navy);margin-bottom:10px;}
   .close-book{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1;cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;padding:0;}
   .close-book:hover{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.4);transform:rotate(90deg);}
   .cw-piano-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
@@ -672,6 +693,10 @@
   .cw-piano-tile.tile-gold.selected{background:linear-gradient(135deg,var(--gold),#b8912c);border-color:var(--gold);box-shadow:0 6px 18px rgba(212,175,55,0.4);}
   .cw-piano-tile.tile-gold.selected b{color:#1a1a2e;}
   .cw-piano-tile.tile-gold.selected{color:#3a2e08;}
+  .cw-piano-tile.tile-silver{background:linear-gradient(135deg,rgba(200,208,220,0.22),rgba(200,208,220,0.08));border-color:rgba(200,208,220,0.6);}
+  .cw-piano-tile.tile-silver b{color:#c8d0dc;}
+  .cw-piano-tile.tile-silver.selected{background:linear-gradient(135deg,#c8d0dc,#8a94a3);border-color:#c8d0dc;box-shadow:0 6px 18px rgba(148,163,184,0.4);}
+  .cw-piano-tile.tile-silver.selected b{color:#1a1a2e;}
   .cw-price-box{background:rgba(255,255,255,0.06);border:2px dashed var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:12px;text-align:center;}
   .cw-price-old{text-decoration:line-through;color:rgba(255,255,255,0.4);font-size:1rem;font-weight:600;margin-right:8px;}
   .cw-price-new{color:#4ade80;font-size:1.4rem;font-weight:800;}
@@ -850,6 +875,7 @@
       </div>
 
       <div class="detail-panel" id="detailPanel">
+        <div class="slots-heading" id="slotsHeading"></div>
         <div class="slots-grid" id="slotsGrid"></div>
       </div>
 
@@ -857,41 +883,60 @@
         <button class="close-book" onclick="closeCalBook()" aria-label="Zamknij" title="Zamknij">✕</button>
         <h3>Zarezerwuj termin</h3>
         <div class="book-when" id="calBookWhen"></div>
+        <div class="book-error" id="calBookError"></div>
 
-        <div class="cw-price-box" id="calPriceBox"></div>
+        <div class="cal-step show" id="calStep1">
+          <div class="cw-price-box" id="calPriceBox"></div>
 
-        <div id="calModeArea"></div>
+          <div id="calModeArea"></div>
 
-        <div id="calPianoArea" style="display:none;">
-          <div class="cw-piano-row">
-            <div class="cw-piano-tile selected" id="calPianoYes" onclick="calSetPiano(true)"><b>Mam pianino</b>bez dopłaty</div>
-            <div class="cw-piano-tile" id="calPianoNo" onclick="calSetPiano(false)"><b>Nie mam</b>dowóz instrumentu</div>
-          </div>
-          <div id="calInstrumentArea" style="display:none;">
+          <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
+
+          <div id="calPianoArea" style="display:none;">
             <div class="cw-piano-row">
-              <div class="cw-piano-tile selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b>20 zł</div>
-              <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b>60 zł</div>
+              <div class="cw-piano-tile selected" id="calPianoYes" onclick="calSetPiano(true)"><b>Mam pianino</b>bez dopłaty</div>
+              <div class="cw-piano-tile" id="calPianoNo" onclick="calSetPiano(false)"><b>Nie mam</b>dowóz instrumentu</div>
+            </div>
+            <div id="calInstrumentArea" style="display:none;">
+              <p class="pd-instr-note">Wybierz pianino, które chcesz dowieźć:</p>
+              <div class="cw-piano-row">
+                <div class="cw-piano-tile tile-silver selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>20 zł</div>
+                <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>60 zł</div>
+              </div>
             </div>
           </div>
+
+          <button class="book-submit" id="calStep1NextBtn" onclick="calGoStep(2)">DALEJ →</button>
         </div>
 
-        <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
-        <div class="phone-row">
-          <span class="phone-prefix">+48</span>
-          <input type="tel" id="calPhone" placeholder="123 456 789" oninput="calPhoneInput(this)">
+        <div class="cal-step" id="calStep2">
+          <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
+          <div class="phone-row">
+            <span class="phone-prefix">+48</span>
+            <input type="tel" id="calPhone" placeholder="123 456 789" oninput="calPhoneInput(this)">
+          </div>
+          <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
+          <div id="calAddrWrap">
+            <select id="calCity" onchange="recalcCalBooking()">
+              <option value="Gdynia" selected>Gdynia</option>
+              <option value="Sopot">Sopot</option>
+            </select>
+            <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()">
+          </div>
+          <div class="book-step-nav">
+            <button class="book-btn-outline" onclick="calGoStep(1)">← COFNIJ</button>
+            <button class="book-submit" onclick="calGoStep(3)">PODSUMUJ →</button>
+          </div>
         </div>
-        <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
-        <div id="calAddrWrap">
-          <select id="calCity" onchange="recalcCalBooking()">
-            <option value="Gdynia" selected>Gdynia</option>
-            <option value="Sopot">Sopot</option>
-          </select>
-          <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()">
+
+        <div class="cal-step" id="calStep3">
+          <div class="book-summary" id="calSummary"></div>
+          <div class="book-step-nav">
+            <button class="book-btn-outline" onclick="calGoStep(2)">← COFNIJ</button>
+            <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">ZAREZERWUJ TERMIN</button>
+          </div>
+          <div class="book-status" id="calBookStatus"></div>
         </div>
-        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
-        <div class="book-error" id="calBookError"></div>
-        <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">ZAREZERWUJ TERMIN</button>
-        <div class="book-status" id="calBookStatus"></div>
       </div>
     </div>
   </div>
@@ -916,8 +961,8 @@
       <div id="delivery-options" style="display:none;">
         <p style="font-size:0.78rem;font-weight:700;margin:2px 0 8px;color:var(--navy);text-align:left;">Wybierz instrument do dowozu:</p>
         <div class="bento-grid">
-          <div class="form-tile selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b><br><small>20 zł</small></div>
-          <div class="form-tile tile-gold" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b><br><small>60 zł</small></div>
+          <div class="form-tile tile-silver selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>20 zł</small></div>
+          <div class="form-tile tile-gold" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>60 zł</small></div>
         </div>
         <div style="font-size:0.7rem;color:var(--text-mid);margin:-6px 0 14px;text-align:left;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
       </div>
@@ -1121,8 +1166,8 @@
         <div id="m-delivery-options" style="display:none;">
           <p style="font-size:0.76rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Wybierz instrument do dowozu:</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div class="m-tile selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki.</span></span></b><br><small>20 zł</small></div>
-            <div class="m-tile tile-gold" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów.</span></span></b><br><small>60 zł</small></div>
+            <div class="m-tile tile-silver selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>20 zł</small></div>
+            <div class="m-tile tile-gold" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>60 zł</small></div>
           </div>
           <div style="font-size:0.68rem;color:#8a8a9a;margin:2px 0 4px;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
         </div>
@@ -1857,6 +1902,7 @@ function selectCalDay(key){
   const [y,m,d] = key.split('-').map(Number);
   const dateObj = new Date(y,m-1,d);
   const label = WEEKDAY_FULL[dateObj.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y;
+  document.getElementById('slotsHeading').textContent = 'Wybierz godzinę — '+label;
 
   const grid = document.getElementById('slotsGrid');
   const candidates = state.candidates || [];
@@ -1909,6 +1955,8 @@ function openCalBook(key, hour, minute){
   }
 
   calApplyModeToUI();
+  document.getElementById('calBookError').textContent = '';
+  calGoStep(1);
   recalcCalBooking();
   document.getElementById('calBookPanel').classList.add('show');
   document.getElementById('calBookPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -2005,6 +2053,68 @@ function calFormComplete(){
   return true;
 }
 
+let calStep = 1;
+function calGoStep(step){
+  if(step===3){
+    if(!calFormComplete()){
+      const errEl = document.getElementById('calBookError');
+      const name = document.getElementById('calName').value.trim();
+      const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
+      const email = document.getElementById('calEmail').value.trim();
+      if(name.length<2 || phoneDigits.length!==9 || !email.includes('@') || !email.includes('.')){
+        errEl.textContent = 'Wypełnij imię, telefon (9 cyfr) i email.';
+      }else{
+        errEl.textContent = 'Wpisz ulicę i numer mieszkania.';
+      }
+      return;
+    }
+    document.getElementById('calBookError').textContent = '';
+    calBuildSummary();
+  }
+  calStep = step;
+  [1,2,3].forEach(n=>{
+    const el = document.getElementById('calStep'+n);
+    if(el) el.classList.toggle('show', n===step);
+  });
+}
+
+function calBuildSummary(){
+  const el = document.getElementById('calSummary');
+  if(!bookCtx || !el) return;
+  const start = bookCtx.start, end = bookCtx.end;
+  const dateLabel = WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear();
+  const timeLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0')
+    +'–'+String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
+  const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela ('+TEACHER_ADDRESS+')' : 'U ucznia — dojazd';
+  const name = document.getElementById('calName').value.trim();
+  const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
+  const email = document.getElementById('calEmail').value.trim();
+  const city = document.getElementById('calCity').value;
+  const street = document.getElementById('calStreet').value.trim();
+  const promo = document.getElementById('calPromo').value.trim();
+  const codeOk = promo.toLowerCase() === PROMO_CODE;
+  const deliveryFee = calDeliveryFee();
+  const lessonBase = 99;
+  const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
+  const total = lessonPrice + deliveryFee;
+
+  const row = (label, val) => '<div class="bs-row"><span>'+label+'</span><b>'+val+'</b></div>';
+  let html = '';
+  html += row('Termin', dateLabel+', godz. '+timeLabel);
+  html += row('Miejsce', modeLabel);
+  if(bookCtx.mode==='uczen'){
+    const pianoLine = calPianoHas ? 'Masz własne pianino' : 'Dowóz: '+(calInstrumentType==='premium'?'Yamaha P-525':'Roland GO:PIANO88PX')+' ('+deliveryFee+' zł)';
+    html += row('Pianino', pianoLine);
+    if(street) html += row('Adres', street+', '+city);
+  }
+  html += row('Imię i nazwisko', name);
+  html += row('Telefon', '+48 '+phoneDigits);
+  html += row('Email', email);
+  if(promo) html += row('Kod rabatowy', promo+(codeOk?' ✓':' (nieprawidłowy)'));
+  html += row('Cena', formatPLN(total)+' zł / h');
+  el.innerHTML = html;
+}
+
 function recalcCalBooking(){
   if(!bookCtx) return true;
   calUpdatePriceBox();
@@ -2015,21 +2125,24 @@ function recalcCalBooking(){
   const valid = isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
   const errEl = document.getElementById('calBookError');
   const btn = document.getElementById('calBookSubmitBtn');
+  const nextBtn = document.getElementById('calStep1NextBtn');
 
   if(!valid){
     errEl.textContent = bookCtx.mode==='mnie'
       ? 'Ta godzina nie mieści się z zachowaniem 5-minutowego odstępu od sąsiednich lekcji.'
       : 'Ta godzina nie mieści się z zachowaniem 25-minutowego odstępu (czas na dojazd).';
+    if(nextBtn) nextBtn.disabled = true;
     btn.disabled = true;
     return false;
   }
   errEl.textContent = '';
+  if(nextBtn) nextBtn.disabled = false;
 
   const endLabel = String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
   const startLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
   document.getElementById('calBookWhen').textContent =
     WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear()
-    +', godz. '+startLabel+'–'+endLabel+' ('+(bookCtx.mode==='mnie'?'u nauczyciela':'u ucznia')+')';
+    +', godz. '+startLabel+'–'+endLabel;
 
   btn.disabled = !calFormComplete();
   return true;
@@ -2114,7 +2227,7 @@ async function submitCalBooking(){
     const text = await r.text();
     if(!r.ok && !text.toLowerCase().includes('accepted')) throw new Error('HTTP '+r.status);
     status.style.color = '#4ade80';
-    status.innerHTML = '✓ Zarezerwowano! Dostaniesz ode mnie telefon z potwierdzeniem tej lekcji.';
+    status.innerHTML = '✓ Zarezerwowano! Niedługo skontaktuje się z Państwem nauczyciel, żeby potwierdzić termin zajęć.';
     showToast('✅ Zarezerwowano!');
     setTimeout(()=>{
       closeCalBook();

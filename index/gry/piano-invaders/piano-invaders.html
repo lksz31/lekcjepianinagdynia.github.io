@@ -377,6 +377,12 @@ PIANO_IMG.onerror = function(){ pianoLoaded = false; };
 BG_IMG.src    = 'grafiki/tlo-invaders.webp';
 PIANO_IMG.src = 'grafiki/pianino-stoi.webp';
 
+/* Klucz basowy na kafelkach ruchu: obraz zamiast wąskiego glifu unicode.
+   Jego dwie kropki muszą otaczać linię F (2. linię pięciolinii od góry). */
+var CLEF_BASS_INVADERS_URL = 'grafiki/basowy-bez-tla-invaders.webp';
+var CLEF_BASS_INVADERS_RATIO = 162 / 201;
+var CLEF_BASS_INVADERS_F_PCT = 0.351;
+
 // ══ NOTES ══
 var MOVE_NOTES = [
   {id:'c', label:'c',  freq:130.81, col:0},
@@ -433,8 +439,9 @@ function makeStaffSVG(noteId, color, w, h){
     var clefY = sb + ls * 0.6, clefSize = h * 0.95;
     clefSvg = '<text x="'+(clefW*0.18)+'" y="'+clefY.toFixed(1)+'" font-size="'+clefSize.toFixed(1)+'" fill="rgba(255,255,255,0.55)" font-family="serif" dominant-baseline="auto">𝄞</text>';
   } else {
-    var bclefY = (st + ls).toFixed(1), bclefSize = (ls * 3).toFixed(1);
-    clefSvg = '<text x="2" y="'+bclefY+'" font-size="'+bclefSize+'" fill="rgba(255,255,255,0.55)" font-family="serif" dominant-baseline="hanging">𝄢</text>';
+    var bch = ls * 4, bcw = bch * CLEF_BASS_INVADERS_RATIO;
+    var bcy = (st + ls) - CLEF_BASS_INVADERS_F_PCT * bch;
+    clefSvg = '<image href="'+CLEF_BASS_INVADERS_URL+'" x="2" y="'+bcy.toFixed(1)+'" width="'+bcw.toFixed(1)+'" height="'+bch.toFixed(1)+'" preserveAspectRatio="none" style="opacity:0.85"/>';
   }
   var noteY = sb - data.step * ls * 0.5, nr = ls * 0.62;
   var cx2 = (sx + sw * 0.5).toFixed(1);
@@ -457,7 +464,19 @@ function makeStaffSVG(noteId, color, w, h){
 var cv = document.getElementById('c'), cx = cv.getContext('2d');
 var COLS=7, COL_W, PW, PH;
 function colX(i){ return COL_W*i + COL_W/2; }
-function getTileH(){ return inputMode==='mic' ? 0 : Math.min(window.innerHeight*0.28, 180); }
+/* Rozmiar kafelka jest źródłem prawdy — wysokość stref (getTileH) jest z
+   niego wyliczana, więc powiększenie kafelków plusikiem zawsze powiększa
+   też pole, na którym się pokazują (bez tego kafelki się ucinały). */
+function computeCardSz(){
+  var baseZoneH = Math.min(window.innerHeight*0.28, 180);
+  var rH = baseZoneH/2, baseSz = Math.min(rH*0.90, 84);
+  return Math.max(38, Math.round(baseSz*tileScale));
+}
+function getTileH(){
+  if(inputMode==='mic') return 0;
+  var sz = computeCardSz();
+  return Math.min((sz+18)*2, window.innerHeight*0.62);
+}
 function resize(){
   PW = cv.width = window.innerWidth;
   var tH = getTileH();
@@ -1277,8 +1296,7 @@ function buildTileCards(){
   moveCards=[]; shootCards=[];
   if(inputMode === 'mic'){ wrap.classList.remove('visible'); resize(); return; }
   wrap.classList.add('visible'); resize();
-  var rH = getTileH() / 2, baseSz = Math.min(rH * 0.90, 84);
-  var cardSz = Math.max(38, Math.round(baseSz * tileScale));
+  var cardSz = computeCardSz();
   MOVE_NOTES.forEach(function(n){
     var card = makeCard(n, 'move', cardSz, zoneMove, function(){
       if(!gameRunning) return;
