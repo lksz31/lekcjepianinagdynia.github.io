@@ -107,6 +107,16 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 .note-tile.mic-only{cursor:default;opacity:0.6;}
 .note-tile.mic-only:hover{border-color:#3a4a2a;box-shadow:none;transform:none;}
 .note-tile.pressing,.note-tile:active{border-color:#d4af37;box-shadow:0 0 20px rgba(212,175,55,.65);transform:scale(.93);background:rgba(212,175,55,.12);}
+.note-size-ctrl{display:flex;flex-direction:column;gap:5px;flex-shrink:0;align-self:center;}
+.note-size-btn{width:26px;height:26px;border-radius:6px;border:1px solid #3a4a2a;background:rgba(3,8,3,.7);color:#9a8a5a;font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;user-select:none;}
+.note-size-btn:hover{border-color:#d4af37;color:#d4af37;box-shadow:0 0 10px rgba(212,175,55,.4);}
+.note-size-btn:active{transform:scale(.92);}
+
+/* ══ KOMPAS ══ */
+#compass-widget{display:none;position:fixed;top:78px;right:14px;width:150px;z-index:45;cursor:grab;touch-action:none;user-select:none;filter:drop-shadow(0 4px 14px rgba(0,0,0,.6));}
+#compass-widget.show{display:block;}
+#compass-widget.dragging{cursor:grabbing;opacity:.85;}
+#compass-widget img{width:100%;display:block;border-radius:10px;pointer-events:none;-webkit-user-drag:none;}
 
 /* ══ WIN OVERLAY ══ */
 #wo{display:none;position:absolute;inset:0;background:rgba(0,0,0,.88);align-items:flex-start;justify-content:center;flex-direction:column;gap:0;z-index:50;backdrop-filter:blur(5px);overflow-y:auto;padding:20px;}
@@ -289,6 +299,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
     </div>
   </div>
   <div id="note-bar"></div>
+  <div id="compass-widget" class="show"><img src="/index/gry/piano-maze/objekty/przedmioty/kompas-labirynt.png" alt="Kompas kierunków" draggable="false"></div>
 </div>
 
 <!-- MENU OVERLAY -->
@@ -358,6 +369,7 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
         <div class="srow"><label><input type="checkbox" id="chk-exit" onchange="toggleShowExit(this.checked)"> Pokaż wyjście przez mgłę</label></div>
         <div class="srow"><label><input type="checkbox" id="chk-hints" onchange="toggleHints(this.checked)"> Boczna belka sterowania</label></div>
         <div class="srow"><label><input type="checkbox" id="chk-notelabels" onchange="toggleNoteLabels(this.checked)"> Podpisy nut na kafelkach</label></div>
+        <div class="srow"><label><input type="checkbox" id="chk-compass" onchange="toggleCompass(this.checked)" checked> Kompas kierunków nut</label></div>
         <div class="srow" id="row-gain" style="display:none;">
           <label>Czułość mikrofonu &nbsp;<span class="sval" id="gainV">3.5×</span></label>
           <input type="range" id="gainSlider" min="1" max="10" step="0.5" value="3.5" oninput="applyGain(this.value)">
@@ -443,6 +455,12 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
 const BASE = 'https://raw.githubusercontent.com/lksz31/lekcjepianinagdynia.github.io/main/index/gry/piano-maze/';
 const SITE_BASE = '/index/gry/piano-maze/';
 const BG_GAME_SRC = SITE_BASE + 'concept-art/loading-screen-maze.webp';
+
+/* ── Klucz basowy: obraz zamiast fontu (jego 2 kropki muszą otaczać linię F,
+   czyli 2. linię pięciolinii licząc od góry) ── */
+const CLEF_BASS_URL = SITE_BASE + 'zapis-nutowy/piano-maze-klucz.png';
+const CLEF_BASS_RATIO = 302 / 362;
+const CLEF_BASS_F_PCT = 0.338;
 
 /* ══ TILE SOURCES ══ */
 const TILE_SRCS = {
@@ -765,7 +783,6 @@ function noteSVG(n, W, H, showLabel) {
   const staffY = n.staffY;
   const noteY = staffTop + (staffY * sg / 2);
   const trebleFS = Math.max(20, Math.round(W * 0.60));
-  const bassFS   = Math.max(14, Math.round(W * 0.33));
   let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
   s += `<rect width="${W}" height="${H}" rx="7" fill="rgba(2,6,2,0.75)" stroke="${c}" stroke-width="1.5"/>`;
   for (let i = 0; i < 5; i++) {
@@ -773,8 +790,10 @@ function noteSVG(n, W, H, showLabel) {
     s += `<line x1="5" y1="${ly}" x2="${W-5}" y2="${ly}" stroke="${c}" stroke-width="${Math.max(0.7, 0.9*scale)}" opacity="0.6"/>`;
   }
   if (isB) {
-    const clefY = staffTop + sg * 3.2;
-    s += `<text x="3" y="${clefY.toFixed(1)}" font-size="${bassFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.9" dominant-baseline="middle">&#119074;</text>`;
+    const ch = Math.round(sg * 4.0);
+    const cw = Math.round(ch * CLEF_BASS_RATIO);
+    const cy = (staffTop + sg) - CLEF_BASS_F_PCT * ch;
+    s += `<image href="${CLEF_BASS_URL}" x="${(2*scale).toFixed(1)}" y="${cy.toFixed(1)}" width="${cw}" height="${ch}" preserveAspectRatio="none"/>`;
   } else {
     s += `<text x="3" y="${staffTop + sg * 4 + Math.round(2*scale)}" font-size="${trebleFS}" font-family="Georgia,'Times New Roman',serif" fill="${c}" opacity="0.85">&#119070;</text>`;
   }
@@ -846,6 +865,7 @@ function applyBoardSize(){
 /* ══ STATE ══ */
 let controlMode='tiles',micGain=3.5,noteMargin=8,transpose=0;
 let fogEnabled=true,showExitHint=false,hintsEnabled=false,noteLabels=false;
+let compassEnabled=true,noteTileScale=1;
 let mAC=null,mAn=null,mGainNode=null,mReady=false,fH=[],dCD=0;
 const buf=new Float32Array(4096);
 let selectedChar=null,mazeData=null,won=false,playerR=0,playerC=0;
@@ -1713,6 +1733,43 @@ function toggleHints(on){
   refreshSideBar();
 }
 function toggleNoteLabels(on){noteLabels=on;buildNoteTiles();}
+function toggleCompass(on){
+  compassEnabled=on;
+  const el=document.getElementById('compass-widget');
+  if(el)el.classList.toggle('show',on);
+}
+
+/* ══ KOMPAS – przeciąganie palcem/myszą po ekranie ══ */
+function initCompassDrag(){
+  const el=document.getElementById('compass-widget');
+  if(!el||el.dataset.dragInit)return;
+  el.dataset.dragInit='1';
+  let dragging=false,offX=0,offY=0;
+  const start=e=>{
+    dragging=true;el.classList.add('dragging');
+    const p=e.touches?e.touches[0]:e;
+    const r=el.getBoundingClientRect();
+    offX=p.clientX-r.left;offY=p.clientY-r.top;
+    e.preventDefault();
+  };
+  const move=e=>{
+    if(!dragging)return;
+    const p=e.touches?e.touches[0]:e;
+    const w=el.offsetWidth,h=el.offsetHeight;
+    const x=Math.max(4,Math.min(window.innerWidth-w-4,p.clientX-offX));
+    const y=Math.max(4,Math.min(window.innerHeight-h-4,p.clientY-offY));
+    el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';
+    e.preventDefault();
+  };
+  const end=()=>{dragging=false;el.classList.remove('dragging');};
+  el.addEventListener('mousedown',start);
+  document.addEventListener('mousemove',move);
+  document.addEventListener('mouseup',end);
+  el.addEventListener('touchstart',start,{passive:false});
+  document.addEventListener('touchmove',move,{passive:false});
+  document.addEventListener('touchend',end);
+  document.addEventListener('touchcancel',end);
+}
 
 function refreshHzGrid(){
   const g=document.getElementById('hz-grid');if(!g)return;
@@ -1745,8 +1802,9 @@ function buildNoteTiles(){
   if(!show){bar.innerHTML='';bar.className='note-bar';return;}
   bar.innerHTML='';
   const barW=window.innerWidth;
-  const tileW=Math.min(82,Math.floor((barW-80)/4));
-  const tileH=noteLabels?Math.min(102,tileW+14):Math.min(94,tileW+10);
+  const baseTileW=Math.min(82,Math.floor((barW-80)/4));
+  const tileW=Math.max(40,Math.round(baseTileW*noteTileScale));
+  const tileH=noteLabels?Math.min(150,tileW+14):Math.min(140,tileW+10);
   tileOrder.forEach(dir=>{
     const n=MN.find(x=>x.dir===dir);if(!n)return;
     const t=document.createElement('div');
@@ -1759,7 +1817,15 @@ function buildNoteTiles(){
     if(controlMode==='mic')t.classList.add('mic-only');
     bar.appendChild(t);
   });
+  const ctrl=document.createElement('div');
+  ctrl.className='note-size-ctrl';
+  ctrl.innerHTML='<button type="button" class="note-size-btn" onclick="adjustTileScale(0.15)" aria-label="Powiększ kafelki">+</button><button type="button" class="note-size-btn" onclick="adjustTileScale(-0.15)" aria-label="Zmniejsz kafelki">−</button>';
+  bar.appendChild(ctrl);
   bar.className='note-bar show';
+}
+function adjustTileScale(delta){
+  noteTileScale=Math.max(0.6,Math.min(1.8,+(noteTileScale+delta).toFixed(2)));
+  buildNoteTiles();
 }
 
 function startPress(dir,tile){
@@ -2180,6 +2246,7 @@ function startGame(){
   if(musicEnabled) startTechno();
   buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
+  initCompassDrag();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
 }
 
