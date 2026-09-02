@@ -45,10 +45,13 @@ const B_ALT=[
 function noteEN(n){
   const base=n.l.replace(/[¹²³]/g,'');
   const oct=n.l.match(/[¹²³]/)?n.l.match(/[¹²³]/)[0]:'';
-  const names={'C':'C','D':'D','E':'E','F':'F','G':'G','A':'A','H':'B',
+  const names={'C':'C','D':'D','E':'E','F':'F','G':'G','A':'A','H':'B','h':'b',
     'Cis':'C#','Dis':'D#','Fis':'F#','Gis':'G#','Ais':'A#',
     'es':'Eb','as':'Ab','b':'Bb','Es':'Eb','As':'Ab','B':'Bb'};
   const baseN=base in names?names[base]:base;
-  const octMap={'¹':'4','²':'5','³':'6','':(n.kontra?'2':'3')};
+  /* Oktawy bez znaku diakrytycznego (bez ¹²³) rozróżniamy wielkością litery
+     oraz flagami kontra/subkontra: subkontra=0, kontra=1, wielka (duża
+     litera, bez flagi)=2, mała (mała litera, bez flagi)=3. */
+  const octMap={'¹':'4','²':'5','³':'6','':(n.subkontra?'0':n.kontra?'1':(/^[A-Z]/.test(base)?'2':'3'))};
   return baseN+(octMap[oct]||'');
 }

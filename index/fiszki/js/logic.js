@@ -128,7 +128,7 @@ function toggleReveal(){
   const children=document.getElementById('namesRow').children;
   notes.forEach((it,i)=>{
     const b=children[i];if(!b)return;
-    if(revealState){b.classList.remove('hidden');b.textContent=formatNoteName(it.n);if(it.n.kontra)b.classList.add('kontra');}
+    if(revealState){b.classList.remove('hidden');b.textContent=formatNoteName(it.n);if(it.n.kontra)b.classList.add('kontra');if(it.n.subkontra)b.classList.add('subkontra');}
     else{b.classList.add('hidden');b.textContent='?';b.className='nb hidden';}
   });
 }
@@ -148,7 +148,7 @@ function buildChoiceButtons(){
   while(wrong.length<3&&wrong.length<p.length){const c=p[rnd(p.length)];if(!used.has(c.l)){used.add(c.l);wrong.push(c);}}
   const opts=shuffle([it.n,...wrong]);
   opts.forEach((n,idx)=>{
-    const btn=document.createElement('button');btn.className='ch-btn'+(n.kontra?' kontra':'');
+    const btn=document.createElement('button');btn.className='ch-btn'+(n.kontra?' kontra':'')+(n.subkontra?' subkontra':'');
     if(nameFormat==='sound'){
       btn.innerHTML='<span style="font-size:1.6rem;">♪</span><br><span style="font-size:0.65rem;opacity:0.6;">'+(idx+1)+'</span>';btn.title=n.l;
       btn.onmouseenter=()=>playFreq(n.f,getACtx().currentTime,0.4);
@@ -162,7 +162,7 @@ function handleChoice(chosen,correct){
   const allBtns=document.querySelectorAll('.ch-btn');const nb=document.getElementById('nc-'+guessIdx);
   if(chosen.l===correct.l){
     allBtns.forEach(b=>{if(b.dataset.noteL===correct.l)b.classList.add('ok');});
-    if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=formatNoteName(correct);if(correct.kontra)nb.classList.add('kontra');}
+    if(nb){nb.classList.remove('guess-cur');nb.classList.add('guess-ok');nb.textContent=formatNoteName(correct);if(correct.kontra)nb.classList.add('kontra');if(correct.subkontra)nb.classList.add('subkontra');}
     render(notes,guessIdx,'#16a34a');
     if(document.getElementById('toggleFeedbackSound').checked)playPyk(true);
     if(kidMode)spawnKidFlower();
@@ -283,6 +283,10 @@ function confirmPlace(){
 function getNoteLabelForP(clefType,p){
   const base=clefType==='bass'?BASS:TREBLE;
   const n=base.find(n=>n.p===p);return n?n.l:'?';
+}
+function getNoteForP(clefType,p){
+  const base=clefType==='bass'?BASS:TREBLE;
+  return base.find(n=>n.p===p)||null;
 }
 
 function showPrevAttempt(entry){
