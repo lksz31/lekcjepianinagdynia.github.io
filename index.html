@@ -841,7 +841,25 @@
         <h3>Zarezerwuj termin</h3>
         <div class="book-when" id="calBookWhen"></div>
 
+        <div class="cw-price-box" id="calPriceBox"></div>
+
         <div id="calModeArea"></div>
+
+        <div id="calPianoArea" style="display:none;">
+          <div class="cw-piano-row">
+            <div class="cw-piano-tile selected" id="calPianoYes" onclick="calSetPiano(true)"><b>Mam pianino</b>bez dopłaty</div>
+            <div class="cw-piano-tile" id="calPianoNo" onclick="calSetPiano(false)"><b>Nie mam</b>dowóz instrumentu</div>
+          </div>
+          <div id="calInstrumentArea" style="display:none;">
+            <div class="cw-piano-row">
+              <div class="cw-piano-tile selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX</b>20 zł</div>
+              <div class="cw-piano-tile" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525</b>60 zł (stojak w cenie)</div>
+            </div>
+            <label id="calStandWrap" style="display:flex;align-items:center;gap:8px;font-size:0.76rem;color:rgba(255,255,255,0.8);margin:-2px 0 12px;cursor:pointer;">
+              <input type="checkbox" id="calStandAddon" onchange="recalcCalBooking()"> Dołóż stojak pod keyboard (+5 zł)
+            </label>
+          </div>
+        </div>
 
         <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
         <div class="phone-row">
@@ -856,7 +874,7 @@
           </select>
           <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()">
         </div>
-        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)">
+        <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
         <div class="book-error" id="calBookError"></div>
         <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">ZAREZERWUJ TERMIN</button>
         <div class="book-status" id="calBookStatus"></div>
@@ -879,7 +897,18 @@
     <div id="piano-options">
       <div class="bento-grid">
         <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b><br><small>Standard</small></div>
-        <div class="form-tile" id="piano-no" onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu (+20 zł)</small></div>
+        <div class="form-tile" id="piano-no" onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu</small></div>
+      </div>
+      <div id="delivery-options" style="display:none;">
+        <p style="font-size:0.78rem;font-weight:700;margin:2px 0 8px;color:var(--navy);text-align:left;">Wybierz instrument do dowozu:</p>
+        <div class="bento-grid">
+          <div class="form-tile selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX</b><br><small>20 zł</small></div>
+          <div class="form-tile" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525</b><br><small>60 zł (stojak w cenie)</small></div>
+        </div>
+        <label id="stand-option-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-mid);margin:-4px 0 12px;text-align:left;cursor:pointer;">
+          <input type="checkbox" id="standAddon" onchange="updatePrice()"> Dołóż stojak pod keyboard (+5 zł)
+        </label>
+        <div style="font-size:0.7rem;color:var(--text-mid);margin:-6px 0 14px;text-align:left;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
       </div>
     </div>
     <div class="contact-box">
@@ -1076,7 +1105,18 @@
         <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
-          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam (+20 zł)</b></div>
+          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam</b></div>
+        </div>
+        <div id="m-delivery-options" style="display:none;">
+          <p style="font-size:0.76rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Wybierz instrument do dowozu:</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="m-tile selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX</b><br><small>20 zł</small></div>
+            <div class="m-tile" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525</b><br><small>60 zł (stojak w cenie)</small></div>
+          </div>
+          <label id="m-stand-option-wrap" style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--navy);margin:10px 0 4px;cursor:pointer;">
+            <input type="checkbox" id="mStandAddon" onchange="mUpdatePrice()"> Dołóż stojak pod keyboard (+5 zł)
+          </label>
+          <div style="font-size:0.68rem;color:#8a8a9a;margin:2px 0 4px;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
         </div>
       </div>
     </div>
@@ -1163,21 +1203,53 @@ async function sprawdzKod(){
 }
 document.getElementById('brief-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')sprawdzKod();});
 
-let isStudio=true,hasPiano=true;
+let isStudio=true,hasPiano=true,deliveryType='eco';
 function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);document.body.style.overflow=show?'hidden':'';}
-function setLoc(loc){isStudio=loc==='studio';document.getElementById('loc-studio').classList.toggle('selected',isStudio);document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);document.getElementById('piano-options').style.display=isStudio?'none':'block';updatePrice();}
-function setPiano(v){hasPiano=v;document.getElementById('piano-yes').classList.toggle('selected',hasPiano);document.getElementById('piano-no').classList.toggle('selected',!hasPiano);updatePrice();}
+function setLoc(loc){
+  isStudio=loc==='studio';
+  document.getElementById('loc-studio').classList.toggle('selected',isStudio);
+  document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);
+  document.getElementById('piano-options').style.display=isStudio?'none':'block';
+  document.getElementById('delivery-options').style.display=(!isStudio&&!hasPiano)?'block':'none';
+  updatePrice();
+}
+function setPiano(v){
+  hasPiano=v;
+  document.getElementById('piano-yes').classList.toggle('selected',hasPiano);
+  document.getElementById('piano-no').classList.toggle('selected',!hasPiano);
+  document.getElementById('delivery-options').style.display=(!isStudio&&!hasPiano)?'block':'none';
+  updatePrice();
+}
+function setDelivery(type){
+  deliveryType=type;
+  document.getElementById('delivery-eco').classList.toggle('selected',type==='eco');
+  document.getElementById('delivery-premium').classList.toggle('selected',type==='premium');
+  const standWrap=document.getElementById('stand-option-wrap');
+  standWrap.style.display=type==='eco'?'flex':'none';
+  if(type==='premium'){document.getElementById('standAddon').checked=false;}
+  updatePrice();
+}
+function calcDeliveryFee(){
+  if(isStudio||hasPiano) return 0;
+  if(deliveryType==='premium') return 60;
+  const standChecked=document.getElementById('standAddon')&&document.getElementById('standAddon').checked;
+  return 20+(standChecked?5:0);
+}
 const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
 function updatePrice(){
-  const base=(!isStudio&&!hasPiano?119:99);
+  const lessonBase=99;
+  const deliveryFee=calcDeliveryFee();
   const codeOk=document.getElementById('res-rabat').value.trim().toLowerCase()===PROMO_CODE;
   const priceEl=document.getElementById('price-val');
+  const lessonPrice=codeOk?lessonBase*(1-PROMO_DISCOUNT):lessonBase;
+  const total=lessonPrice+deliveryFee;
   if(codeOk){
-    const discounted=base*(1-PROMO_DISCOUNT);
-    priceEl.innerHTML=`<span class="price-old">${base} zł</span><span class="price-new">${formatPLN(discounted)} zł</span>`;
+    let html=`<span class="price-old">${lessonBase+deliveryFee} zł</span><span class="price-new">${formatPLN(total)} zł</span>`;
+    if(deliveryFee>0) html+=`<span class="price-hint">Rabat nie obejmuje dowozu (${deliveryFee} zł)</span>`;
+    priceEl.innerHTML=html;
   }else{
-    priceEl.innerText=base+' zł / h';
+    priceEl.innerText=formatPLN(total)+' zł / h';
   }
   val();
 }
@@ -1186,7 +1258,19 @@ async function wyslij(){
   if(!document.getElementById('subBtn').classList.contains('active'))return;
   const s=document.getElementById('res-status'),btn=document.getElementById('subBtn');
   s.innerText='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
-  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),kod_rabatowy:document.getElementById('res-rabat').value.trim(),tresc:document.getElementById('res-msg').value.trim(),miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:isStudio?'—':(hasPiano?'Tak':'Nie — dowóz instrumentu'),cena:(!isStudio&&!hasPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const delFee=calcDeliveryFee();
+  const standChecked=document.getElementById('standAddon')&&document.getElementById('standAddon').checked;
+  const codeOk=document.getElementById('res-rabat').value.trim().toLowerCase()===PROMO_CODE;
+  const lessonPrice=codeOk?99*(1-PROMO_DISCOUNT):99;
+  const totalPrice=lessonPrice+delFee;
+  let pianinoOpis='—';
+  if(!isStudio){
+    if(hasPiano) pianinoOpis='Tak';
+    else if(deliveryType==='premium') pianinoOpis='Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
+    else pianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+delFee+' zł';
+  }
+  const cenaOpis=formatPLN(totalPrice)+' zł łącznie (lekcja: '+formatPLN(lessonPrice)+' zł'+(delFee?' + dowóz '+delFee+' zł, bez rabatu':'')+')';
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),kod_rabatowy:document.getElementById('res-rabat').value.trim(),tresc:document.getElementById('res-msg').value.trim(),miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:pianinoOpis,cena:cenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();
@@ -1198,18 +1282,50 @@ async function wyslij(){
 
 function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
 function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
-let mLoc='s',mPiano=true;
-function mSetLoc(t){mLoc=t;document.getElementById('m-l-s').classList.toggle('selected',t==='s');document.getElementById('m-l-u').classList.toggle('selected',t==='u');document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';mUpdatePrice();}
-function mSetPiano(v){mPiano=v;document.getElementById('m-p-y').classList.toggle('selected',v);document.getElementById('m-p-n').classList.toggle('selected',!v);mUpdatePrice();}
+let mLoc='s',mPiano=true,mDeliveryType='eco';
+function mSetLoc(t){
+  mLoc=t;
+  document.getElementById('m-l-s').classList.toggle('selected',t==='s');
+  document.getElementById('m-l-u').classList.toggle('selected',t==='u');
+  document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';
+  document.getElementById('m-delivery-options').style.display=(t==='u'&&!mPiano)?'block':'none';
+  mUpdatePrice();
+}
+function mSetPiano(v){
+  mPiano=v;
+  document.getElementById('m-p-y').classList.toggle('selected',v);
+  document.getElementById('m-p-n').classList.toggle('selected',!v);
+  document.getElementById('m-delivery-options').style.display=(mLoc==='u'&&!mPiano)?'block':'none';
+  mUpdatePrice();
+}
+function mSetDelivery(type){
+  mDeliveryType=type;
+  document.getElementById('m-delivery-eco').classList.toggle('selected',type==='eco');
+  document.getElementById('m-delivery-premium').classList.toggle('selected',type==='premium');
+  const standWrap=document.getElementById('m-stand-option-wrap');
+  standWrap.style.display=type==='eco'?'flex':'none';
+  if(type==='premium'){document.getElementById('mStandAddon').checked=false;}
+  mUpdatePrice();
+}
+function mCalcDeliveryFee(){
+  if(mLoc==='s'||mPiano) return 0;
+  if(mDeliveryType==='premium') return 60;
+  const standChecked=document.getElementById('mStandAddon')&&document.getElementById('mStandAddon').checked;
+  return 20+(standChecked?5:0);
+}
 function mUpdatePrice(){
-  const base=(mLoc==='u'&&!mPiano?119:99);
+  const lessonBase=99;
+  const deliveryFee=mCalcDeliveryFee();
   const codeOk=document.getElementById('m-rabat').value.trim().toLowerCase()===PROMO_CODE;
   const priceEl=document.getElementById('m-price');
+  const lessonPrice=codeOk?lessonBase*(1-PROMO_DISCOUNT):lessonBase;
+  const total=lessonPrice+deliveryFee;
   if(codeOk){
-    const discounted=base*(1-PROMO_DISCOUNT);
-    priceEl.innerHTML=`<span class="price-old">${base} zł</span><span class="price-new">${formatPLN(discounted)} zł</span>`;
+    let html=`<span class="price-old">${lessonBase+deliveryFee} zł</span><span class="price-new">${formatPLN(total)} zł</span>`;
+    if(deliveryFee>0) html+=`<span class="price-hint">Rabat nie obejmuje dowozu (${deliveryFee} zł)</span>`;
+    priceEl.innerHTML=html;
   }else{
-    priceEl.innerText=base+' zł / h';
+    priceEl.innerText=formatPLN(total)+' zł / h';
   }
 }
 async function wyslijModal(){
@@ -1220,7 +1336,19 @@ async function wyslijModal(){
   const email=document.getElementById('m-email').value.trim();
   if(name.length<2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
   submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
-  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const mDelFee=mCalcDeliveryFee();
+  const mStandChecked=document.getElementById('mStandAddon')&&document.getElementById('mStandAddon').checked;
+  const mCodeOk=document.getElementById('m-rabat').value.trim().toLowerCase()===PROMO_CODE;
+  const mLessonPrice=mCodeOk?99*(1-PROMO_DISCOUNT):99;
+  const mTotalPrice=mLessonPrice+mDelFee;
+  let mPianinoOpis='—';
+  if(mLoc==='u'){
+    if(mPiano) mPianinoOpis='Tak';
+    else if(mDeliveryType==='premium') mPianinoOpis='Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
+    else mPianinoOpis='Nie — dowóz: Roland GO:PIANO88PX'+(mStandChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+mDelFee+' zł';
+  }
+  const mCenaOpis=formatPLN(mTotalPrice)+' zł łącznie (lekcja: '+formatPLN(mLessonPrice)+' zł'+(mDelFee?' + dowóz '+mDelFee+' zł, bez rabatu':'')+')';
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mPianinoOpis,cena:mCenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();
@@ -1424,6 +1552,8 @@ let dayList = [];
 let selectedDateKey = null;
 let lastCalErrors = [];
 let bookCtx = null;
+let calPianoHas = true;
+let calInstrumentType = 'eco';
 let currentStartMonday = null;
 
 const WEEKS_AHEAD_LIMIT = 8; /* jak daleko w przyszłość można przewinąć (8 x 2 tygodnie = ok. 4 miesiące) */
@@ -1763,6 +1893,7 @@ function openCalBook(key, hour, minute){
     mode: defaultMode, bothAvailable,
     duration: MNIE_DURATION
   };
+  calResetPianoState();
 
   const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
   document.getElementById('calBookWhen').textContent = label;
@@ -1776,13 +1907,69 @@ function openCalBook(key, hour, minute){
       + '<div class="mode-note">Ta godzina jest dostępna wyłącznie u nauczyciela — nie można jej odznaczyć.</div>';
   }else{
     modeArea.innerHTML = '<div class="mode-row mode-row-locked"><span class="mode-check-locked off"></span><span class="mode-strike">Lekcja u nauczyciela ('+TEACHER_ADDRESS+')</span></div>'
-      + '<div class="mode-note">Ta godzina wymaga dojazdu do ucznia — nie można wybrać lekcji u nauczyciela. Jeżeli nie masz instrumentu, koszt dowozu wynosi 20 zł.</div>';
+      + '<div class="mode-note">Ta godzina wymaga dojazdu do ucznia — nie można wybrać lekcji u nauczyciela.</div>';
   }
 
   calApplyModeToUI();
   recalcCalBooking();
   document.getElementById('calBookPanel').classList.add('show');
   document.getElementById('calBookPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function calResetPianoState(){
+  calPianoHas = true;
+  calInstrumentType = 'eco';
+  document.getElementById('calPianoYes').classList.add('selected');
+  document.getElementById('calPianoNo').classList.remove('selected');
+  document.getElementById('calInstrumentArea').style.display = 'none';
+  document.getElementById('calInstrEco').classList.add('selected');
+  document.getElementById('calInstrPremium').classList.remove('selected');
+  document.getElementById('calStandAddon').checked = false;
+  document.getElementById('calStandWrap').style.display = 'flex';
+}
+
+function calSetPiano(v){
+  calPianoHas = v;
+  document.getElementById('calPianoYes').classList.toggle('selected', v);
+  document.getElementById('calPianoNo').classList.toggle('selected', !v);
+  document.getElementById('calInstrumentArea').style.display = v ? 'none' : 'block';
+  recalcCalBooking();
+}
+
+function calSetInstrument(type){
+  calInstrumentType = type;
+  document.getElementById('calInstrEco').classList.toggle('selected', type==='eco');
+  document.getElementById('calInstrPremium').classList.toggle('selected', type==='premium');
+  const standWrap = document.getElementById('calStandWrap');
+  standWrap.style.display = type==='eco' ? 'flex' : 'none';
+  if(type==='premium'){ document.getElementById('calStandAddon').checked = false; }
+  recalcCalBooking();
+}
+
+function calDeliveryFee(){
+  if(!bookCtx || bookCtx.mode!=='uczen') return 0;
+  if(calPianoHas) return 0;
+  if(calInstrumentType==='premium') return 60;
+  const standChecked = document.getElementById('calStandAddon') && document.getElementById('calStandAddon').checked;
+  return 20 + (standChecked?5:0);
+}
+
+function calUpdatePriceBox(){
+  const box = document.getElementById('calPriceBox');
+  if(!box) return;
+  const lessonBase = 99;
+  const codeOk = document.getElementById('calPromo').value.trim().toLowerCase() === PROMO_CODE;
+  const deliveryFee = calDeliveryFee();
+  const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
+  const total = lessonPrice + deliveryFee;
+  let html = '';
+  if(codeOk){
+    html += '<span class="cw-price-old">'+(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+' zł / h</span>';
+    if(deliveryFee>0) html += '<div class="cw-price-note">Rabat nie obejmuje dowozu instrumentu ('+deliveryFee+' zł).</div>';
+  }else{
+    html += '<span class="cw-price-plain">'+formatPLN(total)+' zł / h</span>';
+  }
+  box.innerHTML = html;
 }
 
 function calOnModeToggle(){
@@ -1795,12 +1982,15 @@ function calOnModeToggle(){
 
 function calApplyModeToUI(){
   const addrWrap = document.getElementById('calAddrWrap');
+  const pianoArea = document.getElementById('calPianoArea');
   bookCtx.duration = MNIE_DURATION;
   if(bookCtx.mode==='mnie'){
     addrWrap.style.display = 'none';
+    pianoArea.style.display = 'none';
     document.getElementById('calStreet').value = '';
   }else{
     addrWrap.style.display = 'block';
+    pianoArea.style.display = 'block';
   }
 }
 
@@ -1825,6 +2015,7 @@ function calFormComplete(){
 
 function recalcCalBooking(){
   if(!bookCtx) return true;
+  calUpdatePriceBox();
   const start = new Date(bookCtx.dayDate); start.setHours(bookCtx.hour, bookCtx.minute||0, 0, 0);
   const end = new Date(start.getTime() + bookCtx.duration*60000);
   bookCtx.start = start; bookCtx.end = end;
@@ -1890,13 +2081,23 @@ async function submitCalBooking(){
   const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
   const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
 
-  /* Cena: baza 99 zł (-60% jeśli poprawny kod), dowóz +20 zł ZAWSZE bez rabatu */
+  /* Cena: baza 99 zł (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu */
   const baseBefore = 99;
   const baseAfter = promoOk ? baseBefore*(1-PROMO_DISCOUNT) : baseBefore;
-  const dojazdFee = bookCtx.mode==='uczen' ? 20 : 0;
-  const totalPrice = baseAfter + dojazdFee;
+  const deliveryFee = calDeliveryFee();
+  const totalPrice = baseAfter + deliveryFee;
   const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza 99 zł -60% rabat)' : '99 zł (cena bazowa)')
-    + (dojazdFee ? ' + 20 zł (dowóz, bez rabatu)' : '');
+    + (deliveryFee ? ' + '+deliveryFee+' zł (dowóz, bez rabatu)' : '');
+
+  let pianoOpis = '—';
+  if(bookCtx.mode==='uczen'){
+    if(calPianoHas) pianoOpis = 'Tak';
+    else if(calInstrumentType==='premium') pianoOpis = 'Nie — dowóz: Yamaha P-525 + stojak, 60 zł';
+    else{
+      const standChecked = document.getElementById('calStandAddon').checked;
+      pianoOpis = 'Nie — dowóz: Roland GO:PIANO88PX'+(standChecked?' + stojak (+5 zł)':' (bez stojaka)')+', łącznie '+deliveryFee+' zł';
+    }
+  }
 
   const payload = {
     typ: 'rezerwacja-kalendarz',
@@ -1904,6 +2105,7 @@ async function submitCalBooking(){
     telefon: phone,
     email: email,
     miejsce: address,
+    pianino: pianoOpis,
     tresc: modeLabel+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
     kod_rabatowy: promoCode,
     cena: formatPLN(totalPrice)+' zł łącznie — '+priceBreakdown,
@@ -1929,6 +2131,7 @@ async function submitCalBooking(){
       closeCalBook();
       status.textContent = '';
       ['calName','calPhone','calEmail','calStreet','calPromo'].forEach(id=>document.getElementById(id).value='');
+      calResetPianoState();
       document.getElementById('calCity').value = 'Gdynia';
       renderCalDays();
     }, 3500);
