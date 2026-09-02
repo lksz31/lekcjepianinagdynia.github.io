@@ -78,7 +78,7 @@ function detectPitch(){
   if(matchC>=3){
     updateFeedback('Dobrze','ok');bar.style.background='#16a34a';freqHist=[];
     const b=document.getElementById('namesRow').children[seqIdx];
-    if(b){b.classList.remove('hidden','guess-cur');b.classList.add('guess-ok');b.textContent=notes[seqIdx].n.l;if(notes[seqIdx].n.kontra)b.classList.add('kontra');}
+    if(b){b.classList.remove('hidden','guess-cur');b.classList.add('guess-ok');b.textContent=notes[seqIdx].n.l;if(notes[seqIdx].n.kontra)b.classList.add('kontra');if(notes[seqIdx].n.subkontra)b.classList.add('subkontra');}
     seqIdx++;
     if(seqIdx>=notes.length){allGood();}
     else{

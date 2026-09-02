@@ -153,6 +153,26 @@ function renderPlace(dragP,correctP){
   if(dragP!==undefined&&dragP!==null){const col=(correctP!==undefined)?'#ef4444':'rgba(30,58,138,0.7)';drawNote(ctxP,activeSt,{p:dragP,l:'',f:0,a:null},nx,dragP<=4,col,null,activeClef==='bass');}
 }
 
+/* Rysuje "prefix" + nazwę nuty, podkreślając samą nazwę pojedynczo (oktawa
+   kontra) lub podwójnie (subkontra) — wymaga textAlign='center' i
+   textBaseline='bottom' już ustawionych na ctx. */
+function fillLabelWithOctaveMark(ctx,prefix,note,x,y,color){
+  const label=note?note.l:'?';
+  const full=prefix+label;
+  ctx.fillStyle=color;
+  ctx.fillText(full,x,y);
+  if(!note||(!note.kontra&&!note.subkontra))return;
+  const fullW=ctx.measureText(full).width;
+  const labelW=ctx.measureText(label).width;
+  const labelStartX=x-fullW/2+(fullW-labelW);
+  const uy=y+2;
+  ctx.strokeStyle=color;ctx.lineWidth=1.2;
+  ctx.beginPath();ctx.moveTo(labelStartX,uy);ctx.lineTo(labelStartX+labelW,uy);ctx.stroke();
+  if(note.subkontra){
+    ctx.beginPath();ctx.moveTo(labelStartX,uy+2.4);ctx.lineTo(labelStartX+labelW,uy+2.4);ctx.stroke();
+  }
+}
+
 /* ── Render mini-canvasu „poprzednie zagranie" ── */
 function renderPrevAttempt(entry){
   const cvPrev=document.getElementById('Cprev');
@@ -185,19 +205,19 @@ function renderPrevAttempt(entry){
   if(entry.wasCorrect){
     const nx=ns+nw/2;
     drawNote(ctx,st,{p:entry.targetNote.p,l:'',f:0,a:entry.targetNote.a||null},nx,entry.targetNote.p<=4,'#16a34a',entry.targetNote.a||null,isBass);
-    ctx.font=FONT;ctx.fillStyle='#16a34a';ctx.textAlign='center';ctx.textBaseline='bottom';
-    ctx.fillText('✓ '+entry.targetNote.l,nx,labelY);
+    ctx.font=FONT;ctx.textAlign='center';ctx.textBaseline='bottom';
+    fillLabelWithOctaveMark(ctx,'✓ ',entry.targetNote,nx,labelY,'#16a34a');
   }else{
     const nxU=ns+nw*0.28,nxC=ns+nw*0.72;
-    const userName=getNoteLabelForP(ct,entry.userP);
+    const userNote=getNoteForP(ct,entry.userP);
     drawNote(ctx,st,{p:entry.userP,l:'',f:0,a:null},nxU,entry.userP<=4,'#ef4444',null,isBass);
     drawNote(ctx,st,{p:entry.targetNote.p,l:'',f:0,a:entry.targetNote.a||null},nxC,entry.targetNote.p<=4,'#16a34a',entry.targetNote.a||null,isBass);
     /* linia podziału */
     ctx.strokeStyle='rgba(0,0,0,0.08)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(ns+nw*0.5,6);ctx.lineTo(ns+nw*0.5,H-6);ctx.stroke();
     ctx.font=FONT;ctx.textBaseline='bottom';ctx.textAlign='center';
-    ctx.fillStyle='#ef4444';ctx.fillText('Twoja: '+userName,nxU,labelY);
-    ctx.fillStyle='#16a34a';ctx.fillText('Poprawna: '+entry.targetNote.l,nxC,labelY);
+    fillLabelWithOctaveMark(ctx,'Twoja: ',userNote,nxU,labelY,'#ef4444');
+    fillLabelWithOctaveMark(ctx,'Poprawna: ',entry.targetNote,nxC,labelY,'#16a34a');
   }
 }
 

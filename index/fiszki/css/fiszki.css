@@ -109,6 +109,7 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
 .names-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;min-height:38px;align-items:center;}
 .nb{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--navy);font-weight:700;transition:all 0.25s;background:#f0f4ff;padding:2px 11px;border-radius:10px;border:1px solid #dbeafe;cursor:default;}
 .nb.kontra{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:2px;}
+.nb.subkontra{text-decoration:underline;text-decoration-style:double;text-decoration-thickness:1.5px;text-underline-offset:2px;}
 .nb.hidden{opacity:0;}
 .nb.guess-cur{background:#fef9c3;border-color:#facc15;color:#92400e;animation:blink 0.9s infinite;}
 .nb.guess-ok{background:#dcfce7;border-color:#86efac;color:var(--green);}
@@ -138,6 +139,9 @@ canvas#C,canvas#Cplace{width:100%;height:auto;display:block;border-radius:10px;}
 .ch-btn.ok{background:#dcfce7;border-color:var(--green);color:var(--green);}
 .ch-btn.bad{background:#fee2e2;border-color:#dc2626;color:#dc2626;}
 .ch-btn.kontra{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
+.ch-btn.subkontra{text-decoration:underline;text-decoration-style:double;text-decoration-thickness:1.5px;text-underline-offset:3px;}
+#placeTargetNote.kontra{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;}
+#placeTargetNote.subkontra{text-decoration:underline;text-decoration-style:double;text-decoration-thickness:1.5px;text-underline-offset:4px;}
 .ch-btn:disabled{cursor:not-allowed;}
 
 /* ── SCORE ── */

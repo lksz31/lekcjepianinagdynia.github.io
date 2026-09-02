@@ -88,8 +88,9 @@ function updatePlaceHintUI(){
   const sub=document.getElementById('placeTargetSub');
   const noteEl=document.getElementById('placeTargetNote');
   const playBtn=document.getElementById('placePlayBtn');
+  noteEl.classList.remove('kontra','subkontra');
   if(placeHint==='en'){sub.textContent='Umieść:';noteEl.textContent=noteEN(n);noteEl.style.display='block';playBtn.style.display='none';}
-  else if(placeHint==='pl'){sub.textContent='Umieść:';noteEl.textContent=n.l;noteEl.style.display='block';playBtn.style.display='none';}
+  else if(placeHint==='pl'){sub.textContent='Umieść:';noteEl.textContent=n.l;if(n.kontra)noteEl.classList.add('kontra');if(n.subkontra)noteEl.classList.add('subkontra');noteEl.style.display='block';playBtn.style.display='none';}
   else{sub.textContent='Umieść:';noteEl.style.display='none';playBtn.style.display='block';setTimeout(()=>playPlaceTarget(),200);}
 }
 
