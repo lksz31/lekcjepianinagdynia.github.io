@@ -522,6 +522,14 @@ function buildClusterFlow(containerId, categories, basePath){
       p.addEventListener('mouseenter',function(){
         wrap.classList.add('group-active');
         p.classList.add('is-hovered');
+        const hoveredRx=parseFloat(p.style.getPropertyValue('--rx'))||0;
+        const clusterDir=parseFloat(getComputedStyle(p.closest('.cluster')).getPropertyValue('--dir'))||1;
+        wrap.querySelectorAll('.cl-photo').forEach(sib=>{
+          if(sib===p)return;
+          const rx=parseFloat(sib.style.getPropertyValue('--rx'))||0;
+          const pdir=rx>hoveredRx?1:(rx<hoveredRx?-1:clusterDir);
+          sib.style.setProperty('--pdir',String(pdir));
+        });
       });
       p.addEventListener('mouseleave',function(){
         wrap.classList.remove('group-active');
