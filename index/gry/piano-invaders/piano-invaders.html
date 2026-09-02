@@ -464,7 +464,19 @@ function makeStaffSVG(noteId, color, w, h){
 var cv = document.getElementById('c'), cx = cv.getContext('2d');
 var COLS=7, COL_W, PW, PH;
 function colX(i){ return COL_W*i + COL_W/2; }
-function getTileH(){ return inputMode==='mic' ? 0 : Math.min(window.innerHeight*0.28, 180); }
+/* Rozmiar kafelka jest źródłem prawdy — wysokość stref (getTileH) jest z
+   niego wyliczana, więc powiększenie kafelków plusikiem zawsze powiększa
+   też pole, na którym się pokazują (bez tego kafelki się ucinały). */
+function computeCardSz(){
+  var baseZoneH = Math.min(window.innerHeight*0.28, 180);
+  var rH = baseZoneH/2, baseSz = Math.min(rH*0.90, 84);
+  return Math.max(38, Math.round(baseSz*tileScale));
+}
+function getTileH(){
+  if(inputMode==='mic') return 0;
+  var sz = computeCardSz();
+  return Math.min((sz+18)*2, window.innerHeight*0.62);
+}
 function resize(){
   PW = cv.width = window.innerWidth;
   var tH = getTileH();
@@ -1284,8 +1296,7 @@ function buildTileCards(){
   moveCards=[]; shootCards=[];
   if(inputMode === 'mic'){ wrap.classList.remove('visible'); resize(); return; }
   wrap.classList.add('visible'); resize();
-  var rH = getTileH() / 2, baseSz = Math.min(rH * 0.90, 84);
-  var cardSz = Math.max(38, Math.round(baseSz * tileScale));
+  var cardSz = computeCardSz();
   MOVE_NOTES.forEach(function(n){
     var card = makeCard(n, 'move', cardSz, zoneMove, function(){
       if(!gameRunning) return;
