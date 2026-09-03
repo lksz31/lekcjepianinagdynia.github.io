@@ -29,19 +29,20 @@
   .task-box .t-text{font-weight:800;font-size:1.05rem;line-height:1.6;}
   .task-box .t-text b{color:var(--gold);}
 
-  .duration-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-  .dur-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;}
-  .dur-btn:hover{border-color:var(--gold);}
-  .dur-btn svg{width:26px;height:36px;}
-  .dur-btn span{font-size:0.62rem;font-weight:700;color:var(--text-mid);text-align:center;}
+  .instructions{text-align:center;max-width:440px;color:var(--text-mid);font-size:0.82rem;line-height:1.5;}
+  .instructions strong{color:var(--navy);}
 
-  .pitch-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-  .pitch-btn{width:42px;height:42px;border-radius:12px;background:var(--card-bg);border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--navy);cursor:pointer;transition:0.2s;}
-  .pitch-btn:hover{border-color:var(--gold);}
+  .duration-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .dur-tile{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:10px 14px;cursor:grab;touch-action:none;user-select:none;transition:border-color 0.2s,transform 0.2s;}
+  .dur-tile:hover{border-color:var(--gold);}
+  .dur-tile svg{width:26px;height:36px;display:block;pointer-events:none;}
+  .dur-tile.drag-ghost{position:fixed;z-index:1000;cursor:grabbing;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));}
 
   .staff-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:16px;}
   #staffWrap{width:min(92vw,420px);}
-  .slot-hit{cursor:pointer;}
+  .slot-hit rect{transition:0.15s;}
+  .slot-hit.slot-hover rect{stroke:#d4af37;fill:rgba(212,175,55,0.12);}
+  .slot-fill{cursor:pointer;}
 
   .check-btn{background:var(--gold);color:white;border:none;padding:13px 32px;border-radius:50px;font-weight:800;font-size:0.9rem;cursor:pointer;transition:0.2s;}
   .check-btn:disabled{opacity:0.4;cursor:not-allowed;}
@@ -71,19 +72,15 @@
     <button type="button" class="mode-btn" data-focus="duration" onclick="setFocusMode('duration')">Same wartości nut</button>
     <button type="button" class="mode-btn" data-focus="pitch" onclick="setFocusMode('pitch')">Wartości i wysokości</button>
   </div>
-  <div class="mode-row" id="elementRow">
-    <button type="button" class="mode-btn" data-elem="notes" onclick="setElementMode('notes')">Nuty</button>
-    <button type="button" class="mode-btn" data-elem="rests" onclick="setElementMode('rests')">Pauzy</button>
-    <button type="button" class="mode-btn" data-elem="both" onclick="setElementMode('both')">Nuty i pauzy</button>
-  </div>
 
   <div class="task-box">
     <div class="t-label">Zadanie</div>
     <div class="t-text" id="taskText"></div>
   </div>
 
+  <p class="instructions">Przeciągnij <strong>nutkę lub pauzę</strong> z palety na pięciolinię i upuść ją w odpowiednim miejscu.</p>
+
   <div class="duration-row" id="durationRow"></div>
-  <div class="pitch-row" id="pitchRow" style="display:none;"></div>
 
   <div class="staff-card">
     <div id="staffWrap"></div>
@@ -115,20 +112,19 @@ const GAME_NOTES = [
   {id:'a1', letter:'A', staffY:5},
   {id:'h1', letter:'H', staffY:4},
 ];
-const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
 const DURATIONS = [
-  {id:'whole',  label:'Cała nuta'},
-  {id:'half',   label:'Półnuta'},
-  {id:'quarter',label:'Ćwierćnuta'},
+  {id:'whole'},
+  {id:'half'},
+  {id:'quarter'},
 ];
 const REST_DURATIONS = [
-  {id:'whole',  label:'Cała pauza'},
-  {id:'half',   label:'Pauza półnutowa'},
-  {id:'quarter',label:'Pauza ćwierćnutowa'},
+  {id:'quarter'},
 ];
 const NOTE_DUR_NAMES = {whole:'całą nutę', half:'półnutę', quarter:'ćwierćnutę'};
-const REST_DUR_NAMES = {whole:'całą pauzę', half:'pauzę półnutową', quarter:'pauzę ćwierćnutową'};
+const REST_DUR_NAMES = {quarter:'pauzę ćwierćnutową'};
+
+const W = 340, H = 210, SG = 16, STAFF_TOP = 46;
 
 function durIcon(durId){
   const headFill = durId==='quarter' ? '#d4af37' : 'none';
@@ -142,57 +138,41 @@ function durIcon(durId){
   return s;
 }
 
-function restIcon(durId){
+function restIcon(){
   const c = '#8a6d1a';
-  let inner;
-  if(durId==='whole'){
-    inner = '<rect x="8" y="14" width="14" height="6" fill="'+c+'"/>';
-  }else if(durId==='half'){
-    inner = '<rect x="8" y="20" width="14" height="6" fill="'+c+'"/>';
-  }else{
-    inner = '<path d="M13 6 L22 14 L9 20 L22 27 L11 36" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
-  }
+  const inner = '<path d="M13 6 L22 14 L9 20 L22 27 L11 36" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
   return '<svg viewBox="0 0 30 40">'+inner+'</svg>';
 }
 
-function restSVGAt(durId, cx, staffTop, sg){
+function restSVGAt(cx){
   const c = '#8a6d1a';
-  if(durId==='whole'){
-    const ly = staffTop + 1*sg;
-    return '<rect x="'+(cx-7)+'" y="'+ly+'" width="14" height="'+(sg*0.32).toFixed(1)+'" fill="'+c+'"/>';
-  }
-  if(durId==='half'){
-    const ly = staffTop + 2*sg;
-    const h = sg*0.32;
-    return '<rect x="'+(cx-7)+'" y="'+(ly-h).toFixed(1)+'" width="14" height="'+h.toFixed(1)+'" fill="'+c+'"/>';
-  }
-  const cy = staffTop + 2*sg;
+  const cy = STAFF_TOP + 2*SG;
   const pts = [[cx-2,cy-17],[cx+7,cy-9],[cx-6,cy-2],[cx+7,cy+7],[cx-3,cy+17]];
   const d = 'M '+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
   return '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
 }
 
-function noteSVGAt(cx, noteY, durId, staffTop, sg){
+function noteSVGAt(cx, noteY, durId){
   let s = '';
-  const topLine = staffTop, botLine = staffTop + 4*sg, ledW = 12, c = '#1e3a8a';
-  if(noteY > botLine + sg*0.5){
-    let ly = botLine + sg;
-    while(ly <= noteY + sg*0.3){
+  const topLine = STAFF_TOP, botLine = STAFF_TOP + 4*SG, ledW = 12, c = '#1e3a8a';
+  if(noteY > botLine + SG*0.5){
+    let ly = botLine + SG;
+    while(ly <= noteY + SG*0.3){
       s += '<line x1="'+(cx-ledW)+'" y1="'+ly+'" x2="'+(cx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.6"/>';
-      ly += sg;
+      ly += SG;
     }
   }
-  if(noteY < topLine - sg*0.5){
-    let ly = topLine - sg;
-    while(ly >= noteY - sg*0.3){
+  if(noteY < topLine - SG*0.5){
+    let ly = topLine - SG;
+    while(ly >= noteY - SG*0.3){
       s += '<line x1="'+(cx-ledW)+'" y1="'+ly+'" x2="'+(cx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.6"/>';
-      ly -= sg;
+      ly -= SG;
     }
   }
   const fill = durId==='quarter' ? '#d4af37' : 'none';
   s += '<ellipse cx="'+cx+'" cy="'+noteY+'" rx="11" ry="8" fill="'+fill+'" stroke="#8a6d1a" stroke-width="2" transform="rotate(-15,'+cx+','+noteY+')"/>';
   if(durId !== 'whole'){
-    const stemUp = noteY > staffTop + sg*2;
+    const stemUp = noteY > STAFF_TOP + SG*2;
     const sx = stemUp ? cx+9 : cx-9;
     const sy2 = stemUp ? noteY-42 : noteY+42;
     s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="2.4"/>';
@@ -203,21 +183,13 @@ function noteSVGAt(cx, noteY, durId, staffTop, sg){
 const TOTAL_ROUNDS = 8;
 let round = 0, score = 0;
 let focusMode = 'pitch';   /* 'duration' | 'pitch' */
-let elementMode = 'both';  /* 'notes' | 'rests' | 'both' */
 
 let targetSlots = [];
 let placedSlots = [];
-let activeSlotIdx = 0;
-let pendingChoice = null;
 
 function setFocusMode(m){
   focusMode = m;
   document.querySelectorAll('#focusRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.focus===m));
-  restartGame();
-}
-function setElementMode(m){
-  elementMode = m;
-  document.querySelectorAll('#elementRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.elem===m));
   restartGame();
 }
 
@@ -225,11 +197,8 @@ function pickTask(){
   const slotCount = Math.random() < 0.5 ? 1 : 2;
   const slots = [];
   for(let i=0;i<slotCount;i++){
-    let type;
-    if(elementMode==='notes') type = 'note';
-    else if(elementMode==='rests') type = 'rest';
-    else type = Math.random() < 0.5 ? 'note' : 'rest';
-    const durId = DURATIONS[Math.floor(Math.random()*DURATIONS.length)].id;
+    const type = Math.random() < 0.5 ? 'note' : 'rest';
+    const durId = type==='rest' ? 'quarter' : DURATIONS[Math.floor(Math.random()*DURATIONS.length)].id;
     let letter = null;
     if(type==='note' && focusMode==='pitch'){
       letter = GAME_NOTES[Math.floor(Math.random()*GAME_NOTES.length)].letter;
@@ -238,8 +207,6 @@ function pickTask(){
   }
   targetSlots = slots;
   placedSlots = slots.map(()=>null);
-  activeSlotIdx = 0;
-  pendingChoice = null;
 }
 
 function buildTaskText(){
@@ -255,99 +222,126 @@ function buildTaskText(){
 function renderPalette(){
   const row = document.getElementById('durationRow');
   let html = '';
-  if(elementMode !== 'rests'){
-    html += DURATIONS.map(d =>
-      '<div class="dur-btn" onclick="chooseValue(\'note\',\''+d.id+'\')">'+durIcon(d.id)+'<span>'+d.label+'</span></div>'
-    ).join('');
-  }
-  if(elementMode !== 'notes'){
-    html += REST_DURATIONS.map(d =>
-      '<div class="dur-btn" onclick="chooseValue(\'rest\',\''+d.id+'\')">'+restIcon(d.id)+'<span>'+d.label+'</span></div>'
-    ).join('');
-  }
+  html += DURATIONS.map(d =>
+    '<div class="dur-tile" data-type="note" data-dur="'+d.id+'">'+durIcon(d.id)+'</div>'
+  ).join('');
+  html += REST_DURATIONS.map(d =>
+    '<div class="dur-tile" data-type="rest" data-dur="'+d.id+'">'+restIcon()+'</div>'
+  ).join('');
   row.innerHTML = html;
+  row.querySelectorAll('.dur-tile').forEach(attachPaletteDrag);
 }
 
-function renderPitchRow(show){
-  const row = document.getElementById('pitchRow');
-  if(!show){ row.style.display = 'none'; row.innerHTML=''; return; }
-  row.innerHTML = LETTERS_ORDER.map(l => '<button class="pitch-btn" onclick="choosePitch(\''+l+'\')">'+l+'</button>').join('');
-  row.style.display = 'flex';
+function nearestLetter(staffY){
+  let best = GAME_NOTES[0], bestDist = Infinity;
+  GAME_NOTES.forEach(n=>{
+    const d = Math.abs(n.staffY - staffY);
+    if(d < bestDist){ bestDist = d; best = n; }
+  });
+  return best.letter;
 }
 
-function chooseValue(type, durId){
-  if(activeSlotIdx === null) return;
+function pointerToStaffY(clientY){
+  const svg = document.getElementById('staffSvg');
+  const rect = svg.getBoundingClientRect();
+  const scaleY = H / rect.height;
+  const svgY = (clientY - rect.top) * scaleY;
+  return Math.round((svgY - STAFF_TOP) * 2 / SG);
+}
+
+function attachPaletteDrag(tile){
+  tile.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    const type = tile.dataset.type, durId = tile.dataset.dur;
+    const rect = tile.getBoundingClientRect();
+    const ghost = tile.cloneNode(true);
+    ghost.classList.add('drag-ghost');
+    ghost.style.left = rect.left+'px';
+    ghost.style.top = rect.top+'px';
+    ghost.style.width = rect.width+'px';
+    document.body.appendChild(ghost);
+    const offX = e.clientX - rect.left, offY = e.clientY - rect.top;
+
+    function move(ev){
+      ghost.style.left = (ev.clientX - offX)+'px';
+      ghost.style.top = (ev.clientY - offY)+'px';
+      document.querySelectorAll('.slot-hit').forEach(s=>s.classList.remove('slot-hover'));
+      ghost.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(ev.clientX, ev.clientY);
+      const slot = under && under.closest ? under.closest('.slot-hit') : null;
+      if(slot) slot.classList.add('slot-hover');
+    }
+    function up(ev){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      document.querySelectorAll('.slot-hit').forEach(s=>s.classList.remove('slot-hover'));
+      const under = document.elementFromPoint(ev.clientX, ev.clientY);
+      const slot = under && under.closest ? under.closest('.slot-hit') : null;
+      ghost.remove();
+      if(slot){
+        const idx = parseInt(slot.dataset.idx, 10);
+        const staffY = pointerToStaffY(ev.clientY);
+        placeInSlot(idx, type, durId, staffY);
+      }
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+function placeInSlot(idx, type, durId, dropStaffY){
+  let letter = null;
   if(type==='note' && focusMode==='pitch'){
-    pendingChoice = {type, durId};
-    renderPitchRow(true);
-    return;
+    letter = nearestLetter(dropStaffY);
   }
-  finalizePlacement(type, durId, null);
-}
-
-function choosePitch(letter){
-  if(!pendingChoice) return;
-  finalizePlacement(pendingChoice.type, pendingChoice.durId, letter);
-  pendingChoice = null;
-  renderPitchRow(false);
-}
-
-function finalizePlacement(type, durId, letter){
-  placedSlots[activeSlotIdx] = {type:type, durId:durId, letter:letter};
-  const nextEmpty = placedSlots.findIndex(p => p===null);
-  activeSlotIdx = nextEmpty;
+  placedSlots[idx] = {type:type, durId:durId, letter:letter};
   renderStaff();
   updateCheckBtn();
 }
 
-function activateSlot(i){
-  activeSlotIdx = i;
-  pendingChoice = null;
-  renderPitchRow(false);
+function clearSlot(idx){
+  placedSlots[idx] = null;
   renderStaff();
+  updateCheckBtn();
 }
 
 function renderStaff(){
-  const W = 340, H = 210;
-  const sg = 16;
-  const staffTop = 46;
   const c = '#1e3a8a';
-
   let s = '<svg id="staffSvg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
 
   for(let i=0;i<5;i++){
-    const ly = staffTop + i*sg;
+    const ly = STAFF_TOP + i*SG;
     s += '<line x1="20" y1="'+ly+'" x2="'+(W-20)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.55"/>';
   }
 
-  const ch = sg * 6.0;
+  const ch = SG * 6.0;
   const cw = ch * CLEF_TREBLE_RATIO;
-  const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
+  const cy = (STAFF_TOP + 3*SG) - CLEF_TREBLE_G_PCT * ch;
   s += '<image href="'+CLEF_TREBLE_URL+'" x="24" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
 
   const slotXs = targetSlots.length === 1 ? [W*0.68] : [W*0.5, W*0.82];
-  const boxTop = staffTop - 36, boxH = 4*sg + 72;
+  const boxTop = STAFF_TOP - 36, boxH = 4*SG + 72;
 
   slotXs.forEach((sx, i) => {
     const placed = placedSlots[i];
-    const isActive = activeSlotIdx === i;
-    const boxColor = isActive ? '#d4af37' : '#cbd5e1';
-    s += '<g class="slot-hit" onclick="activateSlot('+i+')">';
-    s += '<rect x="'+(sx-19)+'" y="'+boxTop+'" width="38" height="'+boxH+'" rx="8" fill="'+(isActive?'rgba(212,175,55,0.09)':'transparent')+'" stroke="'+boxColor+'" stroke-width="1.6" stroke-dasharray="4,3"/>';
+    s += '<g class="slot-hit" data-idx="'+i+'">';
+    s += '<rect x="'+(sx-19)+'" y="'+boxTop+'" width="38" height="'+boxH+'" rx="8" fill="transparent" stroke="#cbd5e1" stroke-width="1.6" stroke-dasharray="4,3"/>';
     if(targetSlots.length > 1){
-      s += '<text x="'+sx+'" y="'+(boxTop-6)+'" text-anchor="middle" font-size="12" font-weight="800" fill="'+(isActive?'#8a6d1a':'#94a3b8')+'" font-family="Nunito,sans-serif">'+(i+1)+'</text>';
+      s += '<text x="'+sx+'" y="'+(boxTop-6)+'" text-anchor="middle" font-size="12" font-weight="800" fill="#94a3b8" font-family="Nunito,sans-serif">'+(i+1)+'</text>';
     }
+    s += '</g>';
     if(placed){
+      s += '<g class="slot-fill" onclick="clearSlot('+i+')">';
       if(placed.type === 'note'){
         const letterForY = (focusMode==='pitch' && placed.letter) ? placed.letter : 'H';
         const nDef = GAME_NOTES.find(n => n.letter === letterForY);
-        const ny = staffTop + (nDef.staffY * sg / 2);
-        s += noteSVGAt(sx, ny, placed.durId, staffTop, sg);
+        const ny = STAFF_TOP + (nDef.staffY * SG / 2);
+        s += noteSVGAt(sx, ny, placed.durId);
       }else{
-        s += restSVGAt(placed.durId, sx, staffTop, sg);
+        s += restSVGAt(sx);
       }
+      s += '</g>';
     }
-    s += '</g>';
   });
 
   s += '</svg>';
@@ -407,7 +401,6 @@ function nextRound(){
   pickTask();
   document.getElementById('taskText').innerHTML = buildTaskText();
   renderPalette();
-  renderPitchRow(false);
   renderStaff();
   updateCheckBtn();
 }
@@ -428,7 +421,6 @@ function restartGame(){
 
 document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
 document.querySelector('#focusRow .mode-btn[data-focus="'+focusMode+'"]').classList.add('active');
-document.querySelector('#elementRow .mode-btn[data-elem="'+elementMode+'"]').classList.add('active');
 restartGame();
 </script>
 </body>
