@@ -17,28 +17,43 @@
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
-  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
-  .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:18px;}
+  .instructions{text-align:center;max-width:480px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
+
+  .mode-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .mode-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:7px 16px;font-weight:700;font-size:0.78rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .mode-btn:hover{border-color:var(--gold);}
+  .mode-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
 
   .path-card{background:url('/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/pies-buda-mapa.webp') center/cover no-repeat;border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.15);max-width:820px;width:100%;aspect-ratio:1433/736;position:relative;overflow:hidden;}
   .path-row{position:absolute;inset:0;}
-  .stone{position:absolute;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.25);}
-  .stone:hover:not(.done){border-color:var(--gold);transform:translate(-50%,-50%) translateY(-3px);}
+  .stone{position:absolute;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.25);touch-action:none;user-select:none;}
+  .stone:hover{border-color:var(--gold);}
+  .stone.sel{border-color:var(--gold);background:#fffbf0;transform:translate(-50%,-50%) scale(1.1);}
+  .stone.dragging{z-index:200;cursor:grabbing;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.3));}
+  .stone.correct{background:#f0fdf4;border-color:var(--green);}
   .stone .s-letter{font-weight:900;font-size:1.1rem;color:var(--navy);}
-  .stone.done{background:#f0fdf4;border-color:var(--green);opacity:0.55;}
-  .stone.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
-  @keyframes shake{0%,100%{transform:translate(-50%,-50%) translateX(0);}20%{transform:translate(-50%,-50%) translateX(-6px);}40%{transform:translate(-50%,-50%) translateX(6px);}60%{transform:translate(-50%,-50%) translateX(-4px);}80%{transform:translate(-50%,-50%) translateX(4px);}}
+  .stone svg{width:100%;height:100%;pointer-events:none;}
   .doghouse-slot{background:transparent;border:none;box-shadow:none;width:64px;height:64px;cursor:default;}
-  .doghouse-slot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.35));}
-  .dog-marker{position:absolute;width:46px;height:40px;transform:translate(-50%,-100%);transition:left 0.55s cubic-bezier(0.3,0.8,0.3,1),top 0.55s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;}
+  .dog-marker{position:absolute;width:46px;height:40px;transform:translate(-50%,-100%);transition:left 0.55s cubic-bezier(0.3,0.8,0.3,1),top 0.55s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;z-index:150;}
   .dog-marker img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));}
   .dog-marker.hopping img{animation:dogHop 0.55s ease;}
   @keyframes dogHop{0%{transform:translateY(0);}45%{transform:translateY(-24px);}100%{transform:translateY(0);}}
 
+  .match-slot{position:absolute;transform:translate(-50%,-50%);width:44px;height:52px;border-radius:10px;border:2px dashed rgba(255,255,255,0.8);background:rgba(30,58,138,0.15);}
+  .match-slot.hover{border-color:var(--gold);background:rgba(212,175,55,0.25);}
+  .match-slot.correct{border-style:solid;border-color:var(--green);background:rgba(240,253,244,0.85);}
+  .match-slot.wrong{border-style:solid;border-color:var(--red);background:rgba(254,242,242,0.85);}
+  .match-tile{position:absolute;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:10px;background:rgba(248,250,252,0.95);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;color:var(--navy);cursor:grab;touch-action:none;user-select:none;box-shadow:0 3px 6px rgba(0,0,0,0.25);}
+  .match-tile.dragging{z-index:200;cursor:grabbing;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.3));}
+  .match-tile.locked{opacity:0;pointer-events:none;}
+
   .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
   .feedback-msg.ok{color:var(--green);}
   .feedback-msg.bad{color:var(--red);}
+
+  .check-btn{background:var(--gold);color:#fff;border:none;padding:11px 28px;border-radius:50px;font-weight:800;font-size:0.85rem;cursor:pointer;}
 
   .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;text-align:center;padding:20px;}
   .win-overlay.show{display:flex;}
@@ -52,15 +67,23 @@
 <div class="top-bar">
   <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
   <span class="game-title-bar">🐶 Piesek i nuty</span>
-  <span class="score-box">🐾 <span id="scoreVal">0</span> / <span id="totalVal">10</span></span>
+  <span class="score-box">🐾 <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
 </div>
 
 <div class="game-area">
-  <p class="instructions">Kliknij nuty <strong>od najniższej do najwyższej</strong>, żeby piesek dotarł do budy. Kliknięcie niewłaściwej nuty nie przesunie pieska.</p>
+  <div class="mode-row" id="modeRow">
+    <button type="button" class="mode-btn" data-mode="swap" onclick="setMode('swap')">🔤 Zamień miejscami</button>
+    <button type="button" class="mode-btn" data-mode="staff" onclick="setMode('staff')">🎼 Nuty na pięciolinii</button>
+    <button type="button" class="mode-btn" data-mode="match" onclick="setMode('match')">🎯 Dopasuj litery</button>
+  </div>
+
+  <p class="instructions" id="instrText"></p>
 
   <div class="path-card">
     <div class="path-row" id="pathRow"></div>
   </div>
+
+  <button class="check-btn" id="checkBtn" style="display:none;" onclick="checkMatch()">Sprawdź</button>
 
   <div class="feedback-msg" id="feedbackMsg"></div>
 </div>
@@ -73,18 +96,30 @@
 </div>
 
 <script>
-const ALL_NOTES = [
-  {letter:'c', rank:1},
-  {letter:'d', rank:2},
-  {letter:'e', rank:3},
-  {letter:'f', rank:4},
-  {letter:'g', rank:5},
-  {letter:'a', rank:6},
-  {letter:'h', rank:7},
-];
+const LETTERS = ['c','d','e','f','g','a','h'];
+const STAFF_Y = {c:10,d:9,e:8,f:7,g:6,a:5,h:4};
+const DOG_DIR = '/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/';
+const CLEF_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_RATIO = 581/1361, CLEF_G_PCT = 0.64;
 
-const PATH_LEN = 7;
-let path = [], nextIndex = 0;
+/* Punkty (%, %) rozłożone wzdłuż wydeptanej dróżki na mapie */
+const PATH_WAYPOINTS = [
+  {left:23, top:58}, {left:31, top:44}, {left:40, top:36}, {left:50, top:32},
+  {left:60, top:35}, {left:68, top:44}, {left:75, top:34}
+];
+const DOGHOUSE_POS = {left:87, top:19};
+const START_POS = {left:13, top:64};
+
+let gameMode = 'swap';
+let slotLetters = [];   /* dla trybów swap/staff — litera na każdej z 7 pozycji */
+let selIdx = null;
+let nextIndex = 0;
+
+/* dla trybu match */
+const MATCH_LEN = 10;
+let matchTargets = [];  /* litery docelowe w kolejności na pięciolinii */
+let matchTileLetters = []; /* litery kafelków (ta sama multizbiorowość, potasowane) */
+let matchPlaced = [];   /* per slot: litera umieszczona lub null */
 
 function shuffled(arr){
   const a = arr.slice();
@@ -95,32 +130,58 @@ function shuffled(arr){
   return a;
 }
 
-function pickPath(){
-  const chosen = shuffled(ALL_NOTES).slice(0, PATH_LEN);
-  path = shuffled(chosen); // losowa kolejność WIZUALNA, do klikania po randze rosnąco
+function setMode(m){
+  gameMode = m;
+  document.querySelectorAll('#modeRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===m));
+  document.getElementById('checkBtn').style.display = (m==='match') ? 'inline-block' : 'none';
+  restartGame();
 }
 
-const DOG_DIR = '/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/';
+/* ══ Ikona nuty na mini-pięciolinii (dla trybu "staff" i "match") ══ */
+function noteIconSVG(letter, W, H, sg, staffTop){
+  const c = '#1e3a8a';
+  let s = '<svg viewBox="0 0 '+W+' '+H+'">';
+  for(let i=0;i<5;i++){
+    const ly = staffTop + i*sg;
+    s += '<line x1="3" y1="'+ly+'" x2="'+(W-3)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1" opacity="0.55"/>';
+  }
+  const ch = sg*4.4, cw = ch*CLEF_RATIO;
+  const cy = (staffTop + 3*sg) - CLEF_G_PCT*ch;
+  s += '<image href="'+CLEF_URL+'" x="1" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+  const noteX = W*0.76;
+  const noteY = staffTop + (STAFF_Y[letter]*sg/2);
+  const botLine = staffTop+4*sg, topLine = staffTop, ledW = sg*0.55;
+  if(noteY > botLine + sg*0.5){
+    let ly = botLine+sg;
+    while(ly <= noteY+sg*0.3){ s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1"/>'; ly += sg; }
+  }
+  if(noteY < topLine - sg*0.5){
+    let ly = topLine-sg;
+    while(ly >= noteY-sg*0.3){ s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1"/>'; ly -= sg; }
+  }
+  s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="'+(sg*0.32)+'" ry="'+(sg*0.24)+'" fill="#d4af37" stroke="#8a6d1a" stroke-width="0.8" transform="rotate(-15,'+noteX+','+noteY+')"/>';
+  const stemUp = noteY > staffTop+sg*2;
+  const sx = stemUp? noteX+sg*0.28: noteX-sg*0.28;
+  const sy2 = stemUp? noteY-sg*1.7: noteY+sg*1.7;
+  s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="1"/>';
+  s += '</svg>';
+  return s;
+}
 
-/* Punkty (%, %) rozłożone wzdłuż wydeptanej dróżki na mapie */
-const PATH_WAYPOINTS = [
-  {left:23, top:58}, {left:31, top:44}, {left:40, top:36}, {left:50, top:32},
-  {left:60, top:35}, {left:68, top:44}, {left:75, top:34}
-];
-const DOGHOUSE_POS = {left:87, top:19};
-const START_POS = {left:13, top:64};
+/* ══════════════════════ TRYB: swap / staff ══════════════════════ */
 
 function renderPath(){
   const row = document.getElementById('pathRow');
   let html = '<div class="dog-marker" id="dogMarker" style="left:'+START_POS.left+'%;top:'+START_POS.top+'%;"><img id="dogImg" src="'+DOG_DIR+'pies-skok-4.webp" alt="piesek"></div>';
-  path.forEach((n, i) => {
+  slotLetters.forEach((letter, i) => {
     const wp = PATH_WAYPOINTS[i];
-    html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" style="left:'+wp.left+'%;top:'+wp.top+'%;" onclick="tryStone('+i+')">'
-      + '<span class="s-letter">'+n.letter+'</span></div>';
+    const inner = gameMode==='staff' ? noteIconSVG(letter,52,52,7.6,6) : '<span class="s-letter">'+letter+'</span>';
+    html += '<div class="stone" data-idx="'+i+'" style="left:'+wp.left+'%;top:'+wp.top+'%;">'+inner+'</div>';
   });
   html += '<div class="stone doghouse-slot" style="left:'+DOGHOUSE_POS.left+'%;top:'+DOGHOUSE_POS.top+'%;"></div>';
   row.innerHTML = html;
   positionDog();
+  attachStoneEvents();
 }
 
 function computeDogPos(){
@@ -128,88 +189,312 @@ function computeDogPos(){
   if(nextIndex >= PATH_WAYPOINTS.length) return DOGHOUSE_POS;
   return PATH_WAYPOINTS[nextIndex-1];
 }
-
 function positionDog(){
   const pos = computeDogPos();
   const marker = document.getElementById('dogMarker');
+  if(!marker) return;
   marker.style.left = pos.left+'%';
   marker.style.top = pos.top+'%';
 }
-
-function setDogFrame(n){
-  document.getElementById('dogImg').src = DOG_DIR + 'pies-skok-'+n+'.webp';
-}
+function setDogFrame(n){ const img = document.getElementById('dogImg'); if(img) img.src = DOG_DIR+'pies-skok-'+n+'.webp'; }
 
 function animateDogHop(onDone){
   const marker = document.getElementById('dogMarker');
+  if(!marker){ if(onDone) onDone(); return; }
   const target = computeDogPos();
-
   setDogFrame(1);
   marker.classList.add('hopping');
-
-  setTimeout(()=>{
-    setDogFrame(2);
-    marker.style.left = target.left+'%';
-    marker.style.top = target.top+'%';
-  }, 90);
-
+  setTimeout(()=>{ setDogFrame(2); marker.style.left=target.left+'%'; marker.style.top=target.top+'%'; }, 90);
   setTimeout(()=> setDogFrame(3), 320);
   setTimeout(()=> setDogFrame(1), 470);
-  setTimeout(()=>{
-    setDogFrame(4);
-    marker.classList.remove('hopping');
-    if(onDone) onDone();
-  }, 560);
+  setTimeout(()=>{ setDogFrame(4); marker.classList.remove('hopping'); if(onDone) onDone(); }, 560);
 }
 
-function tryStone(i){
-  const stoneEl = document.querySelector('.stone[data-idx="'+i+'"]');
-  if(stoneEl.classList.contains('done')) return;
-  const feedback = document.getElementById('feedbackMsg');
+function attachStoneEvents(){
+  document.querySelectorAll('.stone[data-idx]').forEach(el=>{
+    el.addEventListener('pointerdown', onStoneDown);
+  });
+}
 
-  const sortedRemaining = path
-    .map((n, idx) => ({n, idx}))
-    .filter(o => !document.querySelector('.stone[data-idx="'+o.idx+'"]').classList.contains('done'))
-    .sort((a,b) => a.n.rank - b.n.rank);
+let dragStone = null, dragMoved = false, dragOffX=0, dragOffY=0;
 
-  const expected = sortedRemaining[0];
-
-  if(expected && expected.idx === i){
-    stoneEl.classList.add('done');
-    nextIndex++;
-    document.getElementById('scoreVal').textContent = nextIndex;
-    feedback.textContent = '✓ Dobrze! ' + path[i].letter;
-    feedback.className = 'feedback-msg ok';
-    animateDogHop(()=>{
-      if(nextIndex >= path.length){
-        showWin();
+function onStoneDown(e){
+  const el = e.currentTarget;
+  e.preventDefault();
+  dragStone = el; dragMoved = false;
+  const rect = el.getBoundingClientRect();
+  dragOffX = e.clientX - (rect.left+rect.width/2);
+  dragOffY = e.clientY - (rect.top+rect.height/2);
+  function move(ev){
+    const dx = ev.clientX-(rect.left+rect.width/2)-dragOffX, dy = ev.clientY-(rect.top+rect.height/2)-dragOffY;
+    if(Math.abs(dx)>6 || Math.abs(dy)>6){
+      dragMoved = true;
+      el.classList.add('dragging');
+      el.style.position='fixed';
+      el.style.left=(ev.clientX-dragOffX)+'px';
+      el.style.top=(ev.clientY-dragOffY)+'px';
+      el.style.transform='translate(-50%,-50%)';
+    }
+  }
+  function up(ev){
+    document.removeEventListener('pointermove', move);
+    document.removeEventListener('pointerup', up);
+    if(dragMoved){
+      el.classList.remove('dragging');
+      el.style.position=''; el.style.left=''; el.style.top=''; el.style.transform='';
+      const under = document.elementFromPoint(ev.clientX, ev.clientY);
+      const target = under && under.closest ? under.closest('.stone[data-idx]') : null;
+      if(target && target!==el){
+        swapStones(parseInt(el.dataset.idx,10), parseInt(target.dataset.idx,10));
+      }else{
+        renderPath();
       }
-    });
+    }else{
+      handleStoneClick(parseInt(el.dataset.idx,10));
+    }
+    dragStone = null;
+  }
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+}
+
+function handleStoneClick(idx){
+  if(selIdx === null){
+    selIdx = idx;
+    renderPath();
+    document.querySelector('.stone[data-idx="'+idx+'"]').classList.add('sel');
+  }else if(selIdx === idx){
+    selIdx = null;
+    renderPath();
   }else{
-    stoneEl.classList.add('wrong-flash');
-    feedback.textContent = 'To jeszcze nie ta nuta — szukaj niższej.';
+    swapStones(selIdx, idx);
+    selIdx = null;
+  }
+}
+
+function swapStones(i, j){
+  const tmp = slotLetters[i]; slotLetters[i] = slotLetters[j]; slotLetters[j] = tmp;
+  renderPath();
+  checkSwapWin();
+}
+
+function checkSwapWin(){
+  const correct = slotLetters.every((l,i)=> l === LETTERS[i]);
+  document.querySelectorAll('.stone[data-idx]').forEach((el,i)=>{
+    el.classList.toggle('correct', slotLetters[i]===LETTERS[i]);
+  });
+  if(correct){
+    const feedback = document.getElementById('feedbackMsg');
+    feedback.textContent = '✓ Wszystko na swoim miejscu!';
+    feedback.className = 'feedback-msg ok';
+    walkDogHome();
+  }
+}
+
+function walkDogHome(){
+  const modeAtStart = gameMode;
+  nextIndex++;
+  animateDogHop(()=>{
+    if(gameMode !== modeAtStart) return;
+    document.getElementById('scoreVal').textContent = nextIndex;
+    if(nextIndex >= PATH_WAYPOINTS.length){
+      showWin();
+    }else{
+      walkDogHome();
+    }
+  });
+}
+
+/* ══════════════════════ TRYB: match (dopasuj litery) ══════════════════════ */
+
+function pickMatchTargets(){
+  matchTargets = [];
+  for(let i=0;i<MATCH_LEN;i++) matchTargets.push(LETTERS[Math.floor(Math.random()*LETTERS.length)]);
+  matchTileLetters = shuffled(matchTargets);
+  matchPlaced = matchTargets.map(()=>null);
+}
+
+function renderMatch(){
+  const row = document.getElementById('pathRow');
+  const staffTop = 10, sg = 6.2;
+  let s = '<svg viewBox="0 0 100 34" preserveAspectRatio="none" style="position:absolute;left:4%;top:4%;width:92%;height:26%;">';
+  for(let i=0;i<5;i++){
+    const ly = staffTop+i*sg;
+    s += '<line x1="10" y1="'+ly+'" x2="98" y2="'+ly+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>';
+  }
+  const ch = sg*4.4, cw = ch*CLEF_RATIO;
+  const cy = (staffTop+3*sg)-CLEF_G_PCT*ch;
+  s += '<image href="'+CLEF_URL+'" x="10.5" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+  const startX = 20, stepX = 76/(MATCH_LEN-1);
+  matchTargets.forEach((letter,i)=>{
+    const nx = startX+i*stepX;
+    const ny = staffTop+(STAFF_Y[letter]*sg/2);
+    s += '<ellipse cx="'+nx+'" cy="'+ny.toFixed(1)+'" rx="1.9" ry="1.4" fill="none" stroke="#1e3a8a" stroke-width="0.6" opacity="0.55" transform="rotate(-15,'+nx+','+ny.toFixed(1)+')"/>';
+  });
+  s += '</svg>';
+
+  let html = s;
+  const slotXs = [];
+  for(let i=0;i<MATCH_LEN;i++){
+    slotXs.push(4 + (20+i*stepX)*0.92);
+  }
+  slotXs.forEach((x,i)=>{
+    html += '<div class="match-slot" data-idx="'+i+'" style="left:'+x+'%;top:34%;"></div>';
+  });
+
+  const usedSpots = [];
+  matchTileLetters.forEach((letter,i)=>{
+    let lp, tp;
+    do{
+      lp = 6 + Math.random()*88;
+      tp = 55 + Math.random()*38;
+    }while(usedSpots.some(function(p){return Math.abs(p.lp-lp)<9 && Math.abs(p.tp-tp)<10;}));
+    usedSpots.push({lp,tp});
+    html += '<div class="match-tile" data-tid="'+i+'" data-letter="'+letter+'" style="left:'+lp+'%;top:'+tp+'%;">'+letter+'</div>';
+  });
+
+  row.innerHTML = html;
+  attachMatchTileEvents();
+}
+
+function attachMatchTileEvents(){
+  document.querySelectorAll('.match-tile').forEach(el=>{
+    el.addEventListener('pointerdown', onMatchTileDown);
+  });
+}
+
+function onMatchTileDown(e){
+  const el = e.currentTarget;
+  if(el.classList.contains('locked')) return;
+  e.preventDefault();
+  el.classList.add('dragging');
+  el.style.position='fixed';
+  const rect = el.getBoundingClientRect();
+  const offX = e.clientX-(rect.left+rect.width/2), offY = e.clientY-(rect.top+rect.height/2);
+  el.style.left=(rect.left+rect.width/2)+'px';
+  el.style.top=(rect.top+rect.height/2)+'px';
+  el.style.transform='translate(-50%,-50%)';
+
+  function move(ev){
+    el.style.left=(ev.clientX-offX)+'px';
+    el.style.top=(ev.clientY-offY)+'px';
+    el.style.pointerEvents='none';
+    const under = document.elementFromPoint(ev.clientX,ev.clientY);
+    el.style.pointerEvents='';
+    document.querySelectorAll('.match-slot').forEach(s=>s.classList.remove('hover'));
+    const slot = under && under.closest ? under.closest('.match-slot') : null;
+    if(slot) slot.classList.add('hover');
+  }
+  function up(ev){
+    document.removeEventListener('pointermove', move);
+    document.removeEventListener('pointerup', up);
+    document.querySelectorAll('.match-slot').forEach(s=>s.classList.remove('hover'));
+    el.style.pointerEvents='none';
+    const under = document.elementFromPoint(ev.clientX,ev.clientY);
+    el.style.pointerEvents='';
+    const slot = under && under.closest ? under.closest('.match-slot') : null;
+    el.classList.remove('dragging');
+    el.style.position=''; el.style.left=''; el.style.top=''; el.style.transform='';
+    if(slot){
+      const idx = parseInt(slot.dataset.idx,10);
+      if(matchPlaced[idx]) return renderMatch(); /* zajęte, wróć */
+      matchPlaced[idx] = {letter: el.dataset.letter, tid: parseInt(el.dataset.tid,10)};
+      renderMatch();
+      applyPlacedState();
+    }
+  }
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+}
+
+function applyPlacedState(){
+  matchPlaced.forEach((p,i)=>{
+    if(!p) return;
+    const slot = document.querySelector('.match-slot[data-idx="'+i+'"]');
+    const tile = document.querySelector('.match-tile[data-tid="'+p.tid+'"]');
+    if(slot){
+      slot.style.display='none';
+      if(tile){
+        tile.style.left = slot.style.left;
+        tile.style.top = slot.style.top;
+        tile.dataset.slotIdx = i;
+      }
+    }
+  });
+}
+
+function checkMatch(){
+  const feedback = document.getElementById('feedbackMsg');
+  let filled = 0, correct = 0;
+  matchPlaced.forEach((p,i)=>{
+    const tile = p ? document.querySelector('.match-tile[data-tid="'+p.tid+'"]') : null;
+    if(!p || !tile) return;
+    filled++;
+    const ok = p.letter === matchTargets[i];
+    if(ok){ correct++; tile.classList.add('locked'); }
+    else{ tile.style.outline='2px solid var(--red)'; }
+  });
+  document.getElementById('scoreVal').textContent = correct;
+  if(filled < MATCH_LEN){
+    feedback.textContent = 'Uzupełnij wszystkie luki przed sprawdzeniem.';
     feedback.className = 'feedback-msg bad';
-    setTimeout(()=>stoneEl.classList.remove('wrong-flash'), 400);
+    return;
+  }
+  if(correct === MATCH_LEN){
+    feedback.textContent = '';
+    setTimeout(showWin, 300);
+  }else{
+    matchPlaced = matchPlaced.map((p,i)=>{
+      if(!p) return p;
+      const tile = document.querySelector('.match-tile[data-tid="'+p.tid+'"]');
+      if(tile && tile.classList.contains('locked')) return p;
+      return null;
+    });
+    renderMatch();
+    applyPlacedState();
+    feedback.textContent = 'Prawie! Popraw czerwone kafelki i sprawdź ponownie.';
+    feedback.className = 'feedback-msg bad';
+  }
+}
+
+/* ══════════════════════ Wspólne ══════════════════════ */
+
+function updateInstructions(){
+  const el = document.getElementById('instrText');
+  if(gameMode==='swap'){
+    el.innerHTML = 'Zamień miejscami litery <strong>przeciągając</strong> jedną na drugą (albo kliknij pierwszą, potem drugą), aż będą ułożone od najniższej do najwyższej.';
+  }else if(gameMode==='staff'){
+    el.innerHTML = 'Zamień miejscami nutki na pięciolinii, aż będą ułożone od najniższej do najwyższej.';
+  }else{
+    el.innerHTML = 'Na pięciolinii są nuty. <strong>Przeciągnij</strong> kafelki z literami z dołu mapy do odpowiadających im luk, a potem kliknij <strong>Sprawdź</strong>.';
   }
 }
 
 function showWin(){
-  document.getElementById('winText').textContent = 'Piesek dotarł do budy po '+path.length+' nutach! 🌟';
+  document.getElementById('winText').textContent = 'Piesek dotarł do budy! 🌟';
   document.getElementById('winOverlay').classList.add('show');
 }
 
 function restartGame(){
-  nextIndex = 0;
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('winOverlay').classList.remove('show');
-  pickPath();
-  renderPath();
+  updateInstructions();
+
+  if(gameMode==='match'){
+    document.getElementById('totalVal').textContent = MATCH_LEN;
+    pickMatchTargets();
+    renderMatch();
+  }else{
+    document.getElementById('totalVal').textContent = PATH_WAYPOINTS.length;
+    nextIndex = 0; selIdx = null;
+    do{ slotLetters = shuffled(LETTERS); }while(slotLetters.every((l,i)=>l===LETTERS[i]));
+    renderPath();
+  }
 }
 
-document.getElementById('totalVal').textContent = PATH_LEN;
+document.querySelector('.mode-btn[data-mode="swap"]').classList.add('active');
 restartGame();
-window.addEventListener('resize', positionDog);
 </script>
 </body>
 </html>
