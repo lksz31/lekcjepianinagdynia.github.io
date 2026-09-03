@@ -43,6 +43,8 @@
   .slot-hit rect{transition:0.15s;}
   .slot-hit.slot-hover rect{stroke:#d4af37;fill:rgba(212,175,55,0.12);}
   .slot-fill{cursor:pointer;}
+  .nudge-btn{cursor:pointer;}
+  .nudge-btn:hover circle{fill:#dbe6ff;}
 
   .check-btn{background:var(--gold);color:white;border:none;padding:13px 32px;border-radius:50px;font-weight:800;font-size:0.9rem;cursor:pointer;transition:0.2s;}
   .check-btn:disabled{opacity:0.4;cursor:not-allowed;}
@@ -78,7 +80,7 @@
     <div class="t-text" id="taskText"></div>
   </div>
 
-  <p class="instructions">Przeciągnij <strong>nutkę lub pauzę</strong> z palety na pięciolinię i upuść ją w odpowiednim miejscu.</p>
+  <p class="instructions">Przeciągnij <strong>nutkę lub pauzę</strong> z palety na pięciolinię. Wysokość dźwięku ustaw <strong>strzałkami</strong> obok nutki.</p>
 
   <div class="duration-row" id="durationRow"></div>
 
@@ -241,14 +243,6 @@ function nearestLetter(staffY){
   return best.letter;
 }
 
-function pointerToStaffY(clientY){
-  const svg = document.getElementById('staffSvg');
-  const rect = svg.getBoundingClientRect();
-  const scaleY = H / rect.height;
-  const svgY = (clientY - rect.top) * scaleY;
-  return Math.round((svgY - STAFF_TOP) * 2 / SG);
-}
-
 function attachPaletteDrag(tile){
   tile.addEventListener('pointerdown', function(e){
     e.preventDefault();
@@ -280,8 +274,7 @@ function attachPaletteDrag(tile){
       ghost.remove();
       if(slot){
         const idx = parseInt(slot.dataset.idx, 10);
-        const staffY = pointerToStaffY(ev.clientY);
-        placeInSlot(idx, type, durId, staffY);
+        placeInSlot(idx, type, durId);
       }
     }
     document.addEventListener('pointermove', move);
@@ -289,11 +282,8 @@ function attachPaletteDrag(tile){
   });
 }
 
-function placeInSlot(idx, type, durId, dropStaffY){
-  let letter = null;
-  if(type==='note' && focusMode==='pitch'){
-    letter = nearestLetter(dropStaffY);
-  }
+function placeInSlot(idx, type, durId){
+  let letter = (type==='note' && focusMode==='pitch') ? 'H' : null;
   placedSlots[idx] = {type:type, durId:durId, letter:letter};
   renderStaff();
   updateCheckBtn();
@@ -303,6 +293,16 @@ function clearSlot(idx){
   placedSlots[idx] = null;
   renderStaff();
   updateCheckBtn();
+}
+
+function nudgePitch(idx, deltaStaffY){
+  const p = placedSlots[idx];
+  if(!p || p.type !== 'note') return;
+  const curDef = GAME_NOTES.find(n => n.letter === p.letter);
+  const curY = curDef ? curDef.staffY : 4;
+  const newY = Math.max(4, Math.min(10, curY + deltaStaffY));
+  p.letter = nearestLetter(newY);
+  renderStaff();
 }
 
 function renderStaff(){
@@ -332,15 +332,21 @@ function renderStaff(){
     s += '</g>';
     if(placed){
       s += '<g class="slot-fill" onclick="clearSlot('+i+')">';
+      let ny = STAFF_TOP + 2*SG;
       if(placed.type === 'note'){
         const letterForY = (focusMode==='pitch' && placed.letter) ? placed.letter : 'H';
         const nDef = GAME_NOTES.find(n => n.letter === letterForY);
-        const ny = STAFF_TOP + (nDef.staffY * SG / 2);
+        ny = STAFF_TOP + (nDef.staffY * SG / 2);
         s += noteSVGAt(sx, ny, placed.durId);
       }else{
         s += restSVGAt(sx);
       }
       s += '</g>';
+      if(placed.type === 'note' && focusMode === 'pitch'){
+        const ax = sx + 24;
+        s += '<g class="nudge-btn" onclick="event.stopPropagation();nudgePitch('+i+',-1)"><circle cx="'+ax+'" cy="'+(ny-14)+'" r="10" fill="#f0f4ff"/><polygon points="'+ax+','+(ny-19)+' '+(ax-5)+','+(ny-11)+' '+(ax+5)+','+(ny-11)+'" fill="#1e3a8a"/></g>';
+        s += '<g class="nudge-btn" onclick="event.stopPropagation();nudgePitch('+i+',1)"><circle cx="'+ax+'" cy="'+(ny+14)+'" r="10" fill="#f0f4ff"/><polygon points="'+ax+','+(ny+19)+' '+(ax-5)+','+(ny+11)+' '+(ax+5)+','+(ny+11)+'" fill="#1e3a8a"/></g>';
+      }
     }
   });
 
