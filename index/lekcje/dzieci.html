@@ -277,6 +277,74 @@
   </div>
 </section>
 
+<!-- ══ ZAGRAJKOWO ══ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-label">Gry edukacyjne</div>
+    <h2 class="section-title">Zagrajkowo — nauka nut przez zabawę</h2>
+    <p style="color:#64748b;font-size:0.9rem;max-width:600px;line-height:1.7;margin:0 0 20px;">Kliknij w domek na mapie, żeby otworzyć jedną z siedmiu gierek do nauki nut, wartości rytmicznych i symboli muzycznych.</p>
+    <div class="zk-map-scene">
+      <img src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
+      <button class="zk-hotspot" style="left:15%;top:30%;width:12%;height:30%;" onclick="zkOpenGame(1)" aria-label="Dopasuj nutkę do literki"><span class="zk-label">Dopasuj nutkę</span></button>
+      <button class="zk-hotspot" style="left:30%;top:26%;width:9%;height:42%;" onclick="zkOpenGame(2)" aria-label="Umieść nutę"><span class="zk-label">Umieść nutę</span></button>
+      <button class="zk-hotspot" style="left:35%;top:17%;width:13%;height:30%;" onclick="zkOpenGame(3)" aria-label="Zaznacz właściwą nutę"><span class="zk-label">Zaznacz nutę</span></button>
+      <button class="zk-hotspot" style="left:46%;top:38%;width:12%;height:28%;" onclick="zkOpenGame(4)" aria-label="Piesek i nuty"><span class="zk-label">Piesek i nuty</span></button>
+      <button class="zk-hotspot" style="left:56%;top:35%;width:12%;height:30%;" onclick="zkOpenGame(5)" aria-label="Napisz list nutami"><span class="zk-label">List nutami</span></button>
+      <button class="zk-hotspot" style="left:65%;top:22%;width:13%;height:31%;" onclick="zkOpenGame(6)" aria-label="Ułóż klucz wiolinowy"><span class="zk-label">Klucz z puzzli</span></button>
+      <button class="zk-hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="zkOpenGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="zk-label">Dopasuj nazwę</span></button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .zk-map-scene{position:relative;border-radius:24px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.1);line-height:0;max-width:1000px;margin:0 auto;}
+  .zk-map-scene img{width:100%;display:block;}
+  .zk-hotspot{position:absolute;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;}
+  .zk-hotspot:hover{background:radial-gradient(ellipse,rgba(255,255,255,0.3),transparent 70%);}
+  .zk-hotspot:hover .zk-label{opacity:1;transform:translateX(-50%) translateY(0);}
+  .zk-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:var(--navy);color:white;font-size:0.7rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
+  .zk-popup-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
+  .zk-popup-overlay.show{display:flex;}
+  .zk-popup-box{background:white;border-radius:20px;width:100%;max-width:840px;height:min(88vh,760px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.4);}
+  .zk-popup-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--navy);color:white;flex-shrink:0;}
+  .zk-popup-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;}
+  .zk-popup-close{background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:0.2s;flex-shrink:0;}
+  .zk-popup-close:hover{background:rgba(255,255,255,0.3);}
+  .zk-popup-body{flex:1;overflow:hidden;position:relative;background:var(--bg);}
+  .zk-popup-body iframe{width:100%;height:100%;border:none;}
+</style>
+<div class="zk-popup-overlay" id="zkPopupOverlay" onclick="if(event.target===this)zkCloseGame()">
+  <div class="zk-popup-box">
+    <div class="zk-popup-header">
+      <span class="zk-popup-title" id="zkPopupTitle">Gra</span>
+      <button class="zk-popup-close" onclick="zkCloseGame()" aria-label="Zamknij">✕</button>
+    </div>
+    <div class="zk-popup-body" id="zkPopupBody"></div>
+  </div>
+</div>
+<script>
+  const ZK_GAMES = {
+    1: {title:'🎯 Dopasuj nutkę do literki', url:'/index/gry/zagrajkowo/gra-dopasuj-nute.html'},
+    2: {title:'✏️ Umieść nutę', url:'/index/gry/zagrajkowo/gra-narysuj-nute.html'},
+    3: {title:'⭕ Zaznacz właściwą nutę', url:'/index/gry/zagrajkowo/gra-zaznacz-nute.html'},
+    4: {title:'🐶 Piesek i nuty', url:'/index/gry/zagrajkowo/gra-piesek-nuty.html'},
+    5: {title:'✉️ Napisz list nutami', url:'/index/gry/zagrajkowo/gra-list-nutami.html'},
+    6: {title:'🧩 Ułóż klucz wiolinowy', url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
+    7: {title:'🔗 Dopasuj nazwę do obrazka', url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
+  };
+  function zkOpenGame(id){
+    const g = ZK_GAMES[id];
+    if(!g) return;
+    document.getElementById('zkPopupTitle').textContent = g.title;
+    document.getElementById('zkPopupBody').innerHTML = '<iframe src="'+g.url+'" title="'+g.title+'"></iframe>';
+    document.getElementById('zkPopupOverlay').classList.add('show');
+  }
+  function zkCloseGame(){
+    document.getElementById('zkPopupOverlay').classList.remove('show');
+    document.getElementById('zkPopupBody').innerHTML = '';
+  }
+</script>
+
 <!-- ══ AUTORSKIE POMOCE DYDAKTYCZNE ══ -->
 <section class="pomoce-section" id="pomoce">
   <div class="section-inner">
