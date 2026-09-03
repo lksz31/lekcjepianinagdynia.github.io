@@ -68,9 +68,9 @@
 </div>
 
 <script>
-const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
-const CLEF_TREBLE_RATIO = 183 / 399;
-const CLEF_TREBLE_G_PCT = 0.560;
+const CLEF_TREBLE_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_TREBLE_RATIO = 581 / 1361;
+const CLEF_TREBLE_G_PCT = 0.64;
 
 const GAME_NOTES = [
   {id:'c1', letter:'C', staffY:10},
@@ -110,7 +110,7 @@ function renderStaff(order, target){
   const ch = sg * 6.0;
   const cw = ch * CLEF_TREBLE_RATIO;
   const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
-  s += `<image href="${CLEF_TREBLE_URL}" x="26" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>`;
+  s += `<image href="${CLEF_TREBLE_URL}" x="26" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" preserveAspectRatio="none"/>`;
 
   const topLine = staffTop, botLine = staffTop + 4*sg;
   const startX = 120, stepX = (W - startX - 40) / (order.length - 1);

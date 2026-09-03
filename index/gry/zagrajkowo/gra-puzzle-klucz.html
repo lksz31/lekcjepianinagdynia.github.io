@@ -22,9 +22,9 @@
   .instructions strong{color:var(--navy);}
 
   .puzzle-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:18px;}
-  .puzzle-grid{display:grid;grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,175px);gap:3px;background:var(--border);border-radius:10px;overflow:hidden;}
-  @media(max-width:400px){.puzzle-grid{grid-template-columns:repeat(3,64px);grid-template-rows:repeat(3,140px);}}
-  .piece{background-image:url('/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg');background-repeat:no-repeat;cursor:pointer;transition:0.2s;position:relative;filter:sepia(0.15);}
+  .puzzle-grid{display:grid;grid-template-columns:repeat(3,75px);grid-template-rows:repeat(3,175px);gap:3px;background:var(--border);border-radius:10px;overflow:hidden;}
+  @media(max-width:400px){.puzzle-grid{grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,140px);}}
+  .piece{background-image:url('/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png');background-color:#fff;background-repeat:no-repeat;cursor:pointer;transition:0.2s;position:relative;filter:sepia(0.15);}
   .piece:hover{filter:brightness(1.08) sepia(0.15);}
   .piece.selected{outline:3px solid var(--gold);outline-offset:-3px;z-index:2;}
   .piece.correct{outline:2px solid var(--green);outline-offset:-2px;}
@@ -69,7 +69,7 @@
 
 <script>
 const COLS = 3, ROWS = 3;
-const TILE_W = 80, TILE_H = 175;
+const TILE_W = 75, TILE_H = 175;
 const IMG_W = TILE_W * COLS, IMG_H = TILE_H * ROWS;
 
 let pieces = [];

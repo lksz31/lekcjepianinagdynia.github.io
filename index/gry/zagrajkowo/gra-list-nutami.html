@@ -17,19 +17,32 @@
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
-  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
-  .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:20px;}
+  .instructions{text-align:center;max-width:480px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
 
-  .letter-card{background:var(--card-bg);border-radius:20px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:30px 28px;max-width:540px;width:100%;font-family:'Playfair Display',serif;font-size:1.08rem;line-height:2.1;color:var(--text);}
-  .blank-note{display:inline-flex;align-items:center;justify-content:center;width:34px;height:44px;vertical-align:middle;margin:0 2px;cursor:pointer;border-radius:8px;transition:0.2s;}
-  .blank-note.active{background:#fffbf0;outline:2px dashed var(--gold);}
-  .blank-note svg{width:100%;height:100%;}
-  .blank-letter-filled{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;vertical-align:middle;margin:0 2px;background:#f0fdf4;border:2px solid var(--green);border-radius:8px;font-weight:900;color:var(--green);font-family:'Nunito',sans-serif;}
+  .clef-toggle{display:flex;gap:10px;}
+  .clef-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:8px 20px;font-weight:700;font-size:0.85rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .clef-btn:hover{border-color:var(--gold);}
+  .clef-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
 
-  .keyboard-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
-  .key-btn{width:44px;height:44px;border-radius:12px;background:var(--card-bg);border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--navy);cursor:pointer;transition:0.2s;}
-  .key-btn:hover{border-color:var(--gold);}
+  .letter-card{background:var(--card-bg);border-radius:20px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:30px 28px;max-width:560px;width:100%;font-family:'Playfair Display',serif;font-size:1.08rem;line-height:2.7;color:var(--text);}
+
+  .gap{display:inline-flex;align-items:center;justify-content:center;width:40px;height:52px;vertical-align:middle;margin:0 3px;border-radius:8px;border:2px dashed #cbd5e1;background:#fafafa;transition:0.2s;}
+  .gap.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
+  .gap.correct{border-style:solid;border-color:var(--green);background:#f0fdf4;}
+  .gap.wrong{border-style:solid;border-color:var(--red);background:#fef2f2;}
+
+  .tiles-tray{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:580px;width:100%;padding:16px;background:var(--card-bg);border-radius:18px;border:1px solid var(--border);min-height:76px;box-shadow:0 8px 30px rgba(0,0,0,0.06);}
+
+  .tile{width:40px;height:52px;cursor:grab;touch-action:none;user-select:none;flex-shrink:0;}
+  .tile:active{cursor:grabbing;}
+  .tile.dragging{z-index:1000;cursor:grabbing;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));}
+  .tile.locked{cursor:default;opacity:0.55;}
+  .tile svg{width:100%;height:100%;display:block;pointer-events:none;}
+
+  .check-btn{background:var(--gold);color:#fff;border:none;padding:13px 32px;border-radius:50px;font-weight:800;font-size:0.9rem;cursor:pointer;transition:0.2s;}
+  .check-btn:hover{transform:translateY(-2px);}
 
   .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
   .feedback-msg.ok{color:var(--green);}
@@ -51,11 +64,18 @@
 </div>
 
 <div class="game-area">
-  <p class="instructions">Kliknij nutkę w liście, a potem literkę na klawiaturze poniżej, żeby ją uzupełnić. Odczytaj cały list!</p>
+  <p class="instructions">Przeciągnij <strong>pięciolinie z nutkami</strong> z dołu do pasujących luk w liście. Możesz się pomylić — dopiero po kliknięciu <strong>Sprawdź</strong> okaże się, czy dobrze umieściłeś/aś wszystkie nuty.</p>
+
+  <div class="clef-toggle" id="clefToggle">
+    <button type="button" class="clef-btn" data-clef="treble" onclick="setClef('treble')">🎼 Klucz wiolinowy</button>
+    <button type="button" class="clef-btn" data-clef="bass" onclick="setClef('bass')">𝄢 Klucz basowy</button>
+  </div>
 
   <div class="letter-card" id="letterCard"></div>
 
-  <div class="keyboard-row" id="keyboardRow"></div>
+  <div class="tiles-tray" id="tilesTray"></div>
+
+  <button class="check-btn" onclick="checkAll()">Sprawdź</button>
 
   <div class="feedback-msg" id="feedbackMsg"></div>
 </div>
@@ -68,10 +88,20 @@
 </div>
 
 <script>
-const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
-const CLEF_TREBLE_RATIO = 183 / 399;
-const CLEF_TREBLE_G_PCT = 0.560;
-const STAFF_Y = {C:10, D:9, E:8, F:7, G:6, A:5, H:4};
+const CLEFS = {
+  treble: {
+    url:'/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png',
+    ratio: 581/1361, pct:0.64, refIdx:3,
+    staffY:{C:10,D:9,E:8,F:7,G:6,A:5,H:4}
+  },
+  bass: {
+    url:'/index/fiszki/concept-art/klucz-bez-tla.png',
+    ratio: 148/231, pct:0.366, refIdx:1,
+    staffY:{C:12,D:11,E:10,F:9,G:8,A:7,H:6}
+  }
+};
+let currentClef = 'treble';
+
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
 const LETTER_TEMPLATE = [
@@ -85,85 +115,214 @@ const LETTER_TEMPLATE = [
   {b:'H'}, {t:'. Poćwicz je wszystkie na pianinie — do zobaczenia na lekcji!'},
 ];
 
-function miniNoteSVG(letter){
-  const W=34,H=44,sg=6.5,staffTop=8;
+function miniStaffSVG(letter){
+  const cfg = CLEFS[currentClef];
+  const W=40, H=52, sg=7.6, staffTop=9;
   const c='#1e3a8a';
   let s = '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
   for(let i=0;i<5;i++){
     const ly = staffTop + i*sg;
     s += '<line x1="2" y1="'+ly+'" x2="'+(W-2)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1" opacity="0.5"/>';
   }
-  const ch = sg*4.2, cw = ch*CLEF_TREBLE_RATIO;
-  const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT*ch;
-  s += '<image href="'+CLEF_TREBLE_URL+'" x="0" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>';
-  const noteX = W*0.72;
-  const noteY = staffTop + (STAFF_Y[letter]*sg/2);
-  s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="4.2" ry="3.2" fill="#d4af37" stroke="#8a6d1a" stroke-width="0.8" transform="rotate(-15,'+noteX+','+noteY+')"/>';
+  const ch = sg*4.6, cw = ch*cfg.ratio;
+  const cy = (staffTop + cfg.refIdx*sg) - cfg.pct*ch;
+  s += '<image href="'+cfg.url+'" x="0" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+
+  const noteX = W*0.74;
+  const staffY = cfg.staffY[letter];
+  const noteY = staffTop + (staffY*sg/2);
+  const topLine = staffTop, botLine = staffTop+4*sg, ledW = 5.5;
+
+  if(noteY > botLine + sg*0.5){
+    let ly = botLine+sg;
+    while(ly <= noteY+sg*0.3){
+      s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1"/>';
+      ly += sg;
+    }
+  }
+  if(noteY < topLine - sg*0.5){
+    let ly = topLine-sg;
+    while(ly >= noteY-sg*0.3){
+      s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1"/>';
+      ly -= sg;
+    }
+  }
+
+  s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="4.6" ry="3.5" fill="#d4af37" stroke="#8a6d1a" stroke-width="0.8" transform="rotate(-15,'+noteX+','+noteY+')"/>';
   const stemUp = noteY > staffTop+sg*2;
-  const sx = stemUp? noteX+3.5: noteX-3.5;
-  const sy2 = stemUp? noteY-16: noteY+16;
+  const sx = stemUp ? noteX+3.8 : noteX-3.8;
+  const sy2 = stemUp ? noteY-17 : noteY+17;
   s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="1"/>';
   s += '</svg>';
   return s;
 }
 
-let blanks = [], solvedCount = 0, activeBlankId = null;
+function shuffled(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let blanks = [];
+
+function setClef(clef){
+  currentClef = clef;
+  document.querySelectorAll('.clef-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.clef === clef);
+  });
+  restartGame();
+}
 
 function renderLetter(){
   const card = document.getElementById('letterCard');
   let html = '';
   let bi = 0;
   blanks = [];
-  LETTER_TEMPLATE.forEach(part => {
+  LETTER_TEMPLATE.forEach(function(part){
     if(part.t){ html += part.t; }
     else if(part.b){
       const id = bi++;
-      blanks.push({id:id, letter:part.b, solved:false});
-      html += '<span class="blank-note" data-id="'+id+'" onclick="selectBlank('+id+')">'+miniNoteSVG(part.b)+'</span>';
+      blanks.push({id:id, letter:part.b});
+      html += '<span class="gap" id="gap-'+id+'" data-id="'+id+'" data-letter="'+part.b+'"></span>';
     }
   });
   card.innerHTML = html;
 }
 
-function renderKeyboard(){
-  const row = document.getElementById('keyboardRow');
-  row.innerHTML = LETTERS_ORDER.map(function(l){
-    return '<button class="key-btn" onclick="pressKey(\''+l+'\')">'+l+'</button>';
-  }).join('');
+function renderTray(){
+  const tray = document.getElementById('tilesTray');
+  tray.innerHTML = '';
+  const order = shuffled(blanks.map(function(b){return b.letter;}));
+  order.forEach(function(letter){
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.letter = letter;
+    tile.dataset.gap = '';
+    tile.innerHTML = miniStaffSVG(letter);
+    attachDrag(tile);
+    tray.appendChild(tile);
+  });
 }
 
-function selectBlank(id){
-  const b = blanks.find(function(x){return x.id===id;});
-  if(b.solved) return;
-  activeBlankId = id;
-  document.querySelectorAll('.blank-note').forEach(function(el){el.classList.remove('active');});
-  const el = document.querySelector('.blank-note[data-id="'+id+'"]');
-  if(el) el.classList.add('active');
+let dragTile = null, dragOffsetX = 0, dragOffsetY = 0;
+
+function attachDrag(tile){
+  tile.addEventListener('pointerdown', function(e){
+    if(tile.classList.contains('locked')) return;
+    e.preventDefault();
+    dragTile = tile;
+    const rect = tile.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+    tile.style.position = 'fixed';
+    tile.style.left = rect.left+'px';
+    tile.style.top = rect.top+'px';
+    tile.style.width = rect.width+'px';
+    tile.style.height = rect.height+'px';
+    tile.classList.add('dragging');
+    try{ tile.setPointerCapture(e.pointerId); }catch(err){}
+    document.getElementById('feedbackMsg').textContent = '';
+    document.getElementById('feedbackMsg').className = 'feedback-msg';
+  });
+
+  tile.addEventListener('pointermove', function(e){
+    if(dragTile !== tile) return;
+    tile.style.left = (e.clientX - dragOffsetX)+'px';
+    tile.style.top = (e.clientY - dragOffsetY)+'px';
+    tile.style.pointerEvents = 'none';
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    tile.style.pointerEvents = '';
+    document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
+    const gap = under && under.closest ? under.closest('.gap') : null;
+    if(gap) gap.classList.add('dragover');
+  });
+
+  tile.addEventListener('pointerup', function(e){
+    if(dragTile !== tile) return;
+    dropTile(tile, e.clientX, e.clientY);
+  });
+  tile.addEventListener('pointercancel', function(e){
+    if(dragTile !== tile) return;
+    dropTile(tile, e.clientX, e.clientY);
+  });
 }
 
-function pressKey(letter){
-  if(activeBlankId === null){
-    document.getElementById('feedbackMsg').textContent = 'Najpierw kliknij nutkę w liście.';
-    document.getElementById('feedbackMsg').className = 'feedback-msg bad';
+function clearTileFixedStyle(tile){
+  tile.style.position = '';
+  tile.style.left = '';
+  tile.style.top = '';
+  tile.style.width = '';
+  tile.style.height = '';
+  tile.classList.remove('dragging');
+}
+
+function dropTile(tile, clientX, clientY){
+  document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
+  tile.style.pointerEvents = 'none';
+  const under = document.elementFromPoint(clientX, clientY);
+  tile.style.pointerEvents = '';
+  const gap = under && under.closest ? under.closest('.gap') : null;
+  const tray = document.getElementById('tilesTray');
+
+  if(gap){
+    const occupant = gap.querySelector('.tile');
+    if(occupant && occupant !== tile){
+      const originGapId = tile.dataset.gap;
+      if(originGapId){
+        const originGap = document.getElementById('gap-'+originGapId);
+        occupant.dataset.gap = originGapId;
+        originGap.appendChild(occupant);
+      }else{
+        occupant.dataset.gap = '';
+        tray.appendChild(occupant);
+      }
+    }
+    tile.dataset.gap = gap.dataset.id;
+    gap.classList.remove('correct','wrong');
+    gap.appendChild(tile);
+  }else{
+    tile.dataset.gap = '';
+    tray.appendChild(tile);
+  }
+
+  clearTileFixedStyle(tile);
+  dragTile = null;
+}
+
+function checkAll(){
+  const feedback = document.getElementById('feedbackMsg');
+  let filled = 0, correct = 0;
+  blanks.forEach(function(b){
+    const gap = document.getElementById('gap-'+b.id);
+    const occupant = gap.querySelector('.tile');
+    gap.classList.remove('correct','wrong');
+    if(!occupant) return;
+    filled++;
+    if(occupant.dataset.letter === b.letter){
+      correct++;
+      gap.classList.add('correct');
+      occupant.classList.add('locked');
+    }else{
+      gap.classList.add('wrong');
+    }
+  });
+
+  document.getElementById('scoreVal').textContent = correct;
+
+  if(filled < blanks.length){
+    feedback.textContent = 'Uzupełnij najpierw wszystkie luki, a potem sprawdź jeszcze raz.';
+    feedback.className = 'feedback-msg bad';
     return;
   }
-  const b = blanks.find(function(x){return x.id===activeBlankId;});
-  const el = document.querySelector('.blank-note[data-id="'+activeBlankId+'"]');
-  const feedback = document.getElementById('feedbackMsg');
 
-  if(letter === b.letter){
-    b.solved = true;
-    el.outerHTML = '<span class="blank-letter-filled">'+letter+'</span>';
-    solvedCount++;
-    document.getElementById('scoreVal').textContent = solvedCount;
-    feedback.textContent = '✓ To był dźwięk ' + letter + '!';
-    feedback.className = 'feedback-msg ok';
-    activeBlankId = null;
-    if(solvedCount >= blanks.length){
-      setTimeout(showWin, 600);
-    }
+  if(correct === blanks.length){
+    feedback.textContent = '';
+    setTimeout(showWin, 400);
   }else{
-    feedback.textContent = 'To nie ' + letter + ' — spójrz jeszcze raz na pięciolinię.';
+    feedback.textContent = 'Prawie! Popraw czerwone luki i sprawdź ponownie.';
     feedback.className = 'feedback-msg bad';
   }
 }
@@ -174,15 +333,16 @@ function showWin(){
 }
 
 function restartGame(){
-  solvedCount = 0; activeBlankId = null;
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('feedbackMsg').textContent = '';
+  document.getElementById('feedbackMsg').className = 'feedback-msg';
   document.getElementById('winOverlay').classList.remove('show');
   renderLetter();
-  renderKeyboard();
+  renderTray();
 }
 
 document.getElementById('totalVal').textContent = LETTER_TEMPLATE.filter(function(p){return p.b;}).length;
+document.querySelector('.clef-btn[data-clef="'+currentClef+'"]').classList.add('active');
 restartGame();
 </script>
 </body>
