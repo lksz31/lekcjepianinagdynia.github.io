@@ -21,15 +21,18 @@
   .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
 
-  .path-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:24px 18px;max-width:640px;width:100%;}
+  .path-card{background:url('/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/pies-buda-mapa.webp') center/cover no-repeat;border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.15);padding:24px 18px;max-width:640px;width:100%;}
   .path-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;position:relative;}
-  .stone{position:relative;width:56px;height:56px;border-radius:14px;background:#f8fafc;border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;}
+  .stone{position:relative;width:56px;height:56px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.2);}
   .stone:hover:not(.done){border-color:var(--gold);transform:translateY(-3px);}
   .stone .s-letter{font-weight:900;font-size:1.15rem;color:var(--navy);}
   .stone.done{background:#f0fdf4;border-color:var(--green);opacity:0.55;}
   .stone.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
   @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-  .dog-marker{position:absolute;font-size:1.8rem;top:-30px;transition:left 0.35s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;}
+  .dog-marker{position:absolute;width:52px;height:44px;top:-42px;transition:left 0.55s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;}
+  .dog-marker img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));}
+  .dog-marker.hopping img{animation:dogHop 0.55s ease;}
+  @keyframes dogHop{0%{transform:translateY(0);}45%{transform:translateY(-28px);}100%{transform:translateY(0);}}
   .doghouse{font-size:2rem;}
 
   .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
@@ -96,9 +99,11 @@ function pickPath(){
   path = shuffled(chosen); // losowa kolejność WIZUALNA, do klikania po randze rosnąco
 }
 
+const DOG_DIR = '/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/';
+
 function renderPath(){
   const row = document.getElementById('pathRow');
-  let html = '<div class="dog-marker" id="dogMarker" style="left:0px;">🐶</div>';
+  let html = '<div class="dog-marker" id="dogMarker" style="left:0px;"><img id="dogImg" src="'+DOG_DIR+'pies-skok-4.webp" alt="piesek"></div>';
   path.forEach((n, i) => {
     html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" onclick="tryStone('+i+')">'
       + '<span class="s-letter">'+n.letter+'</span></div>';
@@ -108,16 +113,43 @@ function renderPath(){
   positionDog();
 }
 
-function positionDog(){
+function computeDogLeft(){
   const stones = document.querySelectorAll('.stone:not(.doghouse-slot)');
-  const dog = document.getElementById('dogMarker');
   if(nextIndex >= stones.length){
     const house = document.querySelector('.doghouse-slot');
-    dog.style.left = house.offsetLeft + 'px';
-  }else{
-    const target = document.querySelectorAll('.stone')[Math.max(0,nextIndex-1)] || document.querySelectorAll('.stone')[0];
-    dog.style.left = (nextIndex===0 ? 0 : target.offsetLeft) + 'px';
+    return house.offsetLeft;
   }
+  const target = document.querySelectorAll('.stone')[Math.max(0,nextIndex-1)] || document.querySelectorAll('.stone')[0];
+  return nextIndex===0 ? 0 : target.offsetLeft;
+}
+
+function positionDog(){
+  document.getElementById('dogMarker').style.left = computeDogLeft() + 'px';
+}
+
+function setDogFrame(n){
+  document.getElementById('dogImg').src = DOG_DIR + 'pies-skok-'+n+'.webp';
+}
+
+function animateDogHop(onDone){
+  const marker = document.getElementById('dogMarker');
+  const targetLeft = computeDogLeft();
+
+  setDogFrame(1);
+  marker.classList.add('hopping');
+
+  setTimeout(()=>{
+    setDogFrame(2);
+    marker.style.left = targetLeft + 'px';
+  }, 90);
+
+  setTimeout(()=> setDogFrame(3), 320);
+  setTimeout(()=> setDogFrame(1), 470);
+  setTimeout(()=>{
+    setDogFrame(4);
+    marker.classList.remove('hopping');
+    if(onDone) onDone();
+  }, 560);
 }
 
 function tryStone(i){
@@ -138,10 +170,11 @@ function tryStone(i){
     document.getElementById('scoreVal').textContent = nextIndex;
     feedback.textContent = '✓ Dobrze! ' + path[i].letter;
     feedback.className = 'feedback-msg ok';
-    positionDog();
-    if(nextIndex >= path.length){
-      setTimeout(showWin, 500);
-    }
+    animateDogHop(()=>{
+      if(nextIndex >= path.length){
+        showWin();
+      }
+    });
   }else{
     stoneEl.classList.add('wrong-flash');
     feedback.textContent = 'To jeszcze nie ta nuta — szukaj niższej.';
