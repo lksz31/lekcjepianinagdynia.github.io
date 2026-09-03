@@ -32,14 +32,12 @@
   .flying-item.dragging{transition:none;cursor:grabbing;}
 
   .letters-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:560px;}
-  .letter-target{width:58px;height:66px;position:relative;background:linear-gradient(160deg,#9aa5b1,#5f6b78);clip-path:polygon(16% 10%,84% 10%,77% 100%,23% 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;cursor:default;transition:0.2s;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.18));}
-  .letter-target::before{content:'';position:absolute;top:0;left:2%;right:2%;height:14%;background:#46505b;border-radius:3px;}
-  .letter-target::after{content:'';position:absolute;top:4%;left:38%;width:24%;height:8%;background:#333c45;border-radius:2px;}
-  .letter-target .lt-label{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.35);}
+  .letter-target{width:66px;height:80px;position:relative;background:url('/index/gry/zagrajkowo/dopasuj-nutki-do-literki/grafiki/kosz-na-smieci-crop.webp') center/contain no-repeat;display:flex;align-items:flex-start;justify-content:center;padding-top:15px;cursor:default;transition:0.2s;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.25));}
+  .letter-target::before{content:'';position:absolute;inset:6% 18%;border-radius:10px;background:rgba(220,38,38,0);transition:background 0.2s;pointer-events:none;}
+  .letter-target .lt-label{position:relative;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.65);}
   .letter-target.dragover{transform:scale(1.1) translateY(-3px);filter:drop-shadow(0 6px 10px rgba(212,175,55,0.45));}
-  .letter-target.wrong-flash::before{background:#dc2626;}
+  .letter-target.wrong-flash::before{background:rgba(220,38,38,0.4);}
   .letter-target.bin-happy{animation:binShake 0.55s ease;}
-  .letter-target.bin-happy::before{background:#16a34a;}
   @keyframes binShake{0%,100%{transform:rotate(0);}20%{transform:rotate(-7deg);}40%{transform:rotate(6deg);}60%{transform:rotate(-4deg);}80%{transform:rotate(3deg);}}
 
   .sparkle{position:fixed;pointer-events:none;font-size:1.1rem;z-index:600;animation:sparkleFly 0.7s ease-out forwards;}
@@ -57,7 +55,7 @@
   .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
 
   @media(max-width:420px){
-    .letter-target{width:46px;height:54px;}
+    .letter-target{width:52px;height:64px;}
     .staff-widget svg{width:120px;}
   }
 </style>
