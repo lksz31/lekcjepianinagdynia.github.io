@@ -370,6 +370,10 @@ body{background:#0a120a;font-family:'Cinzel',serif;display:flex;flex-direction:c
         <div class="srow"><label><input type="checkbox" id="chk-hints" onchange="toggleHints(this.checked)"> Boczna belka sterowania</label></div>
         <div class="srow"><label><input type="checkbox" id="chk-notelabels" onchange="toggleNoteLabels(this.checked)"> Podpisy nut na kafelkach</label></div>
         <div class="srow"><label><input type="checkbox" id="chk-compass" onchange="toggleCompass(this.checked)" checked> Kompas kierunków nut</label></div>
+        <div class="srow">
+          <label>Rozmiar kompasu &nbsp;<span class="sval" id="compassSizeV">100%</span></label>
+          <input type="range" id="compassSizeSlider" min="50" max="300" step="10" value="100" oninput="applyCompassSize(this.value)">
+        </div>
         <div class="srow" id="row-gain" style="display:none;">
           <label>Czułość mikrofonu &nbsp;<span class="sval" id="gainV">3.5×</span></label>
           <input type="range" id="gainSlider" min="1" max="10" step="0.5" value="3.5" oninput="applyGain(this.value)">
@@ -1739,13 +1743,42 @@ function toggleCompass(on){
   if(el)el.classList.toggle('show',on);
 }
 
-/* ══ KOMPAS – przeciąganie palcem/myszą po ekranie ══ */
+/* ══ KOMPAS – rozmiar (dwa palce / suwak w ustawieniach) ══ */
+const COMPASS_BASE_W=150;
+let compassScale=1;
+function applyCompassSize(v){
+  compassScale=Math.max(0.5,Math.min(3,parseFloat(v)/100));
+  const pct=Math.round(compassScale*100);
+  const label=document.getElementById('compassSizeV');
+  if(label)label.textContent=pct+'%';
+  const slider=document.getElementById('compassSizeSlider');
+  if(slider)slider.value=pct;
+  const el=document.getElementById('compass-widget');
+  if(el)el.style.width=Math.round(COMPASS_BASE_W*compassScale)+'px';
+}
+function initDefaultCompassSize(){
+  const narrow=window.matchMedia('(max-width:700px)').matches;
+  applyCompassSize(narrow?100:200);
+}
+
+/* ══ KOMPAS – przeciąganie palcem/myszą, pinch dwoma palcami do zmiany rozmiaru ══ */
 function initCompassDrag(){
   const el=document.getElementById('compass-widget');
   if(!el||el.dataset.dragInit)return;
   el.dataset.dragInit='1';
   let dragging=false,offX=0,offY=0;
+  let pinching=false,pinchStartDist=0,pinchStartScale=1;
+  const touchDist=(t0,t1)=>Math.hypot(t0.clientX-t1.clientX,t0.clientY-t1.clientY);
   const start=e=>{
+    if(e.touches&&e.touches.length===2){
+      dragging=false;el.classList.remove('dragging');
+      pinching=true;
+      pinchStartDist=touchDist(e.touches[0],e.touches[1]);
+      pinchStartScale=compassScale;
+      e.preventDefault();
+      return;
+    }
+    pinching=false;
     dragging=true;el.classList.add('dragging');
     const p=e.touches?e.touches[0]:e;
     const r=el.getBoundingClientRect();
@@ -1753,6 +1786,12 @@ function initCompassDrag(){
     e.preventDefault();
   };
   const move=e=>{
+    if(pinching&&e.touches&&e.touches.length===2){
+      const dist=touchDist(e.touches[0],e.touches[1]);
+      applyCompassSize((pinchStartScale*(dist/pinchStartDist))*100);
+      e.preventDefault();
+      return;
+    }
     if(!dragging)return;
     const p=e.touches?e.touches[0]:e;
     const w=el.offsetWidth,h=el.offsetHeight;
@@ -1761,7 +1800,10 @@ function initCompassDrag(){
     el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';
     e.preventDefault();
   };
-  const end=()=>{dragging=false;el.classList.remove('dragging');};
+  const end=e=>{
+    if(e.touches&&e.touches.length>0){pinching=false;return;}
+    dragging=false;pinching=false;el.classList.remove('dragging');
+  };
   el.addEventListener('mousedown',start);
   document.addEventListener('mousemove',move);
   document.addEventListener('mouseup',end);
@@ -2246,6 +2288,7 @@ function startGame(){
   if(musicEnabled) startTechno();
   buildActiveNotes();
   buildNoteTiles();refreshHzGrid();refreshSideBar();
+  initDefaultCompassSize();
   initCompassDrag();
   preloadAll(()=>{newMaze();if(!animRunning){animRunning=true;loop();}});
 }

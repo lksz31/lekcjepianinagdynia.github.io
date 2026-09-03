@@ -114,7 +114,7 @@
   .cl-photo{position:absolute;top:50%;left:50%;width:300px;filter:drop-shadow(0 12px 20px rgba(15,23,42,0.28));transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr));z-index:var(--rz);transition:transform 0.5s cubic-bezier(0.2,0.8,0.2,1),filter 0.3s;cursor:pointer;}
   .cl-photo img{width:100%;height:auto;display:block;}
   .cl-photo.is-hovered{transform:translate(-50%,-50%) translate(var(--rx),var(--ry)) rotate(var(--rr)) scale(1.06)!important;z-index:500!important;filter:drop-shadow(0 20px 34px rgba(15,23,42,0.4));}
-  .cluster-photos.group-active .cl-photo:not(.is-hovered){transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--pdir)*var(--push)),var(--ry)) rotate(var(--rr));}
+  .cluster-photos.group-active .cl-photo:not(.is-hovered){transform:translate(-50%,-50%) translate(calc(var(--rx) + var(--pushpx,0px)),var(--ry)) rotate(var(--rr));}
   .cl-caption{position:absolute;left:8px;right:8px;bottom:8px;background:rgba(12,17,28,0.8);color:#fff;font-size:0.66rem;font-weight:700;letter-spacing:0.01em;padding:4px 10px;border-radius:50px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:3;}
   .cl-photo.is-hovered .cl-caption{opacity:1;}
   .cluster-title{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:260px;background:rgba(255,255,255,0.55);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border:1px solid rgba(255,255,255,0.45);border-radius:16px;padding:14px 18px;z-index:950;pointer-events:none;text-align:left;}
@@ -474,12 +474,10 @@ function buildClusterFlow(containerId, categories, basePath){
       const rx=dir*centeredX;
       const ry=yJitter[i%yJitter.length];
       const rr=n>1?(i-(n-1)/2)*2.4:0;
-      const pdir=rx>0.5?1:(rx<-0.5?-1:dir);
       fig.style.setProperty('--rx',rx+'px');
       fig.style.setProperty('--ry',ry+'px');
       fig.style.setProperty('--rr',rr+'deg');
       fig.style.setProperty('--rz',String(i+1));
-      fig.style.setProperty('--pdir',String(pdir));
       if(!ph.mystery)fig.style.width=photoW+'px';
       if(ph.mystery){
         const mark=document.createElement('span');
@@ -523,13 +521,21 @@ function buildClusterFlow(containerId, categories, basePath){
         wrap.classList.add('group-active');
         p.classList.add('is-hovered');
         const hoveredRx=parseFloat(p.style.getPropertyValue('--rx'))||0;
-        const clusterDir=parseFloat(getComputedStyle(p.closest('.cluster')).getPropertyValue('--dir'))||1;
-        wrap.querySelectorAll('.cl-photo').forEach(sib=>{
-          if(sib===p)return;
-          const rx=parseFloat(sib.style.getPropertyValue('--rx'))||0;
-          const pdir=rx>hoveredRx?1:(rx<hoveredRx?-1:clusterDir);
-          sib.style.setProperty('--pdir',String(pdir));
-        });
+        const cluster=p.closest('.cluster');
+        const clusterDir=parseFloat(getComputedStyle(cluster).getPropertyValue('--dir'))||1;
+        const push=parseFloat(getComputedStyle(cluster).getPropertyValue('--push'))||130;
+        const sibs=Array.from(wrap.querySelectorAll('.cl-photo')).filter(s=>s!==p);
+        const withRx=sibs.map(s=>({el:s,rx:parseFloat(s.style.getPropertyValue('--rx'))||0}));
+        // Rank each side by distance from the hovered photo, then stagger the
+        // push amount by rank so every sibling on a side gets progressively
+        // more room — a flat shared push only moves the whole side as one
+        // block, leaving photos still stacked tight on top of each other.
+        const left=withRx.filter(o=>o.rx<hoveredRx).sort((a,b)=>b.rx-a.rx);
+        const right=withRx.filter(o=>o.rx>hoveredRx).sort((a,b)=>a.rx-b.rx);
+        const tied=withRx.filter(o=>o.rx===hoveredRx);
+        (clusterDir>=0?right:left).push(...tied);
+        left.forEach((o,idx)=>o.el.style.setProperty('--pushpx',(-push*(idx+1))+'px'));
+        right.forEach((o,idx)=>o.el.style.setProperty('--pushpx',(push*(idx+1))+'px'));
       });
       p.addEventListener('mouseleave',function(){
         wrap.classList.remove('group-active');

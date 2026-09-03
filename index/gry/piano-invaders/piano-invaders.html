@@ -286,6 +286,13 @@ canvas#c{display:block;position:fixed;top:52px;left:0;width:100vw;}
       </div>
     </div>
     <div class="s-row">
+      <span class="s-label">Rozmiar liter kolumn</span>
+      <div class="s-control">
+        <input type="range" class="s-slider" id="s-collbl-size" min="50" max="200" step="10" value="100" oninput="setColLabelScale(this.value)">
+        <span class="s-val" id="s-collbl-size-val">100%</span>
+      </div>
+    </div>
+    <div class="s-row">
       <span class="s-label">Poziom trudności</span>
       <div class="seg-row">
         <button class="seg-btn active" id="diff-beginner" onclick="setDifficulty('beginner')">Początkujący</button>
@@ -521,7 +528,7 @@ function updatePlayerSize(){
 // Pressing a move tile makes the piano glide to the target column instead of
 // teleporting. While it's mid-flight, shooting and further moves are locked
 // out — visualized on the move tiles by a dark layer receding from the top.
-var FLIGHT_MS = 420;
+var FLIGHT_MS = 1260;
 var isFlying = false, flightFrom = playerCol, flightTo = playerCol, flightStart = 0;
 function requestMove(col){
   if(col === playerCol && !isFlying) return false;
@@ -1102,9 +1109,10 @@ function draw(){
 
   if(colLabelMode==='off'){
     cx.textAlign='center'; cx.textBaseline='middle';
-    var colLblFont = Math.max(22, Math.round(COL_W*0.24));
-    cx.font='bold '+colLblFont+'px Courier New';
-    for(var i=0;i<COLS;i++){ cx.fillStyle='rgba(68,170,255,0.8)'; cx.fillText(MOVE_NOTES[i].label,colX(i),PH-24); }
+    var colLblFont = Math.max(11, Math.round(COL_W*0.12*colLabelScale));
+    cx.font=colLblFont+'px Courier New';
+    var colLblY = PH - Math.max(14, colLblFont*0.7);
+    for(var i=0;i<COLS;i++){ cx.fillStyle='rgba(68,170,255,0.8)'; cx.fillText(MOVE_NOTES[i].label,colX(i),colLblY); }
   }
 
   // Monsters, bullets & particles — wrapped so a glitch here (e.g. right
@@ -1251,6 +1259,11 @@ function loop(){
 
 // ══ COLUMN LABELS ══
 var colLabelMode = 'off';
+var colLabelScale = 1;
+function setColLabelScale(v){
+  colLabelScale = parseInt(v)/100;
+  document.getElementById('s-collbl-size-val').textContent = v+'%';
+}
 function updateColLabels(){
   var container = document.getElementById('col-labels');
   container.innerHTML = '';
