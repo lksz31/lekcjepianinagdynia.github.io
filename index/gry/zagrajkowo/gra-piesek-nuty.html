@@ -118,7 +118,7 @@ function renderPath(){
     html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" style="left:'+wp.left+'%;top:'+wp.top+'%;" onclick="tryStone('+i+')">'
       + '<span class="s-letter">'+n.letter+'</span></div>';
   });
-  html += '<div class="stone doghouse-slot" style="left:'+DOGHOUSE_POS.left+'%;top:'+DOGHOUSE_POS.top+'%;"><img src="'+DOG_DIR+'buda-pies.webp" alt="Buda"></div>';
+  html += '<div class="stone doghouse-slot" style="left:'+DOGHOUSE_POS.left+'%;top:'+DOGHOUSE_POS.top+'%;"></div>';
   row.innerHTML = html;
   positionDog();
 }
