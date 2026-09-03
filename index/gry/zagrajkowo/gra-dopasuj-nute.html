@@ -23,7 +23,7 @@
   .instructions strong{color:var(--navy);}
 
   .staff-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:20px;}
-  #staffSvgWrap{width:min(90vw,340px);}
+  #staffSvgWrap{width:min(80vw,300px);}
 
   .note-token{cursor:grab;touch-action:none;user-select:none;}
   .note-token:active{cursor:grabbing;}
@@ -31,11 +31,15 @@
   @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.4);opacity:0.6;}100%{transform:scale(0);opacity:0;}}
   @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-6px);}80%{transform:translateX(6px);}}
 
-  .letters-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:520px;}
-  .letter-target{width:56px;height:56px;border-radius:16px;background:var(--card-bg);border:3px dashed var(--border);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--navy);transition:0.2s;}
-  .letter-target.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
-  .letter-target.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
-  .letter-target.correct-flash{border-color:var(--green);background:#f0fdf4;}
+  .letters-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;max-width:560px;}
+  .letter-target{width:58px;height:66px;position:relative;background:linear-gradient(160deg,#9aa5b1,#5f6b78);clip-path:polygon(16% 10%,84% 10%,77% 100%,23% 100%);display:flex;align-items:flex-end;justify-content:center;padding-bottom:9px;cursor:default;transition:0.2s;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.18));}
+  .letter-target::before{content:'';position:absolute;top:0;left:2%;right:2%;height:14%;background:#46505b;border-radius:3px;}
+  .letter-target::after{content:'';position:absolute;top:4%;left:38%;width:24%;height:8%;background:#333c45;border-radius:2px;}
+  .letter-target .lt-label{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.35);}
+  .letter-target.dragover{transform:scale(1.1) translateY(-3px);filter:drop-shadow(0 6px 10px rgba(212,175,55,0.45));}
+  .letter-target.wrong-flash{animation:shake 0.4s;}
+  .letter-target.wrong-flash::before{background:#dc2626;}
+  .letter-target.correct-flash::before{background:#16a34a;}
 
   .feedback-msg{min-height:28px;font-weight:800;font-size:1rem;text-align:center;}
   .feedback-msg.ok{color:var(--green);}
@@ -61,7 +65,7 @@
 </div>
 
 <div class="game-area">
-  <p class="instructions">Na pięciolinii widzisz nutkę. <strong>Przeciągnij ją</strong> (albo dotknij i przenieś na telefonie) do literki, która odpowiada jej nazwie.</p>
+  <p class="instructions">Na pięciolinii widzisz śmieć zamiast nutki. <strong>Przeciągnij go</strong> (albo dotknij i przenieś na telefonie) do kosza z literą, która odpowiada nazwie dźwięku.</p>
 
   <div class="staff-card">
     <div id="staffSvgWrap"></div>
@@ -81,9 +85,9 @@
 
 <script>
 /* ══ Te same ścieżki i dane pozycjonowania co w notes.js (Muzyczny Labirynt) ══ */
-const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
-const CLEF_TREBLE_RATIO = 183 / 399;
-const CLEF_TREBLE_G_PCT = 0.560;
+const CLEF_TREBLE_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_TREBLE_RATIO = 581 / 1361;
+const CLEF_TREBLE_G_PCT = 0.64;
 
 /* Nuty do gry: c¹–h¹ (jak zakres G_small w notes.js), staffY_G z ALL_NOTE_DEFS */
 const GAME_NOTES = [
@@ -97,8 +101,16 @@ const GAME_NOTES = [
 ];
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
+const LITTER_DIR = '/index/gry/zagrajkowo/dopasuj-nutki-do-literki/grafiki/';
+const LITTER_IMAGES = [
+  'banan-smiec.webp','butelka-smiec.webp','klawa-smiec.webp','kubek-smiec.webp',
+  'maseka-smiec.webp','ogryzek-smiec.webp','papier-smiec.webp','puszka-smiec.webp',
+  'slomka_smiec.webp','szklo-smiec.webp','ubranie-smiec.webp'
+];
+
 const TOTAL_ROUNDS = 10;
-let round = 0, score = 0, currentNote = null, recentIds = [];
+let round = 0, score = 0, currentNote = null, currentLitter = null, recentIds = [];
+const STAFF_W = 220, STAFF_H = 220;
 
 function pickNote(){
   let pool = GAME_NOTES.filter(n => !recentIds.includes(n.id));
@@ -109,52 +121,52 @@ function pickNote(){
   return n;
 }
 
-/* ══ Rysowanie pięciolinii + nutki (uproszczona wersja noteSVG z notes.js) ══ */
-function renderStaff(note){
-  const W = 300, H = 200;
-  const sg = 16;
-  const staffTop = 40;
+function pickLitter(){
+  return LITTER_IMAGES[Math.floor(Math.random()*LITTER_IMAGES.length)];
+}
+
+/* ══ Rysowanie pięciolinii + śmiecia w roli nutki ══ */
+function renderStaff(note, litter){
+  const W = STAFF_W, H = STAFF_H;
+  const sg = 22;
+  const staffTop = 60;
   const c = '#1e3a8a';
 
-  let s = `<svg id="noteSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="touch-action:none;">`;
+  let s = `<svg id="noteSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="touch-action:none;overflow:visible;">`;
 
   for(let i=0;i<5;i++){
     const ly = staffTop + i*sg;
-    s += `<line x1="20" y1="${ly}" x2="${W-20}" y2="${ly}" stroke="${c}" stroke-width="1.4" opacity="0.55"/>`;
+    s += `<line x1="16" y1="${ly}" x2="${W-16}" y2="${ly}" stroke="${c}" stroke-width="1.6" opacity="0.55"/>`;
   }
 
   const ch = sg * 6.0;
   const cw = ch * CLEF_TREBLE_RATIO;
   const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
-  s += `<image href="${CLEF_TREBLE_URL}" x="24" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>`;
+  s += `<image href="${CLEF_TREBLE_URL}" x="18" y="${cy.toFixed(1)}" width="${cw.toFixed(1)}" height="${ch.toFixed(1)}" preserveAspectRatio="none"/>`;
 
   const topLine = staffTop, botLine = staffTop + 4*sg;
-  const noteX = W*0.72;
+  const noteX = W*0.76;
   const noteY = staffTop + (note.staffY * sg / 2);
-  const ledW = 12;
+  const ledW = 15;
 
   if(noteY > botLine + sg*0.5){
     let ly = botLine + sg;
     while(ly <= noteY + sg*0.3){
-      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.6"/>`;
+      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.8"/>`;
       ly += sg;
     }
   }
   if(noteY < topLine - sg*0.5){
     let ly = topLine - sg;
     while(ly >= noteY - sg*0.3){
-      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.6"/>`;
+      s += `<line x1="${noteX-ledW}" y1="${ly}" x2="${noteX+ledW}" y2="${ly}" stroke="${c}" stroke-width="1.8"/>`;
       ly -= sg;
     }
   }
 
+  const litSize = sg * 1.7;
   s += `<g id="noteToken" class="note-token" transform="translate(${noteX},${noteY})">`;
-  s += `<ellipse cx="0" cy="0" rx="11" ry="8" fill="#d4af37" stroke="#8a6d1a" stroke-width="1" transform="rotate(-15)"/>`;
-  const stemUp = noteY > staffTop + sg*2;
-  const sx = stemUp ? 9 : -9;
-  const stemLen = 42;
-  const sy2 = stemUp ? -stemLen : stemLen;
-  s += `<line x1="${sx}" y1="0" x2="${sx}" y2="${sy2}" stroke="#8a6d1a" stroke-width="2.4"/>`;
+  s += `<image href="${LITTER_DIR+litter}" x="${(-litSize/2).toFixed(1)}" y="${(-litSize/2).toFixed(1)}" width="${litSize.toFixed(1)}" height="${litSize.toFixed(1)}" preserveAspectRatio="xMidYMid meet"/>`;
   s += `</g>`;
 
   s += '</svg>';
@@ -165,7 +177,7 @@ function renderStaff(note){
 function renderLetters(){
   const row = document.getElementById('lettersRow');
   row.innerHTML = LETTERS_ORDER.map(l =>
-    `<div class="letter-target" data-letter="${l}">${l}</div>`
+    `<div class="letter-target" data-letter="${l}"><span class="lt-label">${l}</span></div>`
   ).join('');
 }
 
@@ -203,7 +215,7 @@ function onDragMove(e){
   const p = getPoint(e);
   const svg = document.getElementById('noteSvg');
   const rect = svg.getBoundingClientRect();
-  const scaleX = 300 / rect.width;
+  const scaleX = STAFF_W / rect.width;
   document.querySelectorAll('.letter-target').forEach(t=>t.classList.remove('dragover'));
   const target = document.elementFromPoint(p.x, p.y);
   const letterTarget = target && target.closest ? target.closest('.letter-target') : null;
@@ -265,7 +277,8 @@ function nextRound(){
     return;
   }
   currentNote = pickNote();
-  renderStaff(currentNote);
+  currentLitter = pickLitter();
+  renderStaff(currentNote, currentLitter);
 }
 
 function showWin(){
@@ -280,7 +293,8 @@ function restartGame(){
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('winOverlay').classList.remove('show');
   currentNote = pickNote();
-  renderStaff(currentNote);
+  currentLitter = pickLitter();
+  renderStaff(currentNote, currentLitter);
 }
 
 document.getElementById('totalVal').textContent = TOTAL_ROUNDS;

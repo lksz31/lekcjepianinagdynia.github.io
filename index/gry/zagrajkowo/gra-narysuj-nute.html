@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Narysuj Nutę | Zagrajkowo</title>
+<title>Umieść Nutę | Zagrajkowo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -17,31 +17,37 @@
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
-  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
+  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 50px;gap:18px;}
 
-  .task-box{background:var(--navy);color:white;border-radius:16px;padding:14px 26px;text-align:center;max-width:420px;}
+  .mode-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .mode-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:7px 16px;font-weight:700;font-size:0.78rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .mode-btn:hover{border-color:var(--gold);}
+  .mode-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+
+  .task-box{background:var(--navy);color:white;border-radius:16px;padding:14px 26px;text-align:center;max-width:440px;}
   .task-box .t-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);margin-bottom:4px;}
-  .task-box .t-text{font-weight:800;font-size:1.15rem;}
+  .task-box .t-text{font-weight:800;font-size:1.05rem;line-height:1.6;}
   .task-box .t-text b{color:var(--gold);}
 
   .duration-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
-  .dur-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:10px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;}
+  .dur-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:14px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;}
   .dur-btn:hover{border-color:var(--gold);}
-  .dur-btn.active{border-color:var(--navy);background:#f0f4ff;}
-  .dur-btn svg{width:30px;height:40px;}
-  .dur-btn span{font-size:0.66rem;font-weight:700;color:var(--text-mid);}
+  .dur-btn svg{width:26px;height:36px;}
+  .dur-btn span{font-size:0.62rem;font-weight:700;color:var(--text-mid);text-align:center;}
+
+  .pitch-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .pitch-btn{width:42px;height:42px;border-radius:12px;background:var(--card-bg);border:2px solid var(--border);font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .pitch-btn:hover{border-color:var(--gold);}
 
   .staff-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:16px;}
   #staffWrap{width:min(92vw,420px);}
   .slot-hit{cursor:pointer;}
-  .slot-hit rect{fill:transparent;}
-  .slot-hit:hover .ghost-note{opacity:0.35;}
 
   .check-btn{background:var(--gold);color:white;border:none;padding:13px 32px;border-radius:50px;font-weight:800;font-size:0.9rem;cursor:pointer;transition:0.2s;}
   .check-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .check-btn:hover:not(:disabled){transform:translateY(-2px);}
 
-  .feedback-msg{min-height:28px;font-weight:800;font-size:1rem;text-align:center;}
+  .feedback-msg{min-height:28px;font-weight:800;font-size:0.92rem;text-align:center;line-height:1.5;}
   .feedback-msg.ok{color:var(--green);}
   .feedback-msg.bad{color:var(--red);}
 
@@ -56,17 +62,28 @@
 
 <div class="top-bar">
   <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
-  <span class="game-title-bar">✏️ Narysuj nutę</span>
+  <span class="game-title-bar">✏️ Umieść nutę</span>
   <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">8</span></span>
 </div>
 
 <div class="game-area">
+  <div class="mode-row" id="focusRow">
+    <button type="button" class="mode-btn" data-focus="duration" onclick="setFocusMode('duration')">Same wartości nut</button>
+    <button type="button" class="mode-btn" data-focus="pitch" onclick="setFocusMode('pitch')">Wartości i wysokości</button>
+  </div>
+  <div class="mode-row" id="elementRow">
+    <button type="button" class="mode-btn" data-elem="notes" onclick="setElementMode('notes')">Nuty</button>
+    <button type="button" class="mode-btn" data-elem="rests" onclick="setElementMode('rests')">Pauzy</button>
+    <button type="button" class="mode-btn" data-elem="both" onclick="setElementMode('both')">Nuty i pauzy</button>
+  </div>
+
   <div class="task-box">
     <div class="t-label">Zadanie</div>
-    <div class="t-text" id="taskText">Narysuj <b>ćwierćnutę</b> na dźwięku <b>C</b></div>
+    <div class="t-text" id="taskText"></div>
   </div>
 
   <div class="duration-row" id="durationRow"></div>
+  <div class="pitch-row" id="pitchRow" style="display:none;"></div>
 
   <div class="staff-card">
     <div id="staffWrap"></div>
@@ -85,9 +102,9 @@
 </div>
 
 <script>
-const CLEF_TREBLE_URL = '/index/gry/piano-maze/zapis-nutowy/wiolinowy-maze-bez-tla.jpg';
-const CLEF_TREBLE_RATIO = 183 / 399;
-const CLEF_TREBLE_G_PCT = 0.560;
+const CLEF_TREBLE_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_TREBLE_RATIO = 581 / 1361;
+const CLEF_TREBLE_G_PCT = 0.64;
 
 const GAME_NOTES = [
   {id:'c1', letter:'C', staffY:10},
@@ -98,54 +115,202 @@ const GAME_NOTES = [
   {id:'a1', letter:'A', staffY:5},
   {id:'h1', letter:'H', staffY:4},
 ];
+const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
 const DURATIONS = [
-  {id:'whole',  label:'Cała nuta',   nazwa:'całą nutę'},
-  {id:'half',   label:'Półnuta',     nazwa:'półnutę'},
-  {id:'quarter',label:'Ćwierćnuta',  nazwa:'ćwierćnutę'},
+  {id:'whole',  label:'Cała nuta'},
+  {id:'half',   label:'Półnuta'},
+  {id:'quarter',label:'Ćwierćnuta'},
 ];
+const REST_DURATIONS = [
+  {id:'whole',  label:'Cała pauza'},
+  {id:'half',   label:'Pauza półnutowa'},
+  {id:'quarter',label:'Pauza ćwierćnutowa'},
+];
+const NOTE_DUR_NAMES = {whole:'całą nutę', half:'półnutę', quarter:'ćwierćnutę'};
+const REST_DUR_NAMES = {whole:'całą pauzę', half:'pauzę półnutową', quarter:'pauzę ćwierćnutową'};
 
-function durIcon(id, filled){
-  filled = filled !== false;
-  const headFill = (id==='whole') ? 'none' : (filled ? '#d4af37' : 'none');
+function durIcon(durId){
+  const headFill = durId==='quarter' ? '#d4af37' : 'none';
   const stroke = '#8a6d1a';
   let s = '<svg viewBox="0 0 30 40">';
   s += '<ellipse cx="15" cy="30" rx="8" ry="6" fill="'+headFill+'" stroke="'+stroke+'" stroke-width="2" transform="rotate(-15,15,30)"/>';
-  if(id !== 'whole'){
+  if(durId !== 'whole'){
     s += '<line x1="22" y1="30" x2="22" y2="4" stroke="'+stroke+'" stroke-width="2.2"/>';
   }
   s += '</svg>';
   return s;
 }
 
+function restIcon(durId){
+  const c = '#8a6d1a';
+  let inner;
+  if(durId==='whole'){
+    inner = '<rect x="8" y="14" width="14" height="6" fill="'+c+'"/>';
+  }else if(durId==='half'){
+    inner = '<rect x="8" y="20" width="14" height="6" fill="'+c+'"/>';
+  }else{
+    inner = '<path d="M13 6 L22 14 L9 20 L22 27 L11 36" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  return '<svg viewBox="0 0 30 40">'+inner+'</svg>';
+}
+
+function restSVGAt(durId, cx, staffTop, sg){
+  const c = '#8a6d1a';
+  if(durId==='whole'){
+    const ly = staffTop + 1*sg;
+    return '<rect x="'+(cx-7)+'" y="'+ly+'" width="14" height="'+(sg*0.32).toFixed(1)+'" fill="'+c+'"/>';
+  }
+  if(durId==='half'){
+    const ly = staffTop + 2*sg;
+    const h = sg*0.32;
+    return '<rect x="'+(cx-7)+'" y="'+(ly-h).toFixed(1)+'" width="14" height="'+h.toFixed(1)+'" fill="'+c+'"/>';
+  }
+  const cy = staffTop + 2*sg;
+  const pts = [[cx-2,cy-17],[cx+7,cy-9],[cx-6,cy-2],[cx+7,cy+7],[cx-3,cy+17]];
+  const d = 'M '+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
+  return '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
+}
+
+function noteSVGAt(cx, noteY, durId, staffTop, sg){
+  let s = '';
+  const topLine = staffTop, botLine = staffTop + 4*sg, ledW = 12, c = '#1e3a8a';
+  if(noteY > botLine + sg*0.5){
+    let ly = botLine + sg;
+    while(ly <= noteY + sg*0.3){
+      s += '<line x1="'+(cx-ledW)+'" y1="'+ly+'" x2="'+(cx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.6"/>';
+      ly += sg;
+    }
+  }
+  if(noteY < topLine - sg*0.5){
+    let ly = topLine - sg;
+    while(ly >= noteY - sg*0.3){
+      s += '<line x1="'+(cx-ledW)+'" y1="'+ly+'" x2="'+(cx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.6"/>';
+      ly -= sg;
+    }
+  }
+  const fill = durId==='quarter' ? '#d4af37' : 'none';
+  s += '<ellipse cx="'+cx+'" cy="'+noteY+'" rx="11" ry="8" fill="'+fill+'" stroke="#8a6d1a" stroke-width="2" transform="rotate(-15,'+cx+','+noteY+')"/>';
+  if(durId !== 'whole'){
+    const stemUp = noteY > staffTop + sg*2;
+    const sx = stemUp ? cx+9 : cx-9;
+    const sy2 = stemUp ? noteY-42 : noteY+42;
+    s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="2.4"/>';
+  }
+  return s;
+}
+
 const TOTAL_ROUNDS = 8;
 let round = 0, score = 0;
-let targetNote = null, targetDuration = null;
-let chosenSlot = null, chosenDuration = null;
+let focusMode = 'pitch';   /* 'duration' | 'pitch' */
+let elementMode = 'both';  /* 'notes' | 'rests' | 'both' */
+
+let targetSlots = [];
+let placedSlots = [];
+let activeSlotIdx = 0;
+let pendingChoice = null;
+
+function setFocusMode(m){
+  focusMode = m;
+  document.querySelectorAll('#focusRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.focus===m));
+  restartGame();
+}
+function setElementMode(m){
+  elementMode = m;
+  document.querySelectorAll('#elementRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.elem===m));
+  restartGame();
+}
 
 function pickTask(){
-  targetNote = GAME_NOTES[Math.floor(Math.random()*GAME_NOTES.length)];
-  targetDuration = DURATIONS[Math.floor(Math.random()*DURATIONS.length)];
+  const slotCount = Math.random() < 0.5 ? 1 : 2;
+  const slots = [];
+  for(let i=0;i<slotCount;i++){
+    let type;
+    if(elementMode==='notes') type = 'note';
+    else if(elementMode==='rests') type = 'rest';
+    else type = Math.random() < 0.5 ? 'note' : 'rest';
+    const durId = DURATIONS[Math.floor(Math.random()*DURATIONS.length)].id;
+    let letter = null;
+    if(type==='note' && focusMode==='pitch'){
+      letter = GAME_NOTES[Math.floor(Math.random()*GAME_NOTES.length)].letter;
+    }
+    slots.push({type, durId, letter});
+  }
+  targetSlots = slots;
+  placedSlots = slots.map(()=>null);
+  activeSlotIdx = 0;
+  pendingChoice = null;
 }
 
-function renderDurationButtons(){
+function buildTaskText(){
+  const parts = targetSlots.map((s,i)=>{
+    const name = s.type==='note' ? NOTE_DUR_NAMES[s.durId] : REST_DUR_NAMES[s.durId];
+    const pitchTxt = (s.type==='note' && s.letter) ? ' na dźwięku <b>'+s.letter+'</b>' : '';
+    const prefix = targetSlots.length>1 ? ('<b>'+(i===0?'Pierwsza':'Druga')+'</b>: ') : '';
+    return prefix+'umieść <b>'+name+'</b>'+pitchTxt;
+  });
+  return parts.join('<br>');
+}
+
+function renderPalette(){
   const row = document.getElementById('durationRow');
-  row.innerHTML = DURATIONS.map(d =>
-    '<div class="dur-btn" data-id="'+d.id+'" onclick="chooseDuration(\''+d.id+'\')">'+durIcon(d.id)+'<span>'+d.label+'</span></div>'
-  ).join('');
+  let html = '';
+  if(elementMode !== 'rests'){
+    html += DURATIONS.map(d =>
+      '<div class="dur-btn" onclick="chooseValue(\'note\',\''+d.id+'\')">'+durIcon(d.id)+'<span>'+d.label+'</span></div>'
+    ).join('');
+  }
+  if(elementMode !== 'notes'){
+    html += REST_DURATIONS.map(d =>
+      '<div class="dur-btn" onclick="chooseValue(\'rest\',\''+d.id+'\')">'+restIcon(d.id)+'<span>'+d.label+'</span></div>'
+    ).join('');
+  }
+  row.innerHTML = html;
 }
 
-function chooseDuration(id){
-  chosenDuration = id;
-  document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('active', b.dataset.id === id));
+function renderPitchRow(show){
+  const row = document.getElementById('pitchRow');
+  if(!show){ row.style.display = 'none'; row.innerHTML=''; return; }
+  row.innerHTML = LETTERS_ORDER.map(l => '<button class="pitch-btn" onclick="choosePitch(\''+l+'\')">'+l+'</button>').join('');
+  row.style.display = 'flex';
+}
+
+function chooseValue(type, durId){
+  if(activeSlotIdx === null) return;
+  if(type==='note' && focusMode==='pitch'){
+    pendingChoice = {type, durId};
+    renderPitchRow(true);
+    return;
+  }
+  finalizePlacement(type, durId, null);
+}
+
+function choosePitch(letter){
+  if(!pendingChoice) return;
+  finalizePlacement(pendingChoice.type, pendingChoice.durId, letter);
+  pendingChoice = null;
+  renderPitchRow(false);
+}
+
+function finalizePlacement(type, durId, letter){
+  placedSlots[activeSlotIdx] = {type:type, durId:durId, letter:letter};
+  const nextEmpty = placedSlots.findIndex(p => p===null);
+  activeSlotIdx = nextEmpty;
+  renderStaff();
   updateCheckBtn();
-  if(chosenSlot !== null) renderStaff();
+}
+
+function activateSlot(i){
+  activeSlotIdx = i;
+  pendingChoice = null;
+  renderPitchRow(false);
+  renderStaff();
 }
 
 function renderStaff(){
-  const W = 300, H = 200;
+  const W = 340, H = 210;
   const sg = 16;
-  const staffTop = 40;
+  const staffTop = 46;
   const c = '#1e3a8a';
 
   let s = '<svg id="staffSvg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
@@ -158,45 +323,29 @@ function renderStaff(){
   const ch = sg * 6.0;
   const cw = ch * CLEF_TREBLE_RATIO;
   const cy = (staffTop + 3*sg) - CLEF_TREBLE_G_PCT * ch;
-  s += '<image href="'+CLEF_TREBLE_URL+'" x="24" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none" style="mix-blend-mode:multiply"/>';
+  s += '<image href="'+CLEF_TREBLE_URL+'" x="24" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
 
-  const topLine = staffTop, botLine = staffTop + 4*sg;
-  const noteX = W*0.72;
-  const ledW = 12;
+  const slotXs = targetSlots.length === 1 ? [W*0.68] : [W*0.5, W*0.82];
+  const boxTop = staffTop - 36, boxH = 4*sg + 72;
 
-  GAME_NOTES.forEach((n, i) => {
-    const noteY = staffTop + (n.staffY * sg / 2);
-    const isChosen = chosenSlot === i;
-
-    if(noteY > botLine + sg*0.5){
-      let ly = botLine + sg;
-      while(ly <= noteY + sg*0.3){
-        s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.5"/>';
-        ly += sg;
-      }
+  slotXs.forEach((sx, i) => {
+    const placed = placedSlots[i];
+    const isActive = activeSlotIdx === i;
+    const boxColor = isActive ? '#d4af37' : '#cbd5e1';
+    s += '<g class="slot-hit" onclick="activateSlot('+i+')">';
+    s += '<rect x="'+(sx-19)+'" y="'+boxTop+'" width="38" height="'+boxH+'" rx="8" fill="'+(isActive?'rgba(212,175,55,0.09)':'transparent')+'" stroke="'+boxColor+'" stroke-width="1.6" stroke-dasharray="4,3"/>';
+    if(targetSlots.length > 1){
+      s += '<text x="'+sx+'" y="'+(boxTop-6)+'" text-anchor="middle" font-size="12" font-weight="800" fill="'+(isActive?'#8a6d1a':'#94a3b8')+'" font-family="Nunito,sans-serif">'+(i+1)+'</text>';
     }
-    if(noteY < topLine - sg*0.5){
-      let ly = topLine - sg;
-      while(ly >= noteY - sg*0.3){
-        s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1.4" opacity="0.5"/>';
-        ly -= sg;
+    if(placed){
+      if(placed.type === 'note'){
+        const letterForY = (focusMode==='pitch' && placed.letter) ? placed.letter : 'H';
+        const nDef = GAME_NOTES.find(n => n.letter === letterForY);
+        const ny = staffTop + (nDef.staffY * sg / 2);
+        s += noteSVGAt(sx, ny, placed.durId, staffTop, sg);
+      }else{
+        s += restSVGAt(placed.durId, sx, staffTop, sg);
       }
-    }
-
-    s += '<g class="slot-hit" data-idx="'+i+'" onclick="chooseSlot('+i+')">';
-    s += '<rect x="'+(noteX-16)+'" y="'+(noteY-50)+'" width="32" height="70"/>';
-
-    if(isChosen && chosenDuration){
-      const headFill = chosenDuration==='whole' ? 'none' : '#d4af37';
-      s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="11" ry="8" fill="'+headFill+'" stroke="#8a6d1a" stroke-width="2" transform="rotate(-15,'+noteX+','+noteY+')"/>';
-      if(chosenDuration !== 'whole'){
-        const stemUp = noteY > staffTop + sg*2;
-        const sx = stemUp ? noteX+9 : noteX-9;
-        const sy2 = stemUp ? noteY-42 : noteY+42;
-        s += '<line x1="'+sx+'" y1="'+noteY+'" x2="'+sx+'" y2="'+sy2+'" stroke="#8a6d1a" stroke-width="2.4"/>';
-      }
-    }else{
-      s += '<circle class="ghost-note" cx="'+noteX+'" cy="'+noteY+'" r="9" fill="'+c+'" opacity="0"/>';
     }
     s += '</g>';
   });
@@ -205,33 +354,47 @@ function renderStaff(){
   document.getElementById('staffWrap').innerHTML = s;
 }
 
-function chooseSlot(i){
-  chosenSlot = i;
-  renderStaff();
-  updateCheckBtn();
-}
-
 function updateCheckBtn(){
-  document.getElementById('checkBtn').disabled = !(chosenSlot !== null && chosenDuration);
+  document.getElementById('checkBtn').disabled = placedSlots.some(p => p===null);
 }
 
 function checkAnswer(){
   const feedback = document.getElementById('feedbackMsg');
-  const chosenNote = GAME_NOTES[chosenSlot];
-  const correctPitch = chosenNote.letter === targetNote.letter;
-  const correctDur = chosenDuration === targetDuration.id;
+  let allCorrect = true;
+  const lines = [];
 
-  if(correctPitch && correctDur){
-    feedback.textContent = '✓ Idealnie!';
+  placedSlots.forEach((p, i) => {
+    const t = targetSlots[i];
+    const label = targetSlots.length > 1 ? (i===0 ? 'Pierwsza — ' : 'Druga — ') : '';
+    const typeOk = p.type === t.type;
+    const durOk = p.durId === t.durId;
+    const checkPitch = t.type==='note' && focusMode==='pitch';
+    const pitchOk = !checkPitch || (p.letter === t.letter);
+
+    if(typeOk && durOk && pitchOk){
+      lines.push(label + '✓ świetnie!');
+      return;
+    }
+    allCorrect = false;
+    if(!typeOk){
+      lines.push(label + (p.type==='rest' ? 'tu miała być nuta, nie pauza.' : 'tu miała być pauza, nie nuta.'));
+    }else if(checkPitch && durOk && !pitchOk){
+      lines.push(label + 'dobra wartość rytmiczna! Ale spróbuj innej wysokości dźwięku.');
+    }else if(checkPitch && pitchOk && !durOk){
+      lines.push(label + 'dobra wysokość dźwięku! Ale spróbuj innej wartości rytmicznej.');
+    }else{
+      lines.push(label + 'jeszcze nie ta wartość rytmiczna — spróbuj ponownie.');
+    }
+  });
+
+  if(allCorrect){
+    feedback.textContent = lines.join('  ');
     feedback.className = 'feedback-msg ok';
     score++;
     document.getElementById('scoreVal').textContent = score;
-    setTimeout(nextRound, 800);
+    setTimeout(nextRound, 900);
   }else{
-    let msg = 'Prawie! ';
-    if(!correctPitch) msg += 'Zła wysokość dźwięku. ';
-    if(!correctDur) msg += 'Zła wartość rytmiczna.';
-    feedback.textContent = msg;
+    feedback.innerHTML = lines.join('<br>');
     feedback.className = 'feedback-msg bad';
   }
 }
@@ -241,10 +404,10 @@ function nextRound(){
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('feedbackMsg').className = 'feedback-msg';
   if(round >= TOTAL_ROUNDS){ showWin(); return; }
-  chosenSlot = null; chosenDuration = null;
   pickTask();
-  document.getElementById('taskText').innerHTML = 'Narysuj <b>'+targetDuration.nazwa+'</b> na dźwięku <b>'+targetNote.letter+'</b>';
-  renderDurationButtons();
+  document.getElementById('taskText').innerHTML = buildTaskText();
+  renderPalette();
+  renderPitchRow(false);
   renderStaff();
   updateCheckBtn();
 }
@@ -264,6 +427,8 @@ function restartGame(){
 }
 
 document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+document.querySelector('#focusRow .mode-btn[data-focus="'+focusMode+'"]').classList.add('active');
+document.querySelector('#elementRow .mode-btn[data-elem="'+elementMode+'"]').classList.add('active');
 restartGame();
 </script>
 </body>
