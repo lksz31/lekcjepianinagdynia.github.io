@@ -33,40 +33,13 @@
 
   /* ══ MIASTECZKO ══ */
   .city-wrap{max-width:1000px;margin:0 auto;padding:44px 4% 70px;}
-  .city-scene{position:relative;background:linear-gradient(to bottom,#bfdcf5 0%,#e8f3fc 55%,#d9ecd4 55%,#c3dfba 100%);border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(30,58,138,0.16);border:1px solid rgba(30,58,138,0.08);}
-  .city-sun{position:absolute;top:22px;right:34px;width:52px;height:52px;border-radius:50%;background:radial-gradient(circle,#fff6d8,var(--gold));box-shadow:0 0 30px rgba(212,175,55,0.5);}
-  .city-cloud{position:absolute;background:rgba(255,255,255,0.85);border-radius:50px;filter:blur(0.5px);}
-  .city-cloud::before,.city-cloud::after{content:'';position:absolute;background:rgba(255,255,255,0.85);border-radius:50%;}
-  .cloud1{width:70px;height:22px;top:38px;left:8%;}
-  .cloud1::before{width:34px;height:34px;top:-16px;left:8px;}
-  .cloud1::after{width:26px;height:26px;top:-10px;left:36px;}
-  .cloud2{width:56px;height:18px;top:70px;left:32%;opacity:0.8;}
-  .cloud2::before{width:26px;height:26px;top:-12px;left:6px;}
-  .cloud2::after{width:20px;height:20px;top:-8px;left:28px;}
-
-  .buildings-row{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:clamp(6px,1.6vw,18px);padding:130px 3% 0;z-index:2;flex-wrap:nowrap;overflow-x:auto;}
-  .building{position:relative;cursor:pointer;flex-shrink:0;width:clamp(64px,10.5vw,100px);border-radius:14px 14px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:14px;transition:transform 0.25s cubic-bezier(0.2,0.8,0.2,1),filter 0.25s;border:2px solid rgba(0,0,0,0.06);border-bottom:none;}
-  .building:hover{transform:translateY(-8px);}
-  .building:hover .b-label{opacity:1;transform:translateY(0);}
-  .b-icon{font-size:clamp(1.5rem,3.6vw,2.1rem);filter:drop-shadow(0 2px 3px rgba(0,0,0,0.15));}
-  .b-num{position:absolute;top:6px;left:8px;font-family:'Nunito',sans-serif;font-weight:900;font-size:0.62rem;color:rgba(255,255,255,0.75);}
-  .b-windows{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:10px;padding:0 8px;}
-  .b-windows span{width:8px;height:8px;background:rgba(255,255,255,0.55);border-radius:2px;}
-  .b-label{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:var(--navy);color:white;font-size:0.68rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.2);}
+  .map-scene{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(30,58,138,0.16);border:1px solid rgba(30,58,138,0.08);line-height:0;}
+  .map-scene img{width:100%;display:block;}
+  .hotspot{position:absolute;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;}
+  .hotspot:hover{background:radial-gradient(ellipse,rgba(255,255,255,0.3),transparent 70%);}
+  .hotspot:hover .b-label{opacity:1;transform:translateX(-50%) translateY(0);}
+  .b-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:var(--navy);color:white;font-size:0.7rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
   .b-label::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);}
-  .b-lock{position:absolute;top:6px;right:8px;font-size:0.85rem;}
-  .building.b1{height:150px;background:linear-gradient(180deg,#f0d060,var(--gold));}
-  .building.b2{height:120px;background:linear-gradient(180deg,#8fb8f5,#4d7fd8);}
-  .building.b3{height:170px;background:linear-gradient(180deg,#f5a3a3,#e35c5c);}
-  .building.b4{height:100px;background:linear-gradient(180deg,#c9a876,#a5794a);border-radius:50% 50% 14px 14px / 60% 60% 14px 14px;}
-  .building.b5{height:140px;background:linear-gradient(180deg,#f5b56b,#e08a2e);}
-  .building.b6{height:160px;background:linear-gradient(180deg,#a3d9c9,#4fae8e);}
-  .building.b7{height:130px;background:linear-gradient(180deg,#c3a3e0,#8b5cc7);}
-  .building.soon{filter:grayscale(0.35) brightness(0.92);}
-  .b-roof{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-bottom:16px solid #6b4a2e;}
-  .building.b4 .b-roof{display:none;}
-
-  .street{height:16px;background:linear-gradient(180deg,#b5a894,#9c8d76);position:relative;z-index:1;}
 
   .city-legend{text-align:center;color:var(--text-mid);font-size:0.8rem;margin-top:18px;}
 
@@ -134,70 +107,17 @@
 </section>
 
 <div class="city-wrap">
-  <div class="city-scene">
-    <div class="city-sun"></div>
-    <div class="city-cloud cloud1"></div>
-    <div class="city-cloud cloud2"></div>
-
-    <div class="buildings-row">
-      <div class="building b1" onclick="openGame(1)">
-        <div class="b-roof"></div>
-        <span class="b-num">1</span>
-        <div class="b-icon">🎯</div>
-        <div class="b-windows"><span></span><span></span><span></span><span></span></div>
-        <div class="b-label">Dopasuj nutkę</div>
-      </div>
-
-      <div class="building b2" onclick="openGame(2)">
-        <div class="b-roof"></div>
-        <span class="b-num">2</span>
-        <div class="b-icon">✏️</div>
-        <div class="b-windows"><span></span><span></span></div>
-        <div class="b-label">Umieść nutę</div>
-      </div>
-
-      <div class="building b3" onclick="openGame(3)">
-        <div class="b-roof"></div>
-        <span class="b-num">3</span>
-        <div class="b-icon">⭕</div>
-        <div class="b-windows"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-        <div class="b-label">Zaznacz nutę</div>
-      </div>
-
-      <div class="building b4" onclick="openGame(4)">
-        <span class="b-num">4</span>
-        <div class="b-icon">🐶</div>
-        <div class="b-label">Piesek i nuty</div>
-      </div>
-
-      <div class="building b5" onclick="openGame(5)">
-        <div class="b-roof"></div>
-        <span class="b-num">5</span>
-        <div class="b-icon">✉️</div>
-        <div class="b-windows"><span></span><span></span><span></span></div>
-        <div class="b-label">List nutami</div>
-      </div>
-
-      <div class="building b6" onclick="openGame(6)">
-        <div class="b-roof"></div>
-        <span class="b-num">6</span>
-        <div class="b-icon">🧩</div>
-        <div class="b-windows"><span></span><span></span><span></span><span></span></div>
-        <div class="b-label">Klucz z puzzli</div>
-      </div>
-
-      <div class="building b7" onclick="openGame(7)">
-        <div class="b-roof"></div>
-        <span class="b-num">7</span>
-        <div class="b-icon">🔗</div>
-        <div class="b-windows"><span></span><span></span></div>
-        <div class="b-label">Dopasuj nazwę</div>
-      </div>
-    </div>
-
-    <div class="street"></div>
+  <div class="map-scene">
+    <img src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
+    <button class="hotspot" style="left:15%;top:30%;width:12%;height:30%;" onclick="openGame(1)" aria-label="Dopasuj nutkę do literki"><span class="b-label">Dopasuj nutkę</span></button>
+    <button class="hotspot" style="left:30%;top:26%;width:9%;height:42%;" onclick="openGame(2)" aria-label="Umieść nutę"><span class="b-label">Umieść nutę</span></button>
+    <button class="hotspot" style="left:35%;top:17%;width:13%;height:30%;" onclick="openGame(3)" aria-label="Zaznacz właściwą nutę"><span class="b-label">Zaznacz nutę</span></button>
+    <button class="hotspot" style="left:46%;top:38%;width:12%;height:28%;" onclick="openGame(4)" aria-label="Piesek i nuty"><span class="b-label">Piesek i nuty</span></button>
+    <button class="hotspot" style="left:56%;top:35%;width:12%;height:30%;" onclick="openGame(5)" aria-label="Napisz list nutami"><span class="b-label">List nutami</span></button>
+    <button class="hotspot" style="left:65%;top:22%;width:13%;height:31%;" onclick="openGame(6)" aria-label="Ułóż klucz wiolinowy"><span class="b-label">Klucz z puzzli</span></button>
+    <button class="hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="openGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="b-label">Dopasuj nazwę</span></button>
   </div>
-  <p class="city-legend">Wszystkie siedem budynków gotowe do zwiedzania! 🎉</p>
+  <p class="city-legend">Kliknij w domek, żeby zagrać! 🎉</p>
 </div>
 
 <footer class="site-footer">
