@@ -214,7 +214,11 @@ function clampP(p){
 }
 
 /* ── Strzałki ▲▼ – przesuwanie nuty krok po kroku ── */
+let lastNudgeTs=0;
 function nudgePlace(delta){
+  const now=Date.now();
+  if(now-lastNudgeTs<150)return;
+  lastNudgeTs=now;
   if(mode!=='place'||!placeTargetNote)return;
   const pool2=getPlacePool();
   const filteredPool=(clef==='both'&&placeInteractClef)?pool2.filter(n=>n.ct===placeInteractClef):pool2;

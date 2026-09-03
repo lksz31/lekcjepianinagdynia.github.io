@@ -358,7 +358,7 @@ body.kid-mode .ctrl-div{background:linear-gradient(90deg,transparent,#ffb3d9,tra
 
 /* ══ STRZAŁKI ▲▼ – tryb Place (przesuwanie nuty krok po kroku) ══ */
 .place-arrows-col{display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:6px;width:44px;flex-shrink:0;margin-left:6px;align-self:stretch;padding:4px 0;}
-.place-arrow-btn{background:white;border:2px solid var(--navy);color:var(--navy);border-radius:12px;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all 0.2s;width:100%;flex:1;display:flex;align-items:center;justify-content:center;min-height:36px;font-family:'Poppins',sans-serif;}
+.place-arrow-btn{background:white;border:2px solid var(--navy);color:var(--navy);border-radius:12px;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all 0.2s;width:100%;flex:1;display:flex;align-items:center;justify-content:center;min-height:36px;font-family:'Poppins',sans-serif;touch-action:manipulation;}
 .place-arrow-btn:hover{background:var(--navy);color:white;transform:scale(1.05);}
 .place-arrow-btn:active{transform:scale(0.92);}
 @media(max-width:500px){.place-arrows-col{width:36px;margin-left:4px;}.place-arrow-btn{font-size:0.95rem;min-height:30px;}}
