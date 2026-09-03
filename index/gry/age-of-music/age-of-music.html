@@ -129,7 +129,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#0d1a0d;font-family:
 
 <!-- LOADING -->
 <div id="loading-screen">
-  <img id="loading-img" src="/index/gry/Age_of_Music/ilustracje/concept_art/miniatura_2.png" alt="">
+  <img id="loading-img" src="/index/gry/age-of-music/ilustracje/concept-art/miniatura-2.png" alt="">
   <div id="loading-pct">0%</div>
   <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
 </div>
@@ -243,18 +243,18 @@ html,body{height:100%;width:100%;overflow:hidden;background:#0d1a0d;font-family:
 /* ════════════════════════════════
    PATHS
 ════════════════════════════════ */
-const BASE = '/index/gry/Age_of_Music/ilustracje/tales/';
+const BASE = '/index/gry/age-of-music/ilustracje/tales/';
 const SRC = {
-  drewno:      [1,2,3,4,5].map(i=>BASE+'drewno_'+i+'.png'),
-  kamien:      [1,2,3,4,5].map(i=>BASE+'kamień_'+i+'.png'),
-  tartak:      [1,2,3,4,5,6].map(i=>BASE+'tartak_'+i+'.png'),
-  kamieniolom: [1,2,3,4,5,6,7].map(i=>BASE+'kamieniołom_'+i+'.png'),
-  rynek:       [1,2,3,4,5,6].map(i=>BASE+'rynek_'+i+'.png'),
-  ratusz_p:    BASE+'ratusz_1.png',
-  ratusz_e:    BASE+'ratusz_2.png',
-  token_wood:  BASE+'drewno_token_1.png',
-  token_stone: BASE+'kamień_token_1.png',
-  token_gold:  BASE+'moneta_1.png',
+  drewno:      [1,2,3,4,5].map(i=>BASE+'drewno-'+i+'.png'),
+  kamien:      [1,2,3,4,5].map(i=>BASE+'kamien-'+i+'.png'),
+  tartak:      [1,2,3,4,5,6].map(i=>BASE+'tartak-'+i+'.png'),
+  kamieniolom: [1,2,3,4,5,6,7].map(i=>BASE+'kamieniolom-'+i+'.png'),
+  rynek:       [1,2,3,4,5,6].map(i=>BASE+'rynek-'+i+'.png'),
+  ratusz_p:    BASE+'ratusz-1.png',
+  ratusz_e:    BASE+'ratusz-2.png',
+  token_wood:  BASE+'drewno-token-1.png',
+  token_stone: BASE+'kamien-token-1.png',
+  token_gold:  BASE+'moneta-1.png',
 };
 const IMGS = {};
 function loadImg(src){ if(!src)return null; if(IMGS[src])return IMGS[src]; const im=new Image(); im.src=src; IMGS[src]=im; return im; }
