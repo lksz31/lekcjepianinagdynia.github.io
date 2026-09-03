@@ -260,6 +260,17 @@ const IMGS = {};
 function loadImg(src){ if(!src)return null; if(IMGS[src])return IMGS[src]; const im=new Image(); im.src=src; IMGS[src]=im; return im; }
 function imgReady(im){ return im&&im.complete&&im.naturalWidth>0; }
 function randFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+// Wybiera losowy wariant grafiki, ale nigdy nie powtarza ostatnio wylosowanego dla danego typu —
+// dzięki temu sąsiednie/kolejne budynki tego samego typu zawsze wyglądają inaczej.
+const lastVariant={};
+function pickVariant(kind){
+  const arr=SRC[kind]; if(!arr)return null;
+  if(!Array.isArray(arr)||arr.length<2) return Array.isArray(arr)?arr[0]:arr;
+  let choice;
+  do{ choice=randFrom(arr); } while(choice===lastVariant[kind]);
+  lastVariant[kind]=choice;
+  return choice;
+}
 
 /* ════════════════════════════════
    CONFIG
@@ -382,8 +393,8 @@ function initGame(){
       const terrain=Math.random()<0.55?'green':'gray';
       hexes[hexKey(q,r)]={
         q,r,terrain,owner:null,building:null,
-        terrainSrc:terrain==='green'?randFrom(SRC.drewno):randFrom(SRC.kamien),
-        prevTerrainSrc:null, buildingSrc:null,
+        terrainSrc:terrain==='green'?pickVariant('drewno'):pickVariant('kamien'),
+        prevTerrainSrc:null, buildingSrc:null, buildTargetSrc:null,
         claimProg:null,claimStart:null,
         buildProg:null,buildStart:null,buildType:null,
         introDelay:Math.random()*1200,
@@ -430,13 +441,19 @@ function initGame(){
   updateHUD();
 }
 
-function setBuilding(key,type,owner,init){
+function setBuilding(key,type,owner,init,preSrc){
   const h=hexes[key]; if(!h)return;
   h.owner=owner; h.building=type;
-  if(type==='sawmill')    {h.terrainSrc=randFrom(SRC.tartak);    h.terrain='green';}
-  else if(type==='quarry'){h.terrainSrc=randFrom(SRC.kamieniolom);h.terrain='gray';}
-  else if(type==='market'){h.terrainSrc=randFrom(SRC.rynek);}
+  if(type==='sawmill')    {h.terrainSrc=preSrc||pickVariant('tartak');    h.terrain='green';}
+  else if(type==='quarry'){h.terrainSrc=preSrc||pickVariant('kamieniolom');h.terrain='gray';}
+  else if(type==='market'){h.terrainSrc=preSrc||pickVariant('rynek');}
   else if(type==='townhall'){h.terrainSrc=owner==='player'?SRC.ratusz_p:SRC.ratusz_e;}
+}
+function targetSrcForType(type){
+  if(type==='sawmill')return pickVariant('tartak');
+  if(type==='quarry')return pickVariant('kamieniolom');
+  if(type==='market')return pickVariant('rynek');
+  return null;
 }
 
 /* ════════════════════════════════
@@ -513,27 +530,39 @@ function drawHex(key,ox,oy,now){
   drawSide(ctx,top[2],top[3],darken(sideBase,.30),isSel);
   drawSide(ctx,top[3],top[4],darken(sideBase,.38),isSel);
 
-  // Top surface — terrain PNG
+  // Top surface — terrain/budynek PNG (podczas budowy: stary teren płynnie
+  // zastępowany docelową grafiką budynku, żeby dokładnie było widać co powstaje)
   const xs=top.map(p=>p.x),ys=top.map(p=>p.y);
   const bx=Math.min(...xs),by=Math.min(...ys),bw=Math.max(...xs)-bx,bh=Math.max(...ys)-by;
-  const tImg=loadImg(h.terrainSrc);
-  if(imgReady(tImg)){
-    const sc=bw/tImg.naturalWidth;
-    const dw=tImg.naturalWidth*sc, dh=tImg.naturalHeight*sc;
-    ctx.drawImage(tImg, bx+(bw-dw)/2, by+bh-dh, dw, dh);
+  function drawTile(src,a){
+    const im=loadImg(src); if(!imgReady(im))return false;
+    const sc=bw/im.naturalWidth; const dw=im.naturalWidth*sc, dh=im.naturalHeight*sc;
+    const prevA=ctx.globalAlpha; ctx.globalAlpha=alpha*a;
+    ctx.drawImage(im, bx+(bw-dw)/2, by+bh-dh, dw, dh);
+    ctx.globalAlpha=prevA;
+    return true;
+  }
+  let baseDrawn;
+  if(h.buildProg!==null){
+    baseDrawn=drawTile(h.prevTerrainSrc,1);
+    if(h.buildTargetSrc) drawTile(h.buildTargetSrc,0.12+0.88*h.buildProg);
   } else {
+    baseDrawn=drawTile(h.terrainSrc,1);
+  }
+  if(!baseDrawn){
     ctx.beginPath(); top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
     ctx.closePath();
     ctx.fillStyle=h.terrain==='green'?'#1e4a14':'#222230'; ctx.fill();
   }
 
-  // Owner tint + selection
+  // Owner tint + selection — czytelne podbicie koloru dla każdego właściciela
   ctx.beginPath(); top.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.closePath();
-  if(h.owner==='enemy'){ctx.fillStyle='rgba(80,0,0,0.22)';ctx.fill();}
-  else if(!h.owner){ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fill();}
+  if(h.owner==='player'){ctx.fillStyle='rgba(40,170,40,0.16)';ctx.fill();}
+  else if(h.owner==='enemy'){ctx.fillStyle='rgba(80,0,0,0.24)';ctx.fill();}
+  else {ctx.fillStyle='rgba(0,0,0,0.15)';ctx.fill();}
   if(isSel){ctx.fillStyle='rgba(240,208,60,0.14)';ctx.fill();}
-  ctx.strokeStyle=isSel?'#f0d060':h.owner==='player'?'rgba(50,140,30,.7)':h.owner==='enemy'?'rgba(140,30,10,.7)':'rgba(30,50,15,.4)';
-  ctx.lineWidth=isSel?2.2:0.8; ctx.stroke();
+  ctx.strokeStyle=isSel?'#f0d060':h.owner==='player'?'rgba(70,220,70,.9)':h.owner==='enemy'?'rgba(220,60,30,.9)':'rgba(30,50,15,.4)';
+  ctx.lineWidth=isSel?2.6:h.owner?1.8:0.8; ctx.stroke();
 
   // Build/resource icon (small, semi-transparent)
   if(showBuildIcons && h.building && h.building!=='townhall' && h.building!=='sawmill' && h.building!=='quarry'){
@@ -548,12 +577,16 @@ function drawHex(key,ox,oy,now){
     }
   }
 
-  // Owner dot (NE corner)
+  // Owner dot (NE corner) — z delikatną poświatą dla lepszej widoczności
   if(h.owner){
     const dotX=top[1].x-2, dotY=top[1].y+4;
-    ctx.beginPath(); ctx.arc(dotX,dotY,5,0,Math.PI*2);
-    ctx.fillStyle=h.owner==='player'?'#48d058':'#d84040';
-    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.lineWidth=1.2; ctx.stroke();
+    const dotColor=h.owner==='player'?'#48d058':'#d84040';
+    const prevA=ctx.globalAlpha;
+    ctx.beginPath(); ctx.arc(dotX,dotY,9,0,Math.PI*2);
+    ctx.fillStyle=dotColor; ctx.globalAlpha=alpha*0.3; ctx.fill(); ctx.globalAlpha=prevA;
+    ctx.beginPath(); ctx.arc(dotX,dotY,6,0,Math.PI*2);
+    ctx.fillStyle=dotColor;
+    ctx.fill(); ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.lineWidth=1.4; ctx.stroke();
   }
 
   // Claim ring
@@ -561,10 +594,17 @@ function drawHex(key,ox,oy,now){
     ctx.beginPath(); ctx.arc(sx,sy,HS*.6,-Math.PI/2,-Math.PI/2+Math.PI*2*h.claimProg,false);
     ctx.strokeStyle='rgba(240,208,60,.85)'; ctx.lineWidth=3; ctx.stroke();
   }
-  // Build ring
+  // Build ring — duży, czytelny pierścień postępu budowy + ikona młotka na środku
   if(h.buildProg!==null){
-    ctx.beginPath(); ctx.arc(sx,sy,HS*.45,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
-    ctx.strokeStyle='rgba(80,200,80,.8)'; ctx.lineWidth=2.5; ctx.stroke();
+    const rr=HS*.5;
+    ctx.beginPath(); ctx.arc(sx,sy,rr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.lineWidth=6; ctx.stroke();
+    ctx.beginPath(); ctx.arc(sx,sy,rr,-Math.PI/2,-Math.PI/2+Math.PI*2*h.buildProg,false);
+    ctx.strokeStyle='#f0d060'; ctx.lineWidth=6; ctx.lineCap='round'; ctx.stroke(); ctx.lineCap='butt';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='16px serif';
+    ctx.fillStyle='rgba(0,0,0,.65)'; ctx.fillText('🔨', sx+1, sy+2);
+    ctx.fillStyle='#fff6d8'; ctx.fillText('🔨', sx, sy+1);
   }
   // Townhall timer ring
   if(h.building==='townhall'&&h.owner==='player'){
@@ -799,13 +839,14 @@ function startBuild(key,type){
   else if(type==='quarry'){if(stone<CFG.buildQuarryStone||wood<CFG.buildQuarryWood)return;stone-=CFG.buildQuarryStone;wood-=CFG.buildQuarryWood;}
   else if(type==='market'){if(gold<CFG.buildMarketGold)return;gold-=CFG.buildMarketGold;}
   h.prevTerrainSrc=h.terrainSrc;
+  h.buildTargetSrc=targetSrcForType(type);
   h.buildType=type;h.buildStart=Date.now();h.buildProg=0;
   updateHUD();showHexInfo(key);
 }
 function completeBuild(key){
   const h=hexes[key];if(h.buildProg===null)return;
-  setBuilding(key,h.buildType,h.owner,false);
-  h.buildProg=null;h.buildStart=null;h.buildType=null;
+  setBuilding(key,h.buildType,h.owner,false,h.buildTargetSrc);
+  h.buildProg=null;h.buildStart=null;h.buildType=null;h.buildTargetSrc=null;h.prevTerrainSrc=null;
   showHexInfo(key);
 }
 function dismantleBuilding(key){
@@ -815,7 +856,7 @@ function dismantleBuilding(key){
   else if(h.building==='quarry'){stone+=Math.floor(CFG.buildQuarryStone*CFG.dismantleReturn);wood+=Math.floor(CFG.buildQuarryWood*CFG.dismantleReturn);}
   else if(h.building==='market') gold+=Math.floor(CFG.buildMarketGold*CFG.dismantleReturn);
   h.building=null;
-  h.terrainSrc=h.prevTerrainSrc||(h.terrain==='green'?randFrom(SRC.drewno):randFrom(SRC.kamien));
+  h.terrainSrc=h.terrain==='green'?pickVariant('drewno'):pickVariant('kamien');
   h.buildingSrc=null;
   updateHUD();showHexInfo(key);
 }
