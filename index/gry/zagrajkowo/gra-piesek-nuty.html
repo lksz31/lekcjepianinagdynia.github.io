@@ -21,19 +21,20 @@
   .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
 
-  .path-card{background:url('/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/pies-buda-mapa.webp') center/cover no-repeat;border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.15);padding:24px 18px;max-width:640px;width:100%;}
-  .path-row{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;position:relative;}
-  .stone{position:relative;width:56px;height:56px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.2);}
-  .stone:hover:not(.done){border-color:var(--gold);transform:translateY(-3px);}
-  .stone .s-letter{font-weight:900;font-size:1.15rem;color:var(--navy);}
+  .path-card{background:url('/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/pies-buda-mapa.webp') center/cover no-repeat;border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.15);max-width:820px;width:100%;aspect-ratio:1433/736;position:relative;overflow:hidden;}
+  .path-row{position:absolute;inset:0;}
+  .stone{position:absolute;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.25);}
+  .stone:hover:not(.done){border-color:var(--gold);transform:translate(-50%,-50%) translateY(-3px);}
+  .stone .s-letter{font-weight:900;font-size:1.1rem;color:var(--navy);}
   .stone.done{background:#f0fdf4;border-color:var(--green);opacity:0.55;}
   .stone.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
-  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
-  .dog-marker{position:absolute;width:52px;height:44px;top:-42px;transition:left 0.55s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;}
+  @keyframes shake{0%,100%{transform:translate(-50%,-50%) translateX(0);}20%{transform:translate(-50%,-50%) translateX(-6px);}40%{transform:translate(-50%,-50%) translateX(6px);}60%{transform:translate(-50%,-50%) translateX(-4px);}80%{transform:translate(-50%,-50%) translateX(4px);}}
+  .doghouse-slot{background:transparent;border:none;box-shadow:none;width:64px;height:64px;cursor:default;}
+  .doghouse-slot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 5px rgba(0,0,0,0.35));}
+  .dog-marker{position:absolute;width:46px;height:40px;transform:translate(-50%,-100%);transition:left 0.55s cubic-bezier(0.3,0.8,0.3,1),top 0.55s cubic-bezier(0.3,0.8,0.3,1);pointer-events:none;}
   .dog-marker img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.3));}
   .dog-marker.hopping img{animation:dogHop 0.55s ease;}
-  @keyframes dogHop{0%{transform:translateY(0);}45%{transform:translateY(-28px);}100%{transform:translateY(0);}}
-  .doghouse{font-size:2rem;}
+  @keyframes dogHop{0%{transform:translateY(0);}45%{transform:translateY(-24px);}100%{transform:translateY(0);}}
 
   .feedback-msg{min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;}
   .feedback-msg.ok{color:var(--green);}
@@ -101,30 +102,38 @@ function pickPath(){
 
 const DOG_DIR = '/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/';
 
+/* Punkty (%, %) rozłożone wzdłuż wydeptanej dróżki na mapie */
+const PATH_WAYPOINTS = [
+  {left:23, top:58}, {left:31, top:44}, {left:40, top:36}, {left:50, top:32},
+  {left:60, top:35}, {left:68, top:44}, {left:75, top:34}
+];
+const DOGHOUSE_POS = {left:87, top:19};
+const START_POS = {left:13, top:64};
+
 function renderPath(){
   const row = document.getElementById('pathRow');
-  let html = '<div class="dog-marker" id="dogMarker" style="left:0px;"><img id="dogImg" src="'+DOG_DIR+'pies-skok-4.webp" alt="piesek"></div>';
+  let html = '<div class="dog-marker" id="dogMarker" style="left:'+START_POS.left+'%;top:'+START_POS.top+'%;"><img id="dogImg" src="'+DOG_DIR+'pies-skok-4.webp" alt="piesek"></div>';
   path.forEach((n, i) => {
-    html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" onclick="tryStone('+i+')">'
+    const wp = PATH_WAYPOINTS[i];
+    html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" style="left:'+wp.left+'%;top:'+wp.top+'%;" onclick="tryStone('+i+')">'
       + '<span class="s-letter">'+n.letter+'</span></div>';
   });
-  html += '<div class="stone doghouse-slot"><span class="doghouse">🏠</span></div>';
+  html += '<div class="stone doghouse-slot" style="left:'+DOGHOUSE_POS.left+'%;top:'+DOGHOUSE_POS.top+'%;"><img src="'+DOG_DIR+'buda-pies.webp" alt="Buda"></div>';
   row.innerHTML = html;
   positionDog();
 }
 
-function computeDogLeft(){
-  const stones = document.querySelectorAll('.stone:not(.doghouse-slot)');
-  if(nextIndex >= stones.length){
-    const house = document.querySelector('.doghouse-slot');
-    return house.offsetLeft;
-  }
-  const target = document.querySelectorAll('.stone')[Math.max(0,nextIndex-1)] || document.querySelectorAll('.stone')[0];
-  return nextIndex===0 ? 0 : target.offsetLeft;
+function computeDogPos(){
+  if(nextIndex === 0) return START_POS;
+  if(nextIndex >= PATH_WAYPOINTS.length) return DOGHOUSE_POS;
+  return PATH_WAYPOINTS[nextIndex-1];
 }
 
 function positionDog(){
-  document.getElementById('dogMarker').style.left = computeDogLeft() + 'px';
+  const pos = computeDogPos();
+  const marker = document.getElementById('dogMarker');
+  marker.style.left = pos.left+'%';
+  marker.style.top = pos.top+'%';
 }
 
 function setDogFrame(n){
@@ -133,14 +142,15 @@ function setDogFrame(n){
 
 function animateDogHop(onDone){
   const marker = document.getElementById('dogMarker');
-  const targetLeft = computeDogLeft();
+  const target = computeDogPos();
 
   setDogFrame(1);
   marker.classList.add('hopping');
 
   setTimeout(()=>{
     setDogFrame(2);
-    marker.style.left = targetLeft + 'px';
+    marker.style.left = target.left+'%';
+    marker.style.top = target.top+'%';
   }, 90);
 
   setTimeout(()=> setDogFrame(3), 320);
