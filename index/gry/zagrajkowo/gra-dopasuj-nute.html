@@ -116,7 +116,7 @@ function renderStaff(note){
   const staffTop = 40;
   const c = '#1e3a8a';
 
-  let s = `<svg id="noteSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="touch-action:none;">`;
+  let s = `<svg id="noteSvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="touch-action:none;overflow:visible;">`;
 
   for(let i=0;i<5;i++){
     const ly = staffTop + i*sg;

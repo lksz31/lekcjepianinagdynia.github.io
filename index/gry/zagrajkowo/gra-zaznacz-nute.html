@@ -17,7 +17,12 @@
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
-  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:24px;}
+  .game-area{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:24px;}
+
+  .wrong-watermark{position:fixed;bottom:22px;right:22px;z-index:1;width:70px;height:70px;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0.8);transition:opacity 0.4s,transform 0.4s;pointer-events:none;}
+  .wrong-watermark.show{opacity:0.3;transform:scale(1);}
+  .wrong-watermark .wm-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.4rem;color:var(--red);}
+  .wrong-watermark .wm-x{position:absolute;font-size:3.2rem;font-weight:900;color:var(--red);}
 
   .target-box{background:var(--navy);color:white;border-radius:16px;padding:14px 30px;text-align:center;}
   .target-box .t-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);}
@@ -48,6 +53,8 @@
 </div>
 
 <div class="game-area">
+  <div class="wrong-watermark" id="wrongWatermark"></div>
+
   <div class="target-box">
     <div class="t-label">Znajdź na pięciolinii</div>
     <div class="t-letter" id="targetLetter">C</div>
@@ -82,8 +89,11 @@ const GAME_NOTES = [
   {id:'h1', letter:'H', staffY:4},
 ];
 
+const FLOWERS = ['aster.png','dzwonek.png','frezja.png','gerbera.png','groszek-pachnacy.png','hibiskus.png','lilia.png','mak.png','ostrozen.png','piwonia.png','roza.png','slonecznik.png','stokrotka.png','szafirek.png','tulipan.png'];
+const BEE_URL = '/index/fiszki/concept-art/pszczola.png';
+
 const TOTAL_ROUNDS = 10;
-let round = 0, score = 0, targetNote = null, roundOrder = [];
+let round = 0, score = 0, targetNote = null, roundOrder = [], roundLocked = false;
 
 function shuffled(arr){
   const a = arr.slice();
@@ -94,8 +104,11 @@ function shuffled(arr){
   return a;
 }
 
+let STAFF_W = 520, STAFF_H = 200;
+
 function renderStaff(order, target){
   const W = 520, H = 200;
+  STAFF_W = W; STAFF_H = H;
   const sg = 16;
   const staffTop = 40;
   const c = '#1e3a8a';
@@ -139,7 +152,7 @@ function renderStaff(order, target){
     const sx = stemUp ? noteX+9 : noteX-9;
     const sy2 = stemUp ? noteY-42 : noteY+42;
 
-    s += `<g class="note-hit" data-letter="${note.letter}" data-idx="${i}">`;
+    s += `<g class="note-hit" data-letter="${note.letter}" data-idx="${i}" data-nx="${noteX}" data-ny="${noteY}">`;
     s += `<rect x="${noteX-16}" y="${Math.min(noteY,sy2)-10}" width="32" height="${Math.abs(sy2-noteY)+20}" fill="transparent"/>`;
     s += `<circle id="circleMark-${i}" cx="${noteX}" cy="${noteY}" r="16" fill="none" stroke="${'#16a34a'}" stroke-width="3" opacity="0"/>`;
     s += `<ellipse cx="${noteX}" cy="${noteY}" rx="11" ry="8" fill="#d4af37" stroke="#8a6d1a" stroke-width="1" transform="rotate(-15,${noteX},${noteY})"/>`;
@@ -155,24 +168,108 @@ function renderStaff(order, target){
   });
 }
 
+function flyAwayAsBee(noteEl, noteX, noteY){
+  noteEl.style.pointerEvents = 'none';
+  noteEl.querySelectorAll('ellipse,line').forEach(function(el){
+    el.style.transition = 'opacity 0.35s';
+    el.style.opacity = '0';
+  });
+
+  const svg = document.getElementById('staffSvg');
+  const bee = document.createElementNS('http://www.w3.org/2000/svg','image');
+  const bw = 24, bh = 24;
+  bee.setAttribute('href', BEE_URL);
+  bee.setAttribute('width', bw);
+  bee.setAttribute('height', bh);
+  bee.setAttribute('x', -bw/2);
+  bee.setAttribute('y', -bh/2);
+  bee.setAttribute('transform', 'translate('+noteX+','+noteY+')');
+  bee.style.transition = 'transform 1.1s cubic-bezier(0.3,0.7,0.3,1)';
+  svg.appendChild(bee);
+
+  const goRight = noteX > STAFF_W/2;
+  const edgeX = goRight ? STAFF_W + 30 : -30;
+  const edgeY = Math.max(20, Math.min(STAFF_H - 20, noteY + (Math.random()*50 - 25)));
+
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      bee.setAttribute('transform', 'translate('+edgeX+','+edgeY+') scale(1.15)');
+    });
+  });
+
+  setTimeout(function(){
+    bee.remove();
+    spawnFlower(goRight ? STAFF_W - 16 : 16, edgeY);
+  }, 1100);
+}
+
+function spawnFlower(x, y){
+  const svg = document.getElementById('staffSvg');
+  if(!svg) return;
+  const flower = FLOWERS[Math.floor(Math.random()*FLOWERS.length)];
+  const fs = 22 + Math.round(Math.random()*8);
+  const img = document.createElementNS('http://www.w3.org/2000/svg','image');
+  img.setAttribute('href', '/index/fiszki/concept-art/'+flower);
+  img.setAttribute('width', fs);
+  img.setAttribute('height', fs);
+  img.setAttribute('x', -fs/2);
+  img.setAttribute('y', -fs/2);
+  img.setAttribute('transform', 'translate('+x+','+y+') scale(0)');
+  img.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+  svg.appendChild(img);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      img.setAttribute('transform', 'translate('+x+','+y+') scale(1)');
+    });
+  });
+}
+
+function showWrongWatermark(letter){
+  const wm = document.getElementById('wrongWatermark');
+  wm.innerHTML = '<span class="wm-letter">'+letter+'</span><span class="wm-x">✕</span>';
+  wm.classList.add('show');
+}
+
+function hideWrongWatermark(){
+  const wm = document.getElementById('wrongWatermark');
+  wm.classList.remove('show');
+  wm.innerHTML = '';
+}
+
 function checkAnswer(letter, idx){
+  if(roundLocked) return;
+  roundLocked = true;
   const feedback = document.getElementById('feedbackMsg');
-  if(letter === targetNote.letter){
-    document.getElementById('circleMark-'+idx).setAttribute('opacity','1');
+  const correct = (letter === targetNote.letter);
+
+  document.querySelectorAll('.note-hit').forEach(function(el){
+    if(el.dataset.letter !== targetNote.letter){
+      const nx = parseFloat(el.dataset.nx), ny = parseFloat(el.dataset.ny);
+      flyAwayAsBee(el, nx, ny);
+    }
+  });
+
+  const targetEl = document.querySelector('.note-hit[data-letter="'+targetNote.letter+'"]');
+  if(targetEl) targetEl.querySelector('circle[id^="circleMark-"]').setAttribute('opacity','1');
+
+  if(correct){
     feedback.textContent = '✓ Dokładnie to! Dźwięk ' + letter + '.';
     feedback.className = 'feedback-msg ok';
     score++;
     document.getElementById('scoreVal').textContent = score;
-    setTimeout(nextRound, 800);
   }else{
-    feedback.textContent = 'To nie ' + targetNote.letter + ' — spróbuj jeszcze raz.';
+    showWrongWatermark(letter);
+    feedback.textContent = 'To nie ' + letter + ' — dobra nuta to ' + targetNote.letter + '.';
     feedback.className = 'feedback-msg bad';
-    setTimeout(()=>{feedback.textContent='';feedback.className='feedback-msg';}, 900);
   }
+
+  setTimeout(nextRound, 1500);
 }
 
 function nextRound(){
   round++;
+  roundLocked = false;
+  hideWrongWatermark();
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('feedbackMsg').className = 'feedback-msg';
   if(round >= TOTAL_ROUNDS){ showWin(); return; }

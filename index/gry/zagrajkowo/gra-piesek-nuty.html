@@ -26,7 +26,6 @@
   .stone{position:relative;width:56px;height:56px;border-radius:14px;background:#f8fafc;border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;}
   .stone:hover:not(.done){border-color:var(--gold);transform:translateY(-3px);}
   .stone .s-letter{font-weight:900;font-size:1.15rem;color:var(--navy);}
-  .stone .s-oct{font-size:0.6rem;color:var(--text-mid);}
   .stone.done{background:#f0fdf4;border-color:var(--green);opacity:0.55;}
   .stone.wrong-flash{border-color:var(--red);background:#fef2f2;animation:shake 0.4s;}
   @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(6px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
@@ -70,25 +69,17 @@
 </div>
 
 <script>
-/* Nuty z dwóch oktaw (jak w notes.js) — pełny zakres do sekwencjonowania */
 const ALL_NOTES = [
-  {letter:'c', oct:1, rank:1},
-  {letter:'d', oct:1, rank:2},
-  {letter:'e', oct:1, rank:3},
-  {letter:'f', oct:1, rank:4},
-  {letter:'g', oct:1, rank:5},
-  {letter:'a', oct:1, rank:6},
-  {letter:'h', oct:1, rank:7},
-  {letter:'c', oct:2, rank:8},
-  {letter:'d', oct:2, rank:9},
-  {letter:'e', oct:2, rank:10},
-  {letter:'f', oct:2, rank:11},
-  {letter:'g', oct:2, rank:12},
-  {letter:'a', oct:2, rank:13},
-  {letter:'h', oct:2, rank:14},
+  {letter:'c', rank:1},
+  {letter:'d', rank:2},
+  {letter:'e', rank:3},
+  {letter:'f', rank:4},
+  {letter:'g', rank:5},
+  {letter:'a', rank:6},
+  {letter:'h', rank:7},
 ];
 
-const PATH_LEN = 10;
+const PATH_LEN = 7;
 let path = [], nextIndex = 0;
 
 function shuffled(arr){
@@ -110,7 +101,7 @@ function renderPath(){
   let html = '<div class="dog-marker" id="dogMarker" style="left:0px;">🐶</div>';
   path.forEach((n, i) => {
     html += '<div class="stone" data-idx="'+i+'" data-rank="'+n.rank+'" onclick="tryStone('+i+')">'
-      + '<span class="s-letter">'+n.letter+'</span><span class="s-oct">'+(n.oct===1?'\u00b9':'\u00b2')+'</span></div>';
+      + '<span class="s-letter">'+n.letter+'</span></div>';
   });
   html += '<div class="stone doghouse-slot"><span class="doghouse">🏠</span></div>';
   row.innerHTML = html;
@@ -145,7 +136,7 @@ function tryStone(i){
     stoneEl.classList.add('done');
     nextIndex++;
     document.getElementById('scoreVal').textContent = nextIndex;
-    feedback.textContent = '✓ Dobrze! ' + path[i].letter + (path[i].oct===1?'¹':'²');
+    feedback.textContent = '✓ Dobrze! ' + path[i].letter;
     feedback.className = 'feedback-msg ok';
     positionDog();
     if(nextIndex >= path.length){
