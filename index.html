@@ -354,6 +354,10 @@
   .apple-card.active{opacity:1;transform:translateY(0);}
   .apple-card-title{font-family:'Playfair Display',serif;text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);color:var(--gold);margin-bottom:14px;}
   .apple-card-sub{color:rgba(255,255,255,0.75);font-size:0.95rem;line-height:1.7;max-width:420px;margin:0 auto;}
+  .apple-card-instruments{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:20px auto 4px;max-width:420px;}
+  .apple-instrument{flex:1;min-width:130px;max-width:170px;background:rgba(255,255,255,0.07);border-radius:16px;padding:10px;}
+  .apple-instrument img{width:100%;height:auto;border-radius:10px;background:#fff;object-fit:contain;display:block;}
+  .apple-instrument span{display:block;margin-top:8px;font-size:0.7rem;color:rgba(255,255,255,0.7);font-weight:600;}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.7);}70%{box-shadow:0 0 0 15px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
   .btn-open-form{display:block;width:fit-content;margin:30px auto 0;background:var(--gold);color:var(--navy);padding:16px 44px;border-radius:50px;font-weight:800;border:none;cursor:pointer;text-decoration:none;font-family:'Poppins',sans-serif;font-size:0.95rem;animation:pulse 2s infinite;transition:transform 0.3s;}
   .btn-open-form:hover{transform:scale(1.05);}
@@ -871,6 +875,11 @@
     <div class="apple-card" id="appleLocation">
       <h2 class="apple-card-title">Poproś o kontakt</h2>
       <p class="apple-card-sub">Nie widzisz pasującej godziny w kalendarzu poniżej albo wolisz, żebym się do Ciebie odezwał? Zostaw swoje dane — skontaktuję się, żeby ustalić termin.</p>
+      <p class="apple-card-sub" style="margin-top:10px;">Nie potrzebujesz własnego instrumentu — mogę dowieźć pianino do ucznia.</p>
+      <div class="apple-card-instruments">
+        <div class="apple-instrument"><img src="/index/lekcje/grafiki-materialy/zdjecia-dojazd-auto-pianino/roland-go-piano.webp" alt="Roland GO:PIANO88PX" loading="lazy"><span>Roland GO:PIANO88PX</span></div>
+        <div class="apple-instrument"><img src="/index/lekcje/grafiki-materialy/zdjecia-dojazd-auto-pianino/yamaha-p-525.webp" alt="Yamaha P-525" loading="lazy"><span>Yamaha P-525</span></div>
+      </div>
       <button class="btn-open-form" onclick="toggleForm(true)">POPROŚ O KONTAKT</button>
     </div>
 
