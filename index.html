@@ -354,11 +354,6 @@
   .apple-card.active{opacity:1;transform:translateY(0);}
   .apple-card-title{font-family:'Playfair Display',serif;text-align:center;font-size:clamp(1.6rem,4vw,2.3rem);color:var(--gold);margin-bottom:14px;}
   .apple-card-sub{color:rgba(255,255,255,0.75);font-size:0.95rem;line-height:1.7;max-width:420px;margin:0 auto;}
-  .apple-card-banner{position:relative;width:100%;max-width:440px;height:190px;margin:22px auto 4px;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#0a1a42,#16326e);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.08);}
-  .apple-card-banner .banner-img{position:absolute;top:52%;left:50%;width:150%;max-width:none;height:auto;transform:translate(-50%,-50%);opacity:0;transition:opacity 1.6s ease;}
-  .apple-card-banner .banner-img.active{opacity:1;}
-  .apple-card-banner .banner-tagline{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;background:linear-gradient(180deg,rgba(8,16,50,0.08) 0%,rgba(8,16,50,0.72) 100%);color:#fff;font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;line-height:1.4;padding:0 22px;text-shadow:0 2px 14px rgba(0,0,0,0.65);pointer-events:none;}
-  @media(max-width:500px){.apple-card-banner{height:160px;}.apple-card-banner .banner-tagline{font-size:1.05rem;}}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.7);}70%{box-shadow:0 0 0 15px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
   .btn-open-form{display:block;width:fit-content;margin:30px auto 0;background:var(--gold);color:var(--navy);padding:16px 44px;border-radius:50px;font-weight:800;border:none;cursor:pointer;text-decoration:none;font-family:'Poppins',sans-serif;font-size:0.95rem;animation:pulse 2s infinite;transition:transform 0.3s;}
   .btn-open-form:hover{transform:scale(1.05);}
@@ -876,12 +871,6 @@
     <div class="apple-card" id="appleLocation">
       <h2 class="apple-card-title">Poproś o kontakt</h2>
       <p class="apple-card-sub">Nie widzisz pasującej godziny w kalendarzu poniżej albo wolisz, żebym się do Ciebie odezwał? Zostaw swoje dane — skontaktuję się, żeby ustalić termin.</p>
-      <p class="apple-card-sub" style="margin-top:10px;">Nie potrzebujesz własnego instrumentu — mogę dowieźć pianino do ucznia.</p>
-      <div class="apple-card-banner" id="instrumentBanner">
-        <img src="/index/lekcje/grafiki-materialy/zdjecia-dojazd-auto-pianino/roland-go-piano.webp" alt="Roland GO:PIANO88PX" class="banner-img active" loading="lazy">
-        <img src="/index/lekcje/grafiki-materialy/zdjecia-dojazd-auto-pianino/yamaha-p-525.webp" alt="Yamaha P-525" class="banner-img" loading="lazy">
-        <div class="banner-tagline">Teraz dowóz instrumentu<br>do Twojego domu!</div>
-      </div>
       <button class="btn-open-form" onclick="toggleForm(true)">POPROŚ O KONTAKT</button>
     </div>
 
@@ -1352,16 +1341,6 @@ function toggleForm(show){
   document.body.style.overflow=show?'hidden':'';
   if(show){document.getElementById('res-choice').style.display='block';document.getElementById('res-simple').style.display='none';document.getElementById('res-status').innerText='';}
 }
-(function(){
-  const imgs=document.querySelectorAll('#instrumentBanner .banner-img');
-  if(imgs.length<2)return;
-  let idx=0;
-  setInterval(()=>{
-    imgs[idx].classList.remove('active');
-    idx=(idx+1)%imgs.length;
-    imgs[idx].classList.add('active');
-  },4000);
-})();
 const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
 // "Poproś o kontakt" / "Umów lekcję" — prosty formularz kontaktowy z opcją
