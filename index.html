@@ -357,10 +357,15 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(212,175,55,0.7);}70%{box-shadow:0 0 0 15px rgba(212,175,55,0);}100%{box-shadow:0 0 0 0 rgba(212,175,55,0);}}
   .btn-open-form{display:block;width:fit-content;margin:30px auto 0;background:var(--gold);color:var(--navy);padding:16px 44px;border-radius:50px;font-weight:800;border:none;cursor:pointer;text-decoration:none;font-family:'Poppins',sans-serif;font-size:0.95rem;animation:pulse 2s infinite;transition:transform 0.3s;}
   .btn-open-form:hover{transform:scale(1.05);}
-  .form-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--card-bg);z-index:2200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;box-sizing:border-box;clip-path:circle(0% at 50% 90%);transition:clip-path 0.8s cubic-bezier(0.7,0,0.3,1);overflow-y:auto;pointer-events:none;}
-  .form-overlay.open{clip-path:circle(150% at 50% 90%);pointer-events:auto;}
+  .form-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2200;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity 0.3s;overflow-y:auto;}
+  .form-overlay.open{opacity:1;pointer-events:auto;}
   .close-btn{position:absolute;top:16px;right:20px;font-size:1.5rem;color:var(--navy);cursor:pointer;font-weight:bold;background:none;border:none;font-family:'Poppins',sans-serif;}
-  .form-content{width:100%;max-width:500px;text-align:center;color:var(--navy);}
+  .form-content{width:100%;max-width:480px;max-height:90vh;overflow-y:auto;text-align:center;color:var(--navy);background:var(--card-bg);border-radius:28px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);position:relative;box-sizing:border-box;}
+  .form-choice-btn{width:100%;background:var(--gold);color:#fff;border:none;padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;margin-bottom:10px;transition:0.2s;}
+  .form-choice-btn:hover{opacity:0.9;}
+  .form-choice-btn-outline{width:100%;background:transparent;color:var(--navy);border:1.5px solid var(--navy);padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
+  .form-choice-btn-outline:hover{background:rgba(30,58,138,0.06);}
+  .form-back-link{background:none;border:none;color:var(--text-mid);font-size:0.78rem;cursor:pointer;margin-top:12px;text-decoration:underline;font-family:'Poppins',sans-serif;}
   .price-tag{background:#f9fbfe;border:2px dashed var(--gold);border-radius:15px;padding:14px 10px;margin-bottom:15px;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
   .price-tag:hover{background:#fdf8ec;border-color:#e8c766;}
   .price-old{text-decoration:line-through;color:#94a3b8;font-size:1.05rem;font-weight:600;margin-right:8px;}
@@ -478,8 +483,8 @@
 
   .footer-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;padding:16px;}
   .footer-modal-overlay.open{opacity:1;pointer-events:all;}
-  .footer-modal{background:var(--card-bg);border-radius:28px;padding:36px;width:90%;max-width:680px;display:grid;grid-template-columns:1fr 1.2fr;gap:28px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;}
-  @media(max-width:600px){.footer-modal{grid-template-columns:1fr;padding:24px;}}
+  .footer-modal{background:var(--card-bg);border-radius:28px;padding:36px;width:90%;max-width:480px;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;overflow-y:auto;position:relative;box-sizing:border-box;}
+  @media(max-width:600px){.footer-modal{padding:24px;}}
   .footer-modal-overlay.open .footer-modal{transform:translateY(0);}
   .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;font-size:1.4rem;color:var(--navy);cursor:pointer;font-weight:bold;}
   .modal-left h3{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:0 0 14px;}
@@ -973,40 +978,28 @@
   </div>
 </section>
 
-<div class="form-overlay" id="formOverlay">
-  <button class="close-btn" onclick="toggleForm(false)">✕</button>
+<div class="form-overlay" id="formOverlay" onclick="if(event.target===this)toggleForm(false)">
   <div class="form-content">
-    <h3 style="margin-top:0;margin-bottom:10px;color:var(--navy);font-family:'Playfair Display',serif;">Szczegóły rezerwacji</h3>
-    <div class="price-tag" onclick="document.getElementById('res-name').focus();document.getElementById('res-name').scrollIntoView({behavior:'smooth',block:'center'});">
-      <span style="font-weight:800;font-size:1.4rem;color:var(--navy);" id="price-val">99 zł / h</span>
+    <button class="close-btn" onclick="toggleForm(false)">✕</button>
+    <h3 style="margin-top:0;margin-bottom:14px;color:var(--navy);font-family:'Playfair Display',serif;">Poproś o kontakt</h3>
+
+    <div id="res-choice">
+      <p style="font-size:0.85rem;color:var(--text-mid);line-height:1.6;margin:0 0 18px;">Chcesz najpierw zobaczyć wolne terminy w kalendarzu?</p>
+      <button class="form-choice-btn" onclick="formGoCalendar('desktop')">📅 Tak, pokaż wolne terminy</button>
+      <button class="form-choice-btn-outline" onclick="formShowSimple('desktop')">✉️ Nie, po prostu wyślę zapytanie</button>
     </div>
-    <div class="bento-grid">
-      <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-      <div class="form-tile" id="loc-uczen" onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-    </div>
-    <div id="piano-options">
-      <div class="bento-grid">
-        <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b><br><small>Standard</small></div>
-        <div class="form-tile" id="piano-no" onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu</small></div>
+
+    <div id="res-simple" style="display:none;">
+      <div class="contact-box">
+        <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()">
+        <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()">
+        <input type="email" id="res-email" placeholder="Adres email" oninput="val()">
+        <textarea id="res-msg" placeholder="Wiadomość (np. wiek ucznia, preferowane godziny...)"></textarea>
+        <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
       </div>
-      <div id="delivery-options" style="display:none;">
-        <p style="font-size:0.78rem;font-weight:700;margin:2px 0 8px;color:var(--navy);text-align:left;">Wybierz instrument do dowozu:</p>
-        <div class="bento-grid">
-          <div class="form-tile tile-silver selected" id="delivery-eco" onclick="setDelivery('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>10 zł</small></div>
-          <div class="form-tile tile-gold" id="delivery-premium" onclick="setDelivery('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>50 zł</small></div>
-        </div>
-        <div style="font-size:0.7rem;color:var(--text-mid);margin:-6px 0 14px;text-align:left;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
-      </div>
+      <button class="form-back-link" onclick="formBackToChoice('desktop')">← Wróć</button>
+      <div id="res-status" style="margin-top:12px;font-weight:600;font-size:0.85rem;"></div>
     </div>
-    <div class="contact-box">
-      <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()">
-      <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()">
-      <input type="email" id="res-email" placeholder="Adres email" oninput="val()">
-      <input type="text" id="res-rabat" placeholder="Kod rabatowy (opcjonalnie)" oninput="updatePrice()">
-      <textarea id="res-msg" placeholder="Dodatkowe informacje (wiek, doświadczenie, preferowane godziny...)"></textarea>
-      <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
-    </div>
-    <div id="res-status" style="margin-top:12px;font-weight:600;font-size:0.85rem;"></div>
   </div>
 </div>
 
@@ -1250,38 +1243,24 @@
 <div class="footer-modal-overlay" id="bookingModal" onclick="if(event.target===this)closeBookingModal()">
   <div class="footer-modal">
     <button class="modal-close" onclick="closeBookingModal()">✕</button>
-    <div class="modal-left">
-      <h3>Umów lekcję</h3>
-      <div class="modal-price" onclick="document.getElementById('m-name').focus();document.getElementById('m-name').scrollIntoView({behavior:'smooth',block:'center'});">
-        <span id="m-price">99 zł / h</span>
-      </div>
-      <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
-      <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-      <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-      <div id="m-piano-box">
-        <p style="font-size:0.8rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Czy masz pianino?</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="m-tile selected" id="m-p-y" onclick="mSetPiano(true)" style="margin:0;"><b>Mam</b></div>
-          <div class="m-tile" id="m-p-n" onclick="mSetPiano(false)" style="margin:0;"><b>Nie mam</b></div>
-        </div>
-        <div id="m-delivery-options" style="display:none;">
-          <p style="font-size:0.76rem;font-weight:700;margin:12px 0 8px;color:var(--navy);">Wybierz instrument do dowozu:</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div class="m-tile tile-silver selected" id="m-delivery-eco" onclick="mSetDelivery('eco')" style="margin:0;"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>10 zł</small></div>
-            <div class="m-tile tile-gold" id="m-delivery-premium" onclick="mSetDelivery('premium')" style="margin:0;"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b><br><small>50 zł</small></div>
-          </div>
-          <div style="font-size:0.68rem;color:#8a8a9a;margin:2px 0 4px;line-height:1.5;">Rabat z kodem promocyjnym nie obejmuje kosztu dowozu instrumentu.</div>
-        </div>
-      </div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:0 0 14px;">Umów lekcję</h3>
+
+    <div id="m-choice">
+      <p style="font-size:0.85rem;color:var(--text-mid);line-height:1.6;margin:0 0 18px;">Chcesz najpierw zobaczyć wolne terminy w kalendarzu?</p>
+      <button class="form-choice-btn" onclick="formGoCalendar('mobile')">📅 Tak, pokaż wolne terminy</button>
+      <button class="form-choice-btn-outline" onclick="formShowSimple('mobile')">✉️ Nie, po prostu wyślę zapytanie</button>
     </div>
-    <div class="modal-right">
-      <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
-      <input type="tel" id="m-phone" placeholder="Numer telefonu">
-      <input type="email" id="m-email" placeholder="Adres email">
-      <input type="text" id="m-rabat" placeholder="Kod rabatowy (opcjonalnie)" oninput="mUpdatePrice()">
-      <textarea id="m-msg" placeholder="Wiek ucznia, preferowane godziny, doświadczenie..."></textarea>
-      <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
-      <div id="modal-status"></div>
+
+    <div id="m-simple" style="display:none;">
+      <div class="modal-right">
+        <input type="text" id="m-name" placeholder="Twoje imię i nazwisko">
+        <input type="tel" id="m-phone" placeholder="Numer telefonu">
+        <input type="email" id="m-email" placeholder="Adres email">
+        <textarea id="m-msg" placeholder="Wiadomość (np. wiek ucznia, preferowane godziny...)"></textarea>
+        <button class="modal-submit-btn" onclick="wyslijModal()">WYŚLIJ PROŚBĘ</button>
+        <div id="modal-status"></div>
+      </div>
+      <button class="form-back-link" onclick="formBackToChoice('mobile')">← Wróć</button>
     </div>
   </div>
 </div>
@@ -1357,122 +1336,53 @@ async function sprawdzKod(){
 }
 document.getElementById('brief-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')sprawdzKod();});
 
-let isStudio=true,hasPiano=true,deliveryType='eco';
-function toggleForm(show){document.getElementById('formOverlay').classList.toggle('open',show);document.body.style.overflow=show?'hidden':'';}
-function setLoc(loc){
-  isStudio=loc==='studio';
-  document.getElementById('loc-studio').classList.toggle('selected',isStudio);
-  document.getElementById('loc-uczen').classList.toggle('selected',!isStudio);
-  document.getElementById('piano-options').style.display=isStudio?'none':'block';
-  document.getElementById('delivery-options').style.display=(!isStudio&&!hasPiano)?'block':'none';
-  updatePrice();
-}
-function setPiano(v){
-  hasPiano=v;
-  document.getElementById('piano-yes').classList.toggle('selected',hasPiano);
-  document.getElementById('piano-no').classList.toggle('selected',!hasPiano);
-  document.getElementById('delivery-options').style.display=(!isStudio&&!hasPiano)?'block':'none';
-  updatePrice();
-}
-function setDelivery(type){
-  deliveryType=type;
-  document.getElementById('delivery-eco').classList.toggle('selected',type==='eco');
-  document.getElementById('delivery-premium').classList.toggle('selected',type==='premium');
-  updatePrice();
-}
-function calcDeliveryFee(){
-  if(isStudio||hasPiano) return 0;
-  if(deliveryType==='premium') return 50;
-  return 10;
+function toggleForm(show){
+  document.getElementById('formOverlay').classList.toggle('open',show);
+  document.body.style.overflow=show?'hidden':'';
+  if(show){document.getElementById('res-choice').style.display='block';document.getElementById('res-simple').style.display='none';document.getElementById('res-status').innerText='';}
 }
 const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
-function updatePrice(){
-  const lessonBase=99;
-  const deliveryFee=calcDeliveryFee();
-  const codeOk=document.getElementById('res-rabat').value.trim().toLowerCase()===PROMO_CODE;
-  const priceEl=document.getElementById('price-val');
-  const lessonPrice=codeOk?lessonBase*(1-PROMO_DISCOUNT):lessonBase;
-  const total=lessonPrice+deliveryFee;
-  if(codeOk){
-    let html=`<span class="price-old">${lessonBase+deliveryFee} zł</span><span class="price-new">${formatPLN(total)} zł</span>`;
-    if(deliveryFee>0) html+=`<span class="price-hint">Rabat nie obejmuje dowozu (${deliveryFee} zł)</span>`;
-    priceEl.innerHTML=html;
-  }else{
-    priceEl.innerText=formatPLN(total)+' zł / h';
-  }
-  val();
+// "Poproś o kontakt" / "Umów lekcję" — prosty formularz kontaktowy z opcją
+// przejścia do kalendarza wolnych terminów zamiast wypełniania szczegółów rezerwacji.
+function formGoCalendar(which){
+  if(which==='desktop') toggleForm(false); else closeBookingModal();
+  const target=document.getElementById('terminy');
+  if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function formShowSimple(which){
+  const p=which==='desktop'?'res':'m';
+  document.getElementById(p+'-choice').style.display='none';
+  document.getElementById(p+'-simple').style.display='block';
+}
+function formBackToChoice(which){
+  const p=which==='desktop'?'res':'m';
+  document.getElementById(p+'-simple').style.display='none';
+  document.getElementById(p+'-choice').style.display='block';
 }
 function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;const e=document.getElementById('res-email').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9&&e.includes('@'));}
 async function wyslij(){
   if(!document.getElementById('subBtn').classList.contains('active'))return;
   const s=document.getElementById('res-status'),btn=document.getElementById('subBtn');
   s.innerText='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
-  const delFee=calcDeliveryFee();
-  const codeOk=document.getElementById('res-rabat').value.trim().toLowerCase()===PROMO_CODE;
-  const lessonPrice=codeOk?99*(1-PROMO_DISCOUNT):99;
-  const totalPrice=lessonPrice+delFee;
-  let pianinoOpis='—';
-  if(!isStudio){
-    if(hasPiano) pianinoOpis='Tak';
-    else if(deliveryType==='premium') pianinoOpis='Nie — dowóz: Yamaha P-525, 50 zł';
-    else pianinoOpis='Nie — dowóz: Roland GO:PIANO88PX, '+delFee+' zł';
-  }
-  const cenaOpis=formatPLN(totalPrice)+' zł łącznie (lekcja: '+formatPLN(lessonPrice)+' zł'+(delFee?' + dowóz '+delFee+' zł, bez rabatu':'')+')';
-  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),kod_rabatowy:document.getElementById('res-rabat').value.trim(),tresc:document.getElementById('res-msg').value.trim(),miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:pianinoOpis,cena:cenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),tresc:document.getElementById('res-msg').value.trim(),data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();
     if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
     s.innerText='✅ Dziękujemy! Odezwiemy się wkrótce.';s.style.color='#22c55e';showToast('✅ Zgłoszenie wysłane!');
-    setTimeout(()=>{toggleForm(false);s.innerText='';['res-name','res-phone','res-email','res-rabat','res-msg'].forEach(id=>document.getElementById(id).value='');btn.disabled=false;},3000);
+    setTimeout(()=>{toggleForm(false);s.innerText='';['res-name','res-phone','res-email','res-msg'].forEach(id=>document.getElementById(id).value='');btn.disabled=false;},3000);
   }catch(e){s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';btn.disabled=false;btn.classList.add('active');showToast('Błąd wysyłki.',true);}
 }
 
-function openBookingModal(){document.getElementById('bookingModal').classList.add('open');document.body.style.overflow='hidden';}
+function openBookingModal(){
+  document.getElementById('bookingModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  document.getElementById('m-choice').style.display='block';
+  document.getElementById('m-simple').style.display='none';
+  document.getElementById('modal-status').innerText='';
+}
 function closeBookingModal(){document.getElementById('bookingModal').classList.remove('open');document.body.style.overflow='';}
-let mLoc='s',mPiano=true,mDeliveryType='eco';
-function mSetLoc(t){
-  mLoc=t;
-  document.getElementById('m-l-s').classList.toggle('selected',t==='s');
-  document.getElementById('m-l-u').classList.toggle('selected',t==='u');
-  document.getElementById('m-piano-box').style.display=t==='u'?'block':'none';
-  document.getElementById('m-delivery-options').style.display=(t==='u'&&!mPiano)?'block':'none';
-  mUpdatePrice();
-}
-function mSetPiano(v){
-  mPiano=v;
-  document.getElementById('m-p-y').classList.toggle('selected',v);
-  document.getElementById('m-p-n').classList.toggle('selected',!v);
-  document.getElementById('m-delivery-options').style.display=(mLoc==='u'&&!mPiano)?'block':'none';
-  mUpdatePrice();
-}
-function mSetDelivery(type){
-  mDeliveryType=type;
-  document.getElementById('m-delivery-eco').classList.toggle('selected',type==='eco');
-  document.getElementById('m-delivery-premium').classList.toggle('selected',type==='premium');
-  mUpdatePrice();
-}
-function mCalcDeliveryFee(){
-  if(mLoc==='s'||mPiano) return 0;
-  if(mDeliveryType==='premium') return 50;
-  return 10;
-}
-function mUpdatePrice(){
-  const lessonBase=99;
-  const deliveryFee=mCalcDeliveryFee();
-  const codeOk=document.getElementById('m-rabat').value.trim().toLowerCase()===PROMO_CODE;
-  const priceEl=document.getElementById('m-price');
-  const lessonPrice=codeOk?lessonBase*(1-PROMO_DISCOUNT):lessonBase;
-  const total=lessonPrice+deliveryFee;
-  if(codeOk){
-    let html=`<span class="price-old">${lessonBase+deliveryFee} zł</span><span class="price-new">${formatPLN(total)} zł</span>`;
-    if(deliveryFee>0) html+=`<span class="price-hint">Rabat nie obejmuje dowozu (${deliveryFee} zł)</span>`;
-    priceEl.innerHTML=html;
-  }else{
-    priceEl.innerText=formatPLN(total)+' zł / h';
-  }
-}
 async function wyslijModal(){
   const s=document.getElementById('modal-status');
   const submitBtn=document.querySelector('.modal-submit-btn');
@@ -1481,24 +1391,13 @@ async function wyslijModal(){
   const email=document.getElementById('m-email').value.trim();
   if(name.length<2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
   submitBtn.disabled=true;submitBtn.innerText='Wysyłanie...';s.innerText='';
-  const mDelFee=mCalcDeliveryFee();
-  const mCodeOk=document.getElementById('m-rabat').value.trim().toLowerCase()===PROMO_CODE;
-  const mLessonPrice=mCodeOk?99*(1-PROMO_DISCOUNT):99;
-  const mTotalPrice=mLessonPrice+mDelFee;
-  let mPianinoOpis='—';
-  if(mLoc==='u'){
-    if(mPiano) mPianinoOpis='Tak';
-    else if(mDeliveryType==='premium') mPianinoOpis='Nie — dowóz: Yamaha P-525, 50 zł';
-    else mPianinoOpis='Nie — dowóz: Roland GO:PIANO88PX, '+mDelFee+' zł';
-  }
-  const mCenaOpis=formatPLN(mTotalPrice)+' zł łącznie (lekcja: '+formatPLN(mLessonPrice)+' zł'+(mDelFee?' + dowóz '+mDelFee+' zł, bez rabatu':'')+')';
-  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,kod_rabatowy:document.getElementById('m-rabat').value.trim(),tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mPianinoOpis,cena:mCenaOpis,data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('m-msg').value.trim(),data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();
     if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status+' '+text);
     s.innerText='✅ Wysłano! Odezwiemy się wkrótce.';s.style.color='#22c55e';submitBtn.innerText='WYŚLIJ PROŚBĘ';
-    setTimeout(()=>{closeBookingModal();s.innerText='';document.getElementById('m-name').value='';document.getElementById('m-phone').value='';document.getElementById('m-email').value='';document.getElementById('m-rabat').value='';document.getElementById('m-msg').value='';submitBtn.disabled=false;},3000);
+    setTimeout(()=>{closeBookingModal();s.innerText='';document.getElementById('m-name').value='';document.getElementById('m-phone').value='';document.getElementById('m-email').value='';document.getElementById('m-msg').value='';submitBtn.disabled=false;},3000);
   }catch(e){s.innerText='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.innerText='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
 }
 
