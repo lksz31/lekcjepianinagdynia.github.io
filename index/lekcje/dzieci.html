@@ -510,11 +510,13 @@ const materialCategories = [
     ]
   },
   {
-    icon:'🚗', tag:'Dojazd', title:'Dowóz instrumentu na zajęcia', wide:true, noOverlap:true,
+    icon:'🚗', tag:'Dojazd', title:'Dowóz instrumentu na zajęcia', wide:true,
     desc:'Przywiozę pianino do Ciebie — bez potrzeby kupowania sprzętu.',
     photos:[
-      {src:'zdjecia-dojazd-auto-pianino/zdjecia-fiat-1.webp', caption:'Dojazd na zajęcia'},
-      {src:'zdjecia-dojazd-auto-pianino/zdjecia-pianino-do-dojazdow-1.webp', caption:'Przenośne pianino w pokrowcu'}
+      {src:'zdjecia-dojazd-auto-pianino/yamaha-p-525.webp', caption:'Yamaha P-525'},
+      {src:'zdjecia-dojazd-auto-pianino/stojak.webp', caption:'Stojak pod instrument', scale:0.8},
+      {src:'zdjecia-dojazd-auto-pianino/roland-go-piano.webp', caption:'Roland GO:PIANO88PX'},
+      {src:'zdjecia-dojazd-auto-pianino/zdjecia-fiat-1.webp', caption:'Dojazd na zajęcia'}
     ]
   },
   {
@@ -653,7 +655,7 @@ function buildClusterFlow(containerId, categories, basePath){
       fig.style.setProperty('--ry',ry+'px');
       fig.style.setProperty('--rr',rr+'deg');
       fig.style.setProperty('--rz',String(i+1));
-      if(!ph.mystery)fig.style.width=photoW+'px';
+      if(!ph.mystery)fig.style.width=Math.round(photoW*(ph.scale||1))+'px';
       if(ph.mystery){
         const mark=document.createElement('span');
         mark.className='cl-mark';
