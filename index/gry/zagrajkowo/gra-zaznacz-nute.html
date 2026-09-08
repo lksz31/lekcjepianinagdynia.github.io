@@ -28,6 +28,15 @@
   .wrong-watermark .wm-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.4rem;color:var(--red);}
   .wrong-watermark .wm-x{position:absolute;font-size:3.2rem;font-weight:900;color:var(--red);}
 
+  .settings-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;z-index:2;}
+  .setting-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:6px 14px;font-weight:700;font-size:0.76rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .setting-btn:hover{border-color:var(--gold);}
+  .setting-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+
+  .timer-bar-wrap{width:min(92vw,560px);height:8px;background:#eef0f4;border-radius:6px;overflow:hidden;display:none;position:relative;z-index:2;}
+  .timer-bar-wrap.show{display:block;}
+  .timer-bar{height:100%;width:100%;background:var(--gold);}
+
   .target-box{background:var(--navy);color:white;border-radius:16px;padding:14px 30px;text-align:center;}
   .target-box .t-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.6);}
   .target-box .t-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--gold);line-height:1.1;}
@@ -60,6 +69,15 @@
 
 <div class="game-area">
   <div class="wrong-watermark" id="wrongWatermark"></div>
+
+  <div class="settings-row" id="settingsRow">
+    <button type="button" class="setting-btn" data-speed="slow" onclick="setSpeed('slow')">🐢 Wolno</button>
+    <button type="button" class="setting-btn" data-speed="normal" onclick="setSpeed('normal')">🚶 Normalnie</button>
+    <button type="button" class="setting-btn" data-speed="fast" onclick="setSpeed('fast')">⚡ Szybko</button>
+    <button type="button" class="setting-btn" id="timedBtn" onclick="toggleTimed()">⏱ Tryb na czas</button>
+  </div>
+
+  <div class="timer-bar-wrap" id="timerBarWrap"><div class="timer-bar" id="timerBar"></div></div>
 
   <div class="target-box">
     <div class="t-label">Znajdź na pięciolinii</div>
@@ -100,6 +118,59 @@ const BEE_URL = '/index/fiszki/concept-art/pszczola.png';
 
 const TOTAL_ROUNDS = 10;
 let round = 0, score = 0, targetNote = null, roundOrder = [], roundLocked = false;
+
+const SPEEDS = {
+  slow:   {roundDelay:2800, timed:11},
+  normal: {roundDelay:2000, timed:7},
+  fast:   {roundDelay:1200, timed:4}
+};
+let speedMode = 'normal';
+let timedMode = false;
+let timerTimeout = null;
+
+function setSpeed(s){
+  speedMode = s;
+  document.querySelectorAll('.setting-btn[data-speed]').forEach(function(b){ b.classList.toggle('active', b.dataset.speed===s); });
+  restartGame();
+}
+
+function toggleTimed(){
+  timedMode = !timedMode;
+  document.getElementById('timedBtn').classList.toggle('active', timedMode);
+  restartGame();
+}
+
+function startTimer(){
+  const wrap = document.getElementById('timerBarWrap');
+  const bar = document.getElementById('timerBar');
+  clearTimeout(timerTimeout);
+  if(!timedMode){
+    wrap.classList.remove('show');
+    return;
+  }
+  wrap.classList.add('show');
+  const dur = SPEEDS[speedMode].timed;
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      bar.style.transition = 'width '+dur+'s linear';
+      bar.style.width = '0%';
+    });
+  });
+  timerTimeout = setTimeout(handleTimeout, dur*1000);
+}
+
+function stopTimer(){
+  clearTimeout(timerTimeout);
+  timerTimeout = null;
+  document.getElementById('timerBar').style.transition = 'none';
+}
+
+function handleTimeout(){
+  if(roundLocked) return;
+  checkAnswer(null, -1, true);
+}
 
 function shuffled(arr){
   const a = arr.slice();
@@ -274,11 +345,12 @@ function hideWrongWatermark(){
   wm.innerHTML = '';
 }
 
-function checkAnswer(letter, idx){
+function checkAnswer(letter, idx, isTimeout){
   if(roundLocked) return;
   roundLocked = true;
+  stopTimer();
   const feedback = document.getElementById('feedbackMsg');
-  const correct = (letter === targetNote.letter);
+  const correct = !isTimeout && (letter === targetNote.letter);
 
   document.querySelectorAll('.note-hit').forEach(function(el){
     if(el.dataset.letter !== targetNote.letter){
@@ -295,13 +367,17 @@ function checkAnswer(letter, idx){
     feedback.className = 'feedback-msg ok';
     score++;
     document.getElementById('scoreVal').textContent = score;
+  }else if(isTimeout){
+    showWrongWatermark('⏱');
+    feedback.textContent = 'Czas minął — dobra nuta to ' + targetNote.letter + '.';
+    feedback.className = 'feedback-msg bad';
   }else{
     showWrongWatermark(letter);
     feedback.textContent = 'To nie ' + letter + ' — dobra nuta to ' + targetNote.letter + '.';
     feedback.className = 'feedback-msg bad';
   }
 
-  setTimeout(nextRound, 2000);
+  setTimeout(nextRound, SPEEDS[speedMode].roundDelay);
 }
 
 function nextRound(){
@@ -310,11 +386,12 @@ function nextRound(){
   hideWrongWatermark();
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('feedbackMsg').className = 'feedback-msg';
-  if(round >= TOTAL_ROUNDS){ showWin(); return; }
+  if(round >= TOTAL_ROUNDS){ stopTimer(); document.getElementById('timerBarWrap').classList.remove('show'); showWin(); return; }
   roundOrder = shuffled(GAME_NOTES);
   targetNote = roundOrder[Math.floor(Math.random()*roundOrder.length)];
   document.getElementById('targetLetter').textContent = targetNote.letter;
   renderStaff(roundOrder, targetNote);
+  startTimer();
 }
 
 function showWin(){
@@ -326,12 +403,14 @@ function showWin(){
 
 function restartGame(){
   round = 0; score = 0;
+  stopTimer();
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('winOverlay').classList.remove('show');
   nextRound();
 }
 
 document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+document.querySelector('.setting-btn[data-speed="normal"]').classList.add('active');
 restartGame();
 </script>
 </body>

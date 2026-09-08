@@ -35,7 +35,7 @@
 
   .tiles-tray{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:580px;width:100%;padding:16px;background:var(--card-bg);border-radius:18px;border:1px solid var(--border);min-height:76px;box-shadow:0 8px 30px rgba(0,0,0,0.06);}
 
-  .tile{width:40px;height:52px;cursor:grab;touch-action:none;user-select:none;flex-shrink:0;}
+  .tile{width:40px;height:52px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;flex-shrink:0;}
   .tile:active{cursor:grabbing;}
   .tile.dragging{z-index:1000;cursor:grabbing;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));}
   .tile.locked{cursor:default;opacity:0.55;}
@@ -246,7 +246,12 @@ function attachDrag(tile){
   });
   tile.addEventListener('pointercancel', function(e){
     if(dragTile !== tile) return;
-    dropTile(tile, e.clientX, e.clientY);
+    document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
+    const gapId = tile.dataset.gap;
+    const home = gapId ? document.getElementById('gap-'+gapId) : document.getElementById('tilesTray');
+    if(home) home.appendChild(tile);
+    clearTileFixedStyle(tile);
+    dragTile = null;
   });
 }
 
