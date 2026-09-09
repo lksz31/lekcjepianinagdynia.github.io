@@ -9,7 +9,8 @@
 <style>
   :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
   *,*::before,*::after{box-sizing:border-box;}
-  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;}
+  html{overscroll-behavior:none;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;overscroll-behavior:none;min-height:100vh;display:flex;flex-direction:column;}
 
   .top-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px;}
   .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
