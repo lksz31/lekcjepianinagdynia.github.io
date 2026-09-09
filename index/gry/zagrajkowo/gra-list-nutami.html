@@ -71,6 +71,11 @@
     <button type="button" class="clef-btn" data-clef="bass" onclick="setClef('bass')">𝄢 Klucz basowy</button>
   </div>
 
+  <div class="clef-toggle" id="modeToggle">
+    <button type="button" class="clef-btn mode-btn" data-mode="natural" onclick="setMode('natural')">🔤 Zwykłe litery</button>
+    <button type="button" class="clef-btn mode-btn" data-mode="accidental" onclick="setMode('accidental')">♯♭ Krzyżyki i bemole</button>
+  </div>
+
   <div class="letter-card" id="letterCard"></div>
 
   <div class="tiles-tray" id="tilesTray"></div>
@@ -97,25 +102,46 @@ const CLEFS = {
   bass: {
     url:'/index/fiszki/concept-art/klucz-bez-tla.png',
     ratio: 148/231, pct:0.366, refIdx:1,
-    staffY:{C:12,D:11,E:10,F:9,G:8,A:7,H:6}
+    staffY:{C:5,D:4,E:3,F:2,G:1,A:0,H:-1}
   }
 };
 let currentClef = 'treble';
+let currentMode = 'natural'; /* 'natural' = same litery C D E F G A H, 'accidental' = krzyżyki i bemole */
 
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
-const LETTER_TEMPLATE = [
-  {t:'Drogi Muzyku! '},
-  {b:'C'}, {t:'ieszę się, że grasz na pianinie. '},
-  {b:'D'}, {t:'źwięki mają swoje nazwy: '},
-  {b:'E'}, {t:', '},
-  {b:'F'}, {t:', '},
-  {b:'G'}, {t:', '},
-  {b:'A'}, {t:' i '},
-  {b:'H'}, {t:'. Do zobaczenia na lekcji!'},
+/* Luki to WYŁĄCZNIE litery ukryte wewnątrz prawdziwych słów listu — nigdy osobno.
+   Każda nuta zaczyna właśnie to słowo (wielka litera = początek zdania/słowa). */
+const TEMPLATE_NATURAL = [
+  {t:'Drogi Muzyku!\n\n'},
+  {b:'C',base:'C'}, {t:'ieszę się, że grasz na pianinie.\n'},
+  {b:'D',base:'D'}, {t:'źwięki mają swoje nazwy — jedna z pierwszych melodii, którą zagrasz, może nazywać się '},
+  {b:'E',base:'E'}, {t:'tiuda.\n'},
+  {t:'Ćwicz '}, {b:'F',base:'F'}, {t:'ortepian codziennie, a szybko zauważysz postępy.\n'},
+  {t:'Kiedy '}, {b:'G',base:'G'}, {t:'rasz, słuchaj uważnie każdego dźwięku.\n'},
+  {t:'Naucz się rozpoznawać '}, {b:'A',base:'A'}, {t:'kordy — to podstawa muzyki.\n'},
+  {t:'Muzyka to prawdziwa '}, {b:'H',base:'H'}, {t:'armonia.\n\n'},
+  {t:'Do zobaczenia na lekcji!'},
 ];
 
-function miniStaffSVG(letter){
+/* Tryb z krzyżykami i bemolami — luka to teraz 2-3 litery (nazwa dźwięku
+   chromatycznego) ukryte w środku prawdziwego słowa, np. "cis" w "cisza".
+   Trzeba się domyślić całego słowa z kontekstu zdania. */
+const TEMPLATE_ACCIDENTAL = [
+  {t:'Drogi Muzyku!\n\n'},
+  {t:'Kiedy w klasie panuje głęboka '}, {b:'cis',base:'C',acc:'#'}, {t:'za, dobrze słychać każdy dźwięk.\n'},
+  {t:'Na starym pianinie jedna '}, {b:'des',base:'D',acc:'b'}, {t:'ka lekko skrzypi, ale to nic nie szkodzi.\n'},
+  {t:'To naprawdę dobry inter'}, {b:'es',base:'E',acc:'b'}, {t:' — uczyć się grać!\n'},
+  {t:'Po lekcji poczęstuję Cię '}, {b:'fis',base:'F',acc:'#'}, {t:'taszkami.\n'},
+  {t:'Ukłon na koniec koncertu to piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t.\n'},
+  {t:'Kiedyś może zostaniesz ma'}, {b:'gis',base:'G',acc:'#'}, {t:'trem muzyki.\n'},
+  {t:'Poświęcaj muzyce dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u.\n\n'},
+  {t:'Do zobaczenia na lekcji!'},
+];
+
+function currentTemplate(){ return currentMode==='accidental' ? TEMPLATE_ACCIDENTAL : TEMPLATE_NATURAL; }
+
+function miniStaffSVG(base, acc){
   const cfg = CLEFS[currentClef];
   const W=40, H=52, sg=7.6, staffTop=9;
   const c='#1e3a8a';
@@ -129,7 +155,7 @@ function miniStaffSVG(letter){
   s += '<image href="'+cfg.url+'" x="0" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
 
   const noteX = W*0.74;
-  const staffY = cfg.staffY[letter];
+  const staffY = cfg.staffY[base];
   const noteY = staffTop + (staffY*sg/2);
   const topLine = staffTop, botLine = staffTop+4*sg, ledW = 5.5;
 
@@ -146,6 +172,11 @@ function miniStaffSVG(letter){
       s += '<line x1="'+(noteX-ledW)+'" y1="'+ly+'" x2="'+(noteX+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="1"/>';
       ly -= sg;
     }
+  }
+
+  if(acc){
+    const sym = acc==='#' ? '♯' : '♭';
+    s += '<text x="'+(noteX-12.5)+'" y="'+(noteY+3.2)+'" font-size="9" fill="#8a6d1a" font-family=\'Georgia,serif\'>'+sym+'</text>';
   }
 
   s += '<ellipse cx="'+noteX+'" cy="'+noteY+'" rx="4.6" ry="3.5" fill="#d4af37" stroke="#8a6d1a" stroke-width="0.8" transform="rotate(-15,'+noteX+','+noteY+')"/>';
@@ -176,16 +207,25 @@ function setClef(clef){
   restartGame();
 }
 
+function setMode(mode){
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.getElementById('totalVal').textContent = currentTemplate().filter(function(p){return p.b;}).length;
+  restartGame();
+}
+
 function renderLetter(){
   const card = document.getElementById('letterCard');
   let html = '';
   let bi = 0;
   blanks = [];
-  LETTER_TEMPLATE.forEach(function(part){
-    if(part.t){ html += part.t; }
+  currentTemplate().forEach(function(part){
+    if(part.t){ html += part.t.replace(/\n/g,'<br>'); }
     else if(part.b){
       const id = bi++;
-      blanks.push({id:id, letter:part.b});
+      blanks.push({id:id, letter:part.b, base:part.base, acc:part.acc||null});
       html += '<span class="gap" id="gap-'+id+'" data-id="'+id+'" data-letter="'+part.b+'"></span>';
     }
   });
@@ -195,13 +235,13 @@ function renderLetter(){
 function renderTray(){
   const tray = document.getElementById('tilesTray');
   tray.innerHTML = '';
-  const order = shuffled(blanks.map(function(b){return b.letter;}));
-  order.forEach(function(letter){
+  const order = shuffled(blanks);
+  order.forEach(function(b){
     const tile = document.createElement('div');
     tile.className = 'tile';
-    tile.dataset.letter = letter;
+    tile.dataset.letter = b.letter;
     tile.dataset.gap = '';
-    tile.innerHTML = miniStaffSVG(letter);
+    tile.innerHTML = miniStaffSVG(b.base, b.acc);
     attachDrag(tile);
     tray.appendChild(tile);
   });
@@ -346,8 +386,9 @@ function restartGame(){
   renderTray();
 }
 
-document.getElementById('totalVal').textContent = LETTER_TEMPLATE.filter(function(p){return p.b;}).length;
+document.getElementById('totalVal').textContent = currentTemplate().filter(function(p){return p.b;}).length;
 document.querySelector('.clef-btn[data-clef="'+currentClef+'"]').classList.add('active');
+document.querySelector('.mode-btn[data-mode="'+currentMode+'"]').classList.add('active');
 restartGame();
 </script>
 </body>
