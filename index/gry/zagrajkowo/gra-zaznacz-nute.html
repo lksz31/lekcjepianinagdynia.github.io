@@ -122,7 +122,7 @@ let round = 0, score = 0, targetNote = null, roundOrder = [], roundLocked = fals
 const SPEEDS = {
   slow:   {roundDelay:2800, timed:11},
   normal: {roundDelay:2000, timed:7},
-  fast:   {roundDelay:1200, timed:4}
+  fast:   {roundDelay:600, timed:4}
 };
 let speedMode = 'normal';
 let timedMode = false;
@@ -259,27 +259,9 @@ function flyAwayAsBee(noteEl, noteX, noteY){
   const startY = svgRect.top + noteY*scale;
 
   const bw = 46, bh = 46, margin = 20;
-  const cardRect = document.querySelector('.staff-card').getBoundingClientRect();
-  const spaceRight = window.innerWidth - cardRect.right;
-  const spaceLeft = cardRect.left;
-  const minSpace = bw + margin*2;
-
-  let edgeX, edgeY;
-  if(spaceRight >= minSpace || spaceLeft >= minSpace){
-    const goRight = spaceRight >= spaceLeft;
-    if(goRight){
-      edgeX = cardRect.right + margin + Math.random()*Math.max(10, spaceRight-margin-bw);
-    }else{
-      edgeX = margin + Math.random()*Math.max(10, spaceLeft-margin-bw);
-    }
-    edgeY = margin + Math.random()*Math.max(10, window.innerHeight-margin*2-bh);
-  }else{
-    edgeX = margin + Math.random()*Math.max(10, window.innerWidth-margin*2-bw);
-    const goDown = (window.innerHeight - cardRect.bottom) >= cardRect.top;
-    edgeY = goDown
-      ? cardRect.bottom + margin + Math.random()*Math.max(10, window.innerHeight-cardRect.bottom-margin-bh)
-      : margin + Math.random()*Math.max(10, cardRect.top-margin-bh);
-  }
+  /* Kwiatki mają obsiewać całą powierzchnię ekranu, nie tylko wąski pasek obok karty */
+  const edgeX = margin + Math.random()*Math.max(10, window.innerWidth-margin*2-bw);
+  const edgeY = margin + Math.random()*Math.max(10, window.innerHeight-margin*2-bh);
   const flip = edgeX > startX + 5;
 
   const bee = document.createElement('img');
@@ -293,10 +275,12 @@ function flyAwayAsBee(noteEl, noteX, noteY){
   bee.style.transform = 'scale(0.2)' + (flip ? ' scaleX(-1)' : '');
   document.getElementById('fieldLayer').appendChild(bee);
 
-  /* faza 1: nutka zanika i "przeistacza się" w pszczółkę w tym samym miejscu */
+  /* faza 1: nutka zanika i "przeistacza się" w pszczółkę w tym samym miejscu.
+     Uwaga: transition musi objąć też left/top (z klasy .field-bee), inaczej
+     ten inline skrót nadpisuje je i pszczółka "teleportuje się" zamiast lecieć. */
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
-      bee.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+      bee.style.transition = 'left 1.1s cubic-bezier(0.3,0.7,0.3,1), top 1.1s cubic-bezier(0.3,0.7,0.3,1), transform 0.5s ease, opacity 0.5s ease';
       bee.style.opacity = '1';
       bee.style.transform = 'scale(1)' + (flip ? ' scaleX(-1)' : '');
     });

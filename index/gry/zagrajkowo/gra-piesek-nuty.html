@@ -31,6 +31,9 @@
   .clef-btn:hover{border-color:var(--gold);}
   .clef-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
 
+  .direction-badge{display:none;align-items:center;gap:8px;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 18px;font-weight:800;font-size:0.8rem;color:var(--navy);}
+  .direction-badge.show{display:flex;}
+
   .path-card{background:url('/index/gry/zagrajkowo/gra-piesek-nuty/grafiki/pies-buda-mapa.webp') center/cover no-repeat;border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.15);max-width:820px;width:100%;aspect-ratio:1433/736;position:relative;overflow:hidden;}
   .path-row{position:absolute;inset:0;}
   .stone{position:absolute;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:14px;background:rgba(248,250,252,0.92);border:2.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;font-family:'Nunito',sans-serif;box-shadow:0 3px 6px rgba(0,0,0,0.25);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;}
@@ -89,6 +92,7 @@
   </div>
 
   <p class="instructions" id="instrText"></p>
+  <div class="direction-badge" id="directionBadge"></div>
 
   <div class="path-card">
     <div class="path-row" id="pathRow"></div>
@@ -118,7 +122,7 @@ const CLEFS = {
   bass: {
     url:'/index/fiszki/concept-art/klucz-bez-tla.png',
     ratio: 148/231, pct:0.366, refIdx:1,
-    staffY:{c:12,d:11,e:10,f:9,g:8,a:7,h:6}
+    staffY:{c:5,d:4,e:3,f:2,g:1,a:0,h:-1}
   }
 };
 let clefMode = 'treble'; /* 'treble' | 'bass' | 'both' */
@@ -136,6 +140,19 @@ let slotLetters = [];   /* dla trybów swap/staff — litera na każdej z 7 pozy
 let slotClefs = [];     /* dla trybu staff — klucz przypisany do każdej pozycji */
 let selIdx = null;
 let nextIndex = 0;
+let direction = 'up';   /* 'up' = od najniższej do najwyższej, 'down' = odwrotnie — losowane co grę */
+let TARGET = LETTERS.slice();
+
+/* W trybie "oba klucze" pierwsza połowa dróżki jest w kluczu basowym,
+   a druga — w kluczu wiolinowym (najpierw klucz basowy, w stronę wiolinowego). */
+function clefsForPath(){
+  const n = PATH_WAYPOINTS.length;
+  const bassCount = Math.ceil(n/2);
+  return Array.from({length:n}, (_, i) => {
+    if(clefMode === 'both') return i < bassCount ? 'bass' : 'treble';
+    return clefMode;
+  });
+}
 
 /* dla trybu match */
 const MATCH_LEN = 10;
@@ -320,9 +337,9 @@ function swapStones(i, j){
 }
 
 function checkSwapWin(){
-  const correct = slotLetters.every((l,i)=> l === LETTERS[i]);
+  const correct = slotLetters.every((l,i)=> l === TARGET[i]);
   document.querySelectorAll('.stone[data-idx]').forEach((el,i)=>{
-    el.classList.toggle('correct', slotLetters[i]===LETTERS[i]);
+    el.classList.toggle('correct', slotLetters[i]===TARGET[i]);
   });
   if(correct){
     const feedback = document.getElementById('feedbackMsg');
@@ -525,13 +542,25 @@ function checkMatch(){
 
 function updateInstructions(){
   const el = document.getElementById('instrText');
-  const bothHint = clefMode==='both' ? ' Nutki pojawiają się na przemian w kluczu wiolinowym i basowym.' : '';
+  const bothHint = clefMode==='both' ? ' Pierwsza część dróżki jest w kluczu basowym, a dalsza — w kluczu wiolinowym.' : '';
   if(gameMode==='swap'){
-    el.innerHTML = 'Zamień miejscami litery <strong>przeciągając</strong> jedną na drugą (albo kliknij pierwszą, potem drugą), aż będą ułożone od najniższej do najwyższej.';
+    el.innerHTML = 'Zamień miejscami litery <strong>przeciągając</strong> jedną na drugą (albo kliknij pierwszą, potem drugą), aż będą ułożone zgodnie z kierunkiem pokazanym powyżej.';
   }else if(gameMode==='staff'){
-    el.innerHTML = 'Zamień miejscami nutki na pięciolinii, aż będą ułożone od najniższej do najwyższej.'+bothHint;
+    el.innerHTML = 'Zamień miejscami nutki na pięciolinii, aż będą ułożone zgodnie z kierunkiem pokazanym powyżej.'+bothHint;
   }else{
     el.innerHTML = 'Na pięciolinii są nuty. <strong>Przeciągnij</strong> kafelki z literami z dołu mapy do odpowiadających im luk, a potem kliknij <strong>Sprawdź</strong>.'+bothHint;
+  }
+  updateDirectionBadge();
+}
+
+function updateDirectionBadge(){
+  const badge = document.getElementById('directionBadge');
+  const showIt = (gameMode==='swap' || gameMode==='staff');
+  badge.classList.toggle('show', showIt);
+  if(showIt){
+    badge.innerHTML = direction==='up'
+      ? '⬆️ Ułóż od najniższej do najwyższej'
+      : '⬇️ Ułóż od najwyższej do najniższej';
   }
 }
 
@@ -553,8 +582,11 @@ function restartGame(){
   }else{
     document.getElementById('totalVal').textContent = PATH_WAYPOINTS.length;
     nextIndex = 0; selIdx = null;
-    do{ slotLetters = shuffled(LETTERS); }while(slotLetters.every((l,i)=>l===LETTERS[i]));
-    slotClefs = LETTERS.map(()=>pickClefFor());
+    direction = Math.random() < 0.5 ? 'up' : 'down';
+    TARGET = direction==='up' ? LETTERS.slice() : LETTERS.slice().reverse();
+    do{ slotLetters = shuffled(LETTERS); }while(slotLetters.every((l,i)=>l===TARGET[i]));
+    slotClefs = clefsForPath();
+    updateDirectionBadge();
     renderPath();
   }
 }
