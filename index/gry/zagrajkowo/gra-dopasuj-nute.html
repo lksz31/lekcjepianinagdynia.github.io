@@ -331,6 +331,7 @@ function onFlyingPointerDown(e){
   const rect = el.getBoundingClientRect();
   dragOffsetX = e.clientX - rect.left;
   dragOffsetY = e.clientY - rect.top;
+  el.style.transition = 'none';
   el.classList.add('dragging');
   try{ el.setPointerCapture(e.pointerId); }catch(err){}
 }
