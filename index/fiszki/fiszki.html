@@ -296,34 +296,9 @@
 <div class="terminy-section">
   <div class="apple-card" id="appleCard">
     <h2 class="apple-card-title">Wolne Terminy</h2>
-    <div class="info-card">
-      <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz terminów"></iframe>
-      <button class="btn-open-form" onclick="toggleForm(true)">ZAREZERWUJ TERMIN</button>
-    </div>
-    <div class="form-overlay" id="formOverlay">
-      <button class="close-btn" onclick="toggleForm(false)">✕</button>
-      <div class="form-content">
-        <h3>Szczegóły rezerwacji</h3>
-        <div class="price-tag"><span id="price-val" style="font-weight:800;font-size:1.4rem;color:var(--navy);">99 zł / h</span></div>
-        <div class="bento-grid">
-          <div class="form-tile selected" id="loc-studio" onclick="setLoc('studio')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
-          <div class="form-tile"          id="loc-uczen"  onclick="setLoc('uczen')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
-        </div>
-        <div id="piano-options">
-          <div class="bento-grid">
-            <div class="form-tile selected" id="piano-yes" onclick="setPiano(true)"><b>Mam pianino</b><br><small>Standard</small></div>
-            <div class="form-tile"          id="piano-no"  onclick="setPiano(false)"><b>Nie mam</b><br><small>Dowóz instrumentu (+10 zł)</small></div>
-          </div>
-        </div>
-        <div class="contact-box">
-          <input type="text"  id="res-name"  placeholder="Twoje imię i nazwisko" oninput="val()">
-          <input type="tel"   id="res-phone" placeholder="Numer telefonu"         oninput="val()">
-          <input type="email" id="res-email" placeholder="Adres email"            oninput="val()">
-          <textarea           id="res-msg"   placeholder="Dodatkowe informacje..."></textarea>
-          <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
-        </div>
-        <div id="res-status"></div>
-      </div>
+    <div class="info-card" style="text-align:center;">
+      <p style="margin:0 0 20px;color:rgba(255,255,255,0.75);font-size:0.92rem;line-height:1.7;">Sprawdź aktualne wolne terminy i umów lekcję na stronie głównej.</p>
+      <a href="/index.html#terminy" class="btn-open-form">ZOBACZ WOLNE TERMINY</a>
     </div>
   </div>
 </div>

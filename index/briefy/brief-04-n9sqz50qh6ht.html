@@ -120,8 +120,8 @@
   .cal-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:28px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.2s,transform 0.7s 0.2s;}
   .cal-inner.visible{opacity:1;transform:translateY(0);}
   .cal-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
-  .cal-inner iframe{width:100%;height:320px;border:none;border-radius:14px;filter:invert(92%) hue-rotate(190deg);}
-  @media(max-width:500px){.cal-inner iframe{height:260px;}}
+  .cal-cta-btn{display:inline-block;background:var(--navy);color:#fff;padding:13px 28px;border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none;transition:0.2s;}
+  .cal-cta-btn:hover{background:var(--gold);color:var(--navy);}
 
   /* STOPKA */
   .site-footer-main{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:10px;}
@@ -447,7 +447,8 @@
 <div class="cal-wrap">
   <div class="cal-inner" id="cal">
     <span class="cal-label">📅 Wolne terminy zajęć</span>
-    <iframe src="https://calendar.google.com/calendar/u/0/embed?color=%239a9cff&color=%23ff7537&src=2a069cee3333b284fc612c7e9c8c285c18a6b13be58b9c5d1fd3f92e797b76e4@group.calendar.google.com&src=5cf7f20d22d8d4f6b753d45cfb944e0588e31633bf62e000bfd603f98a1d2a5d@group.calendar.google.com" title="Kalendarz zajęć"></iframe>
+    <p style="margin:0 0 18px;color:var(--text-mid);font-size:0.92rem;line-height:1.6;">Sprawdź aktualne wolne terminy i umów lekcję na stronie głównej.</p>
+    <a href="/index.html#terminy" class="cal-cta-btn">Zobacz wolne terminy</a>
   </div>
 </div>
 

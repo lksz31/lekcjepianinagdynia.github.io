@@ -424,9 +424,10 @@ document.getElementById('totalVal').textContent = TOTAL_LITTER;
 renderLetters();
 const flyingEl = document.getElementById('flyingItem');
 flyingEl.addEventListener('pointerdown', onFlyingPointerDown);
-flyingEl.addEventListener('pointermove', onFlyingPointerMove);
-flyingEl.addEventListener('pointerup', onFlyingPointerUp);
-flyingEl.addEventListener('pointercancel', onFlyingPointerUp);
+flyingEl.addEventListener('touchstart', function(e){ e.preventDefault(); }, {passive:false});
+document.addEventListener('pointermove', onFlyingPointerMove);
+document.addEventListener('pointerup', onFlyingPointerUp);
+document.addEventListener('pointercancel', onFlyingPointerUp);
 restartGame();
 </script>
 </body>
