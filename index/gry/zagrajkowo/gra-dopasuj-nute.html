@@ -33,9 +33,9 @@
   .flying-item.dragging{transition:none;cursor:grabbing;}
 
   .letters-row{position:absolute;left:2%;right:2%;bottom:3%;display:flex;gap:1.4%;flex-wrap:nowrap;justify-content:center;z-index:5;}
-  .letter-target{width:9.6%;aspect-ratio:66/80;position:relative;background:url('/index/gry/zagrajkowo/dopasuj-nutki-do-literki/grafiki/kosz-na-smieci-crop.webp') center/contain no-repeat;display:flex;align-items:flex-start;justify-content:center;padding-top:16%;cursor:default;transition:0.2s;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));}
+  .letter-target{width:9.6%;aspect-ratio:66/80;position:relative;background:url('/index/gry/zagrajkowo/dopasuj-nutki-do-literki/grafiki/kosz-na-smieci-crop.webp') center/contain no-repeat;cursor:default;transition:0.2s;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4));}
   .letter-target::before{content:'';position:absolute;inset:6% 18%;border-radius:10px;background:rgba(220,38,38,0);transition:background 0.2s;pointer-events:none;}
-  .letter-target .lt-label{position:relative;font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(0.62rem,2.6vw,1.3rem);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.65);}
+  .letter-target .lt-label{position:absolute;top:48%;left:50%;transform:translate(-50%,-50%);font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(0.62rem,2.6vw,1.3rem);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.65);}
   .letter-target.dragover{transform:scale(1.1) translateY(-3px);filter:drop-shadow(0 6px 10px rgba(212,175,55,0.45));}
   .letter-target.wrong-flash::before{background:rgba(220,38,38,0.4);}
   .letter-target.bin-happy{animation:binShake 0.55s ease;}
@@ -57,7 +57,6 @@
 
   @media(max-width:420px){
     .letters-row{bottom:2%;gap:1.1%;}
-    .letter-target{padding-top:14%;}
   }
 </style>
 </head>
@@ -425,9 +424,10 @@ document.getElementById('totalVal').textContent = TOTAL_LITTER;
 renderLetters();
 const flyingEl = document.getElementById('flyingItem');
 flyingEl.addEventListener('pointerdown', onFlyingPointerDown);
-flyingEl.addEventListener('pointermove', onFlyingPointerMove);
-flyingEl.addEventListener('pointerup', onFlyingPointerUp);
-flyingEl.addEventListener('pointercancel', onFlyingPointerUp);
+flyingEl.addEventListener('touchstart', function(e){ e.preventDefault(); }, {passive:false});
+document.addEventListener('pointermove', onFlyingPointerMove);
+document.addEventListener('pointerup', onFlyingPointerUp);
+document.addEventListener('pointercancel', onFlyingPointerUp);
 restartGame();
 </script>
 </body>
