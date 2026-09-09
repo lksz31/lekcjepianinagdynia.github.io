@@ -1111,16 +1111,29 @@
     6: {title:'🧩 Ułóż klucz wiolinowy', url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
     7: {title:'🔗 Dopasuj nazwę do obrazka', url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
   };
+  let zkScrollY = 0;
   function zkOpenGame(id){
     const g = ZK_GAMES[id];
     if(!g) return;
     document.getElementById('zkPopupTitle').textContent = g.title;
     document.getElementById('zkPopupBody').innerHTML = '<iframe src="'+g.url+'" title="'+g.title+'"></iframe>';
     document.getElementById('zkPopupOverlay').classList.add('show');
+    zkScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = (-zkScrollY)+'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
   }
   function zkCloseGame(){
     document.getElementById('zkPopupOverlay').classList.remove('show');
     document.getElementById('zkPopupBody').innerHTML = '';
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    window.scrollTo(0, zkScrollY);
   }
 </script>
 

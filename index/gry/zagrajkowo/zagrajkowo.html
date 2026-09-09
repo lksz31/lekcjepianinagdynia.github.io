@@ -170,6 +170,26 @@ const GAMES = {
   7: {title:'🔗 Dopasuj nazwę do obrazka', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
 };
 
+let popupScrollY = 0;
+
+function lockBodyScroll(){
+  popupScrollY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = (-popupScrollY)+'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+}
+
+function unlockBodyScroll(){
+  document.body.style.position = '';
+  document.body.style.top = '';
+  document.body.style.left = '';
+  document.body.style.right = '';
+  document.body.style.width = '';
+  window.scrollTo(0, popupScrollY);
+}
+
 function openGame(id){
   const g = GAMES[id];
   if(!g) return;
@@ -181,7 +201,7 @@ function openGame(id){
     body.innerHTML = '<div class="popup-soon"><div class="ps-icon">🚧</div><h3>Ta gra jest w budowie</h3><p>Pracuję nad nią — wróć tu za jakiś czas, powinna się wkrótce pojawić!</p></div>';
   }
   document.getElementById('popupOverlay').classList.add('show');
-  document.body.style.overflow = 'hidden';
+  lockBodyScroll();
 }
 
 function requestClose(){
@@ -196,7 +216,7 @@ function confirmClose(){
   document.getElementById('confirmOverlay').classList.remove('show');
   document.getElementById('popupOverlay').classList.remove('show');
   document.getElementById('popupBody').innerHTML = '';
-  document.body.style.overflow = '';
+  unlockBodyScroll();
 }
 
 document.addEventListener('keydown', function(e){
