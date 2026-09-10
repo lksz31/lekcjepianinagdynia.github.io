@@ -20,6 +20,7 @@
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
   .sound-toggle{background:var(--card-bg);border:1.5px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;flex-shrink:0;}
   .sound-toggle:hover{border-color:var(--gold);}
+  .sound-toggle.active{border-color:var(--gold);background:#fdf8ec;}
 
   /* ══ WYBÓR POSTACI ══ */
   .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 16px;background:linear-gradient(180deg,#e8f5e0,#faf9f7);}
@@ -39,6 +40,11 @@
   .scene-wrap{flex:1;position:relative;overflow:hidden;background:#0c2b1a;}
   #c3d{display:block;width:100%;height:100%;touch-action:none;}
   .hint-badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,20,10,0.6);backdrop-filter:blur(6px);color:#fff;padding:8px 18px;border-radius:50px;font-size:0.78rem;font-weight:600;text-align:center;max-width:88%;pointer-events:none;z-index:5;transition:opacity 0.3s;}
+
+  /* ══ Joystick obrotu kamery ══ */
+  .joystick-base{position:absolute;top:66px;right:16px;width:76px;height:76px;border-radius:50%;background:rgba(10,20,10,0.35);border:2px solid rgba(255,255,255,0.45);backdrop-filter:blur(4px);z-index:6;touch-action:none;}
+  .joystick-knob{position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid var(--gold);pointer-events:none;transition:transform 0.05s linear;}
+  .joystick-label{position:absolute;top:144px;right:16px;width:76px;text-align:center;color:#fff;font-size:0.62rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.6);pointer-events:none;z-index:6;}
 
   /* ══ PANEL ZAGADKI ══ */
   .puzzle-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);width:min(92%,420px);background:#3d2a17;background-image:linear-gradient(180deg,#4a3420,#3d2a17);border:3px solid #6b4a28;border-radius:18px;padding:16px 16px 14px;box-shadow:0 14px 34px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;z-index:10;}
@@ -87,6 +93,7 @@
   <span class="game-title-bar">🐾 Dżungla Muzyczna 3D</span>
   <span class="top-bar-right">
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
+    <button type="button" class="sound-toggle" id="compassToggle" onclick="toggleCompass()" aria-label="Obracaj widok, obracając telefon" title="Obracaj widok, obracając telefon lub tablet">🧭</button>
     <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
   </span>
 </div>
@@ -110,6 +117,8 @@
 <div class="scene-wrap" id="sceneWrap" style="display:none;">
   <canvas id="c3d"></canvas>
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
+  <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
+  <div class="joystick-label">obróć widok</div>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -362,6 +371,7 @@ let currentIdx = 0; /* indeks polanki, na której właśnie stoi postać (0 = st
 let score = 0, walking = false;
 let currentPuzzle = null;
 let sceneRunning = false;
+let orbitAngle = 0; /* dodatkowy obrót kamery wokół postaci — joystick i/lub obrót urządzenia */
 
 const PATH_POINTS = [
   {x:0, z:0}, {x:2.6, z:-6}, {x:-2.2, z:-11.5}, {x:2.6, z:-17},
@@ -655,10 +665,82 @@ function cameraOffsetForAspect(){
   const t = aspectBlendFactor(camera.aspect);
   const near = new THREE.Vector3(0, 2.8, 6.2);
   const wide = new THREE.Vector3(0, 4.4, 6.6);
+  const back = near.clone().lerp(wide, t);
+  back.applyAxisAngle(new THREE.Vector3(0,1,0), orbitAngle);
   return {
-    back: near.clone().lerp(wide, t),
+    back: back,
     lookY: 2.1 + (0.7-2.1)*t
   };
+}
+
+/* ══ Obrót widoku: joystick na ekranie i/lub fizyczny obrót telefonu/tabletu ══ */
+const ORBIT_SPEED = 2.0; /* rad/s przy pełnym wychyleniu joysticka */
+let joystickX = 0, joystickActive = false;
+const joyBase = document.getElementById('joystickBase');
+const joyKnob = document.getElementById('joystickKnob');
+const JOY_MAX = 26;
+
+function updateJoystick(e){
+  const rect = joyBase.getBoundingClientRect();
+  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+  let dx = e.clientX - cx, dy = e.clientY - cy;
+  const dist = Math.hypot(dx, dy);
+  if(dist > JOY_MAX){ dx = dx/dist*JOY_MAX; dy = dy/dist*JOY_MAX; }
+  joyKnob.style.transform = 'translate('+dx+'px,'+dy+'px)';
+  joystickX = dx / JOY_MAX;
+}
+function resetJoystick(){
+  joystickActive = false;
+  joystickX = 0;
+  joyKnob.style.transform = 'translate(0px,0px)';
+}
+joyBase.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  joystickActive = true;
+  try{ joyBase.setPointerCapture(e.pointerId); }catch(err){}
+  updateJoystick(e);
+});
+joyBase.addEventListener('pointermove', function(e){
+  if(joystickActive) updateJoystick(e);
+});
+joyBase.addEventListener('pointerup', resetJoystick);
+joyBase.addEventListener('pointercancel', resetJoystick);
+
+let compassEnabled = false, compassListenerAdded = false, lastCompassAlpha = null;
+function onDeviceOrientation(e){
+  if(!compassEnabled || e.alpha === null) return;
+  if(lastCompassAlpha !== null){
+    let delta = e.alpha - lastCompassAlpha;
+    if(delta > 180) delta -= 360;
+    if(delta < -180) delta += 360;
+    orbitAngle -= delta * (Math.PI/180);
+  }
+  lastCompassAlpha = e.alpha;
+}
+function toggleCompass(){
+  const btn = document.getElementById('compassToggle');
+  if(compassEnabled){
+    compassEnabled = false;
+    lastCompassAlpha = null;
+    btn.classList.remove('active');
+    return;
+  }
+  function enable(){
+    compassEnabled = true;
+    lastCompassAlpha = null;
+    btn.classList.add('active');
+    if(!compassListenerAdded){
+      window.addEventListener('deviceorientation', onDeviceOrientation);
+      compassListenerAdded = true;
+    }
+  }
+  if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission().then(function(state){
+      if(state === 'granted') enable();
+    }).catch(function(){});
+  }else if(window.DeviceOrientationEvent){
+    enable();
+  }
 }
 
 function buildPuzzleForWaypoint(idx){
@@ -968,6 +1050,7 @@ function animate(now){
   if(!sceneRunning) return;
   requestAnimationFrame(animate);
   idleT += 0.016;
+  if(joystickX) orbitAngle += joystickX * ORBIT_SPEED * 0.016;
   if(character && !walking){
     character.position.y = Math.sin(idleT*2.2) * 0.015;
   }
@@ -1030,6 +1113,8 @@ function initScene(){
 
   currentIdx = 0;
   score = 0;
+  orbitAngle = 0;
+  resetJoystick();
   document.getElementById('scoreVal').textContent = '0';
   activateMarker(1);
 
@@ -1068,6 +1153,13 @@ function restartGame(){
   chosenChar = null;
   stopAmbient();
   stopMic();
+  orbitAngle = 0;
+  resetJoystick();
+}
+
+if(!window.DeviceOrientationEvent){
+  const cb = document.getElementById('compassToggle');
+  if(cb) cb.style.display = 'none';
 }
 </script>
 <script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
