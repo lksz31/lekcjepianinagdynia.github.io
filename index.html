@@ -1054,7 +1054,7 @@
 
     <div style="margin-top:40px;">
       <h3 style="font-family:'Playfair Display',serif;color:#1e3a8a;font-size:1.3rem;margin:0 0 6px;">🎨 Zagrajkowo — mini-gry dla dzieci</h3>
-      <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 20px;max-width:640px;">Kliknij w domek na mapie, żeby otworzyć jedną z ośmiu gierek do nauki nut, wartości rytmicznych i symboli muzycznych.</p>
+      <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 20px;max-width:640px;">Kliknij w domek na mapie albo wypróbuj gry 3D poniżej, żeby otworzyć jedną z dziewięciu gierek do nauki nut, wartości rytmicznych i symboli muzycznych.</p>
       <div class="zk-map-scene">
         <img class="zk-map-day" src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
         <img class="zk-map-night" src="/index/gry/zagrajkowo/zagrajkowo-mapa-nocny-jesien.webp" alt="Mapa Zagrajkowa (tryb nocny)">
@@ -1072,6 +1072,15 @@
           <span class="zk-jungle-badge">Nowość! Gra 3D</span>
           <span class="zk-jungle-title">Dżungla Muzyczna</span>
           <span class="zk-jungle-desc">Wybierz kotka lub piesa i rusz przez trójwymiarową dżunglę, rozwiązując zagadki muzyczne na każdej polance!</span>
+        </span>
+        <span class="zk-jungle-arrow">→</span>
+      </button>
+      <button type="button" class="zk-jungle-cta" style="background:linear-gradient(135deg,#1e3a8a,#2f5ec4);margin-top:12px;" onclick="zkOpenGame(9)">
+        <span class="zk-jungle-icon">⭕🐝</span>
+        <span>
+          <span class="zk-jungle-badge">Nowość! Gra 3D</span>
+          <span class="zk-jungle-title">Zaznacz Nutę 3D</span>
+          <span class="zk-jungle-desc">Ta sama zabawa w znajdowanie nut, teraz na trójwymiarowej, unoszącej się pięciolinii nad łąką!</span>
         </span>
         <span class="zk-jungle-arrow">→</span>
       </button>
@@ -1129,6 +1138,7 @@
     6: {title:'🧩 Ułóż klucz wiolinowy', url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
     7: {title:'🔗 Dopasuj nazwę do obrazka', url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
     8: {title:'🐾 Dżungla Muzyczna 3D', url:'/index/gry/zagrajkowo/gra-dzungla-3d.html'},
+    9: {title:'⭕ Zaznacz Nutę 3D', url:'/index/gry/zagrajkowo/gra-zaznacz-nute-3d.html'},
   };
   let zkScrollY = 0;
   function zkOpenGame(id){
