@@ -1054,7 +1054,7 @@
 
     <div style="margin-top:40px;">
       <h3 style="font-family:'Playfair Display',serif;color:#1e3a8a;font-size:1.3rem;margin:0 0 6px;">🎨 Zagrajkowo — mini-gry dla dzieci</h3>
-      <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 20px;max-width:640px;">Kliknij w domek na mapie, żeby otworzyć jedną z siedmiu gierek do nauki nut, wartości rytmicznych i symboli muzycznych.</p>
+      <p style="font-size:0.85rem;color:#64748b;line-height:1.65;margin:0 0 20px;max-width:640px;">Kliknij w domek na mapie, żeby otworzyć jedną z ośmiu gierek do nauki nut, wartości rytmicznych i symboli muzycznych.</p>
       <div class="zk-map-scene">
         <img class="zk-map-day" src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
         <img class="zk-map-night" src="/index/gry/zagrajkowo/zagrajkowo-mapa-nocny-jesien.webp" alt="Mapa Zagrajkowa (tryb nocny)">
@@ -1066,6 +1066,15 @@
         <button class="zk-hotspot" style="left:65%;top:22%;width:13%;height:31%;" onclick="zkOpenGame(6)" aria-label="Ułóż klucz wiolinowy"><span class="zk-label">Klucz z puzzli</span></button>
         <button class="zk-hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="zkOpenGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="zk-label">Dopasuj nazwę</span></button>
       </div>
+      <button type="button" class="zk-jungle-cta" onclick="zkOpenGame(8)">
+        <span class="zk-jungle-icon">🐾🌴</span>
+        <span>
+          <span class="zk-jungle-badge">Nowość! Gra 3D</span>
+          <span class="zk-jungle-title">Dżungla Muzyczna</span>
+          <span class="zk-jungle-desc">Wybierz kotka lub piesa i rusz przez trójwymiarową dżunglę, rozwiązując zagadki muzyczne na każdej polance!</span>
+        </span>
+        <span class="zk-jungle-arrow">→</span>
+      </button>
     </div>
 
   </div>
@@ -1091,6 +1100,15 @@
   .zk-popup-close:hover{background:rgba(255,255,255,0.3);}
   .zk-popup-body{flex:1;overflow:hidden;position:relative;background:#faf9f7;}
   .zk-popup-body iframe{width:100%;height:100%;border:none;}
+
+  .zk-jungle-cta{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#0c2b1a,#1e4a2f);border-radius:24px;padding:22px 26px;margin-top:24px;max-width:1000px;width:100%;margin-left:auto;margin-right:auto;text-decoration:none;color:white;cursor:pointer;border:none;text-align:left;box-shadow:0 10px 30px rgba(12,43,26,0.25);transition:transform 0.2s;}
+  .zk-jungle-cta:hover{transform:translateY(-3px);}
+  .zk-jungle-icon{font-size:2.6rem;flex-shrink:0;}
+  .zk-jungle-badge{display:inline-block;background:#d4af37;color:#1a1a2e;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;padding:3px 12px;border-radius:50px;margin-bottom:6px;}
+  .zk-jungle-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;margin-bottom:4px;display:block;}
+  .zk-jungle-desc{font-size:0.83rem;color:rgba(255,255,255,0.75);line-height:1.5;}
+  .zk-jungle-arrow{margin-left:auto;font-size:1.4rem;flex-shrink:0;opacity:0.8;}
+  @media(max-width:560px){.zk-jungle-cta{flex-wrap:wrap;}.zk-jungle-arrow{display:none;}}
 </style>
 <div class="zk-popup-overlay" id="zkPopupOverlay" onclick="if(event.target===this)zkCloseGame()">
   <div class="zk-popup-box">
@@ -1110,6 +1128,7 @@
     5: {title:'✉️ Napisz list nutami', url:'/index/gry/zagrajkowo/gra-list-nutami.html'},
     6: {title:'🧩 Ułóż klucz wiolinowy', url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
     7: {title:'🔗 Dopasuj nazwę do obrazka', url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
+    8: {title:'🐾 Dżungla Muzyczna 3D', url:'/index/gry/zagrajkowo/gra-dzungla-3d.html'},
   };
   let zkScrollY = 0;
   function zkOpenGame(id){
