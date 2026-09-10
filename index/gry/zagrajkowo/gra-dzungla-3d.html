@@ -52,10 +52,11 @@
   .mode-btn.active{background:var(--gold);border-color:var(--gold);color:#3d2a17;}
 
   .fruit-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
-  .fruit-tile{width:60px;height:60px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
+  .fruit-tile{width:76px;height:72px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:4px 2px;}
   .fruit-tile:active{transform:scale(0.93);}
   .fruit-tile .fruit-emoji{font-size:1.5rem;line-height:1;}
-  .fruit-tile .fruit-letter{font-weight:900;color:#5a3d1c;font-size:0.8rem;margin-top:2px;}
+  .fruit-tile .fruit-word{font-weight:700;color:#5a3d1c;font-size:0.66rem;margin-top:3px;text-align:center;line-height:1.1;}
+  .fruit-tile .fruit-first{font-weight:900;color:var(--red);font-size:0.86rem;}
   .fruit-tile.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
   .fruit-tile.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
   @keyframes puzzlePop{0%{transform:scale(1);}50%{transform:scale(1.18);}100%{transform:scale(1);}}
@@ -113,7 +114,7 @@
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
     <div class="input-mode-row">
-      <button type="button" class="mode-btn active" data-mode="tap" onclick="setInputMode('tap')">👆 Wybierz owoc</button>
+      <button type="button" class="mode-btn active" data-mode="tap" onclick="setInputMode('tap')">👆 Wybierz kafelek</button>
       <button type="button" class="mode-btn" data-mode="mic" onclick="setInputMode('mic')">🎤 Zagraj na pianinie</button>
     </div>
     <div class="fruit-row" id="fruitRow"></div>
@@ -237,30 +238,6 @@ function stopAmbient(){
   ambientNodes = null;
 }
 
-/* ══ Narracja głosowa (Web Speech API) ══ */
-let plVoice = null;
-function primeVoices(){
-  if(!('speechSynthesis' in window)) return;
-  const pick = function(){
-    const voices = speechSynthesis.getVoices();
-    plVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf('pl') === 0; }) || null;
-  };
-  pick();
-  speechSynthesis.onvoiceschanged = pick;
-}
-function speak(text){
-  if(!soundEnabled || !('speechSynthesis' in window)) return;
-  try{
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'pl-PL';
-    u.rate = 0.95;
-    u.pitch = 1.05;
-    if(plVoice) u.voice = plVoice;
-    speechSynthesis.speak(u);
-  }catch(e){}
-}
-
 function toggleSound(){
   soundEnabled = !soundEnabled;
   document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
@@ -268,10 +245,8 @@ function toggleSound(){
     if(sceneRunning) startAmbient();
   }else{
     stopAmbient();
-    if('speechSynthesis' in window) speechSynthesis.cancel();
   }
 }
-primeVoices();
 
 /* ══ Nuty / pięciolinia (te same stałe co w innych grach Zagrajkowa) ══ */
 const CLEFS = {
@@ -288,7 +263,18 @@ const CLEFS = {
 };
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
-const FRUIT_EMOJI = ['🥭','🍌','🍍','🍇','🍉','🥝','🍓','🍑'];
+/* Każda nuta ma "swój" owoc/produkt, który zaczyna się na tę samą literę —
+   dzięki temu dziecko kojarzy dźwięk z jedzeniem po pierwszej literze,
+   np. C jak Cebula. */
+const FOOD_BY_LETTER = {
+  C: {word:'Cebula',  emoji:'🧅'},
+  D: {word:'Dynia',   emoji:'🎃'},
+  E: {word:'Eklerka', emoji:'🧁'},
+  F: {word:'Fasola',  emoji:'🫘'},
+  G: {word:'Gruszka', emoji:'🍐'},
+  A: {word:'Ananas',  emoji:'🍍'},
+  H: {word:'Homar',   emoji:'🦞'}
+};
 /* Częstotliwości nut (jak w Fiszkach): oktawa razkreślna dla klucza
    wiolinowego, mała oktawa dla klucza basowego. */
 const NOTE_FREQS = {
@@ -456,7 +442,9 @@ function buildCharacter(kind){
   return g;
 }
 
-function buildTree(){
+/* Kilka gatunków drzew, losowanych przy rozstawianiu, żeby dżungla nie
+   wyglądała na sklonowaną z jednego modelu. */
+function buildTreeConifer(){
   const g = new THREE.Group();
   const trunkMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 1.6, 7), trunkMat);
@@ -471,6 +459,54 @@ function buildTree(){
     g.add(leaf);
   }
   return g;
+}
+
+function buildTreeBroadleaf(){
+  const g = new THREE.Group();
+  const trunkMat = new THREE.MeshStandardMaterial({color:0x7a5530, roughness:0.9});
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.22, 1.5, 7), trunkMat);
+  trunk.position.y = 0.75;
+  g.add(trunk);
+  const canopyColors = [0x3f9950, 0x4dab5c, 0x2f7a3e];
+  const canopyMat = new THREE.MeshStandardMaterial({color: canopyColors[Math.floor(Math.random()*canopyColors.length)], roughness:0.85});
+  const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.95, 10, 8), canopyMat);
+  canopy.scale.set(1, 0.85, 1);
+  canopy.position.y = 1.85;
+  g.add(canopy);
+  const canopy2 = new THREE.Mesh(new THREE.SphereGeometry(0.62, 10, 8), canopyMat);
+  canopy2.position.set(0.45, 2.2, 0.15);
+  g.add(canopy2);
+  const canopy3 = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 8), canopyMat);
+  canopy3.position.set(-0.4, 2.05, -0.25);
+  g.add(canopy3);
+  return g;
+}
+
+function buildTreePalm(){
+  const g = new THREE.Group();
+  const trunkMat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.85});
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.15, 2.3, 7), trunkMat);
+  trunk.position.y = 1.15;
+  trunk.rotation.z = 0.08;
+  g.add(trunk);
+  const frondMat = new THREE.MeshStandardMaterial({color:0x4dab5c, roughness:0.8, side:THREE.DoubleSide});
+  for(let i=0;i<6;i++){
+    const frond = new THREE.Mesh(new THREE.ConeGeometry(0.16, 1.15, 4), frondMat);
+    frond.position.y = 2.35;
+    const ang = (i/6)*Math.PI*2;
+    frond.rotation.z = Math.PI/2.3;
+    frond.rotation.y = ang;
+    frond.position.x = Math.cos(ang)*0.35;
+    frond.position.z = Math.sin(ang)*0.35;
+    g.add(frond);
+  }
+  return g;
+}
+
+const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
+function buildTree(){
+  const pick = TREE_BUILDERS[Math.floor(Math.random()*TREE_BUILDERS.length)];
+  return pick();
 }
 
 function buildMarker(){
@@ -530,6 +566,50 @@ function scatterTrees(){
     tree.scale.set(s, s, s);
     tree.rotation.y = Math.random()*Math.PI*2;
     scene.add(tree);
+  }
+}
+
+/* Góry w tle — nadają dżungli klimat "ścieżki w górach", stoją daleko za
+   drzewami i nigdy nie wchodzą w kolizję ze ścieżką/postacią. */
+function buildMountain(peakHeight, baseRadius){
+  const g = new THREE.Group();
+  const rockMat = new THREE.MeshStandardMaterial({color:0x6b7280, roughness:1});
+  const snowMat = new THREE.MeshStandardMaterial({color:0xf4f7fb, roughness:0.9});
+  const rock = new THREE.Mesh(new THREE.ConeGeometry(baseRadius, peakHeight, 6), rockMat);
+  rock.position.y = peakHeight/2;
+  rock.rotation.y = Math.random()*Math.PI*2;
+  g.add(rock);
+  if(peakHeight > 9){
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(baseRadius*0.32, peakHeight*0.3, 6), snowMat);
+    cap.position.y = peakHeight - (peakHeight*0.3)/2 + 0.2;
+    cap.rotation.y = rock.rotation.y;
+    g.add(cap);
+  }
+  return g;
+}
+
+function scatterMountains(){
+  const ranges = [
+    {side:-1, count:6}, {side:1, count:6}
+  ];
+  ranges.forEach(function(range){
+    for(let i=0;i<range.count;i++){
+      const peakHeight = 9 + Math.random()*9;
+      const baseRadius = 4.5 + Math.random()*3.5;
+      const mtn = buildMountain(peakHeight, baseRadius);
+      const x = range.side * (20 + Math.random()*10);
+      const z = -Math.random()*55 + 10;
+      mtn.position.set(x, 0, z);
+      scene.add(mtn);
+    }
+  });
+  /* grzbiet zamykający dolinę na końcu ścieżki */
+  for(let i=0;i<5;i++){
+    const peakHeight = 11 + Math.random()*8;
+    const baseRadius = 5 + Math.random()*3;
+    const mtn = buildMountain(peakHeight, baseRadius);
+    mtn.position.set((Math.random()*2-1)*16, 0, -58 - Math.random()*10);
+    scene.add(mtn);
   }
 }
 
@@ -596,14 +676,15 @@ function showPuzzle(idx){
   const distractorPool = LETTERS_ORDER.filter(function(l){ return l !== currentPuzzle.letter; });
   const distractors = shuffled(distractorPool).slice(0,3);
   const options = shuffled([currentPuzzle.letter].concat(distractors));
-  const emojis = shuffled(FRUIT_EMOJI).slice(0,4);
 
   const row = document.getElementById('fruitRow');
   row.innerHTML = '';
-  options.forEach(function(letter, i){
+  options.forEach(function(letter){
+    const food = FOOD_BY_LETTER[letter];
     const tile = document.createElement('div');
     tile.className = 'fruit-tile';
-    tile.innerHTML = '<span class="fruit-emoji">'+emojis[i]+'</span><span class="fruit-letter">'+letter+'</span>';
+    tile.innerHTML = '<span class="fruit-emoji">'+food.emoji+'</span>' +
+      '<span class="fruit-word"><span class="fruit-first">'+food.word.charAt(0)+'</span>'+food.word.slice(1)+'</span>';
     tile.addEventListener('pointerdown', function(e){
       e.preventDefault();
       onFruitPick(letter, tile);
@@ -654,7 +735,7 @@ function startMic(){
       statusEl.textContent = 'Graj nutę na pianinie...';
     })
     .catch(function(){
-      statusEl.textContent = 'Brak dostępu do mikrofonu — spróbuj dotknąć owocu.';
+      statusEl.textContent = 'Brak dostępu do mikrofonu — spróbuj dotknąć kafelka.';
     });
 }
 
@@ -903,7 +984,7 @@ function animate(now){
 function initScene(){
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x9fd8ef);
-  scene.fog = new THREE.Fog(0x9fd8ef, 18, 46);
+  scene.fog = new THREE.Fog(0x9fd8ef, 18, 68);
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
@@ -925,6 +1006,7 @@ function initScene(){
 
   buildTrail();
   scatterTrees();
+  scatterMountains();
 
   raycaster = new THREE.Raycaster();
 
@@ -962,14 +1044,12 @@ function initScene(){
   requestAnimationFrame(animate);
 
   startAmbient();
-  speak('Witaj w Muzycznej Dżungli! Znajdź świecącą nutkę na ścieżce i idź dalej.');
 }
 
 function showWin(){
   document.getElementById('winText').textContent =
     'Zebraliście ' + score + ' / ' + (PATH_POINTS.length-1) + ' nutek i przeszliście całą dżunglę!';
   document.getElementById('winOverlay').classList.add('show');
-  speak('Brawo! Dotarliście do serca dżungli!');
   spawnWinCelebration();
 }
 
@@ -988,7 +1068,6 @@ function restartGame(){
   chosenChar = null;
   stopAmbient();
   stopMic();
-  if('speechSynthesis' in window) speechSynthesis.cancel();
 }
 </script>
 <script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
