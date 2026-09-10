@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zaznacz Właściwą Nutę 3D | Zagrajkowo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  html{overscroll-behavior:none;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:20;flex-wrap:wrap;gap:8px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .top-bar-right{display:flex;align-items:center;gap:10px;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+  .sound-toggle{background:var(--card-bg);border:1.5px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;flex-shrink:0;}
+  .sound-toggle:hover{border-color:var(--gold);}
+
+  .controls-bar{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 12px;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:15;}
+  .settings-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .setting-btn{background:var(--bg);border:2px solid var(--border);border-radius:50px;padding:5px 12px;font-weight:700;font-size:0.72rem;color:var(--navy);cursor:pointer;transition:0.2s;}
+  .setting-btn:hover{border-color:var(--gold);}
+  .setting-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+  .timer-bar-wrap{width:min(90vw,480px);height:6px;background:#eef0f4;border-radius:6px;overflow:hidden;display:none;}
+  .timer-bar-wrap.show{display:block;}
+  .timer-bar{height:100%;width:100%;background:var(--gold);}
+
+  .scene-wrap{flex:1;position:relative;overflow:hidden;background:#bfe8f5;}
+  #c3d{display:block;width:100%;height:100%;touch-action:none;}
+
+  .target-badge{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(10,20,40,0.65);backdrop-filter:blur(6px);color:#fff;padding:8px 22px;border-radius:16px;text-align:center;z-index:5;pointer-events:none;}
+  .target-badge .t-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.65);}
+  .target-badge .t-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.9rem;color:var(--gold);line-height:1.1;}
+
+  .feedback-msg{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);min-height:26px;font-weight:800;font-size:0.95rem;text-align:center;background:rgba(255,255,255,0.92);padding:6px 18px;border-radius:50px;z-index:5;pointer-events:none;opacity:0;transition:opacity 0.2s;white-space:nowrap;}
+  .feedback-msg.show{opacity:1;}
+  .feedback-msg.ok{color:var(--green);}
+  .feedback-msg.bad{color:var(--red);}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(30,58,138,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+
+  .confetti-piece{position:fixed;top:-30px;font-size:1.5rem;pointer-events:none;z-index:1200;animation:confettiFall linear forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(112vh) rotate(360deg);opacity:0.85;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">⭕ Zaznacz Nutę 3D</span>
+  <span class="top-bar-right">
+    <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
+    <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">10</span></span>
+  </span>
+</div>
+
+<div class="controls-bar">
+  <div class="settings-row" id="settingsRow">
+    <button type="button" class="setting-btn" data-speed="slow" onclick="setSpeed('slow')">🐢 Wolno</button>
+    <button type="button" class="setting-btn" data-speed="normal" onclick="setSpeed('normal')">🚶 Normalnie</button>
+    <button type="button" class="setting-btn" data-speed="fast" onclick="setSpeed('fast')">⚡ Szybko</button>
+    <button type="button" class="setting-btn" id="timedBtn" onclick="toggleTimed()">⏱ Tryb na czas</button>
+  </div>
+  <div class="timer-bar-wrap" id="timerBarWrap"><div class="timer-bar" id="timerBar"></div></div>
+</div>
+
+<div class="scene-wrap" id="sceneWrap">
+  <canvas id="c3d"></canvas>
+  <div class="target-badge">
+    <div class="t-label">Znajdź na pięciolinii</div>
+    <div class="t-letter" id="targetLetter">C</div>
+  </div>
+  <div class="feedback-msg" id="feedbackMsg"></div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🏆</div>
+  <h2>Brawo!</h2>
+  <p id="winText"></p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+/* ══ Dźwięki (Web Audio) ══ */
+let audioCtx = null;
+let soundEnabled = true;
+function getAudioCtx(){
+  if(!audioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new Ctx();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playErrorBeep(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    function tone(freq, start, dur){
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now+start);
+      gain.gain.exponentialRampToValueAtTime(0.16, now+start+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+start+dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now+start); osc.stop(now+start+dur+0.03);
+    }
+    tone(220, 0, 0.14);
+    tone(185, 0.16, 0.20);
+  }catch(e){}
+}
+function playSuccessChime(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    function tone(freq, start, dur, vol){
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now+start);
+      gain.gain.exponentialRampToValueAtTime(vol, now+start+0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+start+dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now+start); osc.stop(now+start+dur+0.03);
+    }
+    tone(1046.5, 0,    0.18, 0.13);
+    tone(1318.5, 0.07, 0.18, 0.13);
+    tone(1568.0, 0.14, 0.22, 0.14);
+    tone(2093.0, 0.22, 0.30, 0.12);
+  }catch(e){}
+}
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+/* ══ Nuty ══ */
+const CLEF_TREBLE_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_TREBLE_RATIO = 581 / 1361;
+
+const GAME_NOTES = [
+  {id:'c1', letter:'C', staffY:10},
+  {id:'d1', letter:'D', staffY:9},
+  {id:'e1', letter:'E', staffY:8},
+  {id:'f1', letter:'F', staffY:7},
+  {id:'g1', letter:'G', staffY:6},
+  {id:'a1', letter:'A', staffY:5},
+  {id:'h1', letter:'H', staffY:4},
+];
+
+const FLOWERS = ['aster.png','dzwonek.png','frezja.png','gerbera.png','groszek-pachnacy.png','hibiskus.png','lilia.png','mak.png','ostrozen.png','piwonia.png','roza.png','slonecznik.png','stokrotka.png','szafirek.png','tulipan.png'];
+const BEE_URL = '/index/fiszki/concept-art/pszczola.png';
+const FLOWER_DIR = '/index/fiszki/concept-art/';
+
+const TOTAL_ROUNDS = 10;
+let round = 0, score = 0, targetNote = null, roundOrder = [], roundLocked = false;
+
+const SPEEDS = {
+  slow:   {roundDelay:2800, timed:11},
+  normal: {roundDelay:2000, timed:7},
+  fast:   {roundDelay:600, timed:4}
+};
+let speedMode = 'normal';
+let timedMode = false;
+let timerTimeout = null;
+
+function shuffled(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function setSpeed(s){
+  speedMode = s;
+  document.querySelectorAll('.setting-btn[data-speed]').forEach(function(b){ b.classList.toggle('active', b.dataset.speed===s); });
+  restartGame();
+}
+function toggleTimed(){
+  timedMode = !timedMode;
+  document.getElementById('timedBtn').classList.toggle('active', timedMode);
+  restartGame();
+}
+
+function startTimer(){
+  const wrap = document.getElementById('timerBarWrap');
+  const bar = document.getElementById('timerBar');
+  clearTimeout(timerTimeout);
+  if(!timedMode){ wrap.classList.remove('show'); return; }
+  wrap.classList.add('show');
+  const dur = SPEEDS[speedMode].timed;
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      bar.style.transition = 'width '+dur+'s linear';
+      bar.style.width = '0%';
+    });
+  });
+  timerTimeout = setTimeout(handleTimeout, dur*1000);
+}
+function stopTimer(){
+  clearTimeout(timerTimeout);
+  timerTimeout = null;
+  document.getElementById('timerBar').style.transition = 'none';
+}
+function handleTimeout(){
+  if(roundLocked) return;
+  checkAnswer(null, true);
+}
+
+/* ══ Scena 3D ══ */
+let scene, camera, renderer, raycaster, sceneRunning = false, idleT = 0;
+let noteObjects = [];
+let texCache = {};
+let clefSprite = null;
+
+const STAFF_X_START = -3.0, STAFF_X_END = 3.0;
+const STAFF_TOP_Y = 2.9, LINE_GAP = 0.42;
+const UNIT = LINE_GAP/2;
+
+function noteWorldY(staffY){
+  /* staffY=0 odpowiada górnej linii pięciolinii (STAFF_TOP_Y),
+     rosnące staffY = niżej (analogicznie do SVG, gdzie Y rośnie w dół) */
+  return STAFF_TOP_Y - staffY*UNIT;
+}
+
+function getTexture(url, cb){
+  if(texCache[url]){ cb(texCache[url]); return; }
+  const loader = new THREE.TextureLoader();
+  loader.load(url, function(tex){ texCache[url] = tex; cb(tex); });
+}
+
+/* Kamera musi zawsze mieścić w kadrze CAŁĄ szerokość pięciolinii (razem
+   z kluczem), niezależnie od proporcji ekranu — inaczej skrajne nuty na
+   wąskim/pionowym tablecie wypadają poza widoczny obszar i nie da się
+   ich dotknąć. Liczymy potrzebny dystans osobno dla szerokości i
+   wysokości i bierzemy większy z nich. */
+const REQUIRED_HALF_WIDTH = 4.15;
+const REQUIRED_HALF_HEIGHT = 2.5;
+const CAM_FOV = 50;
+
+function resizeRenderer(){
+  const wrap = document.getElementById('sceneWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(!w || !h) return;
+  renderer.setSize(w, h, false);
+  const aspect = w/h;
+  camera.aspect = aspect;
+  camera.fov = CAM_FOV;
+  const halfV = Math.tan(CAM_FOV*Math.PI/360);
+  const distForWidth = REQUIRED_HALF_WIDTH / (halfV*aspect);
+  const distForHeight = REQUIRED_HALF_HEIGHT / halfV;
+  const dist = Math.max(distForWidth, distForHeight, 6.5);
+  camera.position.set(0, 1.95, dist);
+  camera.lookAt(0, 1.85, 0);
+  camera.updateProjectionMatrix();
+}
+
+function buildStaffLines(){
+  const mat = new THREE.MeshStandardMaterial({color:0xfffdf3, emissive:0xd8c98a, emissiveIntensity:0.3, roughness:0.4});
+  for(let i=0;i<5;i++){
+    const y = STAFF_TOP_Y - i*LINE_GAP;
+    const bar = new THREE.Mesh(new THREE.BoxGeometry(STAFF_X_END-STAFF_X_START+0.6, 0.035, 0.035), mat);
+    bar.position.set((STAFF_X_START+STAFF_X_END)/2, y, 0);
+    scene.add(bar);
+  }
+  getTexture(CLEF_TREBLE_URL, function(tex){
+    const h = 2.1, w = h*CLEF_TREBLE_RATIO;
+    const mat2 = new THREE.SpriteMaterial({map:tex, transparent:true});
+    clefSprite = new THREE.Sprite(mat2);
+    clefSprite.scale.set(w, h, 1);
+    clefSprite.position.set(STAFF_X_START-0.55, STAFF_TOP_Y - 2*LINE_GAP + 0.15, 0.05);
+    scene.add(clefSprite);
+  });
+}
+
+function buildNoteMesh(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x1e3a8a, roughness:0.5});
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 14, 10), mat);
+  head.scale.set(1, 0.78, 0.6);
+  head.rotation.z = -0.35;
+  g.add(head);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.62, 6), mat);
+  stem.position.set(0.14, 0.34, 0);
+  g.add(stem);
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.26, 0.03, 8, 24),
+    new THREE.MeshStandardMaterial({color:0x16a34a, emissive:0x0a4a1e, transparent:true, opacity:0})
+  );
+  ring.userData.isRing = true;
+  g.add(ring);
+  const hitArea = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.42, 0.42, 1.0, 10),
+    new THREE.MeshBasicMaterial({visible:false})
+  );
+  g.add(hitArea);
+  g.userData.head = head;
+  g.userData.ring = ring;
+  return g;
+}
+
+function renderRound(order, target){
+  noteObjects.forEach(function(n){ scene.remove(n.mesh); });
+  noteObjects = [];
+  const stepX = (STAFF_X_END - STAFF_X_START) / (order.length - 1 || 1);
+  order.forEach(function(note, i){
+    const mesh = buildNoteMesh();
+    const x = STAFF_X_START + i*stepX;
+    const y = noteWorldY(note.staffY);
+    mesh.position.set(x, y, 0.08);
+    scene.add(mesh);
+    noteObjects.push({note:note, mesh:mesh, x:x, y:y});
+  });
+}
+
+function flyAwayAsBee3D(noteObj){
+  const mesh = noteObj.mesh;
+  scene.remove(mesh);
+  noteObjects = noteObjects.filter(function(n){ return n !== noteObj; });
+
+  getTexture(BEE_URL, function(tex){
+    const mat = new THREE.SpriteMaterial({map:tex, transparent:true});
+    const bee = new THREE.Sprite(mat);
+    bee.scale.set(0.001, 0.001, 1);
+    bee.position.set(noteObj.x, noteObj.y, 0.3);
+    scene.add(bee);
+
+    const targetX = (Math.random()*2-1) * 3.4;
+    const targetY = 0.4 + Math.random()*3.2;
+    const targetZ = -1.5 - Math.random()*2.5;
+    const start = bee.position.clone();
+    const t0 = performance.now();
+    const dur = 1300;
+    function step(now){
+      const t = Math.min(1, (now-t0)/dur);
+      const ease = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+      bee.position.x = start.x + (targetX-start.x)*ease;
+      bee.position.y = start.y + (targetY-start.y)*ease + Math.sin(t*Math.PI*4)*0.12;
+      bee.position.z = start.z + (targetZ-start.z)*ease;
+      const s = Math.min(0.45, t*1.2);
+      bee.scale.set(s, s, 1);
+      if(t < 1 && sceneRunning){
+        requestAnimationFrame(step);
+      }else{
+        scene.remove(bee);
+        spawnFieldFlower3D(targetX, targetY, targetZ);
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+function spawnFieldFlower3D(x, y, z){
+  const flower = FLOWERS[Math.floor(Math.random()*FLOWERS.length)];
+  getTexture(FLOWER_DIR+flower, function(tex){
+    const mat = new THREE.SpriteMaterial({map:tex, transparent:true});
+    const spr = new THREE.Sprite(mat);
+    const s = 0.32 + Math.random()*0.18;
+    spr.scale.set(0.001, 0.001, 1);
+    spr.position.set(x, y, z);
+    scene.add(spr);
+    const t0 = performance.now();
+    function step(now){
+      const t = Math.min(1, (now-t0)/400);
+      const cur = s*t;
+      spr.scale.set(cur, cur, 1);
+      if(t < 1 && sceneRunning) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    setTimeout(function(){
+      if(!scene) return;
+      scene.remove(spr);
+    }, 6000);
+  });
+}
+
+function spawn3DBurst(position){
+  if(!scene) return;
+  const group = new THREE.Group();
+  const colors = [0xffd700, 0xff6b6b, 0x6bc5ff, 0x9dff6b, 0xff9ecb];
+  const particles = [];
+  for(let i=0;i<12;i++){
+    const mat = new THREE.MeshBasicMaterial({color: colors[i % colors.length]});
+    const p = new THREE.Mesh(new THREE.SphereGeometry(0.055, 6, 6), mat);
+    p.position.copy(position);
+    const ang = Math.random()*Math.PI*2;
+    const speed = 0.8 + Math.random()*1.0;
+    p.userData.vel = new THREE.Vector3(Math.cos(ang)*speed, 1.4+Math.random()*1.1, Math.sin(ang)*speed);
+    group.add(p);
+    particles.push(p);
+  }
+  scene.add(group);
+  const t0 = performance.now();
+  function step(now){
+    const dt = 0.016, t = (now-t0)/1000;
+    particles.forEach(function(p){
+      p.userData.vel.y -= 2.4*dt;
+      p.position.addScaledVector(p.userData.vel, dt);
+      p.scale.setScalar(Math.max(0, 1 - t/0.8));
+    });
+    if(t < 0.8 && sceneRunning){
+      requestAnimationFrame(step);
+    }else{
+      scene.remove(group);
+      particles.forEach(function(p){ p.geometry.dispose(); p.material.dispose(); });
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function onCanvasPointerDown(e){
+  if(roundLocked || !noteObjects.length) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = ((e.clientX-rect.left)/rect.width)*2-1;
+  const y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:x, y:y}, camera);
+  const meshes = noteObjects.map(function(n){ return n.mesh; });
+  const hits = raycaster.intersectObjects(meshes, true);
+  if(!hits.length) return;
+  let hitGroup = hits[0].object;
+  while(hitGroup.parent && hitGroup.parent !== scene) hitGroup = hitGroup.parent;
+  const noteObj = noteObjects.find(function(n){ return n.mesh === hitGroup; });
+  if(noteObj) checkAnswer(noteObj.note.letter, false, noteObj);
+}
+
+function animate(now){
+  if(!sceneRunning) return;
+  requestAnimationFrame(animate);
+  idleT += 0.016;
+  noteObjects.forEach(function(n, i){
+    n.mesh.position.y = n.y + Math.sin(idleT*1.5 + i*0.6) * 0.035;
+  });
+  if(clefSprite){
+    clefSprite.position.y = (STAFF_TOP_Y - 2*LINE_GAP + 0.15) + Math.sin(idleT*1.2)*0.03;
+  }
+  renderer.render(scene, camera);
+}
+
+function initScene(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xbfe8f5);
+  scene.fog = new THREE.Fog(0xbfe8f5, 10, 22);
+
+  const wrap = document.getElementById('sceneWrap');
+  camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 100);
+
+  renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c3d'), antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+
+  scene.add(new THREE.AmbientLight(0xdfffe0, 0.8));
+  const sun = new THREE.DirectionalLight(0xfff4d6, 0.85);
+  sun.position.set(6, 10, 6);
+  scene.add(sun);
+
+  const groundMat = new THREE.MeshStandardMaterial({color:0x5fae52, roughness:1});
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.y = -0.6;
+  scene.add(ground);
+
+  buildStaffLines();
+  raycaster = new THREE.Raycaster();
+
+  renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
+  window.addEventListener('resize', resizeRenderer);
+  resizeRenderer();
+
+  sceneRunning = true;
+  requestAnimationFrame(animate);
+}
+
+/* ══ Logika rundy ══ */
+function checkAnswer(letter, isTimeout, tappedObj){
+  if(roundLocked) return;
+  roundLocked = true;
+  stopTimer();
+  const feedback = document.getElementById('feedbackMsg');
+  const correct = !isTimeout && (letter === targetNote.letter);
+
+  const targetObj = noteObjects.find(function(n){ return n.note.letter === targetNote.letter; });
+  noteObjects.slice().forEach(function(n){
+    if(n.note.letter !== targetNote.letter) flyAwayAsBee3D(n);
+  });
+
+  if(targetObj){
+    const ringMat = targetObj.mesh.userData.ring.material;
+    ringMat.opacity = 1;
+    const worldPos = new THREE.Vector3(targetObj.x, targetObj.y, 0.2);
+    setTimeout(function(){ spawn3DBurst(worldPos); }, correct ? 50 : 0);
+  }
+
+  if(correct){
+    playSuccessChime();
+    feedback.textContent = '✓ Dokładnie to! Dźwięk ' + letter + '.';
+    feedback.className = 'feedback-msg show ok';
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+  }else if(isTimeout){
+    playErrorBeep();
+    feedback.textContent = 'Czas minął — dobra nuta to ' + targetNote.letter + '.';
+    feedback.className = 'feedback-msg show bad';
+  }else{
+    playErrorBeep();
+    feedback.textContent = 'To nie ' + letter + ' — dobra nuta to ' + targetNote.letter + '.';
+    feedback.className = 'feedback-msg show bad';
+  }
+
+  setTimeout(nextRound, SPEEDS[speedMode].roundDelay);
+}
+
+function nextRound(){
+  round++;
+  roundLocked = false;
+  document.getElementById('feedbackMsg').classList.remove('show');
+  if(round >= TOTAL_ROUNDS){ stopTimer(); document.getElementById('timerBarWrap').classList.remove('show'); showWin(); return; }
+  roundOrder = shuffled(GAME_NOTES);
+  targetNote = roundOrder[Math.floor(Math.random()*roundOrder.length)];
+  document.getElementById('targetLetter').textContent = targetNote.letter;
+  renderRound(roundOrder, targetNote);
+  startTimer();
+}
+
+function showWin(){
+  document.getElementById('winText').textContent =
+    'Wynik: ' + score + ' / ' + TOTAL_ROUNDS + ' — ' +
+    (score === TOTAL_ROUNDS ? 'komplet! 🌟' : score >= TOTAL_ROUNDS*0.7 ? 'bardzo dobrze!' : 'ćwicz dalej!');
+  document.getElementById('winOverlay').classList.add('show');
+  spawnWinCelebration();
+}
+
+function spawnWinCelebration(){
+  const emojis = ['🎉','✨','🦋','🌸','⭐','🍃'];
+  for(let i=0;i<26;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = (Math.random()*100)+'vw';
+    const dur = 2.4 + Math.random()*2.2;
+    el.style.animationDuration = dur+'s';
+    el.style.animationDelay = (Math.random()*0.7)+'s';
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, (dur+1)*1000);
+  }
+}
+
+function restartGame(){
+  round = 0; score = 0;
+  stopTimer();
+  document.getElementById('scoreVal').textContent = '0';
+  document.getElementById('winOverlay').classList.remove('show');
+  if(!scene) initScene();
+  nextRound();
+}
+
+document.getElementById('totalVal').textContent = TOTAL_ROUNDS;
+document.querySelector('.setting-btn[data-speed="normal"]').classList.add('active');
+
+/* three.min.js ładuje się w tle po treści strony (żeby nic nie blokowało
+   renderowania), więc czekamy aż będzie gotowe zanim zbudujemy scenę. */
+function bootWhenReady(){
+  if(typeof THREE === 'undefined'){
+    setTimeout(bootWhenReady, 50);
+    return;
+  }
+  initScene();
+  restartGame();
+}
+bootWhenReady();
+</script>
+<script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
+</body>
+</html>

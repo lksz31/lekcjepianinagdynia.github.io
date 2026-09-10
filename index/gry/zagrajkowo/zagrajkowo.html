@@ -43,6 +43,15 @@
 
   .city-legend{text-align:center;color:var(--text-mid);font-size:0.8rem;margin-top:18px;}
 
+  .jungle-cta{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#0c2b1a,#1e4a2f);border-radius:24px;padding:22px 26px;margin-top:24px;text-decoration:none;color:white;cursor:pointer;border:none;width:100%;text-align:left;box-shadow:0 10px 30px rgba(12,43,26,0.25);transition:transform 0.2s;}
+  .jungle-cta:hover{transform:translateY(-3px);}
+  .jungle-cta-icon{font-size:2.6rem;flex-shrink:0;}
+  .jungle-cta-badge{display:inline-block;background:var(--gold);color:#1a1a2e;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;padding:3px 12px;border-radius:50px;margin-bottom:6px;}
+  .jungle-cta-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;margin-bottom:4px;display:block;}
+  .jungle-cta-desc{font-size:0.83rem;color:rgba(255,255,255,0.75);line-height:1.5;}
+  .jungle-cta-arrow{margin-left:auto;font-size:1.4rem;flex-shrink:0;opacity:0.8;}
+  @media(max-width:560px){.jungle-cta{flex-wrap:wrap;}.jungle-cta-arrow{display:none;}}
+
   /* ══ POPUP GRY ══ */
   .popup-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
   .popup-overlay.show{display:flex;}
@@ -118,6 +127,26 @@
     <button class="hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="openGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="b-label">Dopasuj nazwę</span></button>
   </div>
   <p class="city-legend">Kliknij w domek, żeby zagrać! 🎉</p>
+
+  <button type="button" class="jungle-cta" onclick="openGame(8)">
+    <span class="jungle-cta-icon">🐾🌴</span>
+    <span>
+      <span class="jungle-cta-badge">Nowość! Gra 3D</span>
+      <span class="jungle-cta-title">Dżungla Muzyczna</span>
+      <span class="jungle-cta-desc">Wybierz kotka lub piesa i rusz przez trójwymiarową dżunglę, rozwiązując zagadki muzyczne na każdej polance!</span>
+    </span>
+    <span class="jungle-cta-arrow">→</span>
+  </button>
+
+  <button type="button" class="jungle-cta" style="background:linear-gradient(135deg,#1e3a8a,#2f5ec4);margin-top:12px;" onclick="openGame(9)">
+    <span class="jungle-cta-icon">⭕🐝</span>
+    <span>
+      <span class="jungle-cta-badge">Nowość! Gra 3D</span>
+      <span class="jungle-cta-title">Zaznacz Nutę 3D</span>
+      <span class="jungle-cta-desc">Ta sama zabawa w znajdowanie nut, teraz na trójwymiarowej, unoszącej się pięciolinii nad łąką!</span>
+    </span>
+    <span class="jungle-cta-arrow">→</span>
+  </button>
 </div>
 
 <footer class="site-footer">
@@ -168,6 +197,8 @@ const GAMES = {
   5: {title:'✉️ Napisz list nutami', ready:true, url:'/index/gry/zagrajkowo/gra-list-nutami.html'},
   6: {title:'🧩 Ułóż klucz wiolinowy', ready:true, url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
   7: {title:'🔗 Dopasuj nazwę do obrazka', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
+  8: {title:'🐾 Dżungla Muzyczna 3D', ready:true, url:'/index/gry/zagrajkowo/gra-dzungla-3d.html'},
+  9: {title:'⭕ Zaznacz Nutę 3D', ready:true, url:'/index/gry/zagrajkowo/gra-zaznacz-nute-3d.html'},
 };
 
 let popupScrollY = 0;

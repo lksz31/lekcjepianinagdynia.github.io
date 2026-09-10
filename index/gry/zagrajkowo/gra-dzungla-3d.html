@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dżungla Muzyczna 3D | Zagrajkowo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
+  *,*::before,*::after{box-sizing:border-box;}
+  html{overscroll-behavior:none;}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;height:100vh;display:flex;flex-direction:column;}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:20;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
+  .back-link:hover{color:var(--gold);}
+  .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
+  .top-bar-right{display:flex;align-items:center;gap:10px;}
+  .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
+  .sound-toggle{background:var(--card-bg);border:1.5px solid var(--border);border-radius:50%;width:36px;height:36px;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.2s;flex-shrink:0;}
+  .sound-toggle:hover{border-color:var(--gold);}
+
+  /* ══ WYBÓR POSTACI ══ */
+  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 16px;background:linear-gradient(180deg,#e8f5e0,#faf9f7);}
+  .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.5rem;margin:0;text-align:center;}
+  .char-select p{color:var(--text-mid);font-size:0.9rem;text-align:center;max-width:380px;margin:0;line-height:1.6;}
+  .char-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
+  .char-card{width:150px;background:var(--card-bg);border:3px solid var(--border);border-radius:22px;padding:22px 12px;text-align:center;cursor:pointer;transition:0.2s;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+  .char-card:hover{border-color:var(--gold);transform:translateY(-3px);}
+  .char-card.selected{border-color:var(--navy);background:#eef3ff;transform:translateY(-3px);}
+  .char-card .char-emoji{font-size:3.2rem;display:block;margin-bottom:10px;}
+  .char-card .char-name{font-weight:800;color:var(--navy);font-size:0.95rem;}
+  .start-btn{background:var(--gold);color:#1a1a2e;border:none;padding:15px 44px;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:0.2s;opacity:0.4;pointer-events:none;}
+  .start-btn.active{opacity:1;pointer-events:auto;}
+  .start-btn.active:hover{transform:translateY(-2px);}
+
+  /* ══ SCENA 3D ══ */
+  .scene-wrap{flex:1;position:relative;overflow:hidden;background:#0c2b1a;}
+  #c3d{display:block;width:100%;height:100%;touch-action:none;}
+  .hint-badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,20,10,0.6);backdrop-filter:blur(6px);color:#fff;padding:8px 18px;border-radius:50px;font-size:0.78rem;font-weight:600;text-align:center;max-width:88%;pointer-events:none;z-index:5;transition:opacity 0.3s;}
+
+  /* ══ PANEL ZAGADKI ══ */
+  .puzzle-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);width:min(92%,420px);background:#3d2a17;background-image:linear-gradient(180deg,#4a3420,#3d2a17);border:3px solid #6b4a28;border-radius:18px;padding:16px 16px 14px;box-shadow:0 14px 34px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;z-index:10;}
+  .puzzle-panel.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+  .puzzle-title{color:#f0d99a;font-weight:800;font-size:0.85rem;text-align:center;margin-bottom:8px;}
+  .puzzle-staff{background:#fdf8ec;border-radius:10px;padding:6px;display:flex;justify-content:center;margin-bottom:12px;}
+  .puzzle-staff svg{width:130px;height:auto;display:block;}
+
+  .input-mode-row{display:flex;gap:8px;justify-content:center;margin-bottom:10px;}
+  .mode-btn{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.25);border-radius:50px;padding:6px 14px;font-size:0.72rem;font-weight:700;color:#f0d99a;cursor:pointer;transition:0.2s;}
+  .mode-btn.active{background:var(--gold);border-color:var(--gold);color:#3d2a17;}
+
+  .fruit-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
+  .fruit-tile{width:60px;height:60px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
+  .fruit-tile:active{transform:scale(0.93);}
+  .fruit-tile .fruit-emoji{font-size:1.5rem;line-height:1;}
+  .fruit-tile .fruit-letter{font-weight:900;color:#5a3d1c;font-size:0.8rem;margin-top:2px;}
+  .fruit-tile.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
+  .fruit-tile.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
+  @keyframes puzzlePop{0%{transform:scale(1);}50%{transform:scale(1.18);}100%{transform:scale(1);}}
+  @keyframes puzzleShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+  .mic-panel{text-align:center;padding:6px 4px 2px;}
+  .mic-vol-wrap{width:100%;height:8px;background:rgba(255,255,255,0.15);border-radius:6px;overflow:hidden;margin-bottom:10px;}
+  .mic-vol-bar{height:100%;width:0%;background:var(--gold);transition:width 0.1s linear;}
+  .mic-status{color:#f0d99a;font-size:0.82rem;font-weight:600;min-height:20px;}
+
+  .win-overlay{position:fixed;inset:0;background:rgba(10,30,15,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
+  .win-overlay.show{display:flex;}
+  .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
+  .win-overlay p{color:white;font-size:1.05rem;margin:0;max-width:420px;}
+  .win-btn{background:var(--gold);color:#1a1a2e;border:none;padding:14px 32px;border-radius:50px;font-weight:800;font-size:0.95rem;cursor:pointer;}
+
+  .confetti-piece{position:fixed;top:-30px;font-size:1.5rem;pointer-events:none;z-index:1200;animation:confettiFall linear forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg);opacity:1;}
+    100%{transform:translateY(112vh) rotate(360deg);opacity:0.85;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <span class="game-title-bar">🐾 Dżungla Muzyczna 3D</span>
+  <span class="top-bar-right">
+    <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
+    <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
+  </span>
+</div>
+
+<div class="char-select" id="charSelect">
+  <h2>Wybierz swojego towarzysza!</h2>
+  <p>Razem ruszycie przez dżunglę i będziecie rozwiązywać zagadki muzyczne, żeby odkrywać kolejne polanki.</p>
+  <div class="char-cards">
+    <div class="char-card" data-char="cat" onclick="selectChar('cat')">
+      <span class="char-emoji">🐱</span>
+      <span class="char-name">Kotek</span>
+    </div>
+    <div class="char-card" data-char="dog" onclick="selectChar('dog')">
+      <span class="char-emoji">🐶</span>
+      <span class="char-name">Piesek</span>
+    </div>
+  </div>
+  <button class="start-btn" id="startBtn" onclick="startGame()">Wyruszamy!</button>
+</div>
+
+<div class="scene-wrap" id="sceneWrap" style="display:none;">
+  <canvas id="c3d"></canvas>
+  <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
+  <div class="puzzle-panel" id="puzzlePanel">
+    <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
+    <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="input-mode-row">
+      <button type="button" class="mode-btn active" data-mode="tap" onclick="setInputMode('tap')">👆 Wybierz owoc</button>
+      <button type="button" class="mode-btn" data-mode="mic" onclick="setInputMode('mic')">🎤 Zagraj na pianinie</button>
+    </div>
+    <div class="fruit-row" id="fruitRow"></div>
+    <div class="mic-panel" id="micPanel" style="display:none;">
+      <div class="mic-vol-wrap"><div class="mic-vol-bar" id="micVolBar"></div></div>
+      <div class="mic-status" id="micStatus">Graj nutę na pianinie...</div>
+    </div>
+  </div>
+</div>
+
+<div class="win-overlay" id="winOverlay">
+  <div style="font-size:3.5rem;">🌺</div>
+  <h2>Dotarliście do serca dżungli!</h2>
+  <p id="winText"></p>
+  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+</div>
+
+<script>
+/* ══ Dźwięki (Web Audio) — jeden wspólny AudioContext dla wszystkiego ══ */
+let audioCtx = null;
+let soundEnabled = true;
+function getAudioCtx(){
+  if(!audioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new Ctx();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playErrorBeep(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    function tone(freq, start, dur){
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now+start);
+      gain.gain.exponentialRampToValueAtTime(0.16, now+start+0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+start+dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now+start); osc.stop(now+start+dur+0.03);
+    }
+    tone(220, 0, 0.14);
+    tone(185, 0.16, 0.20);
+  }catch(e){}
+}
+function playSuccessChime(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    function tone(freq, start, dur, vol){
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, now+start);
+      gain.gain.exponentialRampToValueAtTime(vol, now+start+0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now+start+dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now+start); osc.stop(now+start+dur+0.03);
+    }
+    tone(1046.5, 0,    0.18, 0.13);
+    tone(1318.5, 0.07, 0.18, 0.13);
+    tone(1568.0, 0.14, 0.22, 0.14);
+    tone(2093.0, 0.22, 0.30, 0.12);
+  }catch(e){}
+}
+
+/* ══ Dźwięki tła dżungli — filtrowany szum "wiatru" + losowe ćwierkania ptaków ══ */
+let ambientNodes = null;
+function playBirdChirp(){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const base = 1800 + Math.random()*1200;
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(base, now);
+    osc.frequency.exponentialRampToValueAtTime(base*1.4, now+0.08);
+    osc.frequency.exponentialRampToValueAtTime(base*0.85, now+0.18);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.05, now+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+0.22);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now+0.25);
+  }catch(e){}
+}
+function startAmbient(){
+  if(ambientNodes || !soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const bufferSize = 2*ctx.sampleRate;
+    const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    let last = 0;
+    for(let i=0;i<bufferSize;i++){
+      const white = Math.random()*2-1;
+      data[i] = (last + 0.02*white) / 1.02;
+      last = data[i];
+      data[i] *= 3.2;
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass'; filter.frequency.value = 480;
+    const gain = ctx.createGain(); gain.gain.value = 0.045;
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start();
+    const chirpTimer = setInterval(function(){ playBirdChirp(); }, 3000+Math.random()*4000);
+    ambientNodes = {src:src, gain:gain, chirpTimer:chirpTimer};
+  }catch(e){}
+}
+function stopAmbient(){
+  if(!ambientNodes) return;
+  try{ ambientNodes.src.stop(); }catch(e){}
+  clearInterval(ambientNodes.chirpTimer);
+  ambientNodes = null;
+}
+
+/* ══ Narracja głosowa (Web Speech API) ══ */
+let plVoice = null;
+function primeVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const pick = function(){
+    const voices = speechSynthesis.getVoices();
+    plVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf('pl') === 0; }) || null;
+  };
+  pick();
+  speechSynthesis.onvoiceschanged = pick;
+}
+function speak(text){
+  if(!soundEnabled || !('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'pl-PL';
+    u.rate = 0.95;
+    u.pitch = 1.05;
+    if(plVoice) u.voice = plVoice;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  document.getElementById('soundToggle').textContent = soundEnabled ? '🔊' : '🔇';
+  if(soundEnabled){
+    if(sceneRunning) startAmbient();
+  }else{
+    stopAmbient();
+    if('speechSynthesis' in window) speechSynthesis.cancel();
+  }
+}
+primeVoices();
+
+/* ══ Nuty / pięciolinia (te same stałe co w innych grach Zagrajkowa) ══ */
+const CLEFS = {
+  treble: {
+    url:'/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png',
+    ratio: 581/1361, pct:0.64, refIdx:3,
+    staffY:{C:10,D:9,E:8,F:7,G:6,A:5,H:4}
+  },
+  bass: {
+    url:'/index/fiszki/concept-art/klucz-bez-tla.png',
+    ratio: 148/231, pct:0.366, refIdx:1,
+    staffY:{C:5,D:4,E:3,F:2,G:1,A:0,H:-1}
+  }
+};
+const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
+const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
+const FRUIT_EMOJI = ['🥭','🍌','🍍','🍇','🍉','🥝','🍓','🍑'];
+/* Częstotliwości nut (jak w Fiszkach): oktawa razkreślna dla klucza
+   wiolinowego, mała oktawa dla klucza basowego. */
+const NOTE_FREQS = {
+  treble: {C:261.63, D:293.66, E:329.63, F:349.23, G:392.00, A:440.00, H:493.88},
+  bass:   {C:65.41,  D:73.42,  E:82.41,  F:87.31,  G:98.00,  A:110.00, H:123.47}
+};
+
+function renderPuzzleStaff(letter, clefName){
+  const cfg = CLEFS[clefName];
+  const c = '#1e3a8a';
+  const noteY = STAFF_TOP + (cfg.staffY[letter] * SG / 2);
+  const topLine = STAFF_TOP, botLine = STAFF_TOP + 4*SG, ledW = 9;
+
+  let s = '';
+  for(let i=0;i<5;i++){
+    const ly = STAFF_TOP + i*SG;
+    s += '<line x1="10" y1="'+ly+'" x2="'+(STAFF_VB_W-6)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.4"/>';
+  }
+  const ch = SG * (clefName==='treble' ? 6.0 : 4.4), cw = ch * cfg.ratio;
+  const cy = (STAFF_TOP + cfg.refIdx*SG) - cfg.pct*ch;
+  s += '<image href="'+cfg.url+'" x="9" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+
+  if(noteY > botLine + SG*0.5){
+    let ly = botLine + SG;
+    while(ly <= noteY + SG*0.3){
+      s += '<line x1="'+(NOTE_X-ledW)+'" y1="'+ly+'" x2="'+(NOTE_X+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.2"/>';
+      ly += SG;
+    }
+  }
+  if(noteY < topLine - SG*0.5){
+    let ly = topLine - SG;
+    while(ly >= noteY - SG*0.3){
+      s += '<line x1="'+(NOTE_X-ledW)+'" y1="'+ly+'" x2="'+(NOTE_X+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.2"/>';
+      ly -= SG;
+    }
+  }
+  s += '<ellipse cx="'+NOTE_X+'" cy="'+noteY+'" rx="6.4" ry="4.8" fill="#1e3a8a" transform="rotate(-15,'+NOTE_X+','+noteY+')"/>';
+
+  document.getElementById('puzzleStaffSvg').innerHTML = s;
+}
+
+function shuffled(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ══ Wybór postaci ══ */
+let chosenChar = null;
+function selectChar(kind){
+  chosenChar = kind;
+  document.querySelectorAll('.char-card').forEach(function(c){
+    c.classList.toggle('selected', c.dataset.char === kind);
+  });
+  document.getElementById('startBtn').classList.add('active');
+}
+function startGame(){
+  if(!chosenChar) return;
+  /* three.min.js ładuje się w tle po treści strony, żeby ekran wyboru
+     postaci pokazał się od razu — na wolnym łączu może jeszcze nie być
+     gotowy w momencie kliknięcia "Wyruszamy!", więc czekamy na niego. */
+  if(typeof THREE === 'undefined'){
+    const btn = document.getElementById('startBtn');
+    btn.textContent = 'Ładowanie…';
+    btn.classList.remove('active');
+    setTimeout(function(){
+      btn.textContent = 'Wyruszamy!';
+      btn.classList.add('active');
+      startGame();
+    }, 150);
+    return;
+  }
+  document.getElementById('charSelect').style.display = 'none';
+  document.getElementById('sceneWrap').style.display = 'block';
+  initScene();
+}
+
+/* ══ Scena 3D ══ */
+let scene, camera, renderer, raycaster, character, idleT = 0;
+let waypoints = [];
+let currentIdx = 0; /* indeks polanki, na której właśnie stoi postać (0 = start) */
+let score = 0, walking = false;
+let currentPuzzle = null;
+let sceneRunning = false;
+
+const PATH_POINTS = [
+  {x:0, z:0}, {x:2.6, z:-6}, {x:-2.2, z:-11.5}, {x:2.6, z:-17},
+  {x:-2.6, z:-22.5}, {x:2.2, z:-28.5}, {x:-1.8, z:-34.5}, {x:0, z:-40.5}
+];
+
+function buildCharacter(kind){
+  const g = new THREE.Group();
+  const bodyColor = kind === 'cat' ? 0xf3934a : 0xb9814f;
+  const bellyColor = 0xfdf3e0;
+  const mat = new THREE.MeshStandardMaterial({color:bodyColor, roughness:0.75});
+  const bellyMat = new THREE.MeshStandardMaterial({color:bellyColor, roughness:0.8});
+
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.4, 16, 12), mat);
+  body.scale.set(1, 0.85, 1.35);
+  body.position.y = 0.5;
+  g.add(body);
+
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), bellyMat);
+  belly.scale.set(0.9, 0.8, 1.1);
+  belly.position.set(0, 0.42, 0.18);
+  g.add(belly);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.33, 16, 14), mat);
+  head.position.set(0, 0.86, 0.5);
+  g.add(head);
+
+  const muzzle = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), bellyMat);
+  muzzle.position.set(0, 0.78, 0.76);
+  muzzle.scale.set(1, 0.8, 0.9);
+  g.add(muzzle);
+
+  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), new THREE.MeshStandardMaterial({color:0x2a1a12}));
+  nose.position.set(0, 0.82, 0.9);
+  g.add(nose);
+
+  const eyeMat = new THREE.MeshStandardMaterial({color:0x1a1a1a});
+  [-0.13, 0.13].forEach(function(dx){
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), eyeMat);
+    eye.position.set(dx, 0.9, 0.78);
+    g.add(eye);
+  });
+
+  if(kind === 'cat'){
+    [-0.19, 0.19].forEach(function(dx){
+      const ear = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.22, 4), mat);
+      ear.position.set(dx, 1.13, 0.46);
+      ear.rotation.y = Math.PI/4;
+      g.add(ear);
+    });
+    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.08, 0.7, 8), mat);
+    tail.position.set(0, 0.72, -0.62);
+    tail.rotation.x = -0.9;
+    g.add(tail);
+  }else{
+    [-0.22, 0.22].forEach(function(dx){
+      const ear = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), mat);
+      ear.scale.set(0.6, 1.2, 0.4);
+      ear.position.set(dx, 0.98, 0.48);
+      ear.rotation.z = dx < 0 ? 0.3 : -0.3;
+      g.add(ear);
+    });
+    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.4, 8), mat);
+    tail.position.set(0, 0.62, -0.68);
+    tail.rotation.x = -0.5;
+    g.add(tail);
+  }
+
+  const legMat = mat;
+  const legPositions = [[-0.2,0.16,0.32],[0.2,0.16,0.32],[-0.2,0.16,-0.32],[0.2,0.16,-0.32]];
+  legPositions.forEach(function(p){
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.32, 8), legMat);
+    leg.position.set(p[0], p[1], p[2]);
+    g.add(leg);
+  });
+
+  g.userData.head = head;
+  return g;
+}
+
+function buildTree(){
+  const g = new THREE.Group();
+  const trunkMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.24, 1.6, 7), trunkMat);
+  trunk.position.y = 0.8;
+  g.add(trunk);
+  const leafMat = new THREE.MeshStandardMaterial({color:0x2f7a3e, roughness:0.85});
+  const leafMat2 = new THREE.MeshStandardMaterial({color:0x3f9950, roughness:0.85});
+  for(let i=0;i<3;i++){
+    const s = 0.95 - i*0.18;
+    const leaf = new THREE.Mesh(new THREE.ConeGeometry(s, 1.05, 8), i%2===0?leafMat:leafMat2);
+    leaf.position.y = 1.55 + i*0.7;
+    g.add(leaf);
+  }
+  return g;
+}
+
+function buildMarker(){
+  const g = new THREE.Group();
+  const ring = new THREE.Mesh(
+    new THREE.TorusGeometry(0.55, 0.06, 10, 28),
+    new THREE.MeshStandardMaterial({color:0xd4af37, emissive:0x6b5216, roughness:0.4})
+  );
+  ring.rotation.x = Math.PI/2;
+  ring.position.y = 0.04;
+  g.add(ring);
+
+  const noteMat = new THREE.MeshStandardMaterial({color:0xfff4d6, emissive:0xd4af37, emissiveIntensity:0.5});
+  const noteHead = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), noteMat);
+  noteHead.position.y = 1.1;
+  g.add(noteHead);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.5, 6), noteMat);
+  stem.position.set(0.13, 1.35, 0);
+  g.add(stem);
+
+  const light = new THREE.PointLight(0xffe9a8, 0.9, 4);
+  light.position.y = 1.1;
+  g.add(light);
+
+  /* Niewidzialny, szeroki obszar trafienia — dzieci na tablecie nie trafią
+     idealnie w cienki pierścień, więc cel kliknięcia musi być dużo większy
+     niż to, co faktycznie widać. */
+  const hitArea = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.0, 1.0, 1.8, 12),
+    new THREE.MeshBasicMaterial({visible:false})
+  );
+  hitArea.position.y = 0.6;
+  g.add(hitArea);
+
+  g.userData.bobPhase = Math.random()*Math.PI*2;
+  return g;
+}
+
+function distToPath(x, z){
+  let min = Infinity;
+  PATH_POINTS.forEach(function(p){
+    const d = Math.hypot(p.x-x, p.z-z);
+    if(d < min) min = d;
+  });
+  return min;
+}
+
+function scatterTrees(){
+  for(let i=0;i<26;i++){
+    const x = (Math.random()*2-1) * 9;
+    const z = -Math.random()*44 + 2;
+    if(distToPath(x, z) < 2.4) continue;
+    if(Math.hypot(x, z) < 4.5) continue;
+    const tree = buildTree();
+    tree.position.set(x, 0, z);
+    const s = 0.75 + Math.random()*0.6;
+    tree.scale.set(s, s, s);
+    tree.rotation.y = Math.random()*Math.PI*2;
+    scene.add(tree);
+  }
+}
+
+function buildTrail(){
+  const stoneMat = new THREE.MeshStandardMaterial({color:0xa9895c, roughness:0.95});
+  for(let seg=0; seg<PATH_POINTS.length-1; seg++){
+    const a = PATH_POINTS[seg], b = PATH_POINTS[seg+1];
+    const steps = 8;
+    for(let i=0;i<=steps;i++){
+      const t = i/steps;
+      const x = a.x + (b.x-a.x)*t + (Math.random()*0.5-0.25);
+      const z = a.z + (b.z-a.z)*t + (Math.random()*0.5-0.25);
+      const stone = new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.34,0.06,7), stoneMat);
+      stone.position.set(x, 0.01, z);
+      stone.rotation.y = Math.random()*Math.PI;
+      scene.add(stone);
+    }
+  }
+}
+
+/* Im węższy/bardziej kwadratowy kadr (tablet pionowo, ale też popup na
+   komputerze — prawie kwadratowy 840x760), tym więcej pustej trawy widać
+   pod nogami postaci, bo pionowe pole widzenia się nie zmienia. Zamiast
+   sztywnego progu, płynnie mieszamy dwa ustawienia kamery zależnie od
+   proporcji ekranu, żeby kadr zawsze skupiał się na ścieżce. */
+function aspectBlendFactor(aspect){
+  return Math.min(1, Math.max(0, (aspect - 0.85) / (1.6 - 0.85)));
+}
+
+function resizeRenderer(){
+  const wrap = document.getElementById('sceneWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(!w || !h) return;
+  renderer.setSize(w, h, false);
+  const aspect = w/h;
+  camera.aspect = aspect;
+  const t = aspectBlendFactor(aspect);
+  camera.fov = 40 + (50-40)*t;
+  camera.updateProjectionMatrix();
+}
+
+function cameraOffsetForAspect(){
+  const t = aspectBlendFactor(camera.aspect);
+  const near = new THREE.Vector3(0, 2.8, 6.2);
+  const wide = new THREE.Vector3(0, 4.4, 6.6);
+  return {
+    back: near.clone().lerp(wide, t),
+    lookY: 2.1 + (0.7-2.1)*t
+  };
+}
+
+function buildPuzzleForWaypoint(idx){
+  const letter = LETTERS_ORDER[(idx-1) % LETTERS_ORDER.length];
+  const clefName = (idx % 2 === 1) ? 'treble' : 'bass';
+  return {letter: letter, clef: clefName};
+}
+
+function showPuzzle(idx){
+  currentPuzzle = buildPuzzleForWaypoint(idx);
+  renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef);
+  document.getElementById('puzzleTitle').textContent =
+    currentPuzzle.clef === 'treble' ? 'Jaki to dźwięk? (klucz wiolinowy)' : 'Jaki to dźwięk? (klucz basowy)';
+
+  const distractorPool = LETTERS_ORDER.filter(function(l){ return l !== currentPuzzle.letter; });
+  const distractors = shuffled(distractorPool).slice(0,3);
+  const options = shuffled([currentPuzzle.letter].concat(distractors));
+  const emojis = shuffled(FRUIT_EMOJI).slice(0,4);
+
+  const row = document.getElementById('fruitRow');
+  row.innerHTML = '';
+  options.forEach(function(letter, i){
+    const tile = document.createElement('div');
+    tile.className = 'fruit-tile';
+    tile.innerHTML = '<span class="fruit-emoji">'+emojis[i]+'</span><span class="fruit-letter">'+letter+'</span>';
+    tile.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      onFruitPick(letter, tile);
+    });
+    row.appendChild(tile);
+  });
+
+  document.getElementById('puzzlePanel').classList.add('show');
+  document.getElementById('hintBadge').style.opacity = '0';
+  setInputMode(inputMode);
+}
+
+function hidePuzzle(){
+  document.getElementById('puzzlePanel').classList.remove('show');
+  stopMic();
+}
+
+/* ══ Tryb wejścia: dotyk owocu lub gra na prawdziwym pianinie ══ */
+let inputMode = 'tap';
+let micStream = null, micCtx = null, micAnalyser = null, micInterval = null, micMatchHist = [];
+
+function setInputMode(mode){
+  inputMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.getElementById('fruitRow').style.display = mode === 'tap' ? 'flex' : 'none';
+  document.getElementById('micPanel').style.display = mode === 'mic' ? 'block' : 'none';
+  if(mode === 'mic') startMic(); else stopMic();
+}
+
+function startMic(){
+  if(micStream || !currentPuzzle) return;
+  const statusEl = document.getElementById('micStatus');
+  statusEl.textContent = 'Proszę o dostęp do mikrofonu...';
+  navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}})
+    .then(function(stream){
+      if(inputMode !== 'mic'){ stream.getTracks().forEach(function(t){ t.stop(); }); return; }
+      micStream = stream;
+      micCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = micCtx.createMediaStreamSource(stream);
+      micAnalyser = micCtx.createAnalyser();
+      micAnalyser.fftSize = 8192;
+      micAnalyser.smoothingTimeConstant = 0.6;
+      src.connect(micAnalyser);
+      micMatchHist = [];
+      micInterval = setInterval(detectMicPitch, 100);
+      statusEl.textContent = 'Graj nutę na pianinie...';
+    })
+    .catch(function(){
+      statusEl.textContent = 'Brak dostępu do mikrofonu — spróbuj dotknąć owocu.';
+    });
+}
+
+function stopMic(){
+  if(micInterval){ clearInterval(micInterval); micInterval = null; }
+  if(micStream){ micStream.getTracks().forEach(function(t){ t.stop(); }); micStream = null; }
+  if(micCtx){ try{ micCtx.close(); }catch(e){} micCtx = null; }
+  micAnalyser = null;
+  micMatchHist = [];
+  const bar = document.getElementById('micVolBar');
+  if(bar) bar.style.width = '0%';
+}
+
+function micAutoCorr(buf, sr){
+  let rms = 0;
+  for(let i=0;i<buf.length;i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms/buf.length);
+  if(rms < 0.006) return -1;
+  let r1 = 0, r2 = buf.length-1;
+  for(let i=0;i<buf.length/2;i++){ if(Math.abs(buf[i])<0.12){ r1=i; break; } }
+  for(let i=1;i<buf.length/2;i++){ if(Math.abs(buf[buf.length-i])<0.12){ r2=buf.length-i; break; } }
+  const s = buf.slice(r1, r2);
+  if(s.length < 2) return -1;
+  const c = new Float32Array(s.length);
+  for(let i=0;i<s.length;i++) for(let j=0;j<s.length-i;j++) c[i] += s[j]*s[j+i];
+  let d = 0;
+  while(d < c.length-1 && c[d] > c[d+1]) d++;
+  let mv = -1, mp = -1;
+  for(let i=d;i<s.length;i++){ if(c[i]>mv){ mv=c[i]; mp=i; } }
+  if(mp < 1) return -1;
+  let T = mp;
+  if(T > 0 && T < c.length-1){
+    const a = (c[T-1]+c[T+1]-2*c[T])/2, b = (c[T+1]-c[T-1])/2;
+    if(a) T -= b/(2*a);
+  }
+  const f = sr/T;
+  return (f<50 || f>2000) ? -1 : f;
+}
+
+function detectMicPitch(){
+  if(!micAnalyser || !currentPuzzle) return;
+  const buf = new Float32Array(micAnalyser.fftSize);
+  micAnalyser.getFloatTimeDomainData(buf);
+  const bar = document.getElementById('micVolBar');
+  const freq = micAutoCorr(buf, micCtx.sampleRate);
+  if(freq < 0){
+    micMatchHist = [];
+    if(bar) bar.style.width = '0%';
+    return;
+  }
+  if(bar) bar.style.width = '55%';
+  const targetFreq = NOTE_FREQS[currentPuzzle.clef][currentPuzzle.letter];
+  micMatchHist.push(freq);
+  if(micMatchHist.length > 4) micMatchHist.shift();
+  document.getElementById('micStatus').textContent = 'Słyszę: ' + Math.round(freq) + ' Hz';
+  /* tolerancja oktawowa — dziecko może zagrać nutę o oktawę wyżej/niżej */
+  const matchCount = micMatchHist.filter(function(f){
+    for(let shift=-1; shift<=1; shift++){
+      const adj = f * Math.pow(2, shift);
+      if(Math.abs(adj-targetFreq)/targetFreq < 0.035) return true;
+    }
+    return false;
+  }).length;
+  if(matchCount >= 3){
+    micMatchHist = [];
+    if(bar) bar.style.width = '100%';
+    onFruitPick(currentPuzzle.letter, null);
+  }
+}
+
+function onFruitPick(letter, tileEl){
+  if(!currentPuzzle) return;
+  if(letter === currentPuzzle.letter){
+    const solvedIdx = currentIdx;
+    currentPuzzle = null; /* natychmiast, żeby drugi trafiony dźwięk (mikrofon) albo podwójny dotyk nie policzyły punktu dwa razy */
+    stopMic();
+    playSuccessChime();
+    if(tileEl) tileEl.classList.add('correct-flash');
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+    const burstPos = waypoints[currentIdx].pos.clone();
+    burstPos.y += 1.1;
+    spawn3DBurst(burstPos);
+    setTimeout(function(){
+      hidePuzzle();
+      waypoints[solvedIdx].solved = true;
+      hideMarker(solvedIdx);
+      if(solvedIdx === PATH_POINTS.length - 1){
+        setTimeout(showWin, 500);
+      }else{
+        activateMarker(solvedIdx + 1);
+        document.getElementById('hintBadge').style.opacity = '1';
+      }
+    }, 500);
+  }else{
+    playErrorBeep();
+    if(tileEl){
+      tileEl.classList.add('wrong-flash');
+      setTimeout(function(){ tileEl.classList.remove('wrong-flash'); }, 400);
+    }
+  }
+}
+
+/* ══ Efekty świętowania ══ */
+function spawn3DBurst(position){
+  if(!scene) return;
+  const group = new THREE.Group();
+  const colors = [0xffd700, 0xff6b6b, 0x6bc5ff, 0x9dff6b, 0xff9ecb];
+  const particles = [];
+  for(let i=0;i<12;i++){
+    const mat = new THREE.MeshBasicMaterial({color: colors[i % colors.length]});
+    const p = new THREE.Mesh(new THREE.SphereGeometry(0.065, 6, 6), mat);
+    p.position.copy(position);
+    const ang = Math.random()*Math.PI*2;
+    const speed = 0.9 + Math.random()*1.1;
+    p.userData.vel = new THREE.Vector3(Math.cos(ang)*speed, 1.6+Math.random()*1.3, Math.sin(ang)*speed);
+    group.add(p);
+    particles.push(p);
+  }
+  scene.add(group);
+  const t0 = performance.now();
+  function step(now){
+    const dt = 0.016, t = (now-t0)/1000;
+    particles.forEach(function(p){
+      p.userData.vel.y -= 2.4*dt;
+      p.position.addScaledVector(p.userData.vel, dt);
+      const s = Math.max(0, 1 - t/0.85);
+      p.scale.setScalar(s);
+    });
+    if(t < 0.85 && sceneRunning){
+      requestAnimationFrame(step);
+    }else{
+      scene.remove(group);
+      particles.forEach(function(p){ p.geometry.dispose(); p.material.dispose(); });
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function spawnWinCelebration(){
+  const emojis = ['🎉','✨','🦋','🌸','⭐','🍃'];
+  for(let i=0;i<26;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left = (Math.random()*100)+'vw';
+    const dur = 2.4 + Math.random()*2.2;
+    el.style.animationDuration = dur+'s';
+    el.style.animationDelay = (Math.random()*0.7)+'s';
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, (dur+1)*1000);
+  }
+}
+
+function activateMarker(idx){
+  const wp = waypoints[idx];
+  if(!wp || !wp.markerGroup) return;
+  wp.markerGroup.visible = true;
+  wp.active = true;
+}
+function hideMarker(idx){
+  const wp = waypoints[idx];
+  if(!wp || !wp.markerGroup) return;
+  wp.markerGroup.visible = false;
+  wp.active = false;
+}
+
+function walkTo(idx){
+  if(walking) return;
+  walking = true;
+  const target = waypoints[idx].pos;
+  const start = character.position.clone();
+  const duration = 1100;
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const ease = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+    character.position.x = start.x + (target.x-start.x)*ease;
+    character.position.z = start.z + (target.z-start.z)*ease;
+    character.position.y = Math.abs(Math.sin(t*Math.PI*7)) * 0.09;
+    const lookAhead = new THREE.Vector3(target.x, character.position.y, target.z);
+    if(lookAhead.distanceTo(character.position) > 0.05){
+      character.lookAt(lookAhead);
+    }
+    if(t < 1){
+      requestAnimationFrame(step);
+    }else{
+      character.position.y = 0;
+      walking = false;
+      currentIdx = idx;
+      onArrive(idx);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function onArrive(idx){
+  if(idx === 0) return;
+  if(waypoints[idx].solved) return;
+  showPuzzle(idx);
+}
+
+function onCanvasPointerDown(e){
+  if(walking || currentPuzzle) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = ((e.clientX-rect.left)/rect.width)*2-1;
+  const y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:x,y:y}, camera);
+
+  const nextIdx = currentIdx + 1;
+  if(nextIdx >= waypoints.length) return;
+  const marker = waypoints[nextIdx].markerGroup;
+  if(!marker || !marker.visible) return;
+  const hits = raycaster.intersectObject(marker, true);
+  if(hits.length){
+    walkTo(nextIdx);
+  }
+}
+
+function updateCamera(){
+  const cfg = cameraOffsetForAspect();
+  const desired = character.position.clone().add(cfg.back);
+  camera.position.lerp(desired, 0.06);
+  const lookTarget = character.position.clone();
+  lookTarget.y += cfg.lookY;
+  camera.lookAt(lookTarget);
+}
+
+function animate(now){
+  if(!sceneRunning) return;
+  requestAnimationFrame(animate);
+  idleT += 0.016;
+  if(character && !walking){
+    character.position.y = Math.sin(idleT*2.2) * 0.015;
+  }
+  waypoints.forEach(function(wp){
+    if(wp.markerGroup && wp.markerGroup.visible){
+      wp.markerGroup.rotation.y += 0.015;
+      wp.markerGroup.position.y = Math.sin(idleT*1.6 + wp.markerGroup.userData.bobPhase) * 0.1;
+    }
+  });
+  updateCamera();
+  renderer.render(scene, camera);
+}
+
+function initScene(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9fd8ef);
+  scene.fog = new THREE.Fog(0x9fd8ef, 18, 46);
+
+  const wrap = document.getElementById('sceneWrap');
+  camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
+
+  renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c3d'), antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  resizeRenderer();
+
+  scene.add(new THREE.AmbientLight(0xcfe8c9, 0.75));
+  const sun = new THREE.DirectionalLight(0xfff4d6, 0.85);
+  sun.position.set(8, 16, 8);
+  scene.add(sun);
+
+  const groundMat = new THREE.MeshStandardMaterial({color:0x3a7a3f, roughness:1});
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 90), groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.position.z = -20;
+  scene.add(ground);
+
+  buildTrail();
+  scatterTrees();
+
+  raycaster = new THREE.Raycaster();
+
+  waypoints = PATH_POINTS.map(function(p, i){
+    const pos = new THREE.Vector3(p.x, 0, p.z);
+    const wp = {pos: pos, solved: i===0, active:false, markerGroup:null};
+    if(i > 0){
+      const marker = buildMarker();
+      marker.position.copy(pos);
+      marker.visible = false;
+      scene.add(marker);
+      wp.markerGroup = marker;
+    }
+    return wp;
+  });
+
+  character = buildCharacter(chosenChar);
+  character.position.copy(waypoints[0].pos);
+  character.rotation.y = Math.PI;
+  scene.add(character);
+
+  currentIdx = 0;
+  score = 0;
+  document.getElementById('scoreVal').textContent = '0';
+  activateMarker(1);
+
+  const initCam = cameraOffsetForAspect();
+  camera.position.copy(character.position.clone().add(initCam.back));
+  camera.lookAt(character.position.x, character.position.y + initCam.lookY, character.position.z);
+
+  renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
+  window.addEventListener('resize', resizeRenderer);
+
+  sceneRunning = true;
+  requestAnimationFrame(animate);
+
+  startAmbient();
+  speak('Witaj w Muzycznej Dżungli! Znajdź świecącą nutkę na ścieżce i idź dalej.');
+}
+
+function showWin(){
+  document.getElementById('winText').textContent =
+    'Zebraliście ' + score + ' / ' + (PATH_POINTS.length-1) + ' nutek i przeszliście całą dżunglę!';
+  document.getElementById('winOverlay').classList.add('show');
+  speak('Brawo! Dotarliście do serca dżungli!');
+  spawnWinCelebration();
+}
+
+function restartGame(){
+  sceneRunning = false;
+  document.getElementById('winOverlay').classList.remove('show');
+  document.getElementById('charSelect').style.display = 'flex';
+  document.getElementById('sceneWrap').style.display = 'none';
+  if(renderer){
+    renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
+    window.removeEventListener('resize', resizeRenderer);
+  }
+  scene = null; camera = null; renderer = null; waypoints = []; currentPuzzle = null; walking = false;
+  document.getElementById('startBtn').classList.remove('active');
+  document.querySelectorAll('.char-card').forEach(function(c){ c.classList.remove('selected'); });
+  chosenChar = null;
+  stopAmbient();
+  stopMic();
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+}
+</script>
+<script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
+</body>
+</html>
