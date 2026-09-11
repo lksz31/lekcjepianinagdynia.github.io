@@ -47,10 +47,9 @@
   #c3d{display:block;width:100%;height:100%;touch-action:none;}
   .hint-badge{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(10,20,10,0.6);backdrop-filter:blur(6px);color:#fff;padding:8px 18px;border-radius:50px;font-size:0.78rem;font-weight:600;text-align:center;max-width:88%;pointer-events:none;z-index:5;transition:opacity 0.3s;}
 
-  /* ══ Joystick obrotu kamery ══ */
-  .joystick-base{position:absolute;top:66px;right:16px;width:76px;height:76px;border-radius:50%;background:rgba(10,20,10,0.35);border:2px solid rgba(255,255,255,0.45);backdrop-filter:blur(4px);z-index:6;touch-action:none;}
-  .joystick-knob{position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:rgba(255,255,255,0.9);border:2px solid var(--gold);pointer-events:none;transition:transform 0.05s linear;}
-  .joystick-label{position:absolute;top:144px;right:16px;width:76px;text-align:center;color:#fff;font-size:0.62rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.6);pointer-events:none;z-index:6;}
+  /* ══ Obrót widoku: przesunięcie palcem po ekranie (bez joysticka) ══ */
+  .swipe-hint{position:absolute;top:14px;right:14px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;padding:6px 12px;border-radius:50px;font-size:0.68rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.5);pointer-events:none;z-index:6;max-width:150px;text-align:center;animation:swipeHintFade 4.5s forwards;}
+  @keyframes swipeHintFade{0%,55%{opacity:1;}100%{opacity:0;}}
 
   /* ══ PANEL ZAGADKI ══ */
   .puzzle-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);width:min(92%,420px);background:#3d2a17;background-image:linear-gradient(180deg,#4a3420,#3d2a17);border:3px solid #6b4a28;border-radius:18px;padding:16px 16px 14px;box-shadow:0 14px 34px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;z-index:10;}
@@ -116,6 +115,13 @@
       <button type="button" class="clef-btn" data-clef="both" onclick="setClefMode('both')">Oba na zmianę</button>
     </div>
   </div>
+  <div class="clef-settings">
+    <span class="clef-settings-label">Poziom trudności</span>
+    <div class="clef-btn-row">
+      <button type="button" class="clef-btn diff-btn" data-diff="easy" onclick="setDifficultyMode('easy')">Łatwy (po kolei)</button>
+      <button type="button" class="clef-btn diff-btn" data-diff="hard" onclick="setDifficultyMode('hard')">Trudny (losowo)</button>
+    </div>
+  </div>
   <div class="char-cards">
     <div class="char-card" data-char="cat" onclick="selectChar('cat')">
       <img class="char-img" src="/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/kotek-3d-gra.webp" alt="Kotek">
@@ -132,8 +138,7 @@
 <div class="scene-wrap" id="sceneWrap" style="display:none;">
   <canvas id="c3d"></canvas>
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
-  <div class="joystick-base" id="joystickBase"><div class="joystick-knob" id="joystickKnob"></div></div>
-  <div class="joystick-label">obróć widok</div>
+  <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -306,6 +311,24 @@ function setClefMode(mode){
 document.querySelectorAll('.clef-btn').forEach(function(b){
   b.classList.toggle('active', b.dataset.clef === clefMode);
 });
+
+/* Poziom trudności — łatwy: litery po kolei C D E F G A H (tak jak było
+   zawsze); trudny: losowa litera za każdym razem, bez utrwalonej kolejności. */
+let difficultyMode = 'easy';
+try{
+  const savedDiff = localStorage.getItem('dzunglaDifficulty');
+  if(savedDiff === 'easy' || savedDiff === 'hard') difficultyMode = savedDiff;
+}catch(e){}
+function setDifficultyMode(mode){
+  difficultyMode = mode;
+  try{ localStorage.setItem('dzunglaDifficulty', mode); }catch(e){}
+  document.querySelectorAll('.diff-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.diff === mode);
+  });
+}
+document.querySelectorAll('.diff-btn').forEach(function(b){
+  b.classList.toggle('active', b.dataset.diff === difficultyMode);
+});
 const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
 /* Każda nuta ma "swój" owoc/produkt, który zaczyna się na tę samą literę —
    dzięki temu dziecko kojarzy dźwięk z jedzeniem po pierwszej literze,
@@ -410,7 +433,7 @@ let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — 
   trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
 let currentPuzzle = null;
 let sceneRunning = false;
-let orbitAngle = 0; /* dodatkowy obrót kamery wokół postaci — joystick i/lub obrót urządzenia */
+let orbitAngle = 0; /* dodatkowy obrót kamery wokół postaci — przesunięcie palcem i/lub obrót urządzenia */
 
 const PATH_POINTS = [
   {x:0, z:0}, {x:2.6, z:-6}, {x:-0.4, z:-11.5}, {x:0.4, z:-17},
@@ -707,7 +730,20 @@ function updateCompanions(){
     }
     const groundY = groundLevelAt(animal.position.x, animal.position.z);
     const bobH = animal.userData.flies ? 0.3 : 0.05;
-    animal.position.y = groundY + bobH + Math.abs(Math.sin(idleT*(animal.userData.flies?7:2.4) + i))*bobH;
+    let hopOffset = 0;
+    if(!animal.userData.flies){
+      /* od czasu do czasu delikatny podskok, niezależnie od chodzenia */
+      if(animal.userData.nextHopT === undefined) animal.userData.nextHopT = idleT + 1.5 + Math.random()*3;
+      if(idleT >= animal.userData.nextHopT){
+        animal.userData.hopStart = idleT;
+        animal.userData.nextHopT = idleT + 2.5 + Math.random()*3.5;
+      }
+      if(animal.userData.hopStart !== undefined){
+        const hopT = (idleT - animal.userData.hopStart) / 0.34;
+        if(hopT >= 0 && hopT <= 1) hopOffset = Math.sin(hopT*Math.PI) * 0.22;
+      }
+    }
+    animal.position.y = groundY + bobH + Math.abs(Math.sin(idleT*(animal.userData.flies?7:2.4) + i))*bobH + hopOffset;
   });
 }
 
@@ -1223,13 +1259,19 @@ function nearRiver(x, z){
    porządne przejście z jednej strony na drugą, zamiast urwistego progu.
    Dolina rzeki jest zbyt stroma, żeby przejść nią na wprost — most jest
    jedyną przeprawą. */
+/* Na poziomie 2 most jest trochę dłuższy niż na 1 (i wizualnie kręty —
+   patrz buildRiverAndBridge) — pokład musi więc też być trochę dłuższy. */
+function bridgeDeckHalf(){
+  return currentLevel === 2 ? BRIDGE_DECK_HALF + 1.0 : BRIDGE_DECK_HALF;
+}
 function groundLevelAt(x, z){
   const base = terrainHeight(x, z);
   if(Math.abs(x) > 2.0) return base;
+  const deckHalf = bridgeDeckHalf();
   const dz = Math.abs(z - RIVER_Z);
-  if(dz <= BRIDGE_DECK_HALF) return BRIDGE_Y;
-  if(dz >= BRIDGE_DECK_HALF + BRIDGE_RAMP) return base;
-  const vt = 1 - (dz - BRIDGE_DECK_HALF)/BRIDGE_RAMP;
+  if(dz <= deckHalf) return BRIDGE_Y;
+  if(dz >= deckHalf + BRIDGE_RAMP) return base;
+  const vt = 1 - (dz - deckHalf)/BRIDGE_RAMP;
   const smooth = vt*vt*(3-2*vt);
   return base + smooth * (BRIDGE_Y - base);
 }
@@ -1265,6 +1307,14 @@ function terrainHeight(x, z){
    leżały na boku). */
 function spinAroundUp(obj, angle){
   obj.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), angle));
+}
+
+/* Ustawia obiekt (domyślnie walec wzdłuż lokalnej osi Y) tak, żeby jego oś
+   wskazywała w dowolnym kierunku (dx,dy,dz) w świecie — bezpieczniejsze niż
+   ręczne składanie rotation.x/y/z, bo omija kolejność osi Eulera. */
+function orientCylinderAlong(mesh, dx, dy, dz){
+  const dir = new THREE.Vector3(dx, dy, dz).normalize();
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
 }
 
 function buildHouse(){
@@ -1467,16 +1517,32 @@ function buildRiverAndBridge(){
 
   /* Most — długi, podniesiony pokład nad całą doliną (BRIDGE_Y), z nogami
      schodzącymi do dna, i sznurowymi poręczami (górna lina + skrzyżowane
-     sznurki między poręczą a pokładem, jak w moście linowym). */
+     sznurki między poręczą a pokładem, jak w moście linowym). Na poziomie 2
+     most jest trochę dłuższy i lekko kręty (fala w bok wzdłuż długości) —
+     inny niż na poziomie 1, choć postać wciąż przechodzi nim po prostej
+     linii ścieżki, więc krzywizna jest celowo umiarkowana. */
+  const winding = currentLevel === 2;
+  const deckHalf = bridgeDeckHalf();
+  const deckLen = deckHalf*2;
+  function curveX(z){
+    if(!winding) return 0;
+    const t = (z - RIVER_Z) / deckHalf;
+    return 0.35 * Math.sin(t * Math.PI * 1.5);
+  }
   const deckMat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.85});
-  const deckWidth = 1.8, deckLen = RIVER_VALLEY_HALF*2 - 1;
-  const deck = new THREE.Mesh(new THREE.BoxGeometry(deckWidth, 0.08, deckLen), deckMat);
-  deck.position.set(0, BRIDGE_Y, RIVER_Z);
-  scene.add(deck);
-  const plankCount = 18;
+  const deckWidth = 1.8;
+  if(!winding){
+    /* prosty most poziomu 1: pełna listwa pod deskami, żeby nie było
+       widać przerw między nimi */
+    const deckBase = new THREE.Mesh(new THREE.BoxGeometry(deckWidth, 0.08, deckLen), deckMat);
+    deckBase.position.set(0, BRIDGE_Y, RIVER_Z);
+    scene.add(deckBase);
+  }
+  const plankCount = winding ? 22 : 18;
   for(let i=0;i<plankCount;i++){
+    const pz = RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/plankCount);
     const plank = new THREE.Mesh(new THREE.BoxGeometry(deckWidth*0.94, 0.02, deckLen/plankCount*0.8), deckMat);
-    plank.position.set(0, BRIDGE_Y + 0.045, RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/plankCount));
+    plank.position.set(curveX(pz), BRIDGE_Y + 0.045, pz);
     scene.add(plank);
   }
 
@@ -1484,10 +1550,11 @@ function buildRiverAndBridge(){
   const legMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
   [-0.28, 0.28].forEach(function(frac){
     const legZ = RIVER_Z + frac*deckLen;
+    const legCx = curveX(legZ);
     [-1, 1].forEach(function(side){
       const legLen = BRIDGE_Y + RIVER_DROP;
       const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, legLen, 6), legMat);
-      leg.position.set(side*(deckWidth/2 - 0.1), BRIDGE_Y - legLen/2, legZ);
+      leg.position.set(legCx + side*(deckWidth/2 - 0.1), BRIDGE_Y - legLen/2, legZ);
       leg.rotation.z = side*0.1;
       scene.add(leg);
     });
@@ -1495,34 +1562,39 @@ function buildRiverAndBridge(){
 
   const ropeMat = new THREE.MeshStandardMaterial({color:0xcbb27a, roughness:0.95});
   const railYoff = 0.42, deckYoff = 0.04;
+  const postCount = winding ? 13 : 11;
   [-1, 1].forEach(function(side){
-    const railX = side*(deckWidth/2);
-    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, deckLen, 6), ropeMat);
-    rail.rotation.x = Math.PI/2;
-    rail.position.set(railX, BRIDGE_Y + railYoff, RIVER_Z);
-    scene.add(rail);
-
-    const postCount = 11;
     for(let i=0;i<postCount;i++){
       const pz = RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/postCount);
+      const railX = curveX(pz) + side*(deckWidth/2);
       const post = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, railYoff, 6), ropeMat);
       post.position.set(railX, BRIDGE_Y + railYoff/2, pz);
       scene.add(post);
-    }
-
-    /* sznurki na krzyż między poręczą a pokładem — wygląd mostu linowego */
-    for(let i=0;i<postCount-1;i++){
-      const zA = RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/postCount);
-      const zB = RIVER_Z - deckLen/2 + (i+1.5)*(deckLen/postCount);
-      const spanZ = zB - zA;
-      [[deckYoff, railYoff], [railYoff, deckYoff]].forEach(function(pair){
-        const y0 = pair[0], y1 = pair[1];
-        const len = Math.hypot(spanZ, y1-y0);
-        const diag = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, len, 5), ropeMat);
-        diag.position.set(railX, BRIDGE_Y + (y0+y1)/2, (zA+zB)/2);
-        diag.rotation.x = Math.atan2(spanZ, y1-y0);
-        scene.add(diag);
-      });
+      /* odcinek górnej poręczy do następnego słupka, żeby lina podążała za krzywizną */
+      if(i < postCount-1){
+        const pz2 = RIVER_Z - deckLen/2 + (i+1.5)*(deckLen/postCount);
+        const railX2 = curveX(pz2) + side*(deckWidth/2);
+        const spanZ = pz2 - pz, spanX = railX2 - railX;
+        const len = Math.hypot(spanZ, spanX);
+        const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, len, 6), ropeMat);
+        rail.position.set((railX+railX2)/2, BRIDGE_Y + railYoff, (pz+pz2)/2);
+        orientCylinderAlong(rail, spanX, 0, spanZ);
+        scene.add(rail);
+      }
+      /* sznurki na krzyż między poręczą a pokładem — wygląd mostu linowego */
+      if(i < postCount-1){
+        const zA = pz, zB = RIVER_Z - deckLen/2 + (i+1.5)*(deckLen/postCount);
+        const xA = curveX(zA) + side*(deckWidth/2), xB = curveX(zB) + side*(deckWidth/2);
+        [[deckYoff, railYoff], [railYoff, deckYoff]].forEach(function(pair){
+          const y0 = pair[0], y1 = pair[1];
+          const dx = xB-xA, dz2 = zB-zA, dy = y1-y0;
+          const len = Math.hypot(dx, dy, dz2);
+          const diag = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, len, 5), ropeMat);
+          diag.position.set((xA+xB)/2, BRIDGE_Y + (y0+y1)/2, (zA+zB)/2);
+          orientCylinderAlong(diag, dx, dy, dz2);
+          scene.add(diag);
+        });
+      }
     }
   });
 }
@@ -1818,38 +1890,49 @@ function cameraOffsetForAspect(){
   };
 }
 
-/* ══ Obrót widoku: joystick na ekranie i/lub fizyczny obrót telefonu/tabletu ══ */
-const ORBIT_SPEED = 2.0; /* rad/s przy pełnym wychyleniu joysticka */
-let joystickX = 0, joystickActive = false;
-const joyBase = document.getElementById('joystickBase');
-const joyKnob = document.getElementById('joystickKnob');
-const JOY_MAX = 26;
+/* ══ Obrót widoku: przesunięcie palcem po ekranie (albo fizyczny obrót
+   telefonu/tabletu, patrz kompas niżej) — bez osobnego joysticka. Dotyk bez
+   przeciągnięcia dalej działa jak zwykłe tapnięcie w świecącą nutkę. ══ */
+const DRAG_ROTATE_SPEED = 0.0055; /* rad na piksel przesunięcia palcem */
+const DRAG_THRESHOLD = 6; /* px — poniżej tego to wciąż zwykły dotyk, nie przeciągnięcie */
+let dragPointerId = null, dragStartX = 0, dragLastX = 0, dragMoved = false;
 
-function updateJoystick(e){
-  const rect = joyBase.getBoundingClientRect();
-  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
-  let dx = e.clientX - cx, dy = e.clientY - cy;
-  const dist = Math.hypot(dx, dy);
-  if(dist > JOY_MAX){ dx = dx/dist*JOY_MAX; dy = dy/dist*JOY_MAX; }
-  joyKnob.style.transform = 'translate('+dx+'px,'+dy+'px)';
-  joystickX = -dx / JOY_MAX; /* w lewo na joysticku = kamera skręca w lewo */
+function onCanvasPointerDown(e){
+  dragPointerId = e.pointerId;
+  dragStartX = dragLastX = e.clientX;
+  dragMoved = false;
+  try{ renderer.domElement.setPointerCapture(e.pointerId); }catch(err){}
 }
-function resetJoystick(){
-  joystickActive = false;
-  joystickX = 0;
-  joyKnob.style.transform = 'translate(0px,0px)';
+function onCanvasPointerMove(e){
+  if(dragPointerId === null || e.pointerId !== dragPointerId) return;
+  if(Math.abs(e.clientX - dragStartX) > DRAG_THRESHOLD) dragMoved = true;
+  if(dragMoved){
+    const dx = e.clientX - dragLastX;
+    orbitAngle -= dx * DRAG_ROTATE_SPEED; /* przesunięcie palcem w lewo = kamera skręca w lewo */
+    dragLastX = e.clientX;
+  }
 }
-joyBase.addEventListener('pointerdown', function(e){
-  e.preventDefault();
-  joystickActive = true;
-  try{ joyBase.setPointerCapture(e.pointerId); }catch(err){}
-  updateJoystick(e);
-});
-joyBase.addEventListener('pointermove', function(e){
-  if(joystickActive) updateJoystick(e);
-});
-joyBase.addEventListener('pointerup', resetJoystick);
-joyBase.addEventListener('pointercancel', resetJoystick);
+function onCanvasPointerUp(e){
+  if(dragPointerId === null || e.pointerId !== dragPointerId) return;
+  dragPointerId = null;
+  const wasTap = !dragMoved;
+  dragMoved = false;
+  if(!wasTap) return;
+  if(walking || currentPuzzle) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x = ((e.clientX-rect.left)/rect.width)*2-1;
+  const y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera({x:x,y:y}, camera);
+  const nextIdx = currentIdx + 1;
+  if(nextIdx >= waypoints.length) return;
+  const marker = waypoints[nextIdx].markerGroup;
+  if(!marker || !marker.visible) return;
+  const hits = raycaster.intersectObject(marker, true);
+  if(hits.length) walkTo(nextIdx);
+}
+function onCanvasPointerCancel(e){
+  if(dragPointerId === e.pointerId){ dragPointerId = null; dragMoved = false; }
+}
 
 let compassEnabled = false, compassListenerAdded = false, lastCompassAlpha = null;
 function onDeviceOrientation(e){
@@ -1888,19 +1971,41 @@ function toggleCompass(){
   }
 }
 
+function pickLetterForPosition(pos){
+  if(difficultyMode === 'hard') return LETTERS_ORDER[Math.floor(Math.random()*LETTERS_ORDER.length)];
+  return LETTERS_ORDER[pos % LETTERS_ORDER.length];
+}
+/* Poziom 2: kilka nut (trzy) na jednej stacji zamiast jednej — trudniejsza
+   minizagadka do rozwiązania w całości, zanim stacja liczy się jako zaliczona. */
 function buildPuzzleForWaypoint(idx){
-  const letter = LETTERS_ORDER[(idx-1) % LETTERS_ORDER.length];
-  let clefName;
-  if(clefMode === 'treble' || clefMode === 'bass') clefName = clefMode;
-  else clefName = (idx % 2 === 1) ? 'treble' : 'bass';
-  return {letter: letter, clef: clefName};
+  const notesPerStation = currentLevel === 2 ? 3 : 1;
+  const puzzles = [];
+  for(let n=0;n<notesPerStation;n++){
+    const pos = (idx-1)*notesPerStation + n;
+    const letter = pickLetterForPosition(pos);
+    let clefName;
+    if(clefMode === 'treble' || clefMode === 'bass') clefName = clefMode;
+    else clefName = (pos % 2 === 0) ? 'treble' : 'bass';
+    puzzles.push({letter: letter, clef: clefName});
+  }
+  return puzzles;
 }
 
+let puzzleQueue = [];
+let puzzleQueueIdx = 0;
+
 function showPuzzle(idx){
-  currentPuzzle = buildPuzzleForWaypoint(idx);
+  puzzleQueue = buildPuzzleForWaypoint(idx);
+  puzzleQueueIdx = 0;
+  showCurrentSubPuzzle();
+}
+
+function showCurrentSubPuzzle(){
+  currentPuzzle = puzzleQueue[puzzleQueueIdx];
   renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef);
+  const stepLabel = puzzleQueue.length > 1 ? ' — nuta ' + (puzzleQueueIdx+1) + '/' + puzzleQueue.length : '';
   document.getElementById('puzzleTitle').textContent =
-    currentPuzzle.clef === 'treble' ? 'Jaki to dźwięk? (klucz wiolinowy)' : 'Jaki to dźwięk? (klucz basowy)';
+    (currentPuzzle.clef === 'treble' ? 'Jaki to dźwięk? (klucz wiolinowy)' : 'Jaki to dźwięk? (klucz basowy)') + stepLabel;
 
   const distractorPool = LETTERS_ORDER.filter(function(l){ return l !== currentPuzzle.letter; });
   const distractors = shuffled(distractorPool).slice(0,3);
@@ -2040,10 +2145,22 @@ function onFruitPick(letter, tileEl){
   if(!currentPuzzle) return;
   if(letter === currentPuzzle.letter){
     const solvedIdx = currentIdx;
+    const isLastNote = puzzleQueueIdx >= puzzleQueue.length - 1;
     currentPuzzle = null; /* natychmiast, żeby drugi trafiony dźwięk (mikrofon) albo podwójny dotyk nie policzyły punktu dwa razy */
     stopMic();
     playSuccessChime();
     if(tileEl) tileEl.classList.add('correct-flash');
+
+    if(!isLastNote){
+      /* stacja z kilkoma nutami (poziom 2) — pokaż kolejną, stacja liczy
+         się dopiero po ostatniej poprawnej odpowiedzi */
+      setTimeout(function(){
+        puzzleQueueIdx++;
+        showCurrentSubPuzzle();
+      }, 650);
+      return;
+    }
+
     score++;
     document.getElementById('scoreVal').textContent = score;
     const burstPos = waypoints[currentIdx].pos.clone();
@@ -2209,23 +2326,6 @@ function onArrive(idx){
   showPuzzle(idx);
 }
 
-function onCanvasPointerDown(e){
-  if(walking || currentPuzzle) return;
-  const rect = renderer.domElement.getBoundingClientRect();
-  const x = ((e.clientX-rect.left)/rect.width)*2-1;
-  const y = -((e.clientY-rect.top)/rect.height)*2+1;
-  raycaster.setFromCamera({x:x,y:y}, camera);
-
-  const nextIdx = currentIdx + 1;
-  if(nextIdx >= waypoints.length) return;
-  const marker = waypoints[nextIdx].markerGroup;
-  if(!marker || !marker.visible) return;
-  const hits = raycaster.intersectObject(marker, true);
-  if(hits.length){
-    walkTo(nextIdx);
-  }
-}
-
 function updateCamera(){
   const cfg = cameraOffsetForAspect();
   const desired = character.position.clone().add(cfg.back);
@@ -2239,7 +2339,6 @@ function animate(now){
   if(!sceneRunning) return;
   requestAnimationFrame(animate);
   idleT += 0.016;
-  if(joystickX) orbitAngle += joystickX * ORBIT_SPEED * 0.016;
   if(character && !walking){
     character.position.y = groundLevelAt(character.position.x, character.position.z) + Math.sin(idleT*2.2) * 0.015;
   }
@@ -2358,7 +2457,8 @@ function initScene(){
   orbitAngle = 0;
   companions = [];
   pathHistory = [];
-  resetJoystick();
+  dragPointerId = null;
+  dragMoved = false;
   document.getElementById('scoreVal').textContent = '0';
   activateMarker(1);
 
@@ -2367,6 +2467,9 @@ function initScene(){
   camera.lookAt(character.position.x, character.position.y + initCam.lookY, character.position.z);
 
   renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
+  renderer.domElement.addEventListener('pointermove', onCanvasPointerMove);
+  renderer.domElement.addEventListener('pointerup', onCanvasPointerUp);
+  renderer.domElement.addEventListener('pointercancel', onCanvasPointerCancel);
   window.addEventListener('resize', resizeRenderer);
 
   sceneRunning = true;
@@ -2391,6 +2494,9 @@ function startLevel2(){
   sceneRunning = false;
   if(renderer){
     renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
+    renderer.domElement.removeEventListener('pointermove', onCanvasPointerMove);
+    renderer.domElement.removeEventListener('pointerup', onCanvasPointerUp);
+    renderer.domElement.removeEventListener('pointercancel', onCanvasPointerCancel);
     window.removeEventListener('resize', resizeRenderer);
   }
   scene = null; camera = null; renderer = null; waypoints = []; currentPuzzle = null; walking = false;
@@ -2406,6 +2512,9 @@ function restartGame(){
   document.getElementById('sceneWrap').style.display = 'none';
   if(renderer){
     renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
+    renderer.domElement.removeEventListener('pointermove', onCanvasPointerMove);
+    renderer.domElement.removeEventListener('pointerup', onCanvasPointerUp);
+    renderer.domElement.removeEventListener('pointercancel', onCanvasPointerCancel);
     window.removeEventListener('resize', resizeRenderer);
   }
   scene = null; camera = null; renderer = null; waypoints = []; currentPuzzle = null; walking = false;
@@ -2415,7 +2524,8 @@ function restartGame(){
   stopAmbient();
   stopMic();
   orbitAngle = 0;
-  resetJoystick();
+  dragPointerId = null;
+  dragMoved = false;
 }
 
 if(!window.DeviceOrientationEvent){
