@@ -35,6 +35,12 @@
   .start-btn{background:var(--gold);color:#1a1a2e;border:none;padding:15px 44px;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:0.2s;opacity:0.4;pointer-events:none;}
   .start-btn.active{opacity:1;pointer-events:auto;}
   .start-btn.active:hover{transform:translateY(-2px);}
+  .clef-settings{margin:4px 0 18px;text-align:center;}
+  .clef-settings-label{display:block;font-weight:700;color:var(--text-mid);font-size:0.82rem;margin-bottom:7px;}
+  .clef-btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .clef-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:7px 16px;font-size:0.8rem;font-weight:700;color:var(--text);cursor:pointer;transition:0.2s;}
+  .clef-btn:hover{border-color:var(--gold);}
+  .clef-btn.active{background:var(--gold);border-color:var(--gold);color:#1a1a2e;}
 
   /* ══ SCENA 3D ══ */
   .scene-wrap{flex:1;position:relative;overflow:hidden;background:#0c2b1a;}
@@ -61,8 +67,8 @@
   .fruit-tile{width:76px;height:72px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:4px 2px;}
   .fruit-tile:active{transform:scale(0.93);}
   .fruit-tile .fruit-img{width:34px;height:34px;object-fit:contain;display:block;}
-  .fruit-tile .fruit-word{font-weight:700;color:#5a3d1c;font-size:0.66rem;margin-top:3px;text-align:center;line-height:1.1;}
-  .fruit-tile .fruit-first{font-weight:900;color:var(--red);font-size:0.86rem;}
+  .fruit-tile .fruit-word{font-weight:700;color:#5a3d1c;font-size:0.66rem;margin-top:1px;text-align:center;line-height:1.1;}
+  .fruit-tile .fruit-first{display:block;font-weight:900;color:var(--red);font-size:1.35rem;line-height:1;margin-top:2px;}
   .fruit-tile.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
   .fruit-tile.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
   @keyframes puzzlePop{0%{transform:scale(1);}50%{transform:scale(1.18);}100%{transform:scale(1);}}
@@ -73,7 +79,7 @@
   .mic-vol-bar{height:100%;width:0%;background:var(--gold);transition:width 0.1s linear;}
   .mic-status{color:#f0d99a;font-size:0.82rem;font-weight:600;min-height:20px;}
 
-  .win-overlay{position:fixed;inset:0;background:linear-gradient(rgba(8,22,12,0.78),rgba(8,22,12,0.88)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-nuty-tlo.webp') center/cover;display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
+  .win-overlay{position:fixed;inset:0;background:linear-gradient(rgba(8,22,12,0.42),rgba(8,22,12,0.6));display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
   .win-overlay.show{display:flex;}
   .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
   .win-overlay p{color:white;font-size:1.05rem;margin:0;max-width:420px;}
@@ -94,6 +100,7 @@
   <span class="top-bar-right">
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
     <button type="button" class="sound-toggle" id="compassToggle" onclick="toggleCompass()" aria-label="Obracaj widok, obracając telefon" title="Obracaj widok, obracając telefon lub tablet">🧭</button>
+    <span class="score-box" id="levelBadge" style="display:none;">🌲 Poziom 2</span>
     <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
   </span>
 </div>
@@ -101,6 +108,14 @@
 <div class="char-select" id="charSelect">
   <h2>Wybierz swojego towarzysza!</h2>
   <p>Razem ruszycie przez dżunglę i będziecie rozwiązywać zagadki muzyczne, żeby odkrywać kolejne polanki.</p>
+  <div class="clef-settings">
+    <span class="clef-settings-label">Klucz nutowy</span>
+    <div class="clef-btn-row">
+      <button type="button" class="clef-btn" data-clef="treble" onclick="setClefMode('treble')">Wiolinowy</button>
+      <button type="button" class="clef-btn" data-clef="bass" onclick="setClefMode('bass')">Basowy</button>
+      <button type="button" class="clef-btn" data-clef="both" onclick="setClefMode('both')">Oba na zmianę</button>
+    </div>
+  </div>
   <div class="char-cards">
     <div class="char-card" data-char="cat" onclick="selectChar('cat')">
       <img class="char-img" src="/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/kotek-3d-gra.webp" alt="Kotek">
@@ -136,9 +151,12 @@
 
 <div class="win-overlay" id="winOverlay">
   <div style="font-size:3.5rem;">🌺</div>
-  <h2>Dotarliście do serca dżungli!</h2>
+  <h2 id="winTitle">Dotarliście do serca dżungli!</h2>
   <p id="winText"></p>
-  <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <button class="win-btn" id="level2Btn" onclick="startLevel2()" style="display:none;">Poziom 2: gęsty las →</button>
+    <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
+  </div>
 </div>
 
 <script>
@@ -271,6 +289,23 @@ const CLEFS = {
   }
 };
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
+/* Ustawienie klucza — dziecko/rodzic może wybrać na ekranie startowym
+   tylko wiolinowy, tylko basowy, albo oba na zmianę (domyślnie). */
+let clefMode = 'both';
+try{
+  const savedClef = localStorage.getItem('dzunglaClefMode');
+  if(savedClef === 'treble' || savedClef === 'bass' || savedClef === 'both') clefMode = savedClef;
+}catch(e){}
+function setClefMode(mode){
+  clefMode = mode;
+  try{ localStorage.setItem('dzunglaClefMode', mode); }catch(e){}
+  document.querySelectorAll('.clef-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.clef === mode);
+  });
+}
+document.querySelectorAll('.clef-btn').forEach(function(b){
+  b.classList.toggle('active', b.dataset.clef === clefMode);
+});
 const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
 /* Każda nuta ma "swój" owoc/produkt, który zaczyna się na tę samą literę —
    dzięki temu dziecko kojarzy dźwięk z jedzeniem po pierwszej literze,
@@ -371,12 +406,14 @@ let scene, camera, renderer, raycaster, character, idleT = 0;
 let waypoints = [];
 let currentIdx = 0; /* indeks polanki, na której właśnie stoi postać (0 = start) */
 let score = 0, walking = false;
+let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — ta sama
+  trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
 let currentPuzzle = null;
 let sceneRunning = false;
 let orbitAngle = 0; /* dodatkowy obrót kamery wokół postaci — joystick i/lub obrót urządzenia */
 
 const PATH_POINTS = [
-  {x:0, z:0}, {x:2.6, z:-6}, {x:-2.2, z:-11.5}, {x:2.6, z:-17},
+  {x:0, z:0}, {x:2.6, z:-6}, {x:-0.4, z:-11.5}, {x:0.4, z:-17},
   {x:-2.6, z:-22.5}, {x:2.2, z:-28.5}, {x:-1.8, z:-34.5}, {x:0, z:-40.5}
 ];
 
@@ -650,7 +687,18 @@ function updateCompanions(){
     const idx = Math.max(0, pathHistory.length - 1 - (i+1)*COMPANION_GAP);
     const target = pathHistory[idx];
     if(!target) return;
-    const dx = target.x - animal.position.x, dz = target.z - animal.position.z;
+    /* Kierunek marszu w tym miejscu śladu, żeby policzyć bok — towarzysze
+       mają iść OBOK ścieżki gracza, a nie dokładnie w jego śladach (na
+       przemian lewo/prawo, kolejne pary szerzej od osi). */
+    const prev = pathHistory[Math.max(0, idx-1)] || target;
+    const hx = target.x - prev.x, hz = target.z - prev.z;
+    const hlen = Math.hypot(hx, hz);
+    const dirx = hlen > 0.001 ? hx/hlen : 0, dirz = hlen > 0.001 ? hz/hlen : 1;
+    const side = (i % 2 === 0) ? 1 : -1;
+    const sideDist = 0.55 + Math.floor(i/2)*0.4;
+    const tx = target.x + (-dirz)*side*sideDist;
+    const tz = target.z + dirx*side*sideDist;
+    const dx = tx - animal.position.x, dz = tz - animal.position.z;
     if(Math.hypot(dx, dz) > 0.02){
       animal.position.x += dx*0.18;
       animal.position.z += dz*0.18;
@@ -660,6 +708,282 @@ function updateCompanions(){
     const groundY = groundLevelAt(animal.position.x, animal.position.z);
     const bobH = animal.userData.flies ? 0.3 : 0.05;
     animal.position.y = groundY + bobH + Math.abs(Math.sin(idleT*(animal.userData.flies?7:2.4) + i))*bobH;
+  });
+}
+
+/* ══ Dzikie zwierzątka tła — żyją na mapie same z siebie, delikatnie się
+   poruszają w miejscu/wędrują po małym obszarze, ale NIE chodzą za postacią
+   (w odróżnieniu od towarzyszy powyżej). ══ */
+function buildWoodpecker(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.7});
+  const bellyMat = new THREE.MeshStandardMaterial({color:0xf5f0e0, roughness:0.75});
+  const capMat = new THREE.MeshStandardMaterial({color:0xd6203a, roughness:0.6});
+  const beakMat = new THREE.MeshStandardMaterial({color:0x3a2a1a, roughness:0.5});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), bodyMat);
+  body.scale.set(0.85, 1.3, 0.85);
+  body.position.y = 0.3;
+  g.add(body);
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), bellyMat);
+  belly.position.set(0, 0.24, 0.07);
+  g.add(belly);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), bodyMat);
+  head.position.set(0, 0.46, 0.03);
+  g.add(head);
+  const cap = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 6), capMat);
+  cap.position.set(0, 0.52, 0.03);
+  g.add(cap);
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.12, 6), beakMat);
+  beak.rotation.x = Math.PI/2;
+  beak.position.set(0, 0.46, 0.13);
+  g.add(beak);
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.2, 6), bodyMat);
+  tail.rotation.x = -Math.PI/2.3;
+  tail.position.set(0, 0.16, -0.12);
+  g.add(tail);
+  g.scale.setScalar(0.9);
+  return g;
+}
+function buildSparrow(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x8a6a4a, roughness:0.8});
+  const bellyMat = new THREE.MeshStandardMaterial({color:0xe8dcc0, roughness:0.8});
+  const beakMat = new THREE.MeshStandardMaterial({color:0xd9a441, roughness:0.6});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), mat);
+  body.scale.set(1, 0.95, 1.2);
+  body.position.y = 0.14;
+  g.add(body);
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), bellyMat);
+  belly.position.set(0, 0.1, 0.06);
+  g.add(belly);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 8), mat);
+  head.position.set(0, 0.22, 0.1);
+  g.add(head);
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.06, 6), beakMat);
+  beak.rotation.x = Math.PI/2;
+  beak.position.set(0, 0.22, 0.17);
+  g.add(beak);
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.16, 6), mat);
+  tail.rotation.x = Math.PI/2.4;
+  tail.position.set(0, 0.13, -0.16);
+  g.add(tail);
+  g.scale.setScalar(0.75);
+  return g;
+}
+function buildSheep(){
+  const g = new THREE.Group();
+  const woolMat = new THREE.MeshStandardMaterial({color:0xf5f2e8, roughness:0.95});
+  const skinMat = new THREE.MeshStandardMaterial({color:0x3a3230, roughness:0.7});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 10), woolMat);
+  body.scale.set(1.1, 0.9, 1.4);
+  body.position.y = 0.34;
+  g.add(body);
+  [[-0.16,0.3,0.26],[0.16,0.3,0.26],[-0.16,0.28,-0.3],[0.16,0.28,-0.3]].forEach(function(p){
+    const puff = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), woolMat);
+    puff.position.set(p[0], p[1], p[2]);
+    g.add(puff);
+  });
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), skinMat);
+  head.position.set(0, 0.36, 0.44);
+  g.add(head);
+  [-0.09, 0.09].forEach(function(dx){
+    const ear = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), skinMat);
+    ear.scale.set(1.6, 0.6, 0.8);
+    ear.position.set(dx, 0.36, 0.38);
+    g.add(ear);
+  });
+  [[-0.14,0.1,0.2],[0.14,0.1,0.2],[-0.14,0.1,-0.24],[0.14,0.1,-0.24]].forEach(function(p){
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.22, 6), skinMat);
+    leg.position.set(p[0], p[1], p[2]);
+    g.add(leg);
+  });
+  g.userData.head = head;
+  g.scale.setScalar(0.85);
+  return g;
+}
+function buildDuck(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0xf2eadb, roughness:0.75});
+  const headMat = new THREE.MeshStandardMaterial({color:0x4a7c3f, roughness:0.6});
+  const beakMat = new THREE.MeshStandardMaterial({color:0xe89b1c, roughness:0.5});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8), bodyMat);
+  body.scale.set(1, 0.85, 1.4);
+  body.position.y = 0.14;
+  g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), headMat);
+  head.position.set(0, 0.28, 0.18);
+  g.add(head);
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.1, 6), beakMat);
+  beak.rotation.x = Math.PI/2;
+  beak.position.set(0, 0.27, 0.28);
+  g.add(beak);
+  g.scale.setScalar(0.8);
+  return g;
+}
+
+const WILDLIFE_SPECS = [
+  {build: buildWoodpecker, kind:'woodpecker', count: 5},
+  {build: buildSparrow, kind:'sparrow', count: 9},
+  {build: buildSheep, kind:'sheep', count: 6}
+];
+let wildlife = [];
+function scatterWildlife(){
+  wildlife = [];
+  WILDLIFE_SPECS.forEach(function(spec){
+    for(let i=0;i<spec.count;i++){
+      const x = (Math.random()*2-1) * 9;
+      const z = -Math.random()*44 + 2;
+      if(distToPath(x, z) < 1.8) continue;
+      if(nearRiver(x, z)) continue;
+      if(nearHouse(x, z)) continue;
+      const group = spec.build();
+      group.position.set(x, terrainHeight(x, z), z);
+      group.rotation.y = Math.random()*Math.PI*2;
+      scene.add(group);
+      wildlife.push({group:group, kind:spec.kind, homeX:x, homeZ:z, phase:Math.random()*Math.PI*2});
+    }
+  });
+  for(let i=0;i<3;i++){
+    const side = Math.random()<0.5 ? -1 : 1;
+    const x = side*(1.7 + Math.random()*1.5);
+    const z = RIVER_Z + (Math.random()*2-1)*3.5;
+    const group = buildDuck();
+    group.position.set(x, terrainHeight(x, z), z);
+    group.rotation.y = Math.random()*Math.PI*2;
+    scene.add(group);
+    wildlife.push({group:group, kind:'duck', homeX:x, homeZ:z, phase:Math.random()*Math.PI*2});
+  }
+}
+function updateWildlife(){
+  wildlife.forEach(function(w){
+    const t = idleT + w.phase;
+    const g = w.group;
+    if(w.kind === 'woodpecker'){
+      g.rotation.x = Math.max(0, Math.sin(t*7)) * 0.3; /* stukanie w pień */
+    }else if(w.kind === 'sparrow'){
+      g.position.x = w.homeX + Math.sin(t*0.55)*0.55;
+      g.position.z = w.homeZ + Math.cos(t*0.4)*0.55;
+      const hop = Math.max(0, Math.sin(t*3.4));
+      g.position.y = terrainHeight(g.position.x, g.position.z) + hop*0.1;
+    }else if(w.kind === 'sheep'){
+      g.position.x = w.homeX + Math.sin(t*0.13)*1.1;
+      g.position.z = w.homeZ + Math.cos(t*0.1)*1.1;
+      g.position.y = terrainHeight(g.position.x, g.position.z);
+      if(g.userData.head) g.userData.head.rotation.x = Math.sin(t*0.9)*0.15;
+    }else if(w.kind === 'duck'){
+      g.position.x = w.homeX + Math.sin(t*0.3)*0.5;
+      g.position.z = w.homeZ + Math.cos(t*0.22)*0.5;
+      g.position.y = groundLevelAt(g.position.x, g.position.z) + Math.sin(t*2)*0.025;
+    }
+  });
+}
+
+/* ══ Rzeka — pałki wodne (szuwary) na brzegach, lilie wodne na wodzie
+   i malutkie żabki kumkające na liściach lilii ══ */
+function buildCattail(){
+  const g = new THREE.Group();
+  const stemMat = new THREE.MeshStandardMaterial({color:0x4d7a35, roughness:0.85});
+  const headMat = new THREE.MeshStandardMaterial({color:0x6b4226, roughness:0.8});
+  const count = 3 + Math.floor(Math.random()*3);
+  for(let i=0;i<count;i++){
+    const h = 0.9 + Math.random()*0.5;
+    const ox = (Math.random()-0.5)*0.22, oz = (Math.random()-0.5)*0.22;
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, h, 5), stemMat);
+    stem.position.set(ox, h/2, oz);
+    stem.rotation.z = (Math.random()-0.5)*0.15;
+    g.add(stem);
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 6), headMat);
+    head.scale.set(1, 3.2, 1);
+    head.position.set(ox, h*0.8, oz);
+    g.add(head);
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.03, h*0.9, 3), stemMat);
+    blade.position.set(ox+0.05, h*0.42, oz);
+    blade.rotation.z = 0.25;
+    g.add(blade);
+  }
+  return g;
+}
+function buildLilyPad(){
+  const g = new THREE.Group();
+  const padMat = new THREE.MeshStandardMaterial({color:0x2f7a3e, roughness:0.7, side:THREE.DoubleSide});
+  const pad = new THREE.Mesh(new THREE.CircleGeometry(0.16 + Math.random()*0.08, 10), padMat);
+  pad.rotation.x = -Math.PI/2;
+  g.add(pad);
+  if(Math.random() < 0.55){
+    const flowerMat = new THREE.MeshStandardMaterial({color: Math.random()<0.5?0xffb3d9:0xfff4d6, roughness:0.6});
+    for(let i=0;i<5;i++){
+      const petal = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 6), flowerMat);
+      const ang = (i/5)*Math.PI*2;
+      petal.scale.set(1, 0.5, 1.6);
+      petal.position.set(Math.cos(ang)*0.05, 0.03, Math.sin(ang)*0.05);
+      petal.rotation.y = ang;
+      g.add(petal);
+    }
+    const center = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 6), new THREE.MeshStandardMaterial({color:0xffd166}));
+    center.position.y = 0.03;
+    g.add(center);
+  }
+  return g;
+}
+function buildTinyFrog(){
+  const frog = buildFrog();
+  frog.scale.multiplyScalar(0.34);
+  return frog;
+}
+function buildCaveMouth(){
+  const g = new THREE.Group();
+  const rockMat = new THREE.MeshStandardMaterial({color:0x5f5952, roughness:1});
+  const mound = new THREE.Mesh(new THREE.SphereGeometry(3.2, 12, 10), rockMat);
+  mound.scale.set(1.2, 0.9, 0.8);
+  mound.position.y = 1.6;
+  g.add(mound);
+  const hole = new THREE.Mesh(new THREE.CircleGeometry(1.3, 16), new THREE.MeshBasicMaterial({color:0x0a0a0a}));
+  hole.position.set(0, 1.3, 0.55);
+  g.add(hole);
+  return g;
+}
+let tinyFrogs = [];
+function scatterRiverDecor(){
+  tinyFrogs = [];
+  for(let i=0;i<10;i++){
+    const side = Math.random()<0.5?-1:1;
+    const x = side*(1.7+Math.random()*2.2);
+    const z = RIVER_Z + (Math.random()*2-1)*4.2;
+    if(Math.abs(x) < 1.9) continue;
+    const cat = buildCattail();
+    cat.position.set(x, terrainHeight(x, z), z);
+    cat.rotation.y = Math.random()*Math.PI*2;
+    scene.add(cat);
+  }
+  for(let i=0;i<9;i++){
+    const x = (Math.random()*2-1) * (RIVER_HALF_WIDTH*0.75);
+    const z = RIVER_Z + (Math.random()*2-1)*0.75;
+    if(Math.abs(x) < 1.6) continue; /* nie na samym moście */
+    const pad = buildLilyPad();
+    pad.position.set(x, -RIVER_DROP + 0.13, z);
+    scene.add(pad);
+    if(Math.random() < 0.4){
+      const frog = buildTinyFrog();
+      frog.position.set(x + (Math.random()-0.5)*0.1, -RIVER_DROP + 0.14, z + (Math.random()-0.5)*0.1);
+      frog.rotation.y = Math.random()*Math.PI*2;
+      frog.userData.croakPhase = Math.random()*Math.PI*2;
+      frog.userData.baseScale = frog.scale.x;
+      scene.add(frog);
+      tinyFrogs.push(frog);
+    }
+  }
+  const caveSide = Math.random()<0.5 ? -1 : 1;
+  const cave = buildCaveMouth();
+  cave.position.set(caveSide*(RIVER_HALF_WIDTH-1.5), 0, RIVER_Z);
+  cave.rotation.y = caveSide>0 ? -Math.PI/2 : Math.PI/2;
+  scene.add(cave);
+}
+function updateTinyFrogs(){
+  tinyFrogs.forEach(function(frog){
+    const t = idleT*3 + frog.userData.croakPhase;
+    const pulse = Math.max(0, Math.sin(t));
+    const s = frog.userData.baseScale * (1 + pulse*0.15);
+    frog.scale.set(s, frog.userData.baseScale, s);
   });
 }
 
@@ -732,6 +1056,103 @@ function buildTreePalm(){
   return g;
 }
 
+/* Stary, porzucony samochodzik — ciekawostka do odkrycia w gęstym lesie na
+   poziomie 2. Czysto dekoracyjny, nic nie robi, tylko stoi w krzakach. */
+function buildCar(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0x8a4a3a, roughness:0.95});
+  const cabinMat = new THREE.MeshStandardMaterial({color:0x6b3a2e, roughness:0.95});
+  const wheelMat = new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.9});
+  const glassMat = new THREE.MeshStandardMaterial({color:0x4a5a55, roughness:0.6, transparent:true, opacity:0.6});
+  const bumperMat = new THREE.MeshStandardMaterial({color:0x6b6b6b, roughness:0.8});
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.55, 0.85), bodyMat);
+  body.position.y = 0.42;
+  g.add(body);
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.42, 0.78), cabinMat);
+  cabin.position.set(-0.08, 0.86, 0);
+  g.add(cabin);
+  const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.32, 0.7), glassMat);
+  windshield.position.set(0.4, 0.86, 0);
+  g.add(windshield);
+  [[-0.55,0.18,0.42],[0.55,0.18,0.42],[-0.55,0.18,-0.42],[0.55,0.18,-0.42]].forEach(function(p){
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.18, 12), wheelMat);
+    wheel.rotation.z = Math.PI/2;
+    wheel.position.set(p[0], p[1], p[2]);
+    g.add(wheel);
+  });
+  const bumperF = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.9), bumperMat);
+  bumperF.position.set(0.86, 0.24, 0);
+  g.add(bumperF);
+  const bumperB = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.9), bumperMat);
+  bumperB.position.set(-0.86, 0.24, 0);
+  g.add(bumperB);
+  g.rotation.z = 0.05; /* lekko przechylony, jakby zapadł się w miękkiej ziemi */
+  return g;
+}
+
+/* Opuszczony obóz w gęstym lesie na poziomie 2 — namioty i ognisko obok
+   samochodziku, czysto dekoracyjne (ognisko ma tylko migoczący płomień). */
+function buildTent(){
+  const g = new THREE.Group();
+  const colors = [0xc0533e, 0x3f7a9e, 0x4a8f4f, 0xd9a441];
+  const fabricMat = new THREE.MeshStandardMaterial({color: colors[Math.floor(Math.random()*colors.length)], roughness:0.9});
+  const doorMat = new THREE.MeshStandardMaterial({color:0x241a12, roughness:0.9});
+  const poleMat = new THREE.MeshStandardMaterial({color:0x5c4326, roughness:0.85});
+  const body = new THREE.Mesh(new THREE.ConeGeometry(0.68, 1.05, 5), fabricMat);
+  body.position.y = 0.52;
+  g.add(body);
+  const doorway = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.55, 3), doorMat);
+  doorway.rotation.x = Math.PI/2.4;
+  doorway.position.set(0, 0.32, 0.58);
+  g.add(doorway);
+  [0, 2.1, 4.2].forEach(function(ang){
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.28, 5), poleMat);
+    pole.position.set(Math.cos(ang)*0.06, 1.1, Math.sin(ang)*0.06);
+    pole.rotation.z = Math.cos(ang)*0.3;
+    pole.rotation.x = Math.sin(ang)*0.3;
+    g.add(pole);
+  });
+  return g;
+}
+function buildCampfire(){
+  const g = new THREE.Group();
+  const logMat = new THREE.MeshStandardMaterial({color:0x5c4326, roughness:0.9});
+  const ashMat = new THREE.MeshStandardMaterial({color:0x3a3530, roughness:1});
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.42, 0.08, 12), ashMat);
+  base.position.y = 0.04;
+  g.add(base);
+  for(let i=0;i<5;i++){
+    const ang = (i/5)*Math.PI*2;
+    const log = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.62, 6), logMat);
+    log.rotation.z = Math.PI/2;
+    log.rotation.y = ang;
+    log.position.set(Math.cos(ang)*0.12, 0.1, Math.sin(ang)*0.12);
+    g.add(log);
+  }
+  const flame1 = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 8), new THREE.MeshBasicMaterial({color:0xff9d2e}));
+  flame1.position.y = 0.28;
+  g.add(flame1);
+  const flame2 = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.28, 8), new THREE.MeshBasicMaterial({color:0xffd166}));
+  flame2.position.y = 0.32;
+  g.add(flame2);
+  const glow = new THREE.PointLight(0xff9d40, 0.9, 3.5);
+  glow.position.y = 0.35;
+  g.add(glow);
+  g.userData.flames = [flame1, flame2];
+  g.userData.glow = glow;
+  return g;
+}
+let campfires = [];
+function updateCampfires(){
+  const t = idleT*10;
+  campfires.forEach(function(fire){
+    fire.userData.flames.forEach(function(f, i){
+      f.scale.y = 1 + Math.sin(t + i*2)*0.12;
+    });
+    fire.userData.glow.intensity = 0.75 + Math.abs(Math.sin(t*1.3))*0.35;
+  });
+}
+
 const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
 function buildTree(){
   const pick = TREE_BUILDERS[Math.floor(Math.random()*TREE_BUILDERS.length)];
@@ -789,18 +1210,28 @@ function distToPath(x, z){
    podniesiony (BRIDGE_Y) i rozpięty na całą szerokość doliny. */
 const RIVER_Z = -14, RIVER_DEPTH = 1.8, RIVER_HALF_WIDTH = 13;
 const RIVER_VALLEY_HALF = 5.5, RIVER_DROP = 1.35, BRIDGE_Y = 0.5;
+const BRIDGE_DECK_HALF = RIVER_VALLEY_HALF - 0.5; /* połowa długości pokładu mostu */
+const BRIDGE_RAMP = 1.5; /* krótki zjazd na brzeg tuż za końcem pokładu */
 function nearRiver(x, z){
   return Math.abs(z - RIVER_Z) < RIVER_VALLEY_HALF + 0.4 && Math.abs(x) < 3.6;
 }
-/* Wysokość, na jakiej powinna "stać" postać/towarzysze w danym (x,z) —
-   0 na normalnej ścieżce, płynnie rośnie do wysokości pokładu mostu nad
-   doliną rzeki, żeby nie zapadali się pod deski przy przechodzeniu. */
+/* Wysokość, na jakiej powinna "stać" postać/towarzysze/nutka w danym (x,z).
+   Poza rzeką: dokładnie po terenie (terrainHeight), żeby nikt nie zapadał
+   się w faliste wzniesienia ani nie unosił nad wgłębieniem doliny. Na
+   samym pokładzie mostu: stała wysokość BRIDGE_Y (płaski pokład). Tuż za
+   końcami mostu: krótki, gładki zjazd, żeby ziemia po obu stronach dawała
+   porządne przejście z jednej strony na drugą, zamiast urwistego progu.
+   Dolina rzeki jest zbyt stroma, żeby przejść nią na wprost — most jest
+   jedyną przeprawą. */
 function groundLevelAt(x, z){
+  const base = terrainHeight(x, z);
+  if(Math.abs(x) > 2.0) return base;
   const dz = Math.abs(z - RIVER_Z);
-  if(dz > RIVER_VALLEY_HALF || Math.abs(x) > 1.4) return 0;
-  const vt = 1 - dz/RIVER_VALLEY_HALF;
+  if(dz <= BRIDGE_DECK_HALF) return BRIDGE_Y;
+  if(dz >= BRIDGE_DECK_HALF + BRIDGE_RAMP) return base;
+  const vt = 1 - (dz - BRIDGE_DECK_HALF)/BRIDGE_RAMP;
   const smooth = vt*vt*(3-2*vt);
-  return smooth * BRIDGE_Y;
+  return base + smooth * (BRIDGE_Y - base);
 }
 
 /* Domek z płotkiem na końcu ścieżki — cel wędrówki, "serce dżungli". */
@@ -909,7 +1340,8 @@ function buildHouseAndFence(){
 }
 
 function scatterTrees(){
-  for(let i=0;i<26;i++){
+  const count = currentLevel === 2 ? 54 : 26; /* poziom 2: dużo gęstszy las */
+  for(let i=0;i<count;i++){
     const x = (Math.random()*2-1) * 9;
     const z = -Math.random()*44 + 2;
     if(distToPath(x, z) < 2.4) continue;
@@ -1099,8 +1531,8 @@ function buildRiverAndBridge(){
    drzewami i nigdy nie wchodzą w kolizję ze ścieżką/postacią. */
 function buildMountain(peakHeight, baseRadius){
   const g = new THREE.Group();
-  const rockMat = new THREE.MeshStandardMaterial({color:0x6b7280, roughness:1});
-  const snowMat = new THREE.MeshStandardMaterial({color:0xf4f7fb, roughness:0.9});
+  const rockMat = new THREE.MeshStandardMaterial({color:0x818a94, roughness:1});
+  const snowMat = new THREE.MeshStandardMaterial({color:0xfbfdff, roughness:0.9});
   const rock = new THREE.Mesh(new THREE.ConeGeometry(baseRadius, peakHeight, 6), rockMat);
   rock.position.y = peakHeight/2;
   rock.rotation.y = Math.random()*Math.PI*2;
@@ -1143,6 +1575,81 @@ function scatterMountains(){
     mtn.position.set(x, terrainHeight(x, z), z);
     scene.add(mtn);
   }
+  /* grzbiet zamykający widok też za plecami gracza, na starcie — inaczej
+     przy obróceniu widoku widać "koniec mapy" i pustą łąkę bez oprawy */
+  for(let i=0;i<8;i++){
+    const peakHeight = 11 + Math.random()*9;
+    const baseRadius = 4 + Math.random()*3;
+    const mtn = buildMountain(peakHeight, baseRadius);
+    const x = (Math.random()*2-1)*17, z = 21 + Math.random()*10;
+    mtn.position.set(x, terrainHeight(x, z), z);
+    scene.add(mtn);
+  }
+}
+
+/* Polanka z kwiatami tuż za punktem startowym (dziecko widzi ją, kiedy
+   odwróci widok) — do tej pory ten obszar (z > 2) nie był w ogóle
+   dekorowany przez scatterFlowers/scatterTrees itd (te idą tylko w stronę
+   domku, z < 2). */
+function scatterStartMeadow(){
+  const pools = ['flower','flowerBush'].filter(function(k){ return resolvedModels[k]; });
+  for(let i=0;i<38;i++){
+    const x = (Math.random()*2-1) * 8.5;
+    const z = 3 + Math.random()*15;
+    if(distToPath(x, z) < 1.3) continue;
+    let deco = null;
+    if(pools.length){
+      const key = pools[Math.floor(Math.random()*pools.length)];
+      deco = randomNatureMesh(resolvedModels[key]);
+    }
+    if(!deco) deco = buildGrassTuft();
+    deco.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(deco, Math.random()*Math.PI*2);
+    scene.add(deco);
+  }
+  for(let i=0;i<18;i++){
+    const x = (Math.random()*2-1) * 8.5;
+    const z = 3 + Math.random()*15;
+    if(distToPath(x, z) < 1.3) continue;
+    const tuft = buildGrassTuft();
+    tuft.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(tuft, Math.random()*Math.PI*2);
+    scene.add(tuft);
+  }
+  for(let i=0;i<6;i++){
+    const x = (Math.random()*2-1) * 8;
+    const z = 12 + Math.random()*9;
+    if(distToPath(x, z) < 2.2) continue;
+    const tree = buildTree();
+    tree.position.set(x, terrainHeight(x, z), z);
+    const s = 1.6 + Math.random()*1.1;
+    tree.scale.multiplyScalar(s);
+    spinAroundUp(tree, Math.random()*Math.PI*2);
+    scene.add(tree);
+  }
+}
+
+/* Słońce na niebie — prosta jasna kula + delikatna poświata, żeby scena
+   nie wyglądała na płaski błękit bez źródła światła. */
+function buildSun(){
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(3.2, 16, 12),
+    new THREE.MeshBasicMaterial({color:0xfff6d8})
+  );
+  g.add(core);
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(5.2, 16, 12),
+    new THREE.MeshBasicMaterial({color:0xffe9a0, transparent:true, opacity:0.35})
+  );
+  g.add(halo);
+  const halo2 = new THREE.Mesh(
+    new THREE.SphereGeometry(8, 16, 12),
+    new THREE.MeshBasicMaterial({color:0xffe9a0, transparent:true, opacity:0.16})
+  );
+  g.add(halo2);
+  g.position.set(-24, 46, -34);
+  return g;
 }
 
 /* ══ Tekstury (wygenerowane grafiki) — jeden cache na URL, żeby nie ładować
@@ -1383,7 +1890,9 @@ function toggleCompass(){
 
 function buildPuzzleForWaypoint(idx){
   const letter = LETTERS_ORDER[(idx-1) % LETTERS_ORDER.length];
-  const clefName = (idx % 2 === 1) ? 'treble' : 'bass';
+  let clefName;
+  if(clefMode === 'treble' || clefMode === 'bass') clefName = clefMode;
+  else clefName = (idx % 2 === 1) ? 'treble' : 'bass';
   return {letter: letter, clef: clefName};
 }
 
@@ -1404,7 +1913,8 @@ function showPuzzle(idx){
     const tile = document.createElement('div');
     tile.className = 'fruit-tile';
     tile.innerHTML = '<img class="fruit-img" src="'+food.img+'" alt="'+food.word+'">' +
-      '<span class="fruit-word"><span class="fruit-first">'+food.word.charAt(0)+'</span>'+food.word.slice(1)+'</span>';
+      '<span class="fruit-first">'+letter+'</span>' +
+      '<span class="fruit-word">'+food.word+'</span>';
     tile.addEventListener('pointerdown', function(e){
       e.preventDefault();
       onFruitPick(letter, tile);
@@ -1731,23 +2241,26 @@ function animate(now){
   idleT += 0.016;
   if(joystickX) orbitAngle += joystickX * ORBIT_SPEED * 0.016;
   if(character && !walking){
-    character.position.y = Math.sin(idleT*2.2) * 0.015;
+    character.position.y = groundLevelAt(character.position.x, character.position.z) + Math.sin(idleT*2.2) * 0.015;
   }
   waypoints.forEach(function(wp){
     if(wp.markerGroup && wp.markerGroup.visible){
       wp.markerGroup.rotation.y += 0.015;
-      wp.markerGroup.position.y = Math.sin(idleT*1.6 + wp.markerGroup.userData.bobPhase) * 0.1;
+      wp.markerGroup.position.y = wp.markerGroup.userData.baseY + Math.sin(idleT*1.6 + wp.markerGroup.userData.bobPhase) * 0.1;
     }
   });
   updateCompanions();
+  updateWildlife();
+  updateTinyFrogs();
+  updateCampfires();
   updateCamera();
   renderer.render(scene, camera);
 }
 
 function initScene(){
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x9fd8ef);
-  scene.fog = new THREE.Fog(0x9fd8ef, 18, 68);
+  scene.background = new THREE.Color(0xa9e6fb);
+  scene.fog = new THREE.Fog(0xa9e6fb, 20, 72);
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
@@ -1756,15 +2269,16 @@ function initScene(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   resizeRenderer();
 
-  scene.add(new THREE.AmbientLight(0xcfe8c9, 0.75));
-  const sun = new THREE.DirectionalLight(0xfff4d6, 0.85);
-  sun.position.set(8, 16, 8);
-  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xe4f7db, 0.95));
+  const sunLight = new THREE.DirectionalLight(0xfff6dc, 1.05);
+  sunLight.position.set(-8, 20, -12);
+  scene.add(sunLight);
+  scene.add(buildSun());
 
   const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
   grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
   grassTex.repeat.set(10, 15);
-  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1});
+  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1, color:0xe6ffe0});
   /* Teren nie jest już płaski — odkształcamy siatkę wg terrainHeight()
      (płasko przy ścieżce, łagodne wzniesienia dalej, wgłębienie przy rzece).
      Lokalne Z wierzchołka PlaneGeometry staje się światową wysokością Y po
@@ -1790,15 +2304,43 @@ function initScene(){
   scatterFlowers();
   scatterBushes();
   scatterMountains();
+  scatterStartMeadow();
+  scatterRiverDecor();
+  scatterWildlife();
+  campfires = [];
+  if(currentLevel === 2){
+    const car = buildCar();
+    const cx = 6.5, cz = -25;
+    car.position.set(cx, terrainHeight(cx, cz), cz);
+    car.rotation.y = 0.6;
+    scene.add(car);
+
+    /* opuszczony obozowisko tuż obok samochodziku — namioty + ognisko */
+    const campSpots = [{x:4.3, z:-26.2}, {x:5.6, z:-27.4}];
+    campSpots.forEach(function(p){
+      const tent = buildTent();
+      tent.position.set(p.x, terrainHeight(p.x, p.z), p.z);
+      tent.rotation.y = Math.random()*Math.PI*2;
+      scene.add(tent);
+    });
+    const fire = buildCampfire();
+    const fx = 4.9, fz = -25.3;
+    fire.position.set(fx, terrainHeight(fx, fz), fz);
+    scene.add(fire);
+    campfires.push(fire);
+  }
+  document.getElementById('levelBadge').style.display = currentLevel === 2 ? 'flex' : 'none';
 
   raycaster = new THREE.Raycaster();
 
   waypoints = PATH_POINTS.map(function(p, i){
-    const pos = new THREE.Vector3(p.x, 0, p.z);
+    const gy = groundLevelAt(p.x, p.z);
+    const pos = new THREE.Vector3(p.x, gy, p.z);
     const wp = {pos: pos, solved: i===0, active:false, markerGroup:null};
     if(i > 0){
       const marker = buildMarker();
       marker.position.copy(pos);
+      marker.userData.baseY = gy;
       marker.visible = false;
       scene.add(marker);
       wp.markerGroup = marker;
@@ -1834,14 +2376,31 @@ function initScene(){
 }
 
 function showWin(){
+  document.getElementById('winTitle').textContent = currentLevel === 2 ?
+    'Ukończyliście gęsty las!' : 'Dotarliście do serca dżungli!';
   document.getElementById('winText').textContent =
     'Zebraliście ' + score + ' / ' + (PATH_POINTS.length-1) + ' nutek i przeszliście całą dżunglę!';
+  document.getElementById('level2Btn').style.display = currentLevel === 1 ? 'inline-block' : 'none';
   document.getElementById('winOverlay').classList.add('show');
   spawnWinCelebration();
 }
 
+function startLevel2(){
+  currentLevel = 2;
+  document.getElementById('winOverlay').classList.remove('show');
+  sceneRunning = false;
+  if(renderer){
+    renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
+    window.removeEventListener('resize', resizeRenderer);
+  }
+  scene = null; camera = null; renderer = null; waypoints = []; currentPuzzle = null; walking = false;
+  initScene();
+}
+
 function restartGame(){
   sceneRunning = false;
+  currentLevel = 1;
+  document.getElementById('levelBadge').style.display = 'none';
   document.getElementById('winOverlay').classList.remove('show');
   document.getElementById('charSelect').style.display = 'flex';
   document.getElementById('sceneWrap').style.display = 'none';
