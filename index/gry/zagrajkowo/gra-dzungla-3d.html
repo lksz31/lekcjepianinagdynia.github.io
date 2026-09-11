@@ -454,6 +454,215 @@ function buildCharacter(kind){
   return g;
 }
 
+/* ══ Towarzysze — małe low-poly zwierzątka dżungli, które dołączają do
+   drużyny po każdej poprawnej odpowiedzi i biegną gęsiego za postacią ══ */
+function buildTurtle(){
+  const g = new THREE.Group();
+  const shellMat = new THREE.MeshStandardMaterial({color:0x4a7c3f, roughness:0.8});
+  const skinMat = new THREE.MeshStandardMaterial({color:0x8fbf6a, roughness:0.75});
+  const shell = new THREE.Mesh(new THREE.SphereGeometry(0.26, 12, 8, 0, Math.PI*2, 0, Math.PI/1.7), shellMat);
+  shell.position.y = 0.2;
+  g.add(shell);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), skinMat);
+  head.position.set(0, 0.17, 0.27);
+  g.add(head);
+  [[-0.18,0.08,0.14],[0.18,0.08,0.14],[-0.18,0.08,-0.14],[0.18,0.08,-0.14]].forEach(function(p){
+    const leg = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), skinMat);
+    leg.position.set(p[0], p[1], p[2]);
+    g.add(leg);
+  });
+  g.scale.setScalar(0.85);
+  return g;
+}
+function buildFrog(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x6fbf4f, roughness:0.7});
+  const eyeMat = new THREE.MeshStandardMaterial({color:0xfff4d6, roughness:0.5});
+  const pupilMat = new THREE.MeshStandardMaterial({color:0x1a1a1a});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 10), mat);
+  body.scale.set(1.15, 0.85, 1.25);
+  body.position.y = 0.16;
+  g.add(body);
+  [-0.11, 0.11].forEach(function(dx){
+    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeMat);
+    eye.position.set(dx, 0.32, 0.12);
+    g.add(eye);
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 6), pupilMat);
+    pupil.position.set(dx, 0.34, 0.19);
+    g.add(pupil);
+  });
+  [[-0.2,0.07,0.12],[0.2,0.07,0.12],[-0.22,0.07,-0.15],[0.22,0.07,-0.15]].forEach(function(p){
+    const leg = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), mat);
+    leg.position.set(p[0], p[1], p[2]);
+    g.add(leg);
+  });
+  g.scale.setScalar(0.85);
+  return g;
+}
+function buildSquirrel(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0xb5651d, roughness:0.8});
+  const bellyMat = new THREE.MeshStandardMaterial({color:0xf0e0c0, roughness:0.8});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), mat);
+  body.position.y = 0.22;
+  g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), mat);
+  head.position.set(0, 0.35, 0.14);
+  g.add(head);
+  [-0.06, 0.06].forEach(function(dx){
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.08, 6), mat);
+    ear.position.set(dx, 0.46, 0.14);
+    g.add(ear);
+  });
+  const tail = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), mat);
+  tail.scale.set(0.7, 1.3, 0.7);
+  tail.position.set(0, 0.42, -0.22);
+  tail.rotation.x = -0.5;
+  g.add(tail);
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), bellyMat);
+  belly.position.set(0, 0.2, 0.08);
+  g.add(belly);
+  g.scale.setScalar(0.8);
+  return g;
+}
+function buildButterfly(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.6});
+  const wingColors = [0xff6ba8, 0xffd166, 0x6bc5ff, 0x9dff6b];
+  const wingMat = new THREE.MeshStandardMaterial({color:wingColors[Math.floor(Math.random()*wingColors.length)], roughness:0.6, side:THREE.DoubleSide});
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.16, 6), bodyMat);
+  body.position.y = 0.3;
+  g.add(body);
+  [-1, 1].forEach(function(side){
+    const wingTop = new THREE.Mesh(new THREE.CircleGeometry(0.14, 10), wingMat);
+    wingTop.position.set(side*0.13, 0.35, 0);
+    wingTop.rotation.y = side>0 ? -0.3 : 0.3;
+    g.add(wingTop);
+    const wingBot = new THREE.Mesh(new THREE.CircleGeometry(0.09, 10), wingMat);
+    wingBot.position.set(side*0.1, 0.24, 0);
+    wingBot.rotation.y = side>0 ? -0.3 : 0.3;
+    g.add(wingBot);
+  });
+  g.userData.flies = true;
+  g.scale.setScalar(0.85);
+  return g;
+}
+function buildToucan(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.7});
+  const bellyMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.7});
+  const beakMat = new THREE.MeshStandardMaterial({color:0xff9500, roughness:0.5});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), bodyMat);
+  body.position.y = 0.3;
+  body.scale.set(0.9, 1.05, 1);
+  g.add(body);
+  const belly = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), bellyMat);
+  belly.position.set(0, 0.24, 0.08);
+  g.add(belly);
+  const beak = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.26, 8), beakMat);
+  beak.rotation.z = Math.PI/2;
+  beak.position.set(0, 0.34, 0.24);
+  g.add(beak);
+  const legMat = new THREE.MeshStandardMaterial({color:0xffcc33, roughness:0.7});
+  [-0.06, 0.06].forEach(function(dx){
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.14, 6), legMat);
+    leg.position.set(dx, 0.12, 0);
+    g.add(leg);
+  });
+  g.scale.setScalar(0.8);
+  return g;
+}
+function buildHedgehog(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0x8a6a4a, roughness:0.85});
+  const faceMat = new THREE.MeshStandardMaterial({color:0xe8d5b5, roughness:0.8});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 8), bodyMat);
+  body.position.y = 0.22;
+  g.add(body);
+  const face = new THREE.Mesh(new THREE.SphereGeometry(0.11, 8, 8), faceMat);
+  face.position.set(0, 0.19, 0.16);
+  g.add(face);
+  for(let i=0;i<14;i++){
+    const spike = new THREE.Mesh(new THREE.ConeGeometry(0.025, 0.12, 4), bodyMat);
+    spike.position.set((Math.random()-0.5)*0.32, 0.22+Math.random()*0.14, (Math.random()-0.5)*0.32-0.03);
+    spike.rotation.x = (Math.random()-0.5)*1.2;
+    spike.rotation.z = (Math.random()-0.5)*1.2;
+    g.add(spike);
+  }
+  g.scale.setScalar(0.75);
+  return g;
+}
+function buildFoxCub(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0xe8792a, roughness:0.75});
+  const whiteMat = new THREE.MeshStandardMaterial({color:0xfaf3e8, roughness:0.8});
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), mat);
+  body.scale.set(1, 0.9, 1.2);
+  body.position.y = 0.2;
+  g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), mat);
+  head.position.set(0, 0.32, 0.16);
+  g.add(head);
+  const muzzle = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.13, 8), whiteMat);
+  muzzle.rotation.x = Math.PI/2;
+  muzzle.position.set(0, 0.29, 0.28);
+  g.add(muzzle);
+  [-0.08, 0.08].forEach(function(dx){
+    const ear = new THREE.Mesh(new THREE.ConeGeometry(0.055, 0.14, 4), mat);
+    ear.position.set(dx, 0.44, 0.14);
+    g.add(ear);
+  });
+  const chest = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), whiteMat);
+  chest.position.set(0, 0.18, 0.14);
+  g.add(chest);
+  const tail = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.34, 8), mat);
+  tail.rotation.x = Math.PI*0.55;
+  tail.position.set(0, 0.24, -0.24);
+  g.add(tail);
+  const tailTip = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), whiteMat);
+  tailTip.position.set(0, 0.1, -0.42);
+  g.add(tailTip);
+  g.scale.setScalar(0.8);
+  return g;
+}
+
+const ANIMAL_BUILDERS = [buildTurtle, buildFrog, buildSquirrel, buildButterfly, buildToucan, buildHedgehog, buildFoxCub];
+let companions = [];
+let pathHistory = [];
+const PATH_HISTORY_MAX = 320;
+const COMPANION_GAP = 14; /* klatek odstępu między kolejnymi towarzyszami w "wężyku" */
+
+function spawnCompanion(waypointIdx){
+  const kind = ANIMAL_BUILDERS[(waypointIdx-1) % ANIMAL_BUILDERS.length];
+  const animal = kind();
+  const wp = waypoints[waypointIdx].pos;
+  animal.position.set(wp.x, groundLevelAt(wp.x, wp.z), wp.z);
+  scene.add(animal);
+  companions.push(animal);
+}
+
+function updateCompanions(){
+  if(character){
+    pathHistory.push({x:character.position.x, z:character.position.z});
+    if(pathHistory.length > PATH_HISTORY_MAX) pathHistory.shift();
+  }
+  companions.forEach(function(animal, i){
+    const idx = Math.max(0, pathHistory.length - 1 - (i+1)*COMPANION_GAP);
+    const target = pathHistory[idx];
+    if(!target) return;
+    const dx = target.x - animal.position.x, dz = target.z - animal.position.z;
+    if(Math.hypot(dx, dz) > 0.02){
+      animal.position.x += dx*0.18;
+      animal.position.z += dz*0.18;
+      animal.rotation.y = Math.atan2(dx, dz); /* zwierzątka to zwykłe grupy bez
+        wpieczonego obrotu z FBX, więc bezpiecznie ustawiamy .rotation.y wprost */
+    }
+    const groundY = groundLevelAt(animal.position.x, animal.position.z);
+    const bobH = animal.userData.flies ? 0.3 : 0.05;
+    animal.position.y = groundY + bobH + Math.abs(Math.sin(idleT*(animal.userData.flies?7:2.4) + i))*bobH;
+  });
+}
+
 /* Kilka gatunków drzew, losowanych przy rozstawianiu, żeby dżungla nie
    wyglądała na sklonowaną z jednego modelu. */
 function buildTreeConifer(){
@@ -575,17 +784,56 @@ function distToPath(x, z){
 }
 
 /* Rzeka przecina ścieżkę w poprzek na wysokości Z=-14 (między 2. a 3.
-   polanką) — postać naturalnie przechodzi przez ten punkt idąc prostą
-   linią między punktami ścieżki, więc most nie wymaga zmian w chodzeniu. */
+   polanką) w szerokim wgłębieniu (dolinie) — postać naturalnie przechodzi
+   przez ten punkt idąc prostą linią między punktami ścieżki. Most jest
+   podniesiony (BRIDGE_Y) i rozpięty na całą szerokość doliny. */
 const RIVER_Z = -14, RIVER_DEPTH = 1.8, RIVER_HALF_WIDTH = 13;
+const RIVER_VALLEY_HALF = 5.5, RIVER_DROP = 1.35, BRIDGE_Y = 0.5;
 function nearRiver(x, z){
-  return Math.abs(z - RIVER_Z) < RIVER_DEPTH*1.3 && Math.abs(x) < 3.2;
+  return Math.abs(z - RIVER_Z) < RIVER_VALLEY_HALF + 0.4 && Math.abs(x) < 3.6;
+}
+/* Wysokość, na jakiej powinna "stać" postać/towarzysze w danym (x,z) —
+   0 na normalnej ścieżce, płynnie rośnie do wysokości pokładu mostu nad
+   doliną rzeki, żeby nie zapadali się pod deski przy przechodzeniu. */
+function groundLevelAt(x, z){
+  const dz = Math.abs(z - RIVER_Z);
+  if(dz > RIVER_VALLEY_HALF || Math.abs(x) > 1.4) return 0;
+  const vt = 1 - dz/RIVER_VALLEY_HALF;
+  const smooth = vt*vt*(3-2*vt);
+  return smooth * BRIDGE_Y;
 }
 
 /* Domek z płotkiem na końcu ścieżki — cel wędrówki, "serce dżungli". */
 const HOUSE_Z = -44, HOUSE_YARD_HALF = 4.2;
 function nearHouse(x, z){
   return Math.abs(x) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - HOUSE_Z) < HOUSE_YARD_HALF + 0.6;
+}
+
+/* Teren nie jest już idealnie płaski — łagodne wzniesienia z dala od
+   ścieżki (płasko blisko niej, żeby chodzenie zostało wiarygodne), plus
+   wgłębienie doliny rzeki. Używane zarówno do odkształcenia siatki
+   ziemi, jak i do ustawiania wysokości Y rozrzuconych obiektów. */
+function terrainHeight(x, z){
+  if(nearHouse(x, z)) return 0;
+  let h = Math.sin(x*0.35 + z*0.05)*0.45 + Math.sin(x*0.11 - z*0.17)*0.75 + Math.cos(z*0.22)*0.3;
+  const flatT = Math.min(1, distToPath(x, z)/3.4);
+  h *= flatT;
+  const dzRiver = Math.abs(z - RIVER_Z);
+  if(dzRiver < RIVER_VALLEY_HALF){
+    const vt = 1 - dzRiver/RIVER_VALLEY_HALF;
+    const smooth = vt*vt*(3-2*vt);
+    h -= smooth * RIVER_DROP;
+  }
+  return h;
+}
+
+/* Losowy obrót wokół osi Y w przestrzeni świata — bezpieczny zarówno dla
+   proceduralnych grup (obrót tożsamościowy na starcie) jak i prawdziwych
+   modeli z paczki (mają już "wpieczony" obrót Z-up→Y-up w kwaternionie;
+   ustawienie .rotation.y wprost by go zepsuło i skały wyglądałyby, jakby
+   leżały na boku). */
+function spinAroundUp(obj, angle){
+  obj.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0), angle));
 }
 
 function buildHouse(){
@@ -666,14 +914,14 @@ function scatterTrees(){
     const z = -Math.random()*44 + 2;
     if(distToPath(x, z) < 2.4) continue;
     if(Math.hypot(x, z) < 4.5) continue;
-    if(Math.abs(z - RIVER_Z) < RIVER_DEPTH*1.6) continue;
+    if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
     const tree = buildTree();
-    tree.position.set(x, 0, z);
-    const s = 0.75 + Math.random()*0.6;
+    tree.position.set(x, terrainHeight(x, z), z);
+    const s = 1.8 + Math.random()*1.3; /* dużo większe niż wcześniej */
     tree.scale.multiplyScalar(s); /* mnożymy, nie ustawiamy — prawdziwe modele mają już
        własną skalę korygującą jednostki z FBX (patrz randomNatureMesh) */
-    tree.rotation.y = Math.random()*Math.PI*2;
+    spinAroundUp(tree, Math.random()*Math.PI*2);
     scene.add(tree);
   }
 }
@@ -706,7 +954,8 @@ function scatterGrassTufts(){
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
     const tuft = buildGrassTuft();
-    tuft.position.set(x, 0, z);
+    tuft.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(tuft, Math.random()*Math.PI*2);
     scene.add(tuft);
   }
 }
@@ -724,8 +973,9 @@ function scatterRocks(){
     if(nearHouse(x, z)) continue;
     const rock = randomNatureMesh(resolvedModels.rock);
     if(!rock) continue;
-    rock.position.set(x, 0, z);
-    rock.rotation.y = Math.random()*Math.PI*2;
+    rock.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(rock, Math.random()*Math.PI*2); /* obrót tylko wokół pionu —
+      inaczej skała "kładzie się na bok", bo traci wpieczony obrót Z-up→Y-up */
     const s = 0.7 + Math.random()*0.7;
     rock.scale.multiplyScalar(s);
     scene.add(rock);
@@ -744,8 +994,8 @@ function scatterFlowers(){
     const key = pools[Math.floor(Math.random()*pools.length)];
     const flower = randomNatureMesh(resolvedModels[key]);
     if(!flower) continue;
-    flower.position.set(x, 0, z);
-    flower.rotation.y = Math.random()*Math.PI*2;
+    flower.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(flower, Math.random()*Math.PI*2);
     scene.add(flower);
   }
 }
@@ -760,49 +1010,87 @@ function scatterBushes(){
     if(nearHouse(x, z)) continue;
     const bush = randomNatureMesh(resolvedModels.bush);
     if(!bush) continue;
-    bush.position.set(x, 0, z);
-    bush.rotation.y = Math.random()*Math.PI*2;
+    bush.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(bush, Math.random()*Math.PI*2);
     scene.add(bush);
   }
 }
 
 function buildRiverAndBridge(){
+  /* Woda leży na dnie doliny (RIVER_DROP niżej), nie na powierzchni ziemi. */
   const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.2, metalness:0.15, transparent:true, opacity:0.88});
   const water = new THREE.Mesh(new THREE.PlaneGeometry(RIVER_HALF_WIDTH*2, RIVER_DEPTH), waterMat);
   water.rotation.x = -Math.PI/2;
-  water.position.set(0, 0.025, RIVER_Z);
+  water.position.set(0, -RIVER_DROP + 0.12, RIVER_Z);
   scene.add(water);
 
-  /* brzegi — wąski pas piasku/ziemi po obu stronach wody */
+  /* brzegi — wąski pas piasku/ziemi tuż przy wodzie, na dnie doliny */
   const bankMat = new THREE.MeshStandardMaterial({color:0xc9a96b, roughness:1});
   [-1, 1].forEach(function(side){
-    const bank = new THREE.Mesh(new THREE.PlaneGeometry(RIVER_HALF_WIDTH*2, 0.5), bankMat);
+    const bank = new THREE.Mesh(new THREE.PlaneGeometry(RIVER_HALF_WIDTH*2, 0.7), bankMat);
     bank.rotation.x = -Math.PI/2;
-    bank.position.set(0, 0.015, RIVER_Z + side*(RIVER_DEPTH/2 + 0.22));
+    bank.position.set(0, -RIVER_DROP + 0.13, RIVER_Z + side*(RIVER_DEPTH/2 + 0.32));
     scene.add(bank);
   });
 
-  /* pomost — deski + poręcze po obu stronach */
+  /* Most — długi, podniesiony pokład nad całą doliną (BRIDGE_Y), z nogami
+     schodzącymi do dna, i sznurowymi poręczami (górna lina + skrzyżowane
+     sznurki między poręczą a pokładem, jak w moście linowym). */
   const deckMat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.85});
-  const deckWidth = 2.0, deckLen = RIVER_DEPTH + 1.1;
+  const deckWidth = 1.8, deckLen = RIVER_VALLEY_HALF*2 - 1;
   const deck = new THREE.Mesh(new THREE.BoxGeometry(deckWidth, 0.08, deckLen), deckMat);
-  deck.position.set(0, 0.06, RIVER_Z);
+  deck.position.set(0, BRIDGE_Y, RIVER_Z);
   scene.add(deck);
-  for(let i=0;i<6;i++){
-    const plank = new THREE.Mesh(new THREE.BoxGeometry(deckWidth*0.96, 0.02, deckLen/7), deckMat);
-    plank.position.set(0, 0.105, RIVER_Z - deckLen/2 + (i+0.9)*(deckLen/7));
+  const plankCount = 18;
+  for(let i=0;i<plankCount;i++){
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(deckWidth*0.94, 0.02, deckLen/plankCount*0.8), deckMat);
+    plank.position.set(0, BRIDGE_Y + 0.045, RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/plankCount));
     scene.add(plank);
   }
-  const railMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.85});
+
+  /* nogi podpierające most, w 1/4 i 3/4 rozpiętości */
+  const legMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
+  [-0.28, 0.28].forEach(function(frac){
+    const legZ = RIVER_Z + frac*deckLen;
+    [-1, 1].forEach(function(side){
+      const legLen = BRIDGE_Y + RIVER_DROP;
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, legLen, 6), legMat);
+      leg.position.set(side*(deckWidth/2 - 0.1), BRIDGE_Y - legLen/2, legZ);
+      leg.rotation.z = side*0.1;
+      scene.add(leg);
+    });
+  });
+
+  const ropeMat = new THREE.MeshStandardMaterial({color:0xcbb27a, roughness:0.95});
+  const railYoff = 0.42, deckYoff = 0.04;
   [-1, 1].forEach(function(side){
-    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, deckLen, 6), railMat);
+    const railX = side*(deckWidth/2);
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, deckLen, 6), ropeMat);
     rail.rotation.x = Math.PI/2;
-    rail.position.set(side*(deckWidth/2), 0.42, RIVER_Z);
+    rail.position.set(railX, BRIDGE_Y + railYoff, RIVER_Z);
     scene.add(rail);
-    for(let i=0;i<4;i++){
-      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 6), railMat);
-      post.position.set(side*(deckWidth/2), 0.21, RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/4));
+
+    const postCount = 11;
+    for(let i=0;i<postCount;i++){
+      const pz = RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/postCount);
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, railYoff, 6), ropeMat);
+      post.position.set(railX, BRIDGE_Y + railYoff/2, pz);
       scene.add(post);
+    }
+
+    /* sznurki na krzyż między poręczą a pokładem — wygląd mostu linowego */
+    for(let i=0;i<postCount-1;i++){
+      const zA = RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/postCount);
+      const zB = RIVER_Z - deckLen/2 + (i+1.5)*(deckLen/postCount);
+      const spanZ = zB - zA;
+      [[deckYoff, railYoff], [railYoff, deckYoff]].forEach(function(pair){
+        const y0 = pair[0], y1 = pair[1];
+        const len = Math.hypot(spanZ, y1-y0);
+        const diag = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.013, len, 5), ropeMat);
+        diag.position.set(railX, BRIDGE_Y + (y0+y1)/2, (zA+zB)/2);
+        diag.rotation.x = Math.atan2(spanZ, y1-y0);
+        scene.add(diag);
+      });
     }
   });
 }
@@ -826,42 +1114,35 @@ function buildMountain(peakHeight, baseRadius){
   return g;
 }
 
+/* Góry stoją dużo bliżej ścieżki niż wcześniej, żeby robić wrażenie
+   wąskiego przełomu górskiego, którym prowadzi ścieżka — nie zwykłego
+   dalekiego tła. Promień podstawy dobrany tak, żeby nie wchodziły na
+   samą ścieżkę (min. odległość krawędzi górki od jej środka to
+   zawsze bezpieczny margines od pasa dekoracji do x≈9.5). */
 function scatterMountains(){
   const ranges = [
-    {side:-1, count:10}, {side:1, count:10}
+    {side:-1, count:13}, {side:1, count:13}
   ];
   ranges.forEach(function(range){
     for(let i=0;i<range.count;i++){
-      const peakHeight = 9 + Math.random()*9;
-      const baseRadius = 4.5 + Math.random()*3.5;
+      const baseRadius = 3 + Math.random()*2.5;
+      const peakHeight = 10 + Math.random()*10;
       const mtn = buildMountain(peakHeight, baseRadius);
-      const x = range.side * (18 + Math.random()*16);
-      const z = -Math.random()*62 + 12;
-      mtn.position.set(x, 0, z);
+      const x = range.side * (10 + baseRadius + Math.random()*7);
+      const z = -Math.random()*66 + 14;
+      mtn.position.set(x, terrainHeight(x, z), z);
       scene.add(mtn);
     }
   });
   /* grzbiet zamykający dolinę na końcu ścieżki */
-  for(let i=0;i<8;i++){
-    const peakHeight = 11 + Math.random()*9;
-    const baseRadius = 5 + Math.random()*3.5;
+  for(let i=0;i<9;i++){
+    const peakHeight = 12 + Math.random()*10;
+    const baseRadius = 4.5 + Math.random()*3;
     const mtn = buildMountain(peakHeight, baseRadius);
-    mtn.position.set((Math.random()*2-1)*20, 0, -58 - Math.random()*12);
+    const x = (Math.random()*2-1)*16, z = -60 - Math.random()*12;
+    mtn.position.set(x, terrainHeight(x, z), z);
     scene.add(mtn);
   }
-}
-
-/* Panorama gór w tle, namalowana na dużej zakrzywionej "kurtynie" za
-   proceduralnymi górami — daje głębię, której same stożki nie dają. */
-function buildPanoramaBackdrop(){
-  const tex = getTexture(TEXTURE_DIR+'dzungla-tlo.webp');
-  const radius = 46, height = 46;
-  const geo = new THREE.CylinderGeometry(radius, radius, height, 56, 1, true);
-  const mat = new THREE.MeshBasicMaterial({map:tex, side:THREE.BackSide, fog:false, depthWrite:false});
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.renderOrder = -1;
-  mesh.position.set(0, height*0.28, -20);
-  scene.add(mesh);
 }
 
 /* ══ Tekstury (wygenerowane grafiki) — jeden cache na URL, żeby nie ładować
@@ -1258,12 +1539,15 @@ function onFruitPick(letter, tileEl){
     const burstPos = waypoints[currentIdx].pos.clone();
     burstPos.y += 1.1;
     spawn3DBurst(burstPos);
+    spawnCompanion(currentIdx);
     setTimeout(function(){
       hidePuzzle();
       waypoints[solvedIdx].solved = true;
       hideMarker(solvedIdx);
       if(solvedIdx === PATH_POINTS.length - 1){
-        setTimeout(showWin, 500);
+        setTimeout(function(){
+          runVictoryLap(function(){ setTimeout(showWin, 300); });
+        }, 400);
       }else{
         activateMarker(solvedIdx + 1);
         document.getElementById('hintBadge').style.opacity = '1';
@@ -1354,7 +1638,7 @@ function walkTo(idx){
     const ease = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
     character.position.x = start.x + (target.x-start.x)*ease;
     character.position.z = start.z + (target.z-start.z)*ease;
-    character.position.y = Math.abs(Math.sin(t*Math.PI*7)) * 0.09;
+    character.position.y = groundLevelAt(character.position.x, character.position.z) + Math.abs(Math.sin(t*Math.PI*7)) * 0.09;
     const lookAhead = new THREE.Vector3(target.x, character.position.y, target.z);
     if(lookAhead.distanceTo(character.position) > 0.05){
       character.lookAt(lookAhead);
@@ -1362,13 +1646,51 @@ function walkTo(idx){
     if(t < 1){
       requestAnimationFrame(step);
     }else{
-      character.position.y = 0;
+      character.position.y = groundLevelAt(target.x, target.z);
       walking = false;
       currentIdx = idx;
       onArrive(idx);
     }
   }
   requestAnimationFrame(step);
+}
+
+/* Ogólny "tween" postaci do dowolnego punktu, niezależny od systemu
+   zagadek — używany do biegu na okrążenie po wygraniu (patrz runVictoryLap). */
+function tweenCharacterTo(targetX, targetZ, duration, onDone){
+  const start = character.position.clone();
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const ease = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+    character.position.x = start.x + (targetX-start.x)*ease;
+    character.position.z = start.z + (targetZ-start.z)*ease;
+    character.position.y = groundLevelAt(character.position.x, character.position.z) + Math.abs(Math.sin(t*Math.PI*7)) * 0.09;
+    const lookAhead = new THREE.Vector3(targetX, character.position.y, targetZ);
+    if(lookAhead.distanceTo(character.position) > 0.05){
+      character.lookAt(lookAhead);
+    }
+    if(t < 1){
+      requestAnimationFrame(step);
+    }else{
+      character.position.y = groundLevelAt(targetX, targetZ);
+      if(onDone) onDone();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+const VICTORY_LAP_POINTS = [
+  {x:2.6, z:HOUSE_Z+1.6}, {x:0, z:HOUSE_Z+3.4}, {x:-2.6, z:HOUSE_Z+1.6}, {x:0, z:HOUSE_Z-0.3}
+];
+function runVictoryLap(onDone){
+  let i = 0;
+  function next(){
+    if(i >= VICTORY_LAP_POINTS.length){ onDone(); return; }
+    const p = VICTORY_LAP_POINTS[i++];
+    tweenCharacterTo(p.x, p.z, 550, next);
+  }
+  next();
 }
 
 function onArrive(idx){
@@ -1417,6 +1739,7 @@ function animate(now){
       wp.markerGroup.position.y = Math.sin(idleT*1.6 + wp.markerGroup.userData.bobPhase) * 0.1;
     }
   });
+  updateCompanions();
   updateCamera();
   renderer.render(scene, camera);
 }
@@ -1442,12 +1765,22 @@ function initScene(){
   grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
   grassTex.repeat.set(10, 15);
   const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1});
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 90), groundMat);
+  /* Teren nie jest już płaski — odkształcamy siatkę wg terrainHeight()
+     (płasko przy ścieżce, łagodne wzniesienia dalej, wgłębienie przy rzece).
+     Lokalne Z wierzchołka PlaneGeometry staje się światową wysokością Y po
+     obrocie o -90° wokół X, stąd przeliczenie współrzędnych poniżej. */
+  const groundGeo = new THREE.PlaneGeometry(60, 90, 40, 60);
+  const gPos = groundGeo.attributes.position;
+  for(let i=0;i<gPos.count;i++){
+    const wx = gPos.getX(i), wz = -gPos.getY(i) - 20;
+    gPos.setZ(i, terrainHeight(wx, wz));
+  }
+  groundGeo.computeVertexNormals();
+  const ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI/2;
   ground.position.z = -20;
   scene.add(ground);
 
-  buildPanoramaBackdrop();
   buildTrail();
   buildRiverAndBridge();
   buildHouseAndFence();
@@ -1481,6 +1814,8 @@ function initScene(){
   currentIdx = 0;
   score = 0;
   orbitAngle = 0;
+  companions = [];
+  pathHistory = [];
   resetJoystick();
   document.getElementById('scoreVal').textContent = '0';
   activateMarker(1);
