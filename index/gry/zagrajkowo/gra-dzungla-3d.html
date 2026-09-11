@@ -2945,35 +2945,62 @@ function runIntroCutscene(onDone){
   const skipBtn = document.getElementById('skipCutsceneBtn');
   if(skipBtn) skipBtn.style.display = 'block';
 
-  const flyHeight = 5.5;
-  const points = PATH_POINTS.map(function(p){
-    return {
-      pos: new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z),
-      look: new THREE.Vector3(p.x, terrainHeight(p.x, p.z), p.z)
-    };
+  /* Płynny, ciągły przelot kamery wzdłuż wygładzonej krzywej nad trasą
+     (nie skoki punkt-po-punkcie) — kamera patrzy do PRZODU, w kierunku
+     lotu (styczna do krzywej), lekko w dół na ścieżkę, z delikatnym
+     rozglądaniem się na boki (sinusoidalny "wobble"), zamiast patrzeć
+     prosto w dół jak z lotu ptaka. */
+  const flyHeight = 4;
+  const curvePts = PATH_POINTS.map(function(p){
+    return new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z);
   });
-  camera.position.set(points[0].pos.x, points[0].pos.y + 2, points[0].pos.z + 5);
-  camera.lookAt(points[0].look);
-  cutsceneLookTarget = points[0].look.clone();
+  const startDir = new THREE.Vector3().subVectors(curvePts[0], curvePts[1]).normalize();
+  curvePts.unshift(curvePts[0].clone().addScaledVector(startDir, 4));
+  const endDir = new THREE.Vector3().subVectors(curvePts[curvePts.length-1], curvePts[curvePts.length-2]).normalize();
+  curvePts.push(curvePts[curvePts.length-1].clone().addScaledVector(endDir, 3));
+  /* "centripetal" (nie "catmullrom"/uniform) jest tu konieczne — ścieżka
+     zygzakuje w x, a uniform Catmull-Rom robi przy takich ostrych zakrętach
+     pętle/nawroty (kamera skacze do tyłu). Centripetal tego unika. */
+  const curve = new THREE.CatmullRomCurve3(curvePts, false, 'centripetal', 0.5);
 
-  let i = 0;
-  function forward(){
-    if(i >= points.length){ setTimeout(backward, 400); return; }
-    const p = points[i++];
-    tweenCamera(p.pos, p.look, 480, forward);
+  const upVec = new THREE.Vector3(0, 1, 0);
+  const forwardDuration = 5200;
+  const t0 = performance.now();
+
+  function stepForward(now){
+    if(cutsceneSkip){ startBackward(); return; }
+    const t = Math.min(1, (now - t0) / forwardDuration);
+    const e = t*t*(3-2*t); /* łagodny rozbieg/hamowanie na starcie i końcu */
+    /* getPoint/getTangent (parametr naturalny), NIE getPointAt/getTangentAt
+       (długość łuku) — dla type:'centripetal' na otwartej krzywej ta druga
+       para rzuca wyjątkiem w tej wersji three.js (pusta tabela długości). */
+    const pos = curve.getPoint(e);
+    const tangent = curve.getTangent(Math.min(0.999, e)).normalize();
+    camera.position.copy(pos);
+    const side = new THREE.Vector3().crossVectors(tangent, upVec).normalize();
+    const wobble = Math.sin(now * 0.0014) * 2.6;
+    const lookAhead = pos.clone().addScaledVector(tangent, 7).addScaledVector(side, wobble);
+    lookAhead.y -= 1.3;
+    camera.lookAt(lookAhead);
+    cutsceneLookTarget = lookAhead;
+    if(t < 1){
+      requestAnimationFrame(stepForward);
+    }else{
+      setTimeout(startBackward, 300);
+    }
   }
-  function backward(){
+  function startBackward(){
     const initCam = cameraOffsetForAspect();
     const finalPos = character.position.clone().add(initCam.back);
     const finalLook = character.position.clone();
     finalLook.y += initCam.lookY;
-    tweenCamera(finalPos, finalLook, 1000, function(){
+    tweenCamera(finalPos, finalLook, 1100, function(){
       inCutscene = false;
       if(skipBtn) skipBtn.style.display = 'none';
       onDone();
     });
   }
-  forward();
+  requestAnimationFrame(stepForward);
 }
 
 function onArrive(idx){
