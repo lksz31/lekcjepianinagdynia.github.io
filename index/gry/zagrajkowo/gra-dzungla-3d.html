@@ -565,12 +565,100 @@ function distToPath(x, z){
   return min;
 }
 
+/* Rzeka przecina ścieżkę w poprzek na wysokości Z=-14 (między 2. a 3.
+   polanką) — postać naturalnie przechodzi przez ten punkt idąc prostą
+   linią między punktami ścieżki, więc most nie wymaga zmian w chodzeniu. */
+const RIVER_Z = -14, RIVER_DEPTH = 1.8, RIVER_HALF_WIDTH = 13;
+function nearRiver(x, z){
+  return Math.abs(z - RIVER_Z) < RIVER_DEPTH*1.3 && Math.abs(x) < 3.2;
+}
+
+/* Domek z płotkiem na końcu ścieżki — cel wędrówki, "serce dżungli". */
+const HOUSE_Z = -44, HOUSE_YARD_HALF = 4.2;
+function nearHouse(x, z){
+  return Math.abs(x) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - HOUSE_Z) < HOUSE_YARD_HALF + 0.6;
+}
+
+function buildHouse(){
+  const g = new THREE.Group();
+  const wallMat = new THREE.MeshStandardMaterial({color:0xd9b98a, roughness:0.9});
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.6, 2.2), wallMat);
+  wall.position.y = 0.8;
+  g.add(wall);
+  const roofMat = new THREE.MeshStandardMaterial({color:0xa9432f, roughness:0.85});
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(1.9, 1.2, 4), roofMat);
+  roof.position.y = 1.6 + 0.6;
+  roof.rotation.y = Math.PI/4;
+  g.add(roof);
+  const doorMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.0, 0.08), doorMat);
+  door.position.set(0, 0.5, 1.12);
+  g.add(door);
+  const windowMat = new THREE.MeshStandardMaterial({color:0xfff4d6, emissive:0xffdd88, emissiveIntensity:0.5});
+  const win1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.06), windowMat);
+  win1.position.set(-0.75, 0.9, 1.12);
+  g.add(win1);
+  const win2 = win1.clone();
+  win2.position.x = 0.75;
+  g.add(win2);
+  return g;
+}
+
+function buildFence(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.9});
+  const half = HOUSE_YARD_HALF, gateHalf = 1.1, spacing = 1.05;
+
+  function post(x, z){
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.05, 0.7, 6), mat);
+    p.position.set(x, 0.35, z);
+    g.add(p);
+  }
+  function railX(xFrom, xTo, z){
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(xTo-xFrom), 0.05, 0.05), mat);
+    rail.position.set((xFrom+xTo)/2, 0.5, z);
+    g.add(rail);
+  }
+  function railZ(zFrom, zTo, x){
+    const rail = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, Math.abs(zTo-zFrom)), mat);
+    rail.position.set(x, 0.5, (zFrom+zTo)/2);
+    g.add(rail);
+  }
+
+  for(let x=-half; x<=half+0.001; x+=spacing) post(Math.min(x,half), -half);
+  railX(-half, half, -half);
+
+  for(let x=-half; x<=-gateHalf+0.001; x+=spacing) post(x, half);
+  for(let x=gateHalf; x<=half+0.001; x+=spacing) post(x, half);
+  railX(-half, -gateHalf, half);
+  railX(gateHalf, half, half);
+
+  for(let z=-half; z<=half+0.001; z+=spacing) post(-half, Math.min(z,half));
+  railZ(-half, half, -half);
+
+  for(let z=-half; z<=half+0.001; z+=spacing) post(half, Math.min(z,half));
+  railZ(-half, half, half);
+
+  return g;
+}
+
+function buildHouseAndFence(){
+  const house = buildHouse();
+  house.position.set(0, 0, HOUSE_Z - 1.4);
+  scene.add(house);
+  const fence = buildFence();
+  fence.position.set(0, 0, HOUSE_Z);
+  scene.add(fence);
+}
+
 function scatterTrees(){
   for(let i=0;i<26;i++){
     const x = (Math.random()*2-1) * 9;
     const z = -Math.random()*44 + 2;
     if(distToPath(x, z) < 2.4) continue;
     if(Math.hypot(x, z) < 4.5) continue;
+    if(Math.abs(z - RIVER_Z) < RIVER_DEPTH*1.6) continue;
+    if(nearHouse(x, z)) continue;
     const tree = buildTree();
     tree.position.set(x, 0, z);
     const s = 0.75 + Math.random()*0.6;
@@ -578,6 +666,76 @@ function scatterTrees(){
     tree.rotation.y = Math.random()*Math.PI*2;
     scene.add(tree);
   }
+}
+
+function buildGrassTuft(){
+  const g = new THREE.Group();
+  const shade = 0x3f9950 + Math.floor(Math.random()*3)*0x001500;
+  const bladeMat = new THREE.MeshStandardMaterial({color:shade, roughness:0.9, side:THREE.DoubleSide});
+  const count = 4 + Math.floor(Math.random()*3);
+  for(let i=0;i<count;i++){
+    const h = 0.16 + Math.random()*0.18;
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.02, h, 3), bladeMat);
+    blade.position.set((Math.random()-0.5)*0.14, h/2, (Math.random()-0.5)*0.14);
+    blade.rotation.y = Math.random()*Math.PI;
+    blade.rotation.z = (Math.random()-0.5)*0.35;
+    g.add(blade);
+  }
+  return g;
+}
+
+function scatterGrassTufts(){
+  for(let i=0;i<60;i++){
+    const x = (Math.random()*2-1) * 9.5;
+    const z = -Math.random()*44 + 2;
+    if(distToPath(x, z) < 1.1) continue;
+    if(nearRiver(x, z)) continue;
+    if(nearHouse(x, z)) continue;
+    const tuft = buildGrassTuft();
+    tuft.position.set(x, 0, z);
+    scene.add(tuft);
+  }
+}
+
+function buildRiverAndBridge(){
+  const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.2, metalness:0.15, transparent:true, opacity:0.88});
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(RIVER_HALF_WIDTH*2, RIVER_DEPTH), waterMat);
+  water.rotation.x = -Math.PI/2;
+  water.position.set(0, 0.025, RIVER_Z);
+  scene.add(water);
+
+  /* brzegi — wąski pas piasku/ziemi po obu stronach wody */
+  const bankMat = new THREE.MeshStandardMaterial({color:0xc9a96b, roughness:1});
+  [-1, 1].forEach(function(side){
+    const bank = new THREE.Mesh(new THREE.PlaneGeometry(RIVER_HALF_WIDTH*2, 0.5), bankMat);
+    bank.rotation.x = -Math.PI/2;
+    bank.position.set(0, 0.015, RIVER_Z + side*(RIVER_DEPTH/2 + 0.22));
+    scene.add(bank);
+  });
+
+  /* pomost — deski + poręcze po obu stronach */
+  const deckMat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.85});
+  const deckWidth = 2.0, deckLen = RIVER_DEPTH + 1.1;
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(deckWidth, 0.08, deckLen), deckMat);
+  deck.position.set(0, 0.06, RIVER_Z);
+  scene.add(deck);
+  for(let i=0;i<6;i++){
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(deckWidth*0.96, 0.02, deckLen/7), deckMat);
+    plank.position.set(0, 0.105, RIVER_Z - deckLen/2 + (i+0.9)*(deckLen/7));
+    scene.add(plank);
+  }
+  const railMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.85});
+  [-1, 1].forEach(function(side){
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, deckLen, 6), railMat);
+    rail.rotation.x = Math.PI/2;
+    rail.position.set(side*(deckWidth/2), 0.42, RIVER_Z);
+    scene.add(rail);
+    for(let i=0;i<4;i++){
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.42, 6), railMat);
+      post.position.set(side*(deckWidth/2), 0.21, RIVER_Z - deckLen/2 + (i+0.5)*(deckLen/4));
+      scene.add(post);
+    }
+  });
 }
 
 /* Góry w tle — nadają dżungli klimat "ścieżki w górach", stoją daleko za
@@ -601,27 +759,40 @@ function buildMountain(peakHeight, baseRadius){
 
 function scatterMountains(){
   const ranges = [
-    {side:-1, count:6}, {side:1, count:6}
+    {side:-1, count:10}, {side:1, count:10}
   ];
   ranges.forEach(function(range){
     for(let i=0;i<range.count;i++){
       const peakHeight = 9 + Math.random()*9;
       const baseRadius = 4.5 + Math.random()*3.5;
       const mtn = buildMountain(peakHeight, baseRadius);
-      const x = range.side * (20 + Math.random()*10);
-      const z = -Math.random()*55 + 10;
+      const x = range.side * (18 + Math.random()*16);
+      const z = -Math.random()*62 + 12;
       mtn.position.set(x, 0, z);
       scene.add(mtn);
     }
   });
   /* grzbiet zamykający dolinę na końcu ścieżki */
-  for(let i=0;i<5;i++){
-    const peakHeight = 11 + Math.random()*8;
-    const baseRadius = 5 + Math.random()*3;
+  for(let i=0;i<8;i++){
+    const peakHeight = 11 + Math.random()*9;
+    const baseRadius = 5 + Math.random()*3.5;
     const mtn = buildMountain(peakHeight, baseRadius);
-    mtn.position.set((Math.random()*2-1)*16, 0, -58 - Math.random()*10);
+    mtn.position.set((Math.random()*2-1)*20, 0, -58 - Math.random()*12);
     scene.add(mtn);
   }
+}
+
+/* Panorama gór w tle, namalowana na dużej zakrzywionej "kurtynie" za
+   proceduralnymi górami — daje głębię, której same stożki nie dają. */
+function buildPanoramaBackdrop(){
+  const tex = getTexture(TEXTURE_DIR+'dzungla-tlo.webp');
+  const radius = 46, height = 46;
+  const geo = new THREE.CylinderGeometry(radius, radius, height, 56, 1, true);
+  const mat = new THREE.MeshBasicMaterial({map:tex, side:THREE.BackSide, fog:false, depthWrite:false});
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = -1;
+  mesh.position.set(0, height*0.28, -20);
+  scene.add(mesh);
 }
 
 /* ══ Tekstury (wygenerowane grafiki) — jeden cache na URL, żeby nie ładować
@@ -662,6 +833,7 @@ function buildTrail(){
       const t = i/steps;
       const x = a.x + (b.x-a.x)*t + (Math.random()*0.5-0.25);
       const z = a.z + (b.z-a.z)*t + (Math.random()*0.5-0.25);
+      if(nearRiver(x, z)) continue; /* tę część ścieżki zajmuje most */
       const stoneMat = new THREE.MeshStandardMaterial({map:getStoneTexVariant(), roughness:0.95});
       const stone = new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.34,0.06,7), stoneMat);
       stone.position.set(x, 0.01, z);
@@ -718,7 +890,7 @@ function updateJoystick(e){
   const dist = Math.hypot(dx, dy);
   if(dist > JOY_MAX){ dx = dx/dist*JOY_MAX; dy = dy/dist*JOY_MAX; }
   joyKnob.style.transform = 'translate('+dx+'px,'+dy+'px)';
-  joystickX = dx / JOY_MAX;
+  joystickX = -dx / JOY_MAX; /* w lewo na joysticku = kamera skręca w lewo */
 }
 function resetJoystick(){
   joystickActive = false;
@@ -1121,8 +1293,12 @@ function initScene(){
   ground.position.z = -20;
   scene.add(ground);
 
+  buildPanoramaBackdrop();
   buildTrail();
+  buildRiverAndBridge();
+  buildHouseAndFence();
   scatterTrees();
+  scatterGrassTufts();
   scatterMountains();
 
   raycaster = new THREE.Raycaster();
