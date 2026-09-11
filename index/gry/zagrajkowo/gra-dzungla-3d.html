@@ -346,10 +346,11 @@ function selectChar(kind){
 }
 function startGame(){
   if(!chosenChar) return;
-  /* three.min.js ładuje się w tle po treści strony, żeby ekran wyboru
-     postaci pokazał się od razu — na wolnym łączu może jeszcze nie być
-     gotowy w momencie kliknięcia "Wyruszamy!", więc czekamy na niego. */
-  if(typeof THREE === 'undefined'){
+  /* three.min.js oraz modele 3D ładują się w tle po treści strony, żeby
+     ekran wyboru postaci pokazał się od razu — na wolnym łączu mogą
+     jeszcze nie być gotowe w momencie kliknięcia "Wyruszamy!", więc
+     czekamy na nie. */
+  if(typeof THREE === 'undefined' || !modelsReady){
     const btn = document.getElementById('startBtn');
     btn.textContent = 'Ładowanie…';
     btn.classList.remove('active');
@@ -494,6 +495,14 @@ function buildTreeBroadleaf(){
 }
 
 function buildTreePalm(){
+  /* Prawdziwy model z Ultimate Stylized Nature Pack, jak jest gotowy —
+     przeskalowany w dół, bo w oryginale palmy są większe niż nasze
+     proceduralne drzewa. Proceduralna wersja niżej zostaje jako
+     zapasowa, gdyby model się nie wczytał. */
+  if(resolvedModels.palm){
+    const real = randomNatureMesh(resolvedModels.palm, 0.55);
+    if(real) return real;
+  }
   const g = new THREE.Group();
   const trunkMat = new THREE.MeshStandardMaterial({color:0x8a6a3f, roughness:0.85});
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.15, 2.3, 7), trunkMat);
@@ -662,13 +671,18 @@ function scatterTrees(){
     const tree = buildTree();
     tree.position.set(x, 0, z);
     const s = 0.75 + Math.random()*0.6;
-    tree.scale.set(s, s, s);
+    tree.scale.multiplyScalar(s); /* mnożymy, nie ustawiamy — prawdziwe modele mają już
+       własną skalę korygującą jednostki z FBX (patrz randomNatureMesh) */
     tree.rotation.y = Math.random()*Math.PI*2;
     scene.add(tree);
   }
 }
 
 function buildGrassTuft(){
+  if(resolvedModels.grass){
+    const real = randomNatureMesh(resolvedModels.grass);
+    if(real) return real;
+  }
   const g = new THREE.Group();
   const shade = 0x3f9950 + Math.floor(Math.random()*3)*0x001500;
   const bladeMat = new THREE.MeshStandardMaterial({color:shade, roughness:0.9, side:THREE.DoubleSide});
@@ -694,6 +708,61 @@ function scatterGrassTufts(){
     const tuft = buildGrassTuft();
     tuft.position.set(x, 0, z);
     scene.add(tuft);
+  }
+}
+
+/* Skały, kwiaty i krzaki z Ultimate Stylized Nature Pack — tylko jeśli
+   modele się wczytały (na wolnym łączu resolvedModels.* może zostać puste,
+   wtedy po prostu nie ma tej dekoracji, reszta sceny działa normalnie). */
+function scatterRocks(){
+  if(!resolvedModels.rock) return;
+  for(let i=0;i<20;i++){
+    const x = (Math.random()*2-1) * 9.5;
+    const z = -Math.random()*44 + 2;
+    if(distToPath(x, z) < 1.5) continue;
+    if(nearRiver(x, z)) continue;
+    if(nearHouse(x, z)) continue;
+    const rock = randomNatureMesh(resolvedModels.rock);
+    if(!rock) continue;
+    rock.position.set(x, 0, z);
+    rock.rotation.y = Math.random()*Math.PI*2;
+    const s = 0.7 + Math.random()*0.7;
+    rock.scale.multiplyScalar(s);
+    scene.add(rock);
+  }
+}
+
+function scatterFlowers(){
+  const pools = ['flower','flowerBush'].filter(function(k){ return resolvedModels[k]; });
+  if(!pools.length) return;
+  for(let i=0;i<26;i++){
+    const x = (Math.random()*2-1) * 9;
+    const z = -Math.random()*44 + 2;
+    if(distToPath(x, z) < 1.6) continue;
+    if(nearRiver(x, z)) continue;
+    if(nearHouse(x, z)) continue;
+    const key = pools[Math.floor(Math.random()*pools.length)];
+    const flower = randomNatureMesh(resolvedModels[key]);
+    if(!flower) continue;
+    flower.position.set(x, 0, z);
+    flower.rotation.y = Math.random()*Math.PI*2;
+    scene.add(flower);
+  }
+}
+
+function scatterBushes(){
+  if(!resolvedModels.bush) return;
+  for(let i=0;i<16;i++){
+    const x = (Math.random()*2-1) * 9;
+    const z = -Math.random()*44 + 2;
+    if(distToPath(x, z) < 1.8) continue;
+    if(nearRiver(x, z)) continue;
+    if(nearHouse(x, z)) continue;
+    const bush = randomNatureMesh(resolvedModels.bush);
+    if(!bush) continue;
+    bush.position.set(x, 0, z);
+    bush.rotation.y = Math.random()*Math.PI*2;
+    scene.add(bush);
   }
 }
 
@@ -804,6 +873,91 @@ function getTexture(url){
   if(!textureLoader) textureLoader = new THREE.TextureLoader();
   if(!textureCache[url]) textureCache[url] = textureLoader.load(url);
   return textureCache[url];
+}
+
+/* ══ Prawdziwe modele 3D (Ultimate Stylized Nature Pack, skonwertowane
+   z FBX do glTF ze skompresowanymi teksturami) — ładowane przez GLTFLoader,
+   który dociera do window.GLTFLoader z osobnego modułu ES na końcu strony. */
+const MODEL_DIR = '/index/gry/zagrajkowo/vendor/modele-3d/';
+const NATURE_MODEL_FILES = {
+  palm: 'PalmTrees.glb',
+  rock: 'Rocks.glb',
+  grass: 'Grass.glb',
+  flower: 'Flowers.glb',
+  flowerBush: 'FlowerBushes.glb',
+  bush: 'Bushes.glb'
+};
+function loadGLTFModel(url){
+  return new Promise(function(resolve){
+    (function tryLoad(){
+      if(typeof window.GLTFLoader === 'undefined'){ setTimeout(tryLoad, 60); return; }
+      new window.GLTFLoader().load(url, resolve, undefined, function(){ resolve(null); });
+    })();
+  });
+}
+/* Tekstury w tej paczce mają wypieczone cieniowanie (AO, mech w szczelinach)
+   — pomalowane "na sztywno" w obrazku. Pod zwykłym światłem sceny
+   (MeshStandardMaterial mnoży teksturę przez oświetlenie) wychodzą
+   wyraźnie za ciemne, bo cieniowanie liczy się podwójnie. Zamieniamy
+   materiał na bezcieniowy (MeshBasicMaterial z tą samą teksturą) —
+   pokazuje wypieczone kolory wprost, bez dodatkowego przyciemniania.
+   Robimy to raz na unikalny materiał, żeby nie tworzyć kopii dla każdej
+   sklonowanej instancji z osobna. */
+function convertToUnlitMaterial(gltf){
+  if(!gltf) return;
+  const cache = new Map();
+  gltf.scene.traverse(function(o){
+    if(o.isMesh && o.material){
+      const old = o.material;
+      let unlit = cache.get(old);
+      if(!unlit){
+        unlit = new THREE.MeshBasicMaterial({
+          map: old.map,
+          transparent: old.transparent,
+          alphaTest: old.alphaTest || 0,
+          side: old.side,
+          opacity: old.opacity
+        });
+        cache.set(old, unlit);
+      }
+      o.material = unlit;
+    }
+  });
+}
+
+const resolvedModels = {}; /* wypełniane, jak tylko każdy model się załaduje */
+const natureModelPromises = Object.keys(NATURE_MODEL_FILES).map(function(key){
+  return loadGLTFModel(MODEL_DIR + NATURE_MODEL_FILES[key]).then(function(gltf){
+    convertToUnlitMaterial(gltf);
+    resolvedModels[key] = gltf;
+  });
+});
+let modelsReady = false;
+Promise.all(natureModelPromises).then(function(){ modelsReady = true; });
+
+/* Każdy plik glTF ma kilka nazwanych wariantów (np. Rock_1..Rock_5) jako
+   bezpośrednie dzieci węzła głównego — część z nich to węzły z kilkoma
+   "primitives" (np. pień + liście osobnym materiałem), które GLTFLoader
+   rozbija na kilka Meshy-rodzeństwa, więc klonujemy CAŁY węzeł wariantu
+   (clone(true)), a nie pojedynczy Mesh w środku. Pozycję zerujemy (to był
+   tylko układ obok siebie w pliku źródłowym), skala/obrót z węzła zostają,
+   bo poprawiają jednostki i orientację (Z-up → Y-up) z FBX. */
+function gltfVariantList(gltf){
+  if(!gltf) return [];
+  if(!gltf.__variantList){
+    const root = gltf.scene.children[0];
+    gltf.__variantList = root && root.children.length ? root.children.slice() : gltf.scene.children.slice();
+  }
+  return gltf.__variantList;
+}
+function randomNatureMesh(gltf, extraScale){
+  const list = gltfVariantList(gltf);
+  if(!list.length) return null;
+  const src = list[Math.floor(Math.random()*list.length)];
+  const clone = src.clone(true);
+  clone.position.set(0, 0, 0);
+  if(extraScale) clone.scale.multiplyScalar(extraScale);
+  return clone;
 }
 
 /* Kilka "wycinków" tekstury kamiennej ścieżki, losowanych per kamyk, żeby
@@ -1299,6 +1453,9 @@ function initScene(){
   buildHouseAndFence();
   scatterTrees();
   scatterGrassTufts();
+  scatterRocks();
+  scatterFlowers();
+  scatterBushes();
   scatterMountains();
 
   raycaster = new THREE.Raycaster();
@@ -1373,5 +1530,9 @@ if(!window.DeviceOrientationEvent){
 }
 </script>
 <script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
+<script type="module">
+import { GLTFLoader } from '/index/gry/zagrajkowo/vendor/loaders/GLTFLoader.js';
+window.GLTFLoader = GLTFLoader;
+</script>
 </body>
 </html>
