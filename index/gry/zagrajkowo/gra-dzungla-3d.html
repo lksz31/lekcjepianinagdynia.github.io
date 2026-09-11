@@ -23,7 +23,7 @@
   .sound-toggle.active{border-color:var(--gold);background:#fdf8ec;}
 
   /* ══ WYBÓR POSTACI ══ */
-  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 16px;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
+  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:22px;padding:24px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
   .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.5rem;margin:0;text-align:center;}
   .char-select p{color:var(--text-mid);font-size:0.9rem;text-align:center;max-width:380px;margin:0;line-height:1.6;}
   .char-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
@@ -63,15 +63,39 @@
   .mode-btn.active{background:var(--gold);border-color:var(--gold);color:#3d2a17;}
 
   .fruit-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
-  .fruit-tile{width:76px;height:72px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:4px 2px;}
+  .fruit-tile{width:76px;height:72px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:4px 2px;}
   .fruit-tile:active{transform:scale(0.93);}
-  .fruit-tile .fruit-img{width:34px;height:34px;object-fit:contain;display:block;}
-  .fruit-tile .fruit-word{font-weight:700;color:#5a3d1c;font-size:0.66rem;margin-top:1px;text-align:center;line-height:1.1;}
-  .fruit-tile .fruit-first{display:block;font-weight:900;color:var(--red);font-size:1.35rem;line-height:1;margin-top:2px;}
+  .fruit-tile .fruit-img{position:absolute;inset:0;margin:auto;width:80%;height:80%;object-fit:contain;opacity:0.32;pointer-events:none;}
+  .fruit-tile .fruit-word{position:relative;z-index:1;font-weight:800;color:#5a3d1c;font-size:0.66rem;margin-top:1px;text-align:center;line-height:1.1;text-shadow:0 0 4px #f5eeda,0 0 4px #f5eeda,0 1px 2px #f5eeda;}
+  .fruit-tile .fruit-first{position:relative;z-index:1;display:block;font-weight:900;color:var(--red);font-size:1.4rem;line-height:1;margin-top:2px;text-shadow:0 0 5px #f5eeda,0 0 5px #f5eeda,0 1px 2px #f5eeda;}
+  .fruit-tile .fruit-first-small-oct{font-size:0.95rem;font-weight:700;}
   .fruit-tile.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
   .fruit-tile.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
   @keyframes puzzlePop{0%{transform:scale(1);}50%{transform:scale(1.18);}100%{transform:scale(1);}}
   @keyframes puzzleShake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+  /* ══ Zadanie z koszyczkiem (poziom 3) — kilka nut naraz na pięciolinii,
+     trzeba przełożyć do koszyczka dokładnie te jedzonka, co pasują ══ */
+  .basket-puzzle{display:flex;flex-direction:column;gap:10px;align-items:center;}
+  .basket-pool{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .basket-zone{width:100%;border:3px dashed #a97c40;border-radius:16px;background:rgba(169,124,64,0.12);padding:10px;text-align:center;}
+  .basket-zone-label{font-weight:800;color:#f0d99a;font-size:0.78rem;margin-bottom:6px;}
+  .basket-zone-items{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:64px;}
+  .basket-check-btn{padding:10px 30px;font-size:0.85rem;}
+
+  /* ══ Klawiatura pianina (poziom 4+) — zamiast kafelków, klika się w
+     klawisz. Rozmiar klawiszy skaluje się z szerokością ekranu (flex +
+     clamp), więc na telefonie jest mniejsza, a na tablecie/desktopie większa. */
+  .piano-puzzle{width:100%;display:flex;justify-content:center;}
+  .piano-keys{position:relative;display:flex;width:100%;max-width:440px;height:clamp(84px,24vw,150px);}
+  .piano-white-key{position:relative;flex:1;background:#fdf8ec;border:1.5px solid #a97c40;border-left:none;border-radius:0 0 8px 8px;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;transition:0.1s;user-select:none;-webkit-user-select:none;touch-action:manipulation;overflow:hidden;}
+  .piano-white-key:first-child{border-left:1.5px solid #a97c40;}
+  .piano-white-key:active{background:#f0e2c0;}
+  .piano-white-key .piano-key-img{position:absolute;top:6%;left:50%;transform:translateX(-50%);width:74%;opacity:0.4;object-fit:contain;pointer-events:none;}
+  .piano-white-key .piano-key-label{position:relative;z-index:1;font-weight:800;color:#5a3d1c;font-size:clamp(0.68rem,3vw,0.9rem);text-shadow:0 0 4px #fdf8ec,0 0 4px #fdf8ec;}
+  .piano-white-key.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
+  .piano-white-key.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
+  .piano-black-key{position:absolute;top:0;width:13%;height:58%;background:#2a2320;border-radius:0 0 4px 4px;pointer-events:none;z-index:2;}
 
   .mic-panel{text-align:center;padding:6px 4px 2px;}
   .mic-vol-wrap{width:100%;height:8px;background:rgba(255,255,255,0.15);border-radius:6px;overflow:hidden;margin-bottom:10px;}
@@ -151,6 +175,17 @@
       <div class="mic-vol-wrap"><div class="mic-vol-bar" id="micVolBar"></div></div>
       <div class="mic-status" id="micStatus">Graj nutę na pianinie...</div>
     </div>
+    <div class="basket-puzzle" id="basketPuzzle" style="display:none;">
+      <div class="basket-pool" id="basketPool"></div>
+      <div class="basket-zone">
+        <div class="basket-zone-label">🧺 koszyczek</div>
+        <div class="basket-zone-items" id="basketZoneItems"></div>
+      </div>
+      <button type="button" class="win-btn basket-check-btn" onclick="checkBasketAnswer()">Sprawdź</button>
+    </div>
+    <div class="piano-puzzle" id="pianoPuzzle" style="display:none;">
+      <div class="piano-keys" id="pianoKeys"></div>
+    </div>
   </div>
 </div>
 
@@ -160,6 +195,9 @@
   <p id="winText"></p>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
     <button class="win-btn" id="level2Btn" onclick="startLevel2()" style="display:none;">Poziom 2: gęsty las →</button>
+    <button class="win-btn" id="level3Btn" onclick="startLevel3()" style="display:none;">Poziom 3: jaskinia →</button>
+    <button class="win-btn" id="level4Btn" onclick="startLevel4()" style="display:none;">Poziom 4: klawiatura →</button>
+    <button class="win-btn" id="level5Btn" onclick="startLevel5()" style="display:none;">Poziom 5: nad jeziorem →</button>
     <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
   </div>
 </div>
@@ -350,10 +388,31 @@ const NOTE_FREQS = {
   bass:   {C:65.41,  D:73.42,  E:82.41,  F:87.31,  G:98.00,  A:110.00, H:123.47}
 };
 
-function renderPuzzleStaff(letter, clefName){
+/* Poziom 3: oktawa też ma znaczenie, nie tylko litera. Klucz wiolinowy
+   pokrywa oktawę razkreślną (domyślną, jak dotąd) i dwukreślną (wyżej);
+   klucz basowy pokrywa oktawę wielką (domyślną) i małą (wyżej). Przesunięcie
+   o oktawę na pięciolinii to zawsze 7 kroków (7 nut od C do H). */
+const OCTAVES = {
+  treble: [
+    {name:'razkreślna', shift:0, freqMul:1},
+    {name:'dwukreślna', shift:-7, freqMul:2}
+  ],
+  bass: [
+    {name:'wielka', shift:0, freqMul:1},
+    {name:'mała', shift:-7, freqMul:2}
+  ]
+};
+/* Standardowy zapis nazw dźwięków z oktawami: C = wielka, c = mała,
+   c¹ = razkreślna, c² = dwukreślna. */
+function noteNotation(letter, clefName, octaveIdx){
+  if(clefName === 'bass') return octaveIdx === 0 ? letter : letter.toLowerCase();
+  return letter.toLowerCase() + (octaveIdx === 0 ? '¹' : '²');
+}
+
+function renderPuzzleStaff(letter, clefName, octaveShift){
   const cfg = CLEFS[clefName];
   const c = '#1e3a8a';
-  const noteY = STAFF_TOP + (cfg.staffY[letter] * SG / 2);
+  const noteY = STAFF_TOP + ((cfg.staffY[letter] + (octaveShift||0)) * SG / 2);
   const topLine = STAFF_TOP, botLine = STAFF_TOP + 4*SG, ledW = 9;
 
   let s = '';
@@ -380,6 +439,48 @@ function renderPuzzleStaff(letter, clefName){
     }
   }
   s += '<ellipse cx="'+NOTE_X+'" cy="'+noteY+'" rx="6.4" ry="4.8" fill="#1e3a8a" transform="rotate(-15,'+NOTE_X+','+noteY+')"/>';
+
+  document.getElementById('puzzleStaffSvg').innerHTML = s;
+}
+
+/* Zadanie z koszyczkiem (poziom 3): kilka nut naraz na pięciolinii,
+   rozstawione wzdłuż jej szerokości. Bez oktaw — tylko litera/jedzonko,
+   tak jak w podstawowym skojarzeniu. */
+function renderPuzzleStaffMulti(notes, clefName){
+  const cfg = CLEFS[clefName];
+  const c = '#1e3a8a';
+  const topLine = STAFF_TOP, botLine = STAFF_TOP + 4*SG, ledW = 8;
+
+  let s = '';
+  for(let i=0;i<5;i++){
+    const ly = STAFF_TOP + i*SG;
+    s += '<line x1="10" y1="'+ly+'" x2="'+(STAFF_VB_W-6)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.2"/>';
+  }
+  const ch = SG * (clefName==='treble' ? 6.0 : 4.4), cw = ch * cfg.ratio;
+  const cy = (STAFF_TOP + cfg.refIdx*SG) - cfg.pct*ch;
+  s += '<image href="'+cfg.url+'" x="9" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+
+  const startX = 46, endX = STAFF_VB_W - 10;
+  const gap = notes.length > 1 ? (endX-startX)/(notes.length-1) : 0;
+  notes.forEach(function(n, i){
+    const nx = notes.length === 1 ? (startX+endX)/2 : startX + gap*i;
+    const noteY = STAFF_TOP + ((cfg.staffY[n.letter] + (n.octaveShift||0)) * SG / 2);
+    if(noteY > botLine + SG*0.5){
+      let ly = botLine + SG;
+      while(ly <= noteY + SG*0.3){
+        s += '<line x1="'+(nx-ledW)+'" y1="'+ly+'" x2="'+(nx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2"/>';
+        ly += SG;
+      }
+    }
+    if(noteY < topLine - SG*0.5){
+      let ly = topLine - SG;
+      while(ly >= noteY - SG*0.3){
+        s += '<line x1="'+(nx-ledW)+'" y1="'+ly+'" x2="'+(nx+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2"/>';
+        ly -= SG;
+      }
+    }
+    s += '<ellipse cx="'+nx+'" cy="'+noteY+'" rx="5.4" ry="4" fill="#1e3a8a" transform="rotate(-15,'+nx+','+noteY+')"/>';
+  });
 
   document.getElementById('puzzleStaffSvg').innerHTML = s;
 }
@@ -431,6 +532,9 @@ let currentIdx = 0; /* indeks polanki, na której właśnie stoi postać (0 = st
 let score = 0, walking = false;
 let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — ta sama
   trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
+const LEVEL_BADGE_TEXT = {
+  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5'
+};
 let currentPuzzle = null;
 let sceneRunning = false;
 let orbitAngle = 0; /* dodatkowy obrót kamery wokół postaci — przesunięcie palcem i/lub obrót urządzenia */
@@ -1189,6 +1293,201 @@ function updateCampfires(){
   });
 }
 
+/* ══ Jaskinia w górze (poziom 3) — kamienny tunel z pochodniami, przez który
+   ścieżka prowadzi na drugą stronę. Filary + nadproże po obu stronach ścieżki,
+   powtórzone kilka razy wzdłuż odcinka, żeby dawało wrażenie ciągłego tunelu;
+   ściany boczne łączą sąsiednie łuki. Pochodnie migoczą tak samo jak ognisko
+   (współdzielą campfires/updateCampfires). */
+function buildTorch(){
+  const g = new THREE.Group();
+  const poleMat = new THREE.MeshStandardMaterial({color:0x4a3524, roughness:0.9});
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 1.1, 6), poleMat);
+  pole.position.y = 0.55;
+  g.add(pole);
+  const bowlMat = new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.8});
+  const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.07, 0.14, 8), bowlMat);
+  bowl.position.y = 1.12;
+  g.add(bowl);
+  const flame1 = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.32, 8), new THREE.MeshBasicMaterial({color:0xff9d2e}));
+  flame1.position.y = 1.32;
+  g.add(flame1);
+  const flame2 = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 8), new THREE.MeshBasicMaterial({color:0xffd166}));
+  flame2.position.y = 1.36;
+  g.add(flame2);
+  const glow = new THREE.PointLight(0xff9d40, 1.1, 4.5);
+  glow.position.y = 1.35;
+  g.add(glow);
+  g.userData.flames = [flame1, flame2];
+  g.userData.glow = glow;
+  return g;
+}
+function buildCaveArch(z, rockMat){
+  const g = new THREE.Group();
+  [-1,1].forEach(function(side){
+    const pillar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 4.2, 1.4), rockMat);
+    pillar.position.set(side*3.4, 2.1, z);
+    pillar.rotation.y = (Math.random()-0.5)*0.15;
+    g.add(pillar);
+  });
+  const lintel = new THREE.Mesh(new THREE.BoxGeometry(8.4, 1.3, 1.6), rockMat);
+  lintel.position.set(0, 4.4, z);
+  g.add(lintel);
+  return g;
+}
+function buildCaveTunnel(){
+  const rockMat = new THREE.MeshStandardMaterial({color:0x4a4640, roughness:1});
+  const zStart = -29.5, zEnd = -37, archCount = 4;
+  const positions = [];
+  for(let i=0;i<archCount;i++){
+    positions.push(zStart + (zEnd-zStart)*i/(archCount-1));
+  }
+  positions.forEach(function(z){
+    scene.add(buildCaveArch(z, rockMat));
+  });
+  [-1,1].forEach(function(side){
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4.2, Math.abs(zStart-zEnd)+2), rockMat);
+    wall.position.set(side*3.9, 2.1, (zStart+zEnd)/2);
+    scene.add(wall);
+  });
+  positions.forEach(function(z, i){
+    const side = i % 2 === 0 ? -1 : 1;
+    const torch = buildTorch();
+    torch.position.set(side*2.9, 1.4, z + 0.6);
+    torch.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
+    scene.add(torch);
+    campfires.push(torch);
+  });
+}
+
+/* ══ Poziom 5: jezioro z plażą, hamaki, sklepik z parkingiem i vanem —
+   sklepik zastępuje domek jako cel podróży na końcu ścieżki. ══ */
+function buildHammock(){
+  const g = new THREE.Group();
+  const postMat = new THREE.MeshStandardMaterial({color:0x6b4a28, roughness:0.9});
+  const clothMat = new THREE.MeshStandardMaterial({color: Math.random()<0.5?0xd94f4f:0x4f8fd9, roughness:0.85, side:THREE.DoubleSide});
+  [-1,1].forEach(function(side){
+    const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.06,1.6,6), postMat);
+    post.position.set(side*1.1, 0.8, 0);
+    g.add(post);
+  });
+  const cloth = new THREE.Mesh(new THREE.TorusGeometry(1.05, 0.08, 6, 14, Math.PI), clothMat);
+  cloth.rotation.z = Math.PI;
+  cloth.position.set(0, 0.85, 0);
+  g.add(cloth);
+  return g;
+}
+function buildVan(){
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({color:0xe8dcc8, roughness:0.7});
+  const stripeMat = new THREE.MeshStandardMaterial({color:0x4f8fd9, roughness:0.6});
+  const wheelMat = new THREE.MeshStandardMaterial({color:0x1a1a1a, roughness:0.9});
+  const glassMat = new THREE.MeshStandardMaterial({color:0x4a5a55, roughness:0.5, transparent:true, opacity:0.6});
+  const body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.3, 1.3), bodyMat);
+  body.position.y = 0.85;
+  g.add(body);
+  const stripe = new THREE.Mesh(new THREE.BoxGeometry(2.62, 0.22, 1.32), stripeMat);
+  stripe.position.y = 0.75;
+  g.add(stripe);
+  const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.55, 1.1), glassMat);
+  windshield.position.set(1.28, 1.15, 0);
+  g.add(windshield);
+  [[-0.85,0.32,0.68],[0.85,0.32,0.68],[-0.85,0.32,-0.68],[0.85,0.32,-0.68]].forEach(function(p){
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.32,0.24,14), wheelMat);
+    wheel.rotation.z = Math.PI/2;
+    wheel.position.set(p[0],p[1],p[2]);
+    g.add(wheel);
+  });
+  return g;
+}
+function buildShop(){
+  const g = new THREE.Group();
+  const wallMat = new THREE.MeshStandardMaterial({color:0xe8d5b0, roughness:0.85});
+  const roofMat = new THREE.MeshStandardMaterial({color:0xb5432f, roughness:0.8});
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.1, 2.8), wallMat);
+  body.position.y = 1.05;
+  g.add(body);
+  const roof = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.1, 4), roofMat);
+  roof.rotation.y = Math.PI/4;
+  roof.position.y = 2.65;
+  g.add(roof);
+  const doorMat = new THREE.MeshStandardMaterial({color:0x6b4226, roughness:0.8});
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.3, 0.75), doorMat);
+  door.position.set(1.82, 0.68, 0);
+  g.add(door);
+  const signMat = new THREE.MeshStandardMaterial({color:0xfdf6dd, roughness:0.6});
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.5, 1.8), signMat);
+  sign.position.set(1.86, 1.85, 0);
+  g.add(sign);
+  return g;
+}
+function buildTrashCan(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x3a6b4a, roughness:0.8});
+  const lidMat = new THREE.MeshStandardMaterial({color:0x2a4f38, roughness:0.7});
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.2,0.55,10), mat);
+  body.position.y = 0.28;
+  g.add(body);
+  const lid = new THREE.Mesh(new THREE.CylinderGeometry(0.26,0.26,0.06,10), lidMat);
+  lid.position.y = 0.58;
+  g.add(lid);
+  return g;
+}
+function buildParkingLot(){
+  const g = new THREE.Group();
+  const lotMat = new THREE.MeshStandardMaterial({color:0x3a3a3a, roughness:1});
+  const lot = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 3.4), lotMat);
+  lot.rotation.x = -Math.PI/2;
+  g.add(lot);
+  const lineMat = new THREE.MeshBasicMaterial({color:0xf5f0e0});
+  [-1.3, 0, 1.3].forEach(function(x){
+    const line = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 3.0), lineMat);
+    line.rotation.x = -Math.PI/2;
+    line.position.set(x, 0.01, 0);
+    g.add(line);
+  });
+  return g;
+}
+function buildShopAndParking(){
+  const shop = buildShop();
+  shop.position.set(0, 0, HOUSE_Z - 1.4);
+  scene.add(shop);
+  const fence = buildFence();
+  fence.position.set(0, 0, HOUSE_Z);
+  scene.add(fence);
+  const lot = buildParkingLot();
+  lot.position.set(-3.2, 0, HOUSE_Z + 1.6);
+  scene.add(lot);
+  const van = buildVan();
+  van.position.set(-3.2, 0.02, HOUSE_Z + 1.6);
+  van.rotation.y = Math.PI/2;
+  scene.add(van);
+  [[2.6, HOUSE_Z-2.6],[3.1, HOUSE_Z-2.1]].forEach(function(p){
+    const bin = buildTrashCan();
+    bin.position.set(p[0], 0, p[1]);
+    scene.add(bin);
+  });
+}
+function buildLakeArea(){
+  const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.15, metalness:0.2, transparent:true, opacity:0.88});
+  const lake = new THREE.Mesh(new THREE.CircleGeometry(9, 28), waterMat);
+  lake.rotation.x = -Math.PI/2;
+  lake.position.set(9, 0.04, -50);
+  scene.add(lake);
+  const sandMat = new THREE.MeshStandardMaterial({color:0xe8d3a0, roughness:1});
+  const beach = new THREE.Mesh(new THREE.RingGeometry(9, 12.5, 28), sandMat);
+  beach.rotation.x = -Math.PI/2;
+  beach.position.set(9, 0.03, -50);
+  scene.add(beach);
+  for(let i=0;i<5;i++){
+    const hx = 3 + Math.random()*5, hz = -47 - Math.random()*6;
+    if(distToPath(hx,hz) < 2) continue;
+    const hammock = buildHammock();
+    hammock.position.set(hx, terrainHeight(hx,hz), hz);
+    hammock.rotation.y = Math.random()*Math.PI*2;
+    scene.add(hammock);
+  }
+}
+
 const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
 function buildTree(){
   const pick = TREE_BUILDERS[Math.floor(Math.random()*TREE_BUILDERS.length)];
@@ -1262,7 +1561,7 @@ function nearRiver(x, z){
 /* Na poziomie 2 most jest trochę dłuższy niż na 1 (i wizualnie kręty —
    patrz buildRiverAndBridge) — pokład musi więc też być trochę dłuższy. */
 function bridgeDeckHalf(){
-  return currentLevel === 2 ? BRIDGE_DECK_HALF + 1.0 : BRIDGE_DECK_HALF;
+  return currentLevel >= 2 ? BRIDGE_DECK_HALF + 1.0 : BRIDGE_DECK_HALF;
 }
 function groundLevelAt(x, z){
   const base = terrainHeight(x, z);
@@ -1390,7 +1689,7 @@ function buildHouseAndFence(){
 }
 
 function scatterTrees(){
-  const count = currentLevel === 2 ? 54 : 26; /* poziom 2: dużo gęstszy las */
+  const count = currentLevel >= 2 ? 54 : 26; /* poziom 2+: dużo gęstszy las */
   for(let i=0;i<count;i++){
     const x = (Math.random()*2-1) * 9;
     const z = -Math.random()*44 + 2;
@@ -1484,7 +1783,8 @@ function scatterFlowers(){
 
 function scatterBushes(){
   if(!resolvedModels.bush) return;
-  for(let i=0;i<16;i++){
+  const count = currentLevel === 5 ? 40 : 16; /* poziom 5: dużo krzaczków przy jeziorze */
+  for(let i=0;i<count;i++){
     const x = (Math.random()*2-1) * 9;
     const z = -Math.random()*44 + 2;
     if(distToPath(x, z) < 1.8) continue;
@@ -1521,7 +1821,7 @@ function buildRiverAndBridge(){
      most jest trochę dłuższy i lekko kręty (fala w bok wzdłuż długości) —
      inny niż na poziomie 1, choć postać wciąż przechodzi nim po prostej
      linii ścieżki, więc krzywizna jest celowo umiarkowana. */
-  const winding = currentLevel === 2;
+  const winding = currentLevel >= 2;
   const deckHalf = bridgeDeckHalf();
   const deckLen = deckHalf*2;
   function curveX(z){
@@ -1975,18 +2275,59 @@ function pickLetterForPosition(pos){
   if(difficultyMode === 'hard') return LETTERS_ORDER[Math.floor(Math.random()*LETTERS_ORDER.length)];
   return LETTERS_ORDER[pos % LETTERS_ORDER.length];
 }
+function pickClefForPosition(pos){
+  if(clefMode === 'treble' || clefMode === 'bass') return clefMode;
+  return (pos % 2 === 0) ? 'treble' : 'bass';
+}
+
+/* Poziom 3: dwa rodzaje zadań na przemian — pojedyncza nuta, ale z ważną
+   oktawą (mała/wielka/razkreślna/dwukreślna), oraz "koszyczek" z kilkoma
+   nutami naraz (patrz buildBasketPuzzle). */
+function buildOctavePuzzle(idx){
+  const letter = pickLetterForPosition(idx-1);
+  const clefName = pickClefForPosition(idx);
+  const octIdx = Math.random() < 0.5 ? 0 : 1;
+  const oct = OCTAVES[clefName][octIdx];
+  return {kind:'single', letter:letter, clef:clefName, octaveShift:oct.shift, octaveIdx:octIdx, freqMul:oct.freqMul};
+}
+function buildBasketPuzzle(idx){
+  const clefName = pickClefForPosition(idx);
+  const count = 3;
+  const pool = shuffled(LETTERS_ORDER);
+  const targetLetters = pool.slice(0, count);
+  const decoys = pool.slice(count, count+2);
+  const options = shuffled(targetLetters.concat(decoys));
+  return {
+    kind:'basket', clef:clefName,
+    notes: targetLetters.map(function(l){ return {letter:l, octaveShift:0}; }),
+    targetLetters: targetLetters, options: options
+  };
+}
+
+/* Poziom 4+: zamiast kafelków do wyboru — klawiatura pianina z delikatnym
+   podglądem jedzonka na każdym klawiszu (patrz showKeyboardPuzzle). */
+function buildKeyboardPuzzle(idx){
+  const letter = pickLetterForPosition(idx-1);
+  const clefName = pickClefForPosition(idx);
+  return {kind:'keyboard', letter:letter, clef:clefName, octaveShift:0, octaveIdx:0, freqMul:1};
+}
+
 /* Poziom 2: kilka nut (trzy) na jednej stacji zamiast jednej — trudniejsza
    minizagadka do rozwiązania w całości, zanim stacja liczy się jako zaliczona. */
 function buildPuzzleForWaypoint(idx){
+  if(currentLevel >= 4){
+    return [buildKeyboardPuzzle(idx)];
+  }
+  if(currentLevel === 3){
+    return [idx % 2 === 0 ? buildBasketPuzzle(idx) : buildOctavePuzzle(idx)];
+  }
   const notesPerStation = currentLevel === 2 ? 3 : 1;
   const puzzles = [];
   for(let n=0;n<notesPerStation;n++){
     const pos = (idx-1)*notesPerStation + n;
     const letter = pickLetterForPosition(pos);
-    let clefName;
-    if(clefMode === 'treble' || clefMode === 'bass') clefName = clefMode;
-    else clefName = (pos % 2 === 0) ? 'treble' : 'bass';
-    puzzles.push({letter: letter, clef: clefName});
+    const clefName = pickClefForPosition(pos);
+    puzzles.push({kind:'single', letter: letter, clef: clefName, octaveShift:0, octaveIdx:0, freqMul:1});
   }
   return puzzles;
 }
@@ -2002,27 +2343,63 @@ function showPuzzle(idx){
 
 function showCurrentSubPuzzle(){
   currentPuzzle = puzzleQueue[puzzleQueueIdx];
-  renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef);
-  const stepLabel = puzzleQueue.length > 1 ? ' — nuta ' + (puzzleQueueIdx+1) + '/' + puzzleQueue.length : '';
-  document.getElementById('puzzleTitle').textContent =
-    (currentPuzzle.clef === 'treble' ? 'Jaki to dźwięk? (klucz wiolinowy)' : 'Jaki to dźwięk? (klucz basowy)') + stepLabel;
+  if(currentPuzzle.kind === 'basket'){
+    showBasketPuzzle();
+    return;
+  }
+  if(currentPuzzle.kind === 'keyboard'){
+    showKeyboardPuzzle();
+    return;
+  }
+  document.getElementById('basketPuzzle').style.display = 'none';
+  document.getElementById('pianoPuzzle').style.display = 'none';
+  document.getElementById('fruitRow').style.display = '';
+  document.querySelector('.input-mode-row').style.display = '';
 
-  const distractorPool = LETTERS_ORDER.filter(function(l){ return l !== currentPuzzle.letter; });
-  const distractors = shuffled(distractorPool).slice(0,3);
-  const options = shuffled([currentPuzzle.letter].concat(distractors));
+  renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef, currentPuzzle.octaveShift);
+  const stepLabel = puzzleQueue.length > 1 ? ' — nuta ' + (puzzleQueueIdx+1) + '/' + puzzleQueue.length : '';
+  const octaveLabel = currentLevel === 3 ? ' — oktawa ' + OCTAVES[currentPuzzle.clef][currentPuzzle.octaveIdx].name : '';
+  document.getElementById('puzzleTitle').textContent =
+    (currentPuzzle.clef === 'treble' ? 'Jaki to dźwięk? (klucz wiolinowy)' : 'Jaki to dźwięk? (klucz basowy)') + stepLabel + octaveLabel;
+
+  let options;
+  if(currentLevel === 3){
+    /* dystraktory to inne litery I inne oktawy w tym samym kluczu — dziecko
+       musi rozpoznać zarówno literę, jak i to, która to oktawa */
+    const pool = [];
+    LETTERS_ORDER.forEach(function(l){
+      OCTAVES[currentPuzzle.clef].forEach(function(o, oi){
+        if(l === currentPuzzle.letter && oi === currentPuzzle.octaveIdx) return;
+        pool.push({letter:l, clef:currentPuzzle.clef, octaveShift:o.shift, octaveIdx:oi});
+      });
+    });
+    const distractors = shuffled(pool).slice(0,3);
+    options = shuffled([{letter:currentPuzzle.letter, clef:currentPuzzle.clef, octaveShift:currentPuzzle.octaveShift, octaveIdx:currentPuzzle.octaveIdx}].concat(distractors));
+  }else{
+    const distractorPool = LETTERS_ORDER.filter(function(l){ return l !== currentPuzzle.letter; });
+    const distractors = shuffled(distractorPool).slice(0,3);
+    options = shuffled([currentPuzzle.letter].concat(distractors)).map(function(l){
+      return {letter:l, clef:currentPuzzle.clef, octaveShift:0, octaveIdx:0};
+    });
+  }
 
   const row = document.getElementById('fruitRow');
   row.innerHTML = '';
-  options.forEach(function(letter){
-    const food = FOOD_BY_LETTER[letter];
+  options.forEach(function(opt){
+    const food = FOOD_BY_LETTER[opt.letter];
+    const label = currentLevel === 3 ? noteNotation(opt.letter, opt.clef, opt.octaveIdx) : opt.letter;
+    /* "C" (wielka) i "c" (mała) wyglądają prawie identycznie dla liter
+       okrągłych (np. C) — dla oktawy małej (samo małe c, bez indeksu górnego)
+       zmniejszamy czcionkę, żeby rozmiar sam podkreślał różnicę wielkości liter. */
+    const isBareSmallOctave = currentLevel === 3 && opt.clef === 'bass' && opt.octaveIdx === 1;
     const tile = document.createElement('div');
     tile.className = 'fruit-tile';
     tile.innerHTML = '<img class="fruit-img" src="'+food.img+'" alt="'+food.word+'">' +
-      '<span class="fruit-first">'+letter+'</span>' +
+      '<span class="fruit-first'+(isBareSmallOctave?' fruit-first-small-oct':'')+'">'+label+'</span>' +
       '<span class="fruit-word">'+food.word+'</span>';
     tile.addEventListener('pointerdown', function(e){
       e.preventDefault();
-      onFruitPick(letter, tile);
+      onFruitPick(opt.letter, opt.octaveIdx, tile);
     });
     row.appendChild(tile);
   });
@@ -2032,8 +2409,110 @@ function showCurrentSubPuzzle(){
   setInputMode(inputMode);
 }
 
+/* ══ Zadanie z koszyczkiem (poziom 3): kilka nut naraz, trzeba przełożyć
+   tylko pasujące jedzonka z puli do koszyczka i sprawdzić ══ */
+function showBasketPuzzle(){
+  stopMic();
+  document.querySelector('.input-mode-row').style.display = 'none';
+  document.getElementById('fruitRow').style.display = 'none';
+  document.getElementById('micPanel').style.display = 'none';
+  document.getElementById('pianoPuzzle').style.display = 'none';
+  document.getElementById('basketPuzzle').style.display = 'flex';
+
+  renderPuzzleStaffMulti(currentPuzzle.notes, currentPuzzle.clef);
+  document.getElementById('puzzleTitle').textContent = 'Przełóż do koszyczka tylko te jedzonka, które widzisz na pięciolinii';
+
+  const pool = document.getElementById('basketPool');
+  const zone = document.getElementById('basketZoneItems');
+  pool.innerHTML = '';
+  zone.innerHTML = '';
+  currentPuzzle.options.forEach(function(letter){
+    const food = FOOD_BY_LETTER[letter];
+    const tile = document.createElement('div');
+    tile.className = 'fruit-tile';
+    tile.dataset.letter = letter;
+    tile.innerHTML = '<img class="fruit-img" src="'+food.img+'" alt="'+food.word+'">' +
+      '<span class="fruit-first">'+letter+'</span>' +
+      '<span class="fruit-word">'+food.word+'</span>';
+    tile.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      onBasketTileToggle(tile);
+    });
+    pool.appendChild(tile);
+  });
+
+  document.getElementById('puzzlePanel').classList.add('show');
+  document.getElementById('hintBadge').style.opacity = '0';
+}
+/* ══ Klawiatura pianina (poziom 4+): zamiast kafelków, klika się prosto
+   w klawisz — na każdym delikatny podgląd jedzonka, żeby dziecko wciąż
+   mogło się posiłkować skojarzeniem dźwięk↔jedzonko. ══ */
+function showKeyboardPuzzle(){
+  stopMic();
+  document.querySelector('.input-mode-row').style.display = 'none';
+  document.getElementById('fruitRow').style.display = 'none';
+  document.getElementById('micPanel').style.display = 'none';
+  document.getElementById('basketPuzzle').style.display = 'none';
+  document.getElementById('pianoPuzzle').style.display = 'flex';
+
+  renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef, currentPuzzle.octaveShift);
+  document.getElementById('puzzleTitle').textContent =
+    (currentPuzzle.clef === 'treble' ? 'Zagraj ten dźwięk (klucz wiolinowy)' : 'Zagraj ten dźwięk (klucz basowy)');
+
+  const keysEl = document.getElementById('pianoKeys');
+  keysEl.innerHTML = '';
+  LETTERS_ORDER.forEach(function(letter, i){
+    const food = FOOD_BY_LETTER[letter];
+    const key = document.createElement('div');
+    key.className = 'piano-white-key';
+    key.innerHTML = '<img class="piano-key-img" src="'+food.img+'" alt="'+food.word+'">' +
+      '<span class="piano-key-label">'+letter+'</span>';
+    key.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      onFruitPick(letter, currentPuzzle.octaveIdx, key);
+    });
+    keysEl.appendChild(key);
+    if(i !== 2 && i !== 6){
+      const black = document.createElement('div');
+      black.className = 'piano-black-key';
+      black.style.left = 'calc(' + ((i+1)*100/7) + '% - ' + (100/7*0.065) + '%)';
+      keysEl.appendChild(black);
+    }
+  });
+
+  document.getElementById('puzzlePanel').classList.add('show');
+  document.getElementById('hintBadge').style.opacity = '0';
+}
+
+function onBasketTileToggle(tile){
+  const pool = document.getElementById('basketPool');
+  const zone = document.getElementById('basketZoneItems');
+  if(tile.parentElement === zone) pool.appendChild(tile);
+  else zone.appendChild(tile);
+}
+function checkBasketAnswer(){
+  if(!currentPuzzle || currentPuzzle.kind !== 'basket') return;
+  const zone = document.getElementById('basketZoneItems');
+  const chosen = Array.from(zone.children).map(function(t){ return t.dataset.letter; }).sort().join(',');
+  const target = currentPuzzle.targetLetters.slice().sort().join(',');
+  if(chosen === target && chosen.length){
+    playSuccessChime();
+    Array.from(zone.children).forEach(function(t){ t.classList.add('correct-flash'); });
+    currentPuzzle = null;
+    setTimeout(completeStationSuccess, 650);
+  }else{
+    playErrorBeep();
+    Array.from(zone.children).forEach(function(t){
+      t.classList.add('wrong-flash');
+      setTimeout(function(){ t.classList.remove('wrong-flash'); }, 400);
+    });
+  }
+}
+
 function hidePuzzle(){
   document.getElementById('puzzlePanel').classList.remove('show');
+  document.getElementById('basketPuzzle').style.display = 'none';
+  document.getElementById('pianoPuzzle').style.display = 'none';
   stopMic();
 }
 
@@ -2137,14 +2616,13 @@ function detectMicPitch(){
   if(matchCount >= 3){
     micMatchHist = [];
     if(bar) bar.style.width = '100%';
-    onFruitPick(currentPuzzle.letter, null);
+    onFruitPick(currentPuzzle.letter, currentPuzzle.octaveIdx, null);
   }
 }
 
-function onFruitPick(letter, tileEl){
-  if(!currentPuzzle) return;
-  if(letter === currentPuzzle.letter){
-    const solvedIdx = currentIdx;
+function onFruitPick(letter, octaveIdx, tileEl){
+  if(!currentPuzzle || (currentPuzzle.kind !== 'single' && currentPuzzle.kind !== 'keyboard')) return;
+  if(letter === currentPuzzle.letter && octaveIdx === currentPuzzle.octaveIdx){
     const isLastNote = puzzleQueueIdx >= puzzleQueue.length - 1;
     currentPuzzle = null; /* natychmiast, żeby drugi trafiony dźwięk (mikrofon) albo podwójny dotyk nie policzyły punktu dwa razy */
     stopMic();
@@ -2160,26 +2638,7 @@ function onFruitPick(letter, tileEl){
       }, 650);
       return;
     }
-
-    score++;
-    document.getElementById('scoreVal').textContent = score;
-    const burstPos = waypoints[currentIdx].pos.clone();
-    burstPos.y += 1.1;
-    spawn3DBurst(burstPos);
-    spawnCompanion(currentIdx);
-    setTimeout(function(){
-      hidePuzzle();
-      waypoints[solvedIdx].solved = true;
-      hideMarker(solvedIdx);
-      if(solvedIdx === PATH_POINTS.length - 1){
-        setTimeout(function(){
-          runVictoryLap(function(){ setTimeout(showWin, 300); });
-        }, 400);
-      }else{
-        activateMarker(solvedIdx + 1);
-        document.getElementById('hintBadge').style.opacity = '1';
-      }
-    }, 500);
+    completeStationSuccess();
   }else{
     playErrorBeep();
     if(tileEl){
@@ -2187,6 +2646,29 @@ function onFruitPick(letter, tileEl){
       setTimeout(function(){ tileEl.classList.remove('wrong-flash'); }, 400);
     }
   }
+}
+
+function completeStationSuccess(){
+  const solvedIdx = currentIdx;
+  score++;
+  document.getElementById('scoreVal').textContent = score;
+  const burstPos = waypoints[currentIdx].pos.clone();
+  burstPos.y += 1.1;
+  spawn3DBurst(burstPos);
+  spawnCompanion(currentIdx);
+  setTimeout(function(){
+    hidePuzzle();
+    waypoints[solvedIdx].solved = true;
+    hideMarker(solvedIdx);
+    if(solvedIdx === PATH_POINTS.length - 1){
+      setTimeout(function(){
+        runVictoryLap(function(){ setTimeout(showWin, 300); });
+      }, 400);
+    }else{
+      activateMarker(solvedIdx + 1);
+      document.getElementById('hintBadge').style.opacity = '1';
+    }
+  }, 500);
 }
 
 /* ══ Efekty świętowania ══ */
@@ -2396,7 +2878,11 @@ function initScene(){
 
   buildTrail();
   buildRiverAndBridge();
-  buildHouseAndFence();
+  if(currentLevel === 5){
+    buildShopAndParking();
+  }else{
+    buildHouseAndFence();
+  }
   scatterTrees();
   scatterGrassTufts();
   scatterRocks();
@@ -2407,7 +2893,7 @@ function initScene(){
   scatterRiverDecor();
   scatterWildlife();
   campfires = [];
-  if(currentLevel === 2){
+  if(currentLevel >= 2){
     const car = buildCar();
     const cx = 6.5, cz = -25;
     car.position.set(cx, terrainHeight(cx, cz), cz);
@@ -2428,7 +2914,19 @@ function initScene(){
     scene.add(fire);
     campfires.push(fire);
   }
-  document.getElementById('levelBadge').style.display = currentLevel === 2 ? 'flex' : 'none';
+  if(currentLevel >= 3){
+    buildCaveTunnel();
+  }
+  if(currentLevel === 5){
+    buildLakeArea();
+  }
+  const levelBadge = document.getElementById('levelBadge');
+  if(currentLevel > 1){
+    levelBadge.textContent = LEVEL_BADGE_TEXT[currentLevel] || ('Poziom ' + currentLevel);
+    levelBadge.style.display = 'flex';
+  }else{
+    levelBadge.style.display = 'none';
+  }
 
   raycaster = new THREE.Raycaster();
 
@@ -2478,18 +2976,27 @@ function initScene(){
   startAmbient();
 }
 
+const LEVEL_WIN_TITLES = {
+  1: 'Dotarliście do serca dżungli!',
+  2: 'Ukończyliście gęsty las!',
+  3: 'Przeszliście przez jaskinię!',
+  4: 'Zagraliście na klawiaturze!',
+  5: 'Dotarliście do sklepiku nad jeziorem!'
+};
 function showWin(){
-  document.getElementById('winTitle').textContent = currentLevel === 2 ?
-    'Ukończyliście gęsty las!' : 'Dotarliście do serca dżungli!';
+  document.getElementById('winTitle').textContent = LEVEL_WIN_TITLES[currentLevel] || LEVEL_WIN_TITLES[1];
   document.getElementById('winText').textContent =
     'Zebraliście ' + score + ' / ' + (PATH_POINTS.length-1) + ' nutek i przeszliście całą dżunglę!';
   document.getElementById('level2Btn').style.display = currentLevel === 1 ? 'inline-block' : 'none';
+  document.getElementById('level3Btn').style.display = currentLevel === 2 ? 'inline-block' : 'none';
+  document.getElementById('level4Btn').style.display = currentLevel === 3 ? 'inline-block' : 'none';
+  document.getElementById('level5Btn').style.display = currentLevel === 4 ? 'inline-block' : 'none';
   document.getElementById('winOverlay').classList.add('show');
   spawnWinCelebration();
 }
 
-function startLevel2(){
-  currentLevel = 2;
+function goToLevel(level){
+  currentLevel = level;
   document.getElementById('winOverlay').classList.remove('show');
   sceneRunning = false;
   if(renderer){
@@ -2502,6 +3009,10 @@ function startLevel2(){
   scene = null; camera = null; renderer = null; waypoints = []; currentPuzzle = null; walking = false;
   initScene();
 }
+function startLevel2(){ goToLevel(2); }
+function startLevel3(){ goToLevel(3); }
+function startLevel4(){ goToLevel(4); }
+function startLevel5(){ goToLevel(5); }
 
 function restartGame(){
   sceneRunning = false;
