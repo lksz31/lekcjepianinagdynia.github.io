@@ -1036,6 +1036,7 @@ function scatterWildlife(){
       if(distToPath(x, z) < 1.8) continue;
       if(nearRiver(x, z)) continue;
       if(nearHouse(x, z)) continue;
+      if(nearCave(x, z)) continue;
       const group = spec.build();
       group.position.set(x, terrainHeight(x, z), z);
       group.rotation.y = Math.random()*Math.PI*2;
@@ -1344,12 +1345,15 @@ function buildCampfire(){
 }
 let campfires = [];
 function updateCampfires(){
-  const t = idleT*10;
   campfires.forEach(function(fire){
+    /* torch.userData.flicker (ustawiane w trybie dora) przyspiesza i
+       rozchwiewa migotanie — ogień "nerwowy", zamiast spokojnego. */
+    const speed = fire.userData.flicker || 1;
+    const t = idleT*10*speed;
     fire.userData.flames.forEach(function(f, i){
-      f.scale.y = 1 + Math.sin(t + i*2)*0.12;
+      f.scale.y = 1 + Math.sin(t + i*2)*0.12*speed;
     });
-    fire.userData.glow.intensity = 0.75 + Math.abs(Math.sin(t*1.3))*0.35;
+    fire.userData.glow.intensity = 0.75 + Math.abs(Math.sin(t*1.3))*0.35*speed;
   });
 }
 
@@ -1381,42 +1385,329 @@ function buildTorch(){
   g.userData.glow = glow;
   return g;
 }
-function buildCaveArch(z, rockMat){
-  const g = new THREE.Group();
+/* Prostokątna belka skalna między dwoma punktami (x,y) — do budowania
+   ukośnych połaci "dachu" jaskini, które faktycznie stykają się ze
+   ścianami (zamiast osobnych nadproży z dziurami na niebo między nimi). */
+function rockSlabBetween(p1, p2, thickness, mat, depth){
+  const midX = (p1.x+p2.x)/2, midY = (p1.y+p2.y)/2;
+  const len = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+  const angle = Math.atan2(p2.y-p1.y, p2.x-p1.x);
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(len, thickness, depth), mat);
+  slab.position.set(midX, midY, 0);
+  slab.rotation.z = angle;
+  return slab;
+}
+/* ══ Jaskinia (poziom 3) — teraz jest to zamknięty tunel: postrzępione,
+   nieregularne ściany boczne (zamiast gładkich, powtarzalnych bloków),
+   skośny, dwuspadowy skalny "dach" łączący się ze ścianami bez przerw
+   (wcześniej między osobnymi nadprożami widać było niebo — stąd wrażenie
+   "kilku bramek", a nie prawdziwego tunelu), stalaktyty/stalagmity i
+   kilka prawdziwych brył skalnych z paczki modeli 3D dla naturalności.
+   W trybie "dora" tunel jest wyraźnie mroczniejszy, pochodnie migoczą
+   bardziej nerwowo, a gdzieś w cieniu widać parę świecących oczu. */
+function buildCaveTunnel(){
+  const dora = nightMode;
+  const rockTex = getTexture(TEXTURE_DIR+'sciezka-kamienie-tekstura.webp');
+  rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
+  rockTex.repeat.set(1.6, 1.6);
+  const rockMat = new THREE.MeshStandardMaterial({map:rockTex, color: dora?0x5c5850:0x8a8478, roughness:1});
+  const darkRockMat = new THREE.MeshStandardMaterial({map:rockTex, color: dora?0x2e2c28:0x4a4640, roughness:1});
+  const zStart = CAVE_Z_START, zEnd = CAVE_Z_END;
+  const tunnelLen = Math.abs(zEnd - zStart);
+  const midZ = (zStart+zEnd)/2;
+  const wallX = 3.75, wallTopY = 4.15, ridgeY = 5.2, ridgeX = 0.3;
+  /* zEnd < zStart (tunel biegnie w stronę malejącego z) — lerp zamiast
+     "zStart + dodatnia_wielkość" wszędzie tam, gdzie trzeba iść PO trasie
+     tunelu, żeby kierunek zawsze wyszedł poprawnie niezależnie od znaku. */
+  function lerpZ(a, b, t){ return a + (b-a)*t; }
+
+  /* Ściany boczne — kilka nachodzących na siebie, lekko losowych brył
+     zamiast jednego gładkiego prostopadłościanu, żeby krawędź nie była
+     idealnie prosta jak sztuczny mur. Rozciągnięte po 1 jednostkę poza
+     oba wyloty tunelu. */
   [-1,1].forEach(function(side){
-    const pillar = new THREE.Mesh(new THREE.BoxGeometry(1.1, 4.2, 1.4), rockMat);
-    pillar.position.set(side*3.4, 2.1, z);
-    pillar.rotation.y = (Math.random()-0.5)*0.15;
+    const segs = 7;
+    for(let i=0;i<segs;i++){
+      const z = lerpZ(zStart+1, zEnd-1, i/(segs-1));
+      const w = 1.3 + Math.random()*0.7;
+      const h = wallTopY + 0.5 + Math.random()*0.7;
+      const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 2.1 + Math.random()*0.9), rockMat);
+      wall.position.set(side*(wallX + Math.random()*0.4 - 0.1), h/2 - 0.2, z);
+      wall.rotation.y = (Math.random()-0.5)*0.35;
+      scene.add(wall);
+    }
+  });
+
+  /* Dwuspadowy skalny dach — dwie ukośne połacie od szczytu (x≈0) do
+     wierzchu ścian bocznych, plus grzbiet na styku, żeby całkowicie
+     zamknąć tunel od góry (bez przerw, przez które widać niebo). */
+  [-1,1].forEach(function(side){
+    const slab = rockSlabBetween(
+      {x: side*ridgeX, y: ridgeY}, {x: side*(wallX+0.7), y: wallTopY-0.3},
+      0.75, darkRockMat, tunnelLen+3
+    );
+    slab.position.z = midZ;
+    scene.add(slab);
+  });
+  const ridge = new THREE.Mesh(new THREE.BoxGeometry(ridgeX*2+0.5, 0.7, tunnelLen+3), darkRockMat);
+  ridge.position.set(0, ridgeY, midZ);
+  scene.add(ridge);
+
+  /* Ciemna "zasłona" tuż pod dachem — wnętrze tunelu wygląda wyraźnie
+     mroczniej niż otoczenie na zewnątrz, mocniej w trybie dora. */
+  const shadowMat = new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity: dora?0.6:0.35, side:THREE.DoubleSide});
+  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(wallX*2+1, tunnelLen+2.6), shadowMat);
+  shadowPlane.rotation.x = Math.PI/2;
+  shadowPlane.position.set(0, wallTopY+0.2, midZ);
+  scene.add(shadowPlane);
+
+  /* Stalaktyty (z sufitu) i stalagmity (z podłogi), rozrzucone losowo,
+     trzymane z dala od środka ścieżki, żeby nie zasłaniały przejścia. */
+  function ceilingYAt(absX){
+    const t = Math.min(1, absX/(wallX+0.7));
+    return ridgeY - (ridgeY - (wallTopY-0.3)) * t;
+  }
+  for(let i=0;i<15;i++){
+    const z = lerpZ(zStart, zEnd, Math.random());
+    const side = Math.random()<0.5 ? -1 : 1;
+    const ax = 1.5 + Math.random()*2.0;
+    const s = 0.5 + Math.random()*0.9;
+    const stalactite = new THREE.Mesh(new THREE.ConeGeometry(0.16*s, 0.85*s, 6), darkRockMat);
+    stalactite.position.set(side*ax, ceilingYAt(ax) - 0.05, z);
+    stalactite.rotation.x = Math.PI;
+    scene.add(stalactite);
+    if(Math.random() < 0.55){
+      const gx = side*ax*0.85, gz = z + (Math.random()-0.5)*1.4;
+      const stalagmite = new THREE.Mesh(new THREE.ConeGeometry(0.14*s, 0.55*s, 6), rockMat);
+      stalagmite.position.set(gx, terrainHeight(gx, gz) + 0.27*s, gz);
+      scene.add(stalagmite);
+    }
+  }
+
+  /* Kilka prawdziwych brył skalnych z paczki modeli 3D u podnóża ścian —
+     nieregularny, "prawdziwy" kształt zamiast samych prostych brył. */
+  if(resolvedModels.rock){
+    for(let i=0;i<9;i++){
+      const side = Math.random()<0.5 ? -1 : 1;
+      const x = side*(wallX - 0.3 + Math.random()*0.7);
+      const z = lerpZ(zStart, zEnd, Math.random());
+      const boulder = randomNatureMesh(resolvedModels.rock);
+      if(!boulder) continue;
+      boulder.position.set(x, terrainHeight(x, z), z);
+      spinAroundUp(boulder, Math.random()*Math.PI*2);
+      boulder.scale.multiplyScalar(0.8 + Math.random()*0.8);
+      scene.add(boulder);
+    }
+  }
+
+  /* Pochodnie po obu stronach — częściej niż wcześniej, żeby oświetlały
+     cały tunel ciągle, a nie tylko w czterech punktach. */
+  const torchCount = 6;
+  for(let i=0;i<torchCount;i++){
+    const z = lerpZ(zStart+0.6, zEnd-0.6, i/(torchCount-1));
+    const side = i % 2 === 0 ? -1 : 1;
+    const torch = buildTorch();
+    torch.position.set(side*2.9, 1.4, z);
+    torch.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
+    if(dora) torch.userData.flicker = 1.8 + Math.random()*0.8; /* nerwowsze migotanie w trybie dora */
+    scene.add(torch);
+    campfires.push(torch);
+  }
+
+  /* W trybie dora — para świecących oczu ukryta w cieniu tunelu,
+     nieruchoma i bardzo dyskretna (delikatny niepokojący akcent, bez
+     żadnej postaci czy szczegółów — tylko dwa małe punkty światła). */
+  if(dora){
+    const eyesZ = midZ + (Math.random()-0.5)*tunnelLen*0.4;
+    const eyeMat = new THREE.MeshBasicMaterial({color:0xff2f2f});
+    [-0.09, 0.09].forEach(function(dx){
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 6), eyeMat);
+      eye.position.set(dx + wallX - 0.5, 1.35, eyesZ);
+      scene.add(eye);
+    });
+    const eyeGlow = new THREE.PointLight(0xff2f2f, 0.35, 1.4);
+    eyeGlow.position.set(wallX - 0.5, 1.35, eyesZ);
+    scene.add(eyeGlow);
+  }
+}
+
+/* ══ Poziom 4: ogród starożytnych ruin w dżungli (zamiast gęstego lasu
+   i mostu nad rzeką jak na poziomach 1-2) — kolumny, złamany posąg,
+   kamienne latarnie i mała fontanna, oplecione mchem/roślinnością.
+   W miejscu, gdzie na innych poziomach stał most, stoi tu kamienna
+   brama — inne wejście do tej samej trasy. ══ */
+function buildRuinPillar(broken, dora){
+  const g = new THREE.Group();
+  const stoneTex = getTexture(TEXTURE_DIR+'sciezka-kamienie-tekstura.webp');
+  stoneTex.wrapS = stoneTex.wrapT = THREE.RepeatWrapping;
+  stoneTex.repeat.set(1, 1);
+  const mat = new THREE.MeshStandardMaterial({map:stoneTex, color: dora?0x6b6a62:0xaba587, roughness:1});
+  const mossMat = new THREE.MeshStandardMaterial({color: dora?0x394a2c:0x5c7a45, roughness:0.95});
+  const height = broken ? 1.1 + Math.random()*0.8 : 2.5 + Math.random()*0.6;
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.34, height, 10), mat);
+  shaft.position.y = height/2;
+  g.add(shaft);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.32, 0.2, 10), mat);
+  cap.position.y = height + 0.1;
+  g.add(cap);
+  if(!broken){
+    const cap2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.16, 0.8), mat);
+    cap2.position.y = height + 0.28;
+    g.add(cap2);
+  }
+  const moss = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 6, 0, Math.PI*2, 0, Math.PI/2), mossMat);
+  moss.scale.set(1, 0.35, 1);
+  moss.position.y = height*0.12;
+  moss.rotation.y = Math.random()*Math.PI*2;
+  g.add(moss);
+  return g;
+}
+function buildRuinArch(dora){
+  const g = new THREE.Group();
+  const stoneTex = getTexture(TEXTURE_DIR+'sciezka-kamienie-tekstura.webp');
+  const mat = new THREE.MeshStandardMaterial({map:stoneTex, color: dora?0x5f5e57:0x9d9884, roughness:1});
+  [-1,1].forEach(function(side){
+    const pillar = buildRuinPillar(false, dora);
+    pillar.position.x = side*1.75;
     g.add(pillar);
   });
-  const lintel = new THREE.Mesh(new THREE.BoxGeometry(8.4, 1.3, 1.6), rockMat);
-  lintel.position.set(0, 4.4, z);
+  const lintel = new THREE.Mesh(new THREE.TorusGeometry(1.95, 0.24, 8, 16, Math.PI), mat);
+  lintel.position.y = 3.05;
   g.add(lintel);
   return g;
 }
-function buildCaveTunnel(){
-  const rockMat = new THREE.MeshStandardMaterial({color:0x4a4640, roughness:1});
-  const zStart = -29.5, zEnd = -37, archCount = 4;
-  const positions = [];
-  for(let i=0;i<archCount;i++){
-    positions.push(zStart + (zEnd-zStart)*i/(archCount-1));
+function buildBrokenStatue(dora){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color: dora?0x63615a:0xb7b2a0, roughness:0.95});
+  const base = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.6), mat);
+  base.position.y = 0.15;
+  g.add(base);
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.9, 8), mat);
+  torso.position.y = 0.75;
+  g.add(torso);
+  const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.5, 6), mat);
+  arm.position.set(0.26, 0.95, 0);
+  arm.rotation.z = Math.PI/3;
+  g.add(arm);
+  return g;
+}
+function buildStoneLantern(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({color:0x8f8a78, roughness:0.9});
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.5, 8), mat);
+  base.position.y = 0.25;
+  g.add(base);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.9, 8), mat);
+  stem.position.y = 0.95;
+  g.add(stem);
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.42, 0.42), mat);
+  box.position.y = 1.55;
+  g.add(box);
+  const roofT = new THREE.Mesh(new THREE.ConeGeometry(0.36, 0.28, 4), mat);
+  roofT.rotation.y = Math.PI/4;
+  roofT.position.y = 1.9;
+  g.add(roofT);
+  const glowMat = new THREE.MeshBasicMaterial({color:0xffdd88});
+  const glow = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.22, 0.2), glowMat);
+  glow.position.y = 1.55;
+  g.add(glow);
+  const light = new THREE.PointLight(0xffcf80, 0.8, 3.5);
+  light.position.y = 1.55;
+  g.add(light);
+  g.userData.flames = [glow]; /* migotanie przez wspólny updateCampfires() */
+  g.userData.glow = light;
+  return g;
+}
+function buildRuinPool(){
+  const g = new THREE.Group();
+  const rimMat = new THREE.MeshStandardMaterial({color:0x9d9884, roughness:0.9});
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.14, 8, 20), rimMat);
+  rim.rotation.x = Math.PI/2;
+  rim.position.y = 0.1;
+  g.add(rim);
+  const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.15, metalness:0.2, transparent:true, opacity:0.85});
+  const water = new THREE.Mesh(new THREE.CircleGeometry(1.3, 20), waterMat);
+  water.rotation.x = -Math.PI/2;
+  water.position.y = 0.08;
+  g.add(water);
+  return g;
+}
+/* Rozmieszcza cały "ogród ruin" wzdłuż trasy — brama tam, gdzie na
+   innych poziomach jest most (RIVER_Z), kolumny/posągi rozrzucone jak
+   drzewa, latarnie po obu stronach ścieżki co kawałek, mała fontanna
+   z boku. W trybie dora — ciemniejszy kamień (patrz materiały wyżej) i
+   nieruchoma mroczna postać widoczna między kolumnami w oddali. */
+function scatterRuins(){
+  const dora = nightMode;
+  const gate = buildRuinArch(dora);
+  gate.position.set(0, terrainHeight(0, RIVER_Z), RIVER_Z);
+  scene.add(gate);
+
+  const pool = buildRuinPool();
+  const poolX = -5.6, poolZ = -20;
+  pool.position.set(poolX, terrainHeight(poolX, poolZ), poolZ);
+  scene.add(pool);
+
+  /* Prawdziwe modele kolumn/muru/gruzu z darmowej paczki Kenney (Graveyard
+     Kit, CC0) — dużo bardziej wiarygodne niż proste bryły, z zachowanym
+     fallbackiem na wersję proceduralną, gdyby model z jakiegoś powodu nie
+     był gotowy. */
+  for(let i=0;i<13;i++){
+    const x = (Math.random()*2-1) * 8.5;
+    const z = -Math.random()*40 + 1;
+    if(distToPath(x, z) < 2.2) continue;
+    if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
+    if(Math.abs(z - RIVER_Z) < 3) continue; /* nie zaśmiecaj okolic bramy */
+    if(Math.hypot(x-poolX, z-poolZ) < 2.2) continue;
+    const broken = Math.random() < 0.4;
+    let pillar = broken ? kenneyMesh('ruinBorderPillar', 2.1) : kenneyMesh('ruinColumn', 2.5);
+    if(!pillar) pillar = buildRuinPillar(broken, dora);
+    pillar.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(pillar, Math.random()*Math.PI*2);
+    scene.add(pillar);
   }
-  positions.forEach(function(z){
-    scene.add(buildCaveArch(z, rockMat));
-  });
-  [-1,1].forEach(function(side){
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4.2, Math.abs(zStart-zEnd)+2), rockMat);
-    wall.position.set(side*3.9, 2.1, (zStart+zEnd)/2);
-    scene.add(wall);
-  });
-  positions.forEach(function(z, i){
+  for(let i=0;i<5;i++){
+    const x = (Math.random()*2-1) * 7.5;
+    const z = -Math.random()*38 + 1;
+    if(distToPath(x, z) < 2.2) continue;
+    if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
+    let debris = Math.random() < 0.5 ? kenneyMesh('ruinDebris', 2.6) : kenneyMesh('ruinBrickWall', 2.0);
+    if(!debris) debris = buildBrokenStatue(dora);
+    debris.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(debris, Math.random()*Math.PI*2);
+    scene.add(debris);
+  }
+  for(let i=0;i<6;i++){
     const side = i % 2 === 0 ? -1 : 1;
-    const torch = buildTorch();
-    torch.position.set(side*2.9, 1.4, z + 0.6);
-    torch.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
-    scene.add(torch);
-    campfires.push(torch);
-  });
+    const x = side*(2.5 + Math.random()*0.6);
+    const z = -6 - i*6;
+    const lantern = buildStoneLantern();
+    lantern.position.set(x, terrainHeight(x, z), z);
+    scene.add(lantern);
+    campfires.push(lantern);
+  }
+
+  /* W trybie dora ogród ruin zamienia się w coś bliższego cmentarzowi —
+     krzyż, mała krypta i świeca (z paczki Kenney), plus nieruchoma upiorna
+     postać (szkielet/duch) widoczna z dala między kolumnami. Bez trybu
+     dora tych elementów w ogóle nie ma — zwykłe, "dziecięce" ruiny. */
+  if(dora){
+    const crossM = kenneyMesh('ruinCrossColumn', 1.8);
+    if(crossM){ const cx=-4.5, cz=-24; crossM.position.set(cx, terrainHeight(cx,cz), cz); spinAroundUp(crossM, Math.random()*Math.PI*2); scene.add(crossM); }
+    const cryptM = kenneyMesh('ruinCrypt', 1.4);
+    if(cryptM){ const cx=4.6, cz=-16.5; cryptM.position.set(cx, terrainHeight(cx,cz), cz); spinAroundUp(cryptM, Math.random()*Math.PI*2); scene.add(cryptM); }
+    const candleM = kenneyMesh('ruinCandle', 3.2);
+    if(candleM){ const cx=4.9, cz=-15.6; candleM.position.set(cx, terrainHeight(cx,cz)+0.7, cz); scene.add(candleM); }
+
+    const fx = 5.2, fz = -32;
+    const spookyModel = Math.random() < 0.5 ? kenneyMesh('skeletonFigure', 2.9) : kenneyMesh('ghostFigure', 2.7);
+    const figure = spookyModel || buildDarkFigure();
+    figure.position.set(fx, terrainHeight(fx, fz), fz);
+    figure.rotation.y = -Math.PI/6;
+    scene.add(figure);
+  }
 }
 
 /* ══ Poziom 5: jezioro z plażą, hamaki, sklepik z parkingiem i vanem —
@@ -1459,25 +1750,88 @@ function buildVan(){
   });
   return g;
 }
+/* Opuszczony sklepik — celowo INNA architektura niż domek (buildHouse):
+   płaski, jednospadowy blaszany dach zamiast spiczastego stożka, zabite
+   deskami okno, przekrzywiony szyld, poszarpana markiza i plamy rdzy —
+   żeby nawet z daleka nie dało się go pomylić z domkiem. Front (drzwi +
+   markiza) zwrócony w stronę +Z, w stronę ścieżki, tak jak domek. */
 function buildShop(){
   const g = new THREE.Group();
-  const wallMat = new THREE.MeshStandardMaterial({color:0xe8d5b0, roughness:0.85});
-  const roofMat = new THREE.MeshStandardMaterial({color:0xb5432f, roughness:0.8});
-  const body = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.1, 2.8), wallMat);
-  body.position.y = 1.05;
+  const wallMat = new THREE.MeshStandardMaterial({color:0xb9ab8e, roughness:0.92});
+  const roofMat = new THREE.MeshStandardMaterial({color:0x6c6f63, roughness:0.75, metalness:0.2});
+  const rustMat = new THREE.MeshStandardMaterial({color:0x8a4a2c, roughness:0.95, side:THREE.DoubleSide});
+  const boardMat = new THREE.MeshStandardMaterial({color:0x4a3a26, roughness:0.95});
+  const doorMat = new THREE.MeshStandardMaterial({color:0x453626, roughness:0.9});
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.0, 2.6), wallMat);
+  body.position.y = 1.0;
   g.add(body);
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(2.9, 1.1, 4), roofMat);
-  roof.rotation.y = Math.PI/4;
-  roof.position.y = 2.65;
+
+  /* dach jednospadowy (blaszany), lekko nachylony — zupełnie inna
+     sylwetka niż czterospadowy stożek domku */
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(4.15, 0.12, 2.95), roofMat);
+  roof.position.set(0, 2.14, -0.1);
+  roof.rotation.x = 0.13;
   g.add(roof);
-  const doorMat = new THREE.MeshStandardMaterial({color:0x6b4226, roughness:0.8});
-  const door = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.3, 0.75), doorMat);
-  door.position.set(1.82, 0.68, 0);
+  for(let i=-1.85; i<=1.85; i+=0.46){
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 2.95), roofMat);
+    ridge.position.set(i, 2.21, -0.1);
+    ridge.rotation.x = 0.13;
+    g.add(ridge);
+  }
+  const rustStreak = new THREE.Mesh(new THREE.BoxGeometry(4.15, 0.04, 0.22), rustMat);
+  rustStreak.position.set(-0.6, 2.02, 1.28);
+  rustStreak.rotation.x = 0.13;
+  g.add(rustStreak);
+
+  /* zabite deskami okno — krzyżujące się listwy na ciemnej wnęce */
+  const winFrame = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.8, 0.1), new THREE.MeshStandardMaterial({color:0x241c14, roughness:0.9}));
+  winFrame.position.set(-1.2, 1.05, 1.3);
+  g.add(winFrame);
+  [-0.26, 0, 0.26].forEach(function(dy){
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.17, 0.06), boardMat);
+    plank.position.set(-1.2, 1.05+dy, 1.35);
+    plank.rotation.z = (Math.random()-0.5)*0.07;
+    g.add(plank);
+  });
+  [1, -1].forEach(function(s){
+    const brace = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.13, 0.05), boardMat);
+    brace.position.set(-1.2, 1.05, 1.37);
+    brace.rotation.z = s*Math.PI/4.3;
+    g.add(brace);
+  });
+
+  /* drzwi przesunięte od środka (jak w prawdziwym sklepiku), wytarta klamka */
+  const door = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.55, 0.08), doorMat);
+  door.position.set(1.0, 0.78, 1.3);
   g.add(door);
-  const signMat = new THREE.MeshStandardMaterial({color:0xfdf6dd, roughness:0.6});
-  const sign = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.5, 1.8), signMat);
-  sign.position.set(1.86, 1.85, 0);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), new THREE.MeshStandardMaterial({color:0xb89a4a, roughness:0.55, metalness:0.5}));
+  knob.position.set(1.3, 0.78, 1.35);
+  g.add(knob);
+
+  /* poszarpana, pasiasta markiza nad drzwiami */
+  const awningA = new THREE.MeshStandardMaterial({color:0xb5432f, roughness:0.85, side:THREE.DoubleSide});
+  const awningB = new THREE.MeshStandardMaterial({color:0xd8cdae, roughness:0.85, side:THREE.DoubleSide});
+  for(let i=0;i<5;i++){
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 0.7), i%2===0?awningA:awningB);
+    stripe.position.set(0.55+i*0.3, 1.72 - i*0.03, 1.62);
+    stripe.rotation.x = -0.4;
+    g.add(stripe);
+  }
+
+  /* przekrzywiony, spękany szyld — nie wisi równo, jak porzucony */
+  const sign = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.4, 0.06), new THREE.MeshStandardMaterial({color:0xcfc6a8, roughness:0.75}));
+  sign.position.set(0.85, 2.05, 1.4);
+  sign.rotation.z = 0.06;
   g.add(sign);
+
+  /* plamy rdzy na ścianie */
+  [[-1.55,0.4],[1.75,1.55],[-0.15,1.7]].forEach(function(p){
+    const patch = new THREE.Mesh(new THREE.PlaneGeometry(0.45+Math.random()*0.3, 0.35+Math.random()*0.3), rustMat);
+    patch.position.set(p[0], p[1], 1.301);
+    g.add(patch);
+  });
+
   return g;
 }
 function buildTrashCan(){
@@ -1525,6 +1879,26 @@ function buildShopAndParking(){
     const bin = buildTrashCan();
     bin.position.set(p[0], 0, p[1]);
     scene.add(bin);
+  });
+
+  /* Porzucony dobytek sklepiku, walający się na zewnątrz — prawdziwe
+     modele z paczek Kenney (Mini Market + Survival Kit, CC0), żeby od
+     razu było widać, że to SKLEP, a nie domek. */
+  const shopFrontZ = HOUSE_Z - 1.4 + 1.3;
+  const clutter = [
+    {key:'marketShelfBoxes', scale:1.35, x:-2.3, z:shopFrontZ+0.4, rot:0.3},
+    {key:'marketShelfBags', scale:1.35, x:-2.9, z:shopFrontZ-0.7, rot:-0.5},
+    {key:'marketFreezer', scale:1.3, x:2.6, z:shopFrontZ+0.5, rot:0.2},
+    {key:'survivalBarrel', scale:1.7, x:1.85, z:shopFrontZ+0.65, rot:0},
+    {key:'survivalBox', scale:1.6, x:2.1, z:shopFrontZ+0.8, rot:0.4},
+    {key:'survivalBoxLarge', scale:1.5, x:1.5, z:shopFrontZ+0.55, rot:-0.3}
+  ];
+  clutter.forEach(function(c){
+    const item = kenneyMesh(c.key, c.scale);
+    if(!item) return;
+    item.position.set(c.x, terrainHeight(c.x, c.z), c.z);
+    item.rotation.y = c.rot;
+    scene.add(item);
   });
 }
 function buildLakeArea(){
@@ -1623,7 +1997,11 @@ const RIVER_Z = -14, RIVER_DEPTH = 1.8, RIVER_HALF_WIDTH = 13;
 const RIVER_VALLEY_HALF = 5.5, RIVER_DROP = 1.35, BRIDGE_Y = 0.5;
 const BRIDGE_DECK_HALF = RIVER_VALLEY_HALF - 0.5; /* połowa długości pokładu mostu */
 const BRIDGE_RAMP = 1.5; /* krótki zjazd na brzeg tuż za końcem pokładu */
+/* Rzeka/most istnieją tylko na poziomach 1-2 — dalsze poziomy mają
+   własny, inny motyw przeprawy (jaskinia, ruiny, jezioro), żeby nie
+   każdy poziom powtarzał ten sam most nad rzeką. */
 function nearRiver(x, z){
+  if(currentLevel > 2) return false;
   return Math.abs(z - RIVER_Z) < RIVER_VALLEY_HALF + 0.4 && Math.abs(x) < 3.6;
 }
 /* Wysokość, na jakiej powinna "stać" postać/towarzysze/nutka w danym (x,z).
@@ -1641,6 +2019,7 @@ function bridgeDeckHalf(){
 }
 function groundLevelAt(x, z){
   const base = terrainHeight(x, z);
+  if(currentLevel > 2) return base; /* bez rzeki/mostu na tych poziomach — zwykły teren */
   if(Math.abs(x) > 2.0) return base;
   const deckHalf = bridgeDeckHalf();
   const dz = Math.abs(z - RIVER_Z);
@@ -1657,17 +2036,27 @@ function nearHouse(x, z){
   return Math.abs(x) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - HOUSE_Z) < HOUSE_YARD_HALF + 0.6;
 }
 
+/* Jaskinia (poziom 3+, patrz buildCaveTunnel) — strefa wykluczenia, żeby
+   zwykłe drzewa/skały/kwiaty z rozrzutu roślinności nie wyrastały w
+   środku tunelu, zasłaniając go i wbijając się w skalne ściany. */
+const CAVE_Z_START = -29.5, CAVE_Z_END = -37.5, CAVE_HALF_WIDTH = 4.6;
+function nearCave(x, z){
+  return currentLevel === 3 && Math.abs(x) < CAVE_HALF_WIDTH &&
+    z <= CAVE_Z_START + 1.2 && z >= CAVE_Z_END - 1.2;
+}
+
 /* Teren nie jest już idealnie płaski — łagodne wzniesienia z dala od
    ścieżki (płasko blisko niej, żeby chodzenie zostało wiarygodne), plus
    wgłębienie doliny rzeki. Używane zarówno do odkształcenia siatki
    ziemi, jak i do ustawiania wysokości Y rozrzuconych obiektów. */
 function terrainHeight(x, z){
   if(nearHouse(x, z)) return 0;
+  if(nearCave(x, z)) return 0;
   let h = Math.sin(x*0.35 + z*0.05)*0.45 + Math.sin(x*0.11 - z*0.17)*0.75 + Math.cos(z*0.22)*0.3;
   const flatT = Math.min(1, distToPath(x, z)/3.4);
   h *= flatT;
   const dzRiver = Math.abs(z - RIVER_Z);
-  if(dzRiver < RIVER_VALLEY_HALF){
+  if(currentLevel <= 2 && dzRiver < RIVER_VALLEY_HALF){
     const vt = 1 - dzRiver/RIVER_VALLEY_HALF;
     const smooth = vt*vt*(3-2*vt);
     h -= smooth * RIVER_DROP;
@@ -1765,7 +2154,9 @@ function buildHouseAndFence(){
 }
 
 function scatterTrees(){
-  const count = currentLevel >= 2 ? 54 : 26; /* poziom 2+: dużo gęstszy las */
+  /* poziom 4: znacznie mniej drzew — to otwarty ogród ruin, nie gęsty las;
+     poziom 2+: dużo gęstszy las (istniejące). */
+  const count = currentLevel === 4 ? 14 : (currentLevel >= 2 ? 54 : 26);
   for(let i=0;i<count;i++){
     const x = (Math.random()*2-1) * 9;
     const z = -Math.random()*44 + 2;
@@ -1773,6 +2164,7 @@ function scatterTrees(){
     if(Math.hypot(x, z) < 4.5) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
     const tree = buildTree();
     tree.position.set(x, terrainHeight(x, z), z);
     const s = 1.8 + Math.random()*1.3; /* dużo większe niż wcześniej */
@@ -1810,6 +2202,7 @@ function scatterGrassTufts(){
     if(distToPath(x, z) < 1.1) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
     const tuft = buildGrassTuft();
     tuft.position.set(x, terrainHeight(x, z), z);
     spinAroundUp(tuft, Math.random()*Math.PI*2);
@@ -1828,6 +2221,7 @@ function scatterRocks(){
     if(distToPath(x, z) < 1.5) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
     const rock = randomNatureMesh(resolvedModels.rock);
     if(!rock) continue;
     rock.position.set(x, terrainHeight(x, z), z);
@@ -1848,6 +2242,7 @@ function scatterFlowers(){
     if(distToPath(x, z) < 1.6) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
     const key = pools[Math.floor(Math.random()*pools.length)];
     const flower = randomNatureMesh(resolvedModels[key]);
     if(!flower) continue;
@@ -1866,6 +2261,7 @@ function scatterBushes(){
     if(distToPath(x, z) < 1.8) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
+    if(nearCave(x, z)) continue;
     const bush = randomNatureMesh(resolvedModels.bush);
     if(!bush) continue;
     bush.position.set(x, terrainHeight(x, z), z);
@@ -2197,8 +2593,51 @@ const natureModelPromises = Object.keys(NATURE_MODEL_FILES).map(function(key){
     resolvedModels[key] = gltf;
   });
 });
+/* ══ Modele z darmowych paczek Kenney (CC0, kenney.nl) — każdy plik to
+   JEDEN gotowy model (nie kilka wariantów jak w paczce natury powyżej),
+   więc nie trzeba listy wariantów: po prostu klonujemy gltf.scene.
+   Tekstury Kenney nie mają wypieczonego podwójnego cieniowania, więc
+   zostają zwykłym materiałem PBR (oświetlanym przez światła sceny). */
+const KENNEY_DIR = MODEL_DIR + 'kenney/';
+/* Ścieżki względne trzymają się oryginalnego układu paczek (każda paczka
+   ma własny podfolder + własne Textures/colormap.png) — kilka paczek Kenney
+   ma teksturę o TEJ SAMEJ nazwie względnej ("Textures/colormap.png"), więc
+   trzymanie ich w jednym wspólnym folderze nadpisywałoby sobie tekstury. */
+const KENNEY_MODEL_FILES = {
+  ruinColumn: 'graveyard/column-large.glb',
+  ruinBorderPillar: 'graveyard/border-pillar.glb',
+  ruinBrickWall: 'graveyard/brick-wall.glb',
+  ruinDebris: 'graveyard/debris.glb',
+  ruinCrossColumn: 'graveyard/cross-column.glb',
+  ruinCrypt: 'graveyard/crypt-small.glb',
+  ruinCandle: 'graveyard/candle.glb',
+  ghostFigure: 'graveyard/character-ghost.glb',
+  skeletonFigure: 'graveyard/character-skeleton.glb',
+  marketShelfBoxes: 'market/shelf-boxes.glb',
+  marketShelfBags: 'market/shelf-bags.glb',
+  marketFreezer: 'market/freezer.glb',
+  survivalBarrel: 'survival/barrel.glb',
+  survivalBox: 'survival/box.glb',
+  survivalBoxLarge: 'survival/box-large.glb',
+  cliffRock: 'nature/cliff_block_rock.glb',
+  cliffCaveRock: 'nature/cliff_cave_rock.glb'
+};
+const resolvedKenney = {};
+const kenneyModelPromises = Object.keys(KENNEY_MODEL_FILES).map(function(key){
+  return loadGLTFModel(KENNEY_DIR + KENNEY_MODEL_FILES[key]).then(function(gltf){
+    resolvedKenney[key] = gltf;
+  });
+});
+function kenneyMesh(key, extraScale){
+  const gltf = resolvedKenney[key];
+  if(!gltf) return null;
+  const clone = gltf.scene.clone(true);
+  if(extraScale) clone.scale.multiplyScalar(extraScale);
+  return clone;
+}
+
 let modelsReady = false;
-Promise.all(natureModelPromises).then(function(){ modelsReady = true; });
+Promise.all(natureModelPromises.concat(kenneyModelPromises)).then(function(){ modelsReady = true; });
 
 /* Każdy plik glTF ma kilka nazwanych wariantów (np. Rock_1..Rock_5) jako
    bezpośrednie dzieci węzła głównego — część z nich to węzły z kilkoma
@@ -2938,6 +3377,25 @@ function tweenCamera(toPos, toLook, duration, onDone){
   }
   requestAnimationFrame(step);
 }
+/* Wylicza kamerę, która idealnie kadruje budynek docelowy (domek na
+   poziomach 1-4, sklepik na poziomie 5) — drzwi wejściowe dokładnie na
+   środku kadru. Domek ma drzwi na ścianie +Z (patrzą w stronę ścieżki),
+   sklepik ma drzwi na ścianie +X (patrzy w bok, na parking) — stąd
+   różne osie podejścia dla obu budynków (patrz buildHouse/buildShop). */
+function getArrivalShot(){
+  /* Sklepik (poziom 5) ma teraz front (drzwi+markiza) zwrócony w stronę
+     +Z, tak jak domek — tylko drzwi są przesunięte od środka (x=1.0),
+     więc kadr centruje się na NICH, nie na środku całego budynku. */
+  const isShop = currentLevel === 5;
+  const doorX = isShop ? 1.0 : 0;
+  const doorZ = HOUSE_Z - 1.4 + (isShop ? 1.3 : 1.12);
+  const dist = isShop ? 6.5 : 6;
+  const camX = doorX, camZ = doorZ + dist;
+  const camPos = new THREE.Vector3(camX, terrainHeight(camX, camZ) + (isShop ? 2.0 : 2.1), camZ);
+  const lookAt = new THREE.Vector3(doorX, isShop ? 1.4 : 1.35, doorZ);
+  return {camPos, lookAt};
+}
+
 function runIntroCutscene(onDone){
   inCutscene = true;
   cutsceneSkip = false;
@@ -2964,13 +3422,32 @@ function runIntroCutscene(onDone){
   const curve = new THREE.CatmullRomCurve3(curvePts, false, 'centripetal', 0.5);
 
   const upVec = new THREE.Vector3(0, 1, 0);
-  const forwardDuration = 6400;
+  /* Krzywa ma curvePts.length-1 odcinków, każdy o RÓWNEJ szerokości w
+     parametrze naturalnym (getPoint/getTangent) — niezależnie od realnej
+     odległości między punktami. Zamiast jednego wygładzenia na CAŁY
+     przelot (co dawało wolny start/koniec, ale bardzo szybki, gwałtowny
+     środek — czyli właśnie przeloty między bazami), każdy odcinek
+     dostaje WŁASNY, osobny wolny rozbieg/hamowanie i własny czas trwania.
+     Skrajne odcinki (najazd na pierwszą bazę / odjazd od ostatniej) są
+     krótsze, a odcinki między kolejnymi bazami — dłuższe i spokojniejsze. */
+  const segCount = curvePts.length - 1;
+  const segDurations = [];
+  for(let i=0; i<segCount; i++){
+    segDurations.push((i===0 || i===segCount-1) ? 900 : 1500);
+  }
+  const segStartTimes = [0];
+  for(let i=0; i<segCount; i++) segStartTimes.push(segStartTimes[i] + segDurations[i]);
+  const totalDuration = segStartTimes[segCount];
   const t0 = performance.now();
 
   function stepForward(now){
     if(cutsceneSkip){ startBackward(); return; }
-    const t = Math.min(1, (now - t0) / forwardDuration);
-    const e = t*t*(3-2*t); /* łagodny rozbieg/hamowanie na starcie i końcu */
+    const elapsed = Math.min(totalDuration, now - t0);
+    let segIdx = 0;
+    while(segIdx < segCount-1 && elapsed >= segStartTimes[segIdx+1]) segIdx++;
+    const localT = Math.min(1, (elapsed - segStartTimes[segIdx]) / segDurations[segIdx]);
+    const localE = localT*localT*(3-2*localT); /* łagodny rozbieg/hamowanie NA KAŻDYM odcinku */
+    const e = Math.min(1, (segIdx + localE) / segCount);
     /* getPoint/getTangent (parametr naturalny), NIE getPointAt/getTangentAt
        (długość łuku) — dla type:'centripetal' na otwartej krzywej ta druga
        para rzuca wyjątkiem w tej wersji three.js (pusta tabela długości). */
@@ -2978,16 +3455,31 @@ function runIntroCutscene(onDone){
     const tangent = curve.getTangent(Math.min(0.999, e)).normalize();
     camera.position.copy(pos);
     const side = new THREE.Vector3().crossVectors(tangent, upVec).normalize();
-    const wobble = Math.sin(now * 0.0007) * 0.7;
+    /* Delikatne spojrzenie w bok narastające i zanikające do zera w
+       obrębie KAŻDEGO odcinka (zero dokładnie na każdej bazie) —
+       zamiast ciągłej fali sinusoidalnej niezależnej od trasy, która
+       przy szybszym fragmencie dawała gwałtowne machanie ekranem.
+       Kierunek spojrzenia zmienia się naprzemiennie odcinek po odcinku. */
+    const glanceSign = (segIdx % 2 === 0) ? 1 : -1;
+    const wobble = Math.sin(Math.PI * localT) * 0.6 * glanceSign;
     const lookAhead = pos.clone().addScaledVector(tangent, 7).addScaledVector(side, wobble);
     lookAhead.y -= 0.8;
     camera.lookAt(lookAhead);
     cutsceneLookTarget = lookAhead;
-    if(t < 1){
+    if(elapsed < totalDuration){
       requestAnimationFrame(stepForward);
     }else{
-      setTimeout(startBackward, 300);
+      showArrivalShot();
     }
+  }
+  function showArrivalShot(){
+    /* Po dolocie na miejsce — dosuwamy kamerę do idealnie wykadrowanego
+       ujęcia budynku docelowego (drzwi na środku), zamiast lecieć dalej
+       stycznie do trasy, i chwilę się na nim zatrzymujemy. */
+    const shot = getArrivalShot();
+    tweenCamera(shot.camPos, shot.lookAt, 1100, function(){
+      setTimeout(startBackward, 700);
+    });
   }
   function startBackward(){
     const initCam = cameraOffsetForAspect();
@@ -3089,7 +3581,9 @@ function initScene(){
   scene.add(ground);
 
   buildTrail();
-  buildRiverAndBridge();
+  if(currentLevel <= 2){
+    buildRiverAndBridge();
+  }
   if(currentLevel === 5){
     buildShopAndParking();
   }else{
@@ -3102,7 +3596,9 @@ function initScene(){
   scatterBushes();
   scatterMountains();
   scatterStartMeadow();
-  scatterRiverDecor();
+  if(currentLevel <= 2){
+    scatterRiverDecor();
+  }
   scatterWildlife();
   campfires = [];
   if(currentLevel >= 2){
@@ -3126,8 +3622,11 @@ function initScene(){
     scene.add(fire);
     campfires.push(fire);
   }
-  if(currentLevel >= 3){
+  if(currentLevel === 3){
     buildCaveTunnel();
+  }
+  if(currentLevel === 4){
+    scatterRuins();
   }
   if(currentLevel === 5){
     buildLakeArea();
