@@ -23,24 +23,42 @@
   .sound-toggle.active{border-color:var(--gold);background:#fdf8ec;}
 
   /* ══ WYBÓR POSTACI ══ */
-  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:22px;padding:24px 16px 40px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
-  .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.5rem;margin:0;text-align:center;}
-  .char-select p{color:var(--text-mid);font-size:0.9rem;text-align:center;max-width:380px;margin:0;line-height:1.6;}
-  .char-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
-  .char-card{width:150px;background:var(--card-bg);border:3px solid var(--border);border-radius:22px;padding:22px 12px;text-align:center;cursor:pointer;transition:0.2s;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
+  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:14px 16px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
+  .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:clamp(1.1rem,4.5vw,1.5rem);margin:0;text-align:center;}
+  .char-select p{color:var(--text-mid);font-size:0.82rem;text-align:center;max-width:380px;margin:0;line-height:1.4;}
+  .char-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .char-card{width:130px;background:var(--card-bg);border:3px solid var(--border);border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:0.2s;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
   .char-card:hover{border-color:var(--gold);transform:translateY(-3px);}
   .char-card.selected{border-color:var(--navy);background:#eef3ff;transform:translateY(-3px);}
-  .char-card .char-img{width:100px;height:100px;object-fit:contain;display:block;margin:0 auto 10px;}
-  .char-card .char-name{font-weight:800;color:var(--navy);font-size:0.95rem;}
-  .start-btn{background:var(--gold);color:#1a1a2e;border:none;padding:15px 44px;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:0.2s;opacity:0.4;pointer-events:none;}
+  .char-card .char-img{width:68px;height:68px;object-fit:contain;display:block;margin:0 auto 6px;}
+  .char-card .char-name{font-weight:800;color:var(--navy);font-size:0.9rem;}
+  .start-btn{background:var(--gold);color:#1a1a2e;border:none;padding:12px 36px;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:0.2s;opacity:0.4;pointer-events:none;}
   .start-btn.active{opacity:1;pointer-events:auto;}
   .start-btn.active:hover{transform:translateY(-2px);}
-  .clef-settings{margin:4px 0 18px;text-align:center;}
-  .clef-settings-label{display:block;font-weight:700;color:var(--text-mid);font-size:0.82rem;margin-bottom:7px;}
-  .clef-btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-  .clef-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:7px 16px;font-size:0.8rem;font-weight:700;color:var(--text);cursor:pointer;transition:0.2s;}
+  .clef-settings{margin:0;text-align:center;}
+  .clef-settings-label{display:block;font-weight:700;color:var(--text-mid);font-size:0.78rem;margin-bottom:5px;}
+  .clef-btn-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .clef-btn{background:var(--card-bg);border:2px solid var(--border);border-radius:50px;padding:5px 12px;font-size:0.74rem;font-weight:700;color:var(--text);cursor:pointer;transition:0.2s;}
   .clef-btn:hover{border-color:var(--gold);}
   .clef-btn.active{background:var(--gold);border-color:var(--gold);color:#1a1a2e;}
+
+  /* Bardzo niskie/wąskie ekrany (popup na telefonie) — jeszcze ciaśniej,
+     żeby przycisk "Wyruszamy!" był widoczny bez przewijania. */
+  @media (max-height:760px){
+    .char-select{gap:8px;padding:8px 14px 16px;}
+    .char-select p{display:none;}
+    .char-card{width:110px;padding:10px 8px;}
+    .char-card .char-img{width:52px;height:52px;}
+    .start-btn{padding:10px 30px;font-size:0.92rem;}
+  }
+  @media (max-height:640px){
+    .char-select h2{font-size:1.05rem;}
+    .clef-settings-label{margin-bottom:3px;}
+    .char-cards{gap:8px;}
+    .char-card{width:96px;padding:8px 6px;border-radius:14px;}
+    .char-card .char-img{width:42px;height:42px;margin-bottom:3px;}
+    .char-card .char-name{font-size:0.78rem;}
+  }
 
   /* ══ SCENA 3D ══ */
   .scene-wrap{flex:1;position:relative;overflow:hidden;background:#0c2b1a;}
@@ -113,6 +131,24 @@
     0%{transform:translateY(0) rotate(0deg);opacity:1;}
     100%{transform:translateY(112vh) rotate(360deg);opacity:0.85;}
   }
+
+  /* ══ Ukryty kod wersji gry — ma być całkiem niepozorny, nikt nie musi go
+     zauważyć. Wpisanie "dora" włącza ciemniejszy motyw. ══ */
+  .secret-code-input{display:block;margin:8px auto 0;width:64px;padding:3px 6px;font-size:0.65rem;border:1px solid rgba(0,0,0,0.08);border-radius:7px;background:transparent;color:rgba(100,116,139,0.35);text-align:center;}
+  .secret-code-input:focus{opacity:1;outline:none;border-color:var(--gold);color:var(--text-mid);}
+  body.night-theme{background:#0d0d16;}
+  body.night-theme .top-bar{background:#171722;border-bottom-color:#2a2a38;}
+  body.night-theme .game-title-bar,body.night-theme .back-link{color:#dbe0f5;}
+  body.night-theme .char-select{background:linear-gradient(180deg,rgba(10,10,20,0.92),rgba(6,6,14,0.96)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
+  body.night-theme .char-select h2{color:#dbe0f5;}
+  body.night-theme .char-select p{color:#9aa3c4;}
+  body.night-theme .char-card{background:#1c1c2a;border-color:#2f2f42;}
+  body.night-theme .char-card .char-name{color:#dbe0f5;}
+  body.night-theme .clef-settings-label{color:#9aa3c4;}
+  body.night-theme .clef-btn{background:#1c1c2a;border-color:#2f2f42;color:#c8cde6;}
+
+  /* ══ Cutscene przelotu kamery przed poziomem ══ */
+  .skip-cutscene-btn{position:absolute;bottom:18px;right:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 18px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;}
 </style>
 </head>
 <body>
@@ -157,12 +193,14 @@
     </div>
   </div>
   <button class="start-btn" id="startBtn" onclick="startGame()">Wyruszamy!</button>
+  <input type="text" id="secretCodeInput" class="secret-code-input" placeholder="kod" autocomplete="off" spellcheck="false">
 </div>
 
 <div class="scene-wrap" id="sceneWrap" style="display:none;">
   <canvas id="c3d"></canvas>
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
   <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
+  <button type="button" class="skip-cutscene-btn" id="skipCutsceneBtn" onclick="cutsceneSkip=true;" style="display:none;">Pomiń ▶</button>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -367,6 +405,28 @@ function setDifficultyMode(mode){
 document.querySelectorAll('.diff-btn').forEach(function(b){
   b.classList.toggle('active', b.dataset.diff === difficultyMode);
 });
+
+/* Ukryty kod "dora" — całkiem niepozorne pole na ekranie startowym, nikt
+   nie musi go zauważyć. Włącza ciemniejszy motyw i nocne poziomy 2/4/5. */
+let nightMode = false;
+try{ nightMode = localStorage.getItem('dzunglaNightMode') === '1'; }catch(e){}
+function setNightMode(on){
+  nightMode = on;
+  try{ localStorage.setItem('dzunglaNightMode', on ? '1' : ''); }catch(e){}
+  document.body.classList.toggle('night-theme', on);
+}
+setNightMode(nightMode);
+const secretCodeInput = document.getElementById('secretCodeInput');
+if(secretCodeInput){
+  secretCodeInput.addEventListener('input', function(e){
+    if(e.target.value.trim().toLowerCase() === 'dora'){
+      setNightMode(true);
+      e.target.value = '';
+      e.target.blur();
+    }
+  });
+}
+
 const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
 /* Każda nuta ma "swój" owoc/produkt, który zaczyna się na tę samą literę —
    dzięki temu dziecko kojarzy dźwięk z jedzeniem po pierwszej literze,
@@ -1487,6 +1547,22 @@ function buildLakeArea(){
     scene.add(hammock);
   }
 }
+/* Ciemna, nieruchoma postać daleko w rogu mapy — tylko w nocnej wersji
+   poziomu 5 (tajny kod). Czysto klimatyczny easter egg, nic nie robi. */
+function buildDarkFigure(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial({color:0x08080c});
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.1, 1.1, 8), mat);
+  legs.position.y = 0.55;
+  g.add(legs);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.16, 1.3, 8), mat);
+  body.position.y = 1.5;
+  g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 10, 8), mat);
+  head.position.y = 2.28;
+  g.add(head);
+  return g;
+}
 
 const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
 function buildTree(){
@@ -2021,6 +2097,35 @@ function buildSun(){
   );
   g.add(halo2);
   g.position.set(-24, 46, -34);
+  return g;
+}
+/* Księżyc + gwiazdy — nocna wersja poziomów 2/4/5 po wpisaniu tajnego kodu. */
+function buildMoon(){
+  const g = new THREE.Group();
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(2.6, 16, 12),
+    new THREE.MeshBasicMaterial({color:0xeef2ff})
+  );
+  g.add(core);
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(4.2, 16, 12),
+    new THREE.MeshBasicMaterial({color:0xc9d4ff, transparent:true, opacity:0.28})
+  );
+  g.add(halo);
+  g.position.set(20, 40, -30);
+  return g;
+}
+function buildStars(){
+  const g = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial({color:0xf5f6ff});
+  for(let i=0;i<70;i++){
+    const star = new THREE.Mesh(new THREE.SphereGeometry(0.12 + Math.random()*0.1, 5, 4), mat);
+    const ang = Math.random()*Math.PI*2;
+    const height = 15 + Math.random()*35;
+    const radius = 30 + Math.random()*40;
+    star.position.set(Math.cos(ang)*radius, height, Math.sin(ang)*radius - 20);
+    g.add(star);
+  }
   return g;
 }
 
@@ -2802,6 +2907,75 @@ function runVictoryLap(onDone){
   next();
 }
 
+/* ══ Cutscene przed każdym poziomem — kamera przelatuje nad całą trasą aż
+   do celu, a potem wraca na sam początek do postaci, zanim gracz przejmie
+   sterowanie. Kamera podczas tego jest w pełni sterowana tutaj (animate()
+   pomija updateCamera(), dopóki inCutscene===true). ══ */
+let inCutscene = false, cutsceneSkip = false, cutsceneLookTarget = null;
+function tweenCamera(toPos, toLook, duration, onDone){
+  const fromPos = camera.position.clone();
+  const fromLook = cutsceneLookTarget ? cutsceneLookTarget.clone() : toLook.clone();
+  const t0 = performance.now();
+  function step(now){
+    if(cutsceneSkip){
+      camera.position.copy(toPos);
+      camera.lookAt(toLook);
+      cutsceneLookTarget = toLook.clone();
+      if(onDone) onDone();
+      return;
+    }
+    const t = Math.min(1, (now-t0)/duration);
+    const e = t*t*(3-2*t);
+    camera.position.lerpVectors(fromPos, toPos, e);
+    const look = new THREE.Vector3().lerpVectors(fromLook, toLook, e);
+    camera.lookAt(look);
+    cutsceneLookTarget = look;
+    if(t < 1){
+      requestAnimationFrame(step);
+    }else if(onDone){
+      onDone();
+    }
+  }
+  requestAnimationFrame(step);
+}
+function runIntroCutscene(onDone){
+  inCutscene = true;
+  cutsceneSkip = false;
+  cutsceneLookTarget = null;
+  const skipBtn = document.getElementById('skipCutsceneBtn');
+  if(skipBtn) skipBtn.style.display = 'block';
+
+  const flyHeight = 5.5;
+  const points = PATH_POINTS.map(function(p){
+    return {
+      pos: new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z),
+      look: new THREE.Vector3(p.x, terrainHeight(p.x, p.z), p.z)
+    };
+  });
+  camera.position.set(points[0].pos.x, points[0].pos.y + 2, points[0].pos.z + 5);
+  camera.lookAt(points[0].look);
+  cutsceneLookTarget = points[0].look.clone();
+
+  let i = 0;
+  function forward(){
+    if(i >= points.length){ setTimeout(backward, 400); return; }
+    const p = points[i++];
+    tweenCamera(p.pos, p.look, 480, forward);
+  }
+  function backward(){
+    const initCam = cameraOffsetForAspect();
+    const finalPos = character.position.clone().add(initCam.back);
+    const finalLook = character.position.clone();
+    finalLook.y += initCam.lookY;
+    tweenCamera(finalPos, finalLook, 1000, function(){
+      inCutscene = false;
+      if(skipBtn) skipBtn.style.display = 'none';
+      onDone();
+    });
+  }
+  forward();
+}
+
 function onArrive(idx){
   if(idx === 0) return;
   if(waypoints[idx].solved) return;
@@ -2834,14 +3008,16 @@ function animate(now){
   updateWildlife();
   updateTinyFrogs();
   updateCampfires();
-  updateCamera();
+  if(!inCutscene) updateCamera();
   renderer.render(scene, camera);
 }
 
 function initScene(){
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xa9e6fb);
-  scene.fog = new THREE.Fog(0xa9e6fb, 20, 72);
+  const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5);
+  const skyColor = isNight ? 0x0c1230 : 0xa9e6fb;
+  scene.background = new THREE.Color(skyColor);
+  scene.fog = new THREE.Fog(skyColor, isNight ? 14 : 20, isNight ? 55 : 72);
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
@@ -2850,16 +3026,25 @@ function initScene(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   resizeRenderer();
 
-  scene.add(new THREE.AmbientLight(0xe4f7db, 0.95));
-  const sunLight = new THREE.DirectionalLight(0xfff6dc, 1.05);
-  sunLight.position.set(-8, 20, -12);
-  scene.add(sunLight);
-  scene.add(buildSun());
+  if(isNight){
+    scene.add(new THREE.AmbientLight(0x3a4a7a, 0.55));
+    const moonLight = new THREE.DirectionalLight(0xaebfff, 0.4);
+    moonLight.position.set(20, 40, -30);
+    scene.add(moonLight);
+    scene.add(buildMoon());
+    scene.add(buildStars());
+  }else{
+    scene.add(new THREE.AmbientLight(0xe4f7db, 0.95));
+    const sunLight = new THREE.DirectionalLight(0xfff6dc, 1.05);
+    sunLight.position.set(-8, 20, -12);
+    scene.add(sunLight);
+    scene.add(buildSun());
+  }
 
   const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
   grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
   grassTex.repeat.set(10, 15);
-  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1, color:0xe6ffe0});
+  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1, color: isNight ? 0x2a3550 : 0xe6ffe0});
   /* Teren nie jest już płaski — odkształcamy siatkę wg terrainHeight()
      (płasko przy ścieżce, łagodne wzniesienia dalej, wgłębienie przy rzece).
      Lokalne Z wierzchołka PlaneGeometry staje się światową wysokością Y po
@@ -2919,6 +3104,13 @@ function initScene(){
   }
   if(currentLevel === 5){
     buildLakeArea();
+    if(isNight){
+      const figure = buildDarkFigure();
+      const fx = -19, fz = -61;
+      figure.position.set(fx, terrainHeight(fx, fz), fz);
+      figure.rotation.y = Math.PI/5;
+      scene.add(figure);
+    }
   }
   const levelBadge = document.getElementById('levelBadge');
   if(currentLevel > 1){
@@ -2964,16 +3156,32 @@ function initScene(){
   camera.position.copy(character.position.clone().add(initCam.back));
   camera.lookAt(character.position.x, character.position.y + initCam.lookY, character.position.z);
 
-  renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
-  renderer.domElement.addEventListener('pointermove', onCanvasPointerMove);
-  renderer.domElement.addEventListener('pointerup', onCanvasPointerUp);
-  renderer.domElement.addEventListener('pointercancel', onCanvasPointerCancel);
   window.addEventListener('resize', resizeRenderer);
 
   sceneRunning = true;
   requestAnimationFrame(animate);
-
   startAmbient();
+
+  /* Zanim gracz przejmie sterowanie, kamera przelatuje nad całą trasą aż
+     do celu i wraca na start — dopiero potem podpinamy dotyk/przeciąganie
+     i pokazujemy podpowiedź, żeby nic nie przeszkadzało w cutscenie. */
+  document.getElementById('hintBadge').style.opacity = '0';
+  const swipeHintPre = document.querySelector('.swipe-hint');
+  if(swipeHintPre) swipeHintPre.style.opacity = '0';
+  runIntroCutscene(function(){
+    renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
+    renderer.domElement.addEventListener('pointermove', onCanvasPointerMove);
+    renderer.domElement.addEventListener('pointerup', onCanvasPointerUp);
+    renderer.domElement.addEventListener('pointercancel', onCanvasPointerCancel);
+    document.getElementById('hintBadge').style.opacity = '1';
+    const swipeHintEl = document.querySelector('.swipe-hint');
+    if(swipeHintEl){
+      swipeHintEl.style.animation = 'none';
+      void swipeHintEl.offsetWidth;
+      swipeHintEl.style.animation = '';
+      swipeHintEl.style.opacity = '';
+    }
+  });
 }
 
 const LEVEL_WIN_TITLES = {
