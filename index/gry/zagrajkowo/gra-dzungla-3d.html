@@ -23,14 +23,14 @@
   .sound-toggle.active{border-color:var(--gold);background:#fdf8ec;}
 
   /* ══ WYBÓR POSTACI ══ */
-  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 16px;background:linear-gradient(180deg,#e8f5e0,#faf9f7);}
+  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px 16px;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
   .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.5rem;margin:0;text-align:center;}
   .char-select p{color:var(--text-mid);font-size:0.9rem;text-align:center;max-width:380px;margin:0;line-height:1.6;}
   .char-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;}
   .char-card{width:150px;background:var(--card-bg);border:3px solid var(--border);border-radius:22px;padding:22px 12px;text-align:center;cursor:pointer;transition:0.2s;box-shadow:0 6px 18px rgba(0,0,0,0.06);}
   .char-card:hover{border-color:var(--gold);transform:translateY(-3px);}
   .char-card.selected{border-color:var(--navy);background:#eef3ff;transform:translateY(-3px);}
-  .char-card .char-emoji{font-size:3.2rem;display:block;margin-bottom:10px;}
+  .char-card .char-img{width:100px;height:100px;object-fit:contain;display:block;margin:0 auto 10px;}
   .char-card .char-name{font-weight:800;color:var(--navy);font-size:0.95rem;}
   .start-btn{background:var(--gold);color:#1a1a2e;border:none;padding:15px 44px;border-radius:50px;font-weight:800;font-size:1rem;cursor:pointer;transition:0.2s;opacity:0.4;pointer-events:none;}
   .start-btn.active{opacity:1;pointer-events:auto;}
@@ -60,7 +60,7 @@
   .fruit-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
   .fruit-tile{width:76px;height:72px;border-radius:14px;background:#f5eeda;border:2.5px solid #a97c40;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:4px 2px;}
   .fruit-tile:active{transform:scale(0.93);}
-  .fruit-tile .fruit-emoji{font-size:1.5rem;line-height:1;}
+  .fruit-tile .fruit-img{width:34px;height:34px;object-fit:contain;display:block;}
   .fruit-tile .fruit-word{font-weight:700;color:#5a3d1c;font-size:0.66rem;margin-top:3px;text-align:center;line-height:1.1;}
   .fruit-tile .fruit-first{font-weight:900;color:var(--red);font-size:0.86rem;}
   .fruit-tile.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
@@ -73,7 +73,7 @@
   .mic-vol-bar{height:100%;width:0%;background:var(--gold);transition:width 0.1s linear;}
   .mic-status{color:#f0d99a;font-size:0.82rem;font-weight:600;min-height:20px;}
 
-  .win-overlay{position:fixed;inset:0;background:rgba(10,30,15,0.92);display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
+  .win-overlay{position:fixed;inset:0;background:linear-gradient(rgba(8,22,12,0.78),rgba(8,22,12,0.88)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-nuty-tlo.webp') center/cover;display:none;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:16px;text-align:center;padding:20px;}
   .win-overlay.show{display:flex;}
   .win-overlay h2{color:var(--gold);font-family:'Playfair Display',serif;font-size:2rem;margin:0;}
   .win-overlay p{color:white;font-size:1.05rem;margin:0;max-width:420px;}
@@ -103,11 +103,11 @@
   <p>Razem ruszycie przez dżunglę i będziecie rozwiązywać zagadki muzyczne, żeby odkrywać kolejne polanki.</p>
   <div class="char-cards">
     <div class="char-card" data-char="cat" onclick="selectChar('cat')">
-      <span class="char-emoji">🐱</span>
+      <img class="char-img" src="/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/kotek-3d-gra.webp" alt="Kotek">
       <span class="char-name">Kotek</span>
     </div>
     <div class="char-card" data-char="dog" onclick="selectChar('dog')">
-      <span class="char-emoji">🐶</span>
+      <img class="char-img" src="/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/piesek-3d-gra.webp" alt="Piesek">
       <span class="char-name">Piesek</span>
     </div>
   </div>
@@ -275,14 +275,15 @@ const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
 /* Każda nuta ma "swój" owoc/produkt, który zaczyna się na tę samą literę —
    dzięki temu dziecko kojarzy dźwięk z jedzeniem po pierwszej literze,
    np. C jak Cebula. */
+const FOOD_IMG_DIR = '/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/';
 const FOOD_BY_LETTER = {
-  C: {word:'Cebula',  emoji:'🧅'},
-  D: {word:'Dynia',   emoji:'🎃'},
-  E: {word:'Eklerka', emoji:'🧁'},
-  F: {word:'Fasola',  emoji:'🫘'},
-  G: {word:'Gruszka', emoji:'🍐'},
-  A: {word:'Ananas',  emoji:'🍍'},
-  H: {word:'Homar',   emoji:'🦞'}
+  C: {word:'Cebula',  img:FOOD_IMG_DIR+'cebula-3d-gra.webp'},
+  D: {word:'Dynia',   img:FOOD_IMG_DIR+'dynia-3d-gra.webp'},
+  E: {word:'Eklerka', img:FOOD_IMG_DIR+'eklerka-3d-gra.webp'},
+  F: {word:'Fasola',  img:FOOD_IMG_DIR+'groszek-3d-gra.webp'},
+  G: {word:'Gruszka', img:FOOD_IMG_DIR+'gruszka-3d-gra.webp'},
+  A: {word:'Ananas',  img:FOOD_IMG_DIR+'ananas-3d-gra.webp'},
+  H: {word:'Homar',   img:FOOD_IMG_DIR+'krab-3d-gra.webp'}
 };
 /* Częstotliwości nut (jak w Fiszkach): oktawa razkreślna dla klucza
    wiolinowego, mała oktawa dla klucza basowego. */
@@ -623,8 +624,37 @@ function scatterMountains(){
   }
 }
 
+/* ══ Tekstury (wygenerowane grafiki) — jeden cache na URL, żeby nie ładować
+   tego samego obrazka wielokrotnie ══ */
+const TEXTURE_DIR = '/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/';
+let textureLoader = null;
+const textureCache = {};
+function getTexture(url){
+  if(!textureLoader) textureLoader = new THREE.TextureLoader();
+  if(!textureCache[url]) textureCache[url] = textureLoader.load(url);
+  return textureCache[url];
+}
+
+/* Kilka "wycinków" tekstury kamiennej ścieżki, losowanych per kamyk, żeby
+   nie każdy kamyk wyglądał identycznie mimo współdzielenia jednego obrazka. */
+let stoneTexVariants = null;
+function getStoneTexVariant(){
+  if(!stoneTexVariants){
+    stoneTexVariants = [];
+    const base = getTexture(TEXTURE_DIR+'sciezka-kamienie-tekstura.webp');
+    for(let i=0;i<6;i++){
+      const t = base.clone();
+      t.needsUpdate = true;
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(0.14, 0.14);
+      t.offset.set(Math.random()*0.8, Math.random()*0.8);
+      stoneTexVariants.push(t);
+    }
+  }
+  return stoneTexVariants[Math.floor(Math.random()*stoneTexVariants.length)];
+}
+
 function buildTrail(){
-  const stoneMat = new THREE.MeshStandardMaterial({color:0xa9895c, roughness:0.95});
   for(let seg=0; seg<PATH_POINTS.length-1; seg++){
     const a = PATH_POINTS[seg], b = PATH_POINTS[seg+1];
     const steps = 8;
@@ -632,6 +662,7 @@ function buildTrail(){
       const t = i/steps;
       const x = a.x + (b.x-a.x)*t + (Math.random()*0.5-0.25);
       const z = a.z + (b.z-a.z)*t + (Math.random()*0.5-0.25);
+      const stoneMat = new THREE.MeshStandardMaterial({map:getStoneTexVariant(), roughness:0.95});
       const stone = new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.34,0.06,7), stoneMat);
       stone.position.set(x, 0.01, z);
       stone.rotation.y = Math.random()*Math.PI;
@@ -765,7 +796,7 @@ function showPuzzle(idx){
     const food = FOOD_BY_LETTER[letter];
     const tile = document.createElement('div');
     tile.className = 'fruit-tile';
-    tile.innerHTML = '<span class="fruit-emoji">'+food.emoji+'</span>' +
+    tile.innerHTML = '<img class="fruit-img" src="'+food.img+'" alt="'+food.word+'">' +
       '<span class="fruit-word"><span class="fruit-first">'+food.word.charAt(0)+'</span>'+food.word.slice(1)+'</span>';
     tile.addEventListener('pointerdown', function(e){
       e.preventDefault();
@@ -1081,7 +1112,10 @@ function initScene(){
   sun.position.set(8, 16, 8);
   scene.add(sun);
 
-  const groundMat = new THREE.MeshStandardMaterial({color:0x3a7a3f, roughness:1});
+  const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
+  grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
+  grassTex.repeat.set(10, 15);
+  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1});
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 90), groundMat);
   ground.rotation.x = -Math.PI/2;
   ground.position.z = -20;
