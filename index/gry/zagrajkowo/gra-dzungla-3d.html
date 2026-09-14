@@ -136,6 +136,15 @@
      zauważyć. Wpisanie "dora" włącza ciemniejszy motyw. ══ */
   .secret-code-input{display:block;margin:8px auto 0;width:64px;padding:3px 6px;font-size:0.65rem;border:1px solid rgba(0,0,0,0.08);border-radius:7px;background:transparent;color:rgba(100,116,139,0.35);text-align:center;}
   .secret-code-input:focus{opacity:1;outline:none;border-color:var(--gold);color:var(--text-mid);}
+  /* Kod "akord" (wpisany w to samo pole co "dora") pokazuje spis
+     poziomów do szybkiego przeskoczenia — wygodne do testowania. */
+  .level-menu{margin:14px auto 0;max-width:360px;padding:12px 14px;border:1.5px dashed var(--gold);border-radius:14px;background:#fffbf0;}
+  .level-menu-title{font-weight:800;color:var(--navy);font-size:0.85rem;margin-bottom:8px;text-align:center;}
+  .level-menu-grid{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .level-menu-grid button{background:var(--navy);color:#fff;border:none;border-radius:50px;padding:7px 16px;font-weight:700;font-size:0.8rem;cursor:pointer;}
+  .level-menu-grid button:hover{background:var(--gold);}
+  body.night-theme .level-menu{background:#1c1c2a;border-color:#4a4a62;}
+  body.night-theme .level-menu-title{color:#dbe0f5;}
   body.night-theme{background:#0d0d16;}
   body.night-theme .top-bar{background:#171722;border-bottom-color:#2a2a38;}
   body.night-theme .game-title-bar,body.night-theme .back-link{color:#dbe0f5;}
@@ -194,6 +203,16 @@
   </div>
   <button class="start-btn" id="startBtn" onclick="startGame()">Wyruszamy!</button>
   <input type="text" id="secretCodeInput" class="secret-code-input" placeholder="kod" autocomplete="off" spellcheck="false">
+  <div class="level-menu" id="levelMenu" style="display:none;">
+    <div class="level-menu-title">Spis poziomów</div>
+    <div class="level-menu-grid">
+      <button type="button" onclick="jumpToLevel(1)">Poziom 1</button>
+      <button type="button" onclick="jumpToLevel(2)">Poziom 2</button>
+      <button type="button" onclick="jumpToLevel(3)">Poziom 3</button>
+      <button type="button" onclick="jumpToLevel(4)">Poziom 4</button>
+      <button type="button" onclick="jumpToLevel(5)">Poziom 5</button>
+    </div>
+  </div>
 </div>
 
 <div class="scene-wrap" id="sceneWrap" style="display:none;">
@@ -419,12 +438,26 @@ setNightMode(nightMode);
 const secretCodeInput = document.getElementById('secretCodeInput');
 if(secretCodeInput){
   secretCodeInput.addEventListener('input', function(e){
-    if(e.target.value.trim().toLowerCase() === 'dora'){
+    const val = e.target.value.trim().toLowerCase();
+    if(val === 'dora'){
       setNightMode(true);
+      e.target.value = '';
+      e.target.blur();
+    }else if(val === 'akord'){
+      const menu = document.getElementById('levelMenu');
+      if(menu) menu.style.display = 'block';
       e.target.value = '';
       e.target.blur();
     }
   });
+}
+/* Przeskok bezpośrednio do wybranego poziomu (kod "akord") — pomija
+   normalną kolejność odblokowywania, wygodne do szybkiego testowania. */
+function jumpToLevel(level){
+  if(!chosenChar) chosenChar = 'cat';
+  document.getElementById('charSelect').style.display = 'none';
+  document.getElementById('sceneWrap').style.display = 'block';
+  goToLevel(level);
 }
 
 const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;

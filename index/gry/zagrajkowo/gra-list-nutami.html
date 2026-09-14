@@ -40,19 +40,27 @@
 
   .content-row{display:flex;gap:18px;align-items:flex-start;justify-content:center;width:100%;max-width:900px;}
 
-  /* Poprzednio linie kartki były wypalone w obrazku tła o stałej wysokości,
-     a tekst listu (zmiennej długości, zależnej od trybu/szerokości ekranu)
-     się pod nie nie podkładał — po prostu spływał dalej po zwykłym tle bez
-     linii. Linie są teraz rysowane w CSS z DOKŁADNIE takim samym odstępem
-     jak line-height tekstu, więc zawsze idealnie się pokrywają, niezależnie
-     od długości listu czy szerokości ekranu. Wysokość linii (54px) jest
-     dobrana tak, żeby zmieścić w jednej linijce kafelek-lukę (.gap, 52px
-     wysokości), więc luka nie "rozpycha" swojej linijki. */
-  .letter-card{background-color:#f5ecd3;background-image:
-      linear-gradient(to right, transparent 0, transparent 7%, #c0504a 7%, #c0504a calc(7% + 2px), transparent calc(7% + 2px)),
-      repeating-linear-gradient(to bottom, transparent 0, transparent 53px, #a9c8ce 53px, #a9c8ce 54px);
-    background-position:0 0, 0 26px;
-    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);padding:26px 7% 26px 10%;max-width:640px;width:100%;font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;flex:1;min-width:0;}
+  /* Obrazek notatnika (16 poziomych linii w oryginale, natywny odstęp
+     ~27.3px przy natywnej szerokości 1024px) ma linie o wiele za ciasne,
+     żeby zmieścić w nich czytelny tekst i 52px-wysokie kafelki-luki (.gap)
+     — stąd oryginalny problem: tekst po prostu spływał poza obrazek na
+     czyste tło bez linii. Naprawa: background-size dostaje WYRAŹNĄ
+     wysokość w px (zamiast "auto" trzymającego proporcje obrazka), więc
+     obrazek rozciąga się w pionie NIEZALEŻNIE od szerokości, tak żeby
+     jego linie wypadły dokładnie co 54px — czyli tyle, ile wynosi
+     line-height tekstu (i tyle, żeby kafelek-luka się zmieścił w jednej
+     linijce, bez "rozpychania" jej i psucia wyrównania kolejnych linii).
+     Druga warstwa tła (powtarzalny gradient w tym samym kolorze i z tym
+     samym odstępem) dorysowuje linie POD obrazkiem — widoczne tylko tam,
+     gdzie tekst jest dłuższy niż obrazek, żeby list NIGDY nie spływał na
+     puste tło bez linii, niezależnie od długości czy szerokości ekranu. */
+  .letter-card{background-color:#f8f1d6;background-image:
+      url('/index/gry/zagrajkowo/gra-list-nutami/grafiki/notatnik.webp'),
+      repeating-linear-gradient(to bottom, transparent 0, transparent 53px, #2d7d8b 53px, #2d7d8b 54px);
+    background-repeat:no-repeat, repeat;
+    background-position:top center, 0 194px;
+    background-size:100% 1106px, auto;
+    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);padding:194px 11% 24px 19%;max-width:640px;width:100%;font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;flex:1;min-width:0;}
 
   .gap{display:inline-flex;align-items:center;justify-content:center;width:40px;height:52px;vertical-align:middle;margin:0 3px;border-radius:8px;border:2px dashed #cbd5e1;background:#fafafa;transition:0.2s;}
   .gap.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
@@ -285,6 +293,42 @@ function renderTray(){
 
 let dragTile = null, dragOffsetX = 0, dragOffsetY = 0;
 
+/* Nasłuchy pointermove/pointerup/pointercancel wiszą na DOCUMENT (nie na
+   samym kafelku) i filtrują po współdzielonej zmiennej dragTile — NIE na
+   Element.setPointerCapture(). Capture potrafi się wycichaczkowo wywalić
+   na niektórych przeglądarkach dotykowych (np. starsze Safari na iOS);
+   gdy tak się dzieje, a nasłuchy wiszą na samym kafelku, kolejne
+   pointermove trafiają w element, który akurat jest pod palcem (bo
+   kafelek to już nie jest), więc nigdy nie docierają do jego handlera —
+   z zewnątrz wygląda to tak, jakby nie dało się wyciągnąć nutki poza
+   miejsce, w którym zaczęło się przeciąganie. Nasłuch na document działa
+   niezależnie od tego, czy capture się powiódł. */
+document.addEventListener('pointermove', function(e){
+  if(!dragTile) return;
+  dragTile.style.left = (e.clientX - dragOffsetX)+'px';
+  dragTile.style.top = (e.clientY - dragOffsetY)+'px';
+  dragTile.style.pointerEvents = 'none';
+  const under = document.elementFromPoint(e.clientX, e.clientY);
+  dragTile.style.pointerEvents = '';
+  document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
+  const gap = under && under.closest ? under.closest('.gap') : null;
+  if(gap) gap.classList.add('dragover');
+});
+document.addEventListener('pointerup', function(e){
+  if(!dragTile) return;
+  dropTile(dragTile, e.clientX, e.clientY);
+});
+document.addEventListener('pointercancel', function(e){
+  if(!dragTile) return;
+  const tile = dragTile;
+  document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
+  const gapId = tile.dataset.gap;
+  const home = gapId ? document.getElementById('gap-'+gapId) : document.getElementById('tilesTray');
+  if(home) home.appendChild(tile);
+  clearTileFixedStyle(tile);
+  dragTile = null;
+});
+
 function attachDrag(tile){
   tile.addEventListener('pointerdown', function(e){
     if(tile.classList.contains('locked')) return;
@@ -302,32 +346,6 @@ function attachDrag(tile){
     try{ tile.setPointerCapture(e.pointerId); }catch(err){}
     document.getElementById('feedbackMsg').textContent = '';
     document.getElementById('feedbackMsg').className = 'feedback-msg';
-  });
-
-  tile.addEventListener('pointermove', function(e){
-    if(dragTile !== tile) return;
-    tile.style.left = (e.clientX - dragOffsetX)+'px';
-    tile.style.top = (e.clientY - dragOffsetY)+'px';
-    tile.style.pointerEvents = 'none';
-    const under = document.elementFromPoint(e.clientX, e.clientY);
-    tile.style.pointerEvents = '';
-    document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
-    const gap = under && under.closest ? under.closest('.gap') : null;
-    if(gap) gap.classList.add('dragover');
-  });
-
-  tile.addEventListener('pointerup', function(e){
-    if(dragTile !== tile) return;
-    dropTile(tile, e.clientX, e.clientY);
-  });
-  tile.addEventListener('pointercancel', function(e){
-    if(dragTile !== tile) return;
-    document.querySelectorAll('.gap.dragover').forEach(function(g){g.classList.remove('dragover');});
-    const gapId = tile.dataset.gap;
-    const home = gapId ? document.getElementById('gap-'+gapId) : document.getElementById('tilesTray');
-    if(home) home.appendChild(tile);
-    clearTileFixedStyle(tile);
-    dragTile = null;
   });
 }
 
