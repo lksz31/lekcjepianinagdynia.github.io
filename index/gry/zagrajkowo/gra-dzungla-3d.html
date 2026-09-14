@@ -113,7 +113,7 @@
   .piano-white-key .piano-key-label{position:relative;z-index:1;font-weight:800;color:#5a3d1c;font-size:clamp(0.68rem,3vw,0.9rem);text-shadow:0 0 4px #fdf8ec,0 0 4px #fdf8ec;}
   .piano-white-key.correct-flash{background:#dcfce7;border-color:var(--green);animation:puzzlePop 0.4s ease;}
   .piano-white-key.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
-  .piano-black-key{position:absolute;top:0;width:13%;height:58%;background:#2a2320;border-radius:0 0 4px 4px;pointer-events:none;z-index:2;}
+  .piano-black-key{position:absolute;top:0;width:7%;height:58%;background:#2a2320;border-radius:0 0 4px 4px;pointer-events:none;z-index:2;}
 
   .mic-panel{text-align:center;padding:6px 4px 2px;}
   .mic-vol-wrap{width:100%;height:8px;background:rgba(255,255,255,0.15);border-radius:6px;overflow:hidden;margin-bottom:10px;}
@@ -233,7 +233,7 @@
   <p id="winText"></p>
   <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
     <button class="win-btn" id="level2Btn" onclick="startLevel2()" style="display:none;">Poziom 2: gęsty las →</button>
-    <button class="win-btn" id="level3Btn" onclick="startLevel3()" style="display:none;">Poziom 3: jaskinia →</button>
+    <button class="win-btn" id="level3Btn" onclick="startLevel3()" style="display:none;">Poziom 3: górska przełęcz →</button>
     <button class="win-btn" id="level4Btn" onclick="startLevel4()" style="display:none;">Poziom 4: klawiatura →</button>
     <button class="win-btn" id="level5Btn" onclick="startLevel5()" style="display:none;">Poziom 5: nad jeziorem →</button>
     <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
@@ -1357,11 +1357,8 @@ function updateCampfires(){
   });
 }
 
-/* ══ Jaskinia w górze (poziom 3) — kamienny tunel z pochodniami, przez który
-   ścieżka prowadzi na drugą stronę. Filary + nadproże po obu stronach ścieżki,
-   powtórzone kilka razy wzdłuż odcinka, żeby dawało wrażenie ciągłego tunelu;
-   ściany boczne łączą sąsiednie łuki. Pochodnie migoczą tak samo jak ognisko
-   (współdzielą campfires/updateCampfires). */
+/* Pochodnia (poziom 2 obozowisko + poziom 3 górska przełęcz) — migocze
+   tak samo jak ognisko (współdzielą campfires/updateCampfires). */
 function buildTorch(){
   const g = new THREE.Group();
   const poleMat = new THREE.MeshStandardMaterial({color:0x4a3524, roughness:0.9});
@@ -1385,148 +1382,66 @@ function buildTorch(){
   g.userData.glow = glow;
   return g;
 }
-/* Prostokątna belka skalna między dwoma punktami (x,y) — do budowania
-   ukośnych połaci "dachu" jaskini, które faktycznie stykają się ze
-   ścianami (zamiast osobnych nadproży z dziurami na niebo między nimi). */
-function rockSlabBetween(p1, p2, thickness, mat, depth){
-  const midX = (p1.x+p2.x)/2, midY = (p1.y+p2.y)/2;
-  const len = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-  const angle = Math.atan2(p2.y-p1.y, p2.x-p1.x);
-  const slab = new THREE.Mesh(new THREE.BoxGeometry(len, thickness, depth), mat);
-  slab.position.set(midX, midY, 0);
-  slab.rotation.z = angle;
-  return slab;
-}
-/* ══ Jaskinia (poziom 3) — teraz jest to zamknięty tunel: postrzępione,
-   nieregularne ściany boczne (zamiast gładkich, powtarzalnych bloków),
-   skośny, dwuspadowy skalny "dach" łączący się ze ścianami bez przerw
-   (wcześniej między osobnymi nadprożami widać było niebo — stąd wrażenie
-   "kilku bramek", a nie prawdziwego tunelu), stalaktyty/stalagmity i
-   kilka prawdziwych brył skalnych z paczki modeli 3D dla naturalności.
-   W trybie "dora" tunel jest wyraźnie mroczniejszy, pochodnie migoczą
-   bardziej nerwowo, a gdzieś w cieniu widać parę świecących oczu. */
-function buildCaveTunnel(){
+/* ══ Górska przełęcz (poziom 3) — otwarta, skalna ścieżka wysoko w
+   górach, z głazami po bokach i pochodniami całą drogą (bez zamkniętego
+   tunelu — wcześniejsza wersja z murowanymi ścianami i dachem nie
+   wyglądała dobrze, więc ją usunięto). Tu właśnie zaczyna mieć znaczenie
+   oktawa nuty. W trybie "dora" pochodnie migoczą bardziej nerwowo,
+   a w cieniu między głazami widać parę świecących oczu. */
+function buildMountainPass(){
   const dora = nightMode;
-  const rockTex = getTexture(TEXTURE_DIR+'sciezka-kamienie-tekstura.webp');
-  rockTex.wrapS = rockTex.wrapT = THREE.RepeatWrapping;
-  rockTex.repeat.set(1.6, 1.6);
-  const rockMat = new THREE.MeshStandardMaterial({map:rockTex, color: dora?0x5c5850:0x8a8478, roughness:1});
-  const darkRockMat = new THREE.MeshStandardMaterial({map:rockTex, color: dora?0x2e2c28:0x4a4640, roughness:1});
   const zStart = CAVE_Z_START, zEnd = CAVE_Z_END;
-  const tunnelLen = Math.abs(zEnd - zStart);
-  const midZ = (zStart+zEnd)/2;
-  const wallX = 3.75, wallTopY = 4.15, ridgeY = 5.2, ridgeX = 0.3;
-  /* zEnd < zStart (tunel biegnie w stronę malejącego z) — lerp zamiast
-     "zStart + dodatnia_wielkość" wszędzie tam, gdzie trzeba iść PO trasie
-     tunelu, żeby kierunek zawsze wyszedł poprawnie niezależnie od znaku. */
   function lerpZ(a, b, t){ return a + (b-a)*t; }
 
-  /* Ściany boczne — kilka nachodzących na siebie, lekko losowych brył
-     zamiast jednego gładkiego prostopadłościanu, żeby krawędź nie była
-     idealnie prosta jak sztuczny mur. Rozciągnięte po 1 jednostkę poza
-     oba wyloty tunelu. */
-  [-1,1].forEach(function(side){
-    const segs = 7;
-    for(let i=0;i<segs;i++){
-      const z = lerpZ(zStart+1, zEnd-1, i/(segs-1));
-      const w = 1.3 + Math.random()*0.7;
-      const h = wallTopY + 0.5 + Math.random()*0.7;
-      const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 2.1 + Math.random()*0.9), rockMat);
-      wall.position.set(side*(wallX + Math.random()*0.4 - 0.1), h/2 - 0.2, z);
-      wall.rotation.y = (Math.random()-0.5)*0.35;
-      scene.add(wall);
-    }
-  });
-
-  /* Dwuspadowy skalny dach — dwie ukośne połacie od szczytu (x≈0) do
-     wierzchu ścian bocznych, plus grzbiet na styku, żeby całkowicie
-     zamknąć tunel od góry (bez przerw, przez które widać niebo). */
-  [-1,1].forEach(function(side){
-    const slab = rockSlabBetween(
-      {x: side*ridgeX, y: ridgeY}, {x: side*(wallX+0.7), y: wallTopY-0.3},
-      0.75, darkRockMat, tunnelLen+3
-    );
-    slab.position.z = midZ;
-    scene.add(slab);
-  });
-  const ridge = new THREE.Mesh(new THREE.BoxGeometry(ridgeX*2+0.5, 0.7, tunnelLen+3), darkRockMat);
-  ridge.position.set(0, ridgeY, midZ);
-  scene.add(ridge);
-
-  /* Ciemna "zasłona" tuż pod dachem — wnętrze tunelu wygląda wyraźnie
-     mroczniej niż otoczenie na zewnątrz, mocniej w trybie dora. */
-  const shadowMat = new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity: dora?0.6:0.35, side:THREE.DoubleSide});
-  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(wallX*2+1, tunnelLen+2.6), shadowMat);
-  shadowPlane.rotation.x = Math.PI/2;
-  shadowPlane.position.set(0, wallTopY+0.2, midZ);
-  scene.add(shadowPlane);
-
-  /* Stalaktyty (z sufitu) i stalagmity (z podłogi), rozrzucone losowo,
-     trzymane z dala od środka ścieżki, żeby nie zasłaniały przejścia. */
-  function ceilingYAt(absX){
-    const t = Math.min(1, absX/(wallX+0.7));
-    return ridgeY - (ridgeY - (wallTopY-0.3)) * t;
-  }
-  for(let i=0;i<15;i++){
-    const z = lerpZ(zStart, zEnd, Math.random());
+  /* Głazy po obu stronach ścieżki — te same prawdziwe modele skał co
+     gdzie indziej w grze (scatterRocks), z proceduralnym fallbackiem,
+     gdyby model nie był gotowy. (Kenney ma też "cliff_block_rock", ale
+     to modularny klocek do budowania ściany klifu, nie pojedynczy głaz —
+     jako pojedynczy obiekt wygląda jak czarna skrzynia, więc go nie
+     używamy tutaj.) */
+  const rockMat = new THREE.MeshStandardMaterial({color: dora?0x5c5850:0x8a8478, roughness:1});
+  for(let i=0;i<11;i++){
     const side = Math.random()<0.5 ? -1 : 1;
-    const ax = 1.5 + Math.random()*2.0;
-    const s = 0.5 + Math.random()*0.9;
-    const stalactite = new THREE.Mesh(new THREE.ConeGeometry(0.16*s, 0.85*s, 6), darkRockMat);
-    stalactite.position.set(side*ax, ceilingYAt(ax) - 0.05, z);
-    stalactite.rotation.x = Math.PI;
-    scene.add(stalactite);
-    if(Math.random() < 0.55){
-      const gx = side*ax*0.85, gz = z + (Math.random()-0.5)*1.4;
-      const stalagmite = new THREE.Mesh(new THREE.ConeGeometry(0.14*s, 0.55*s, 6), rockMat);
-      stalagmite.position.set(gx, terrainHeight(gx, gz) + 0.27*s, gz);
-      scene.add(stalagmite);
+    const x = side*(2.1 + Math.random()*1.7);
+    const z = lerpZ(zStart+1, zEnd-1, Math.random());
+    let boulder = resolvedModels.rock ? randomNatureMesh(resolvedModels.rock) : null;
+    if(!boulder){
+      boulder = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55 + Math.random()*0.35, 0), rockMat);
+    }else{
+      boulder.scale.multiplyScalar(1.1 + Math.random()*0.9);
     }
+    boulder.position.set(x, terrainHeight(x, z), z);
+    spinAroundUp(boulder, Math.random()*Math.PI*2);
+    scene.add(boulder);
   }
 
-  /* Kilka prawdziwych brył skalnych z paczki modeli 3D u podnóża ścian —
-     nieregularny, "prawdziwy" kształt zamiast samych prostych brył. */
-  if(resolvedModels.rock){
-    for(let i=0;i<9;i++){
-      const side = Math.random()<0.5 ? -1 : 1;
-      const x = side*(wallX - 0.3 + Math.random()*0.7);
-      const z = lerpZ(zStart, zEnd, Math.random());
-      const boulder = randomNatureMesh(resolvedModels.rock);
-      if(!boulder) continue;
-      boulder.position.set(x, terrainHeight(x, z), z);
-      spinAroundUp(boulder, Math.random()*Math.PI*2);
-      boulder.scale.multiplyScalar(0.8 + Math.random()*0.8);
-      scene.add(boulder);
-    }
-  }
-
-  /* Pochodnie po obu stronach — częściej niż wcześniej, żeby oświetlały
-     cały tunel ciągle, a nie tylko w czterech punktach. */
-  const torchCount = 6;
+  /* Pochodnie po obu stronach ścieżki, całą drogą przez przełęcz. */
+  const torchCount = 7;
   for(let i=0;i<torchCount;i++){
     const z = lerpZ(zStart+0.6, zEnd-0.6, i/(torchCount-1));
     const side = i % 2 === 0 ? -1 : 1;
     const torch = buildTorch();
-    torch.position.set(side*2.9, 1.4, z);
+    torch.position.set(side*2.9, terrainHeight(side*2.9, z), z);
     torch.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
     if(dora) torch.userData.flicker = 1.8 + Math.random()*0.8; /* nerwowsze migotanie w trybie dora */
     scene.add(torch);
     campfires.push(torch);
   }
 
-  /* W trybie dora — para świecących oczu ukryta w cieniu tunelu,
+  /* W trybie dora — para świecących oczu ukryta między głazami,
      nieruchoma i bardzo dyskretna (delikatny niepokojący akcent, bez
      żadnej postaci czy szczegółów — tylko dwa małe punkty światła). */
   if(dora){
-    const eyesZ = midZ + (Math.random()-0.5)*tunnelLen*0.4;
+    const ex = 4.1, ez = lerpZ(zStart, zEnd, 0.5) + (Math.random()-0.5)*4;
+    const ey = terrainHeight(ex, ez) + 1.3;
     const eyeMat = new THREE.MeshBasicMaterial({color:0xff2f2f});
     [-0.09, 0.09].forEach(function(dx){
       const eye = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 6), eyeMat);
-      eye.position.set(dx + wallX - 0.5, 1.35, eyesZ);
+      eye.position.set(ex+dx, ey, ez);
       scene.add(eye);
     });
     const eyeGlow = new THREE.PointLight(0xff2f2f, 0.35, 1.4);
-    eyeGlow.position.set(wallX - 0.5, 1.35, eyesZ);
+    eyeGlow.position.set(ex, ey, ez);
     scene.add(eyeGlow);
   }
 }
@@ -1701,9 +1616,11 @@ function scatterRuins(){
     const candleM = kenneyMesh('ruinCandle', 3.2);
     if(candleM){ const cx=4.9, cz=-15.6; candleM.position.set(cx, terrainHeight(cx,cz)+0.7, cz); scene.add(candleM); }
 
-    const fx = 5.2, fz = -32;
-    const spookyModel = Math.random() < 0.5 ? kenneyMesh('skeletonFigure', 2.9) : kenneyMesh('ghostFigure', 2.7);
-    const figure = spookyModel || buildDarkFigure();
+    /* Nieruchoma, ledwo widoczna ciemna sylwetka daleko na uboczu mapy —
+       tak samo dyskretnie jak na poziomie 5, żadnej wyraźnej postaci
+       (ducha/szkieletu) wprost na trasie. */
+    const fx = 12.5, fz = -34;
+    const figure = buildDarkFigure();
     figure.position.set(fx, terrainHeight(fx, fz), fz);
     figure.rotation.y = -Math.PI/6;
     scene.add(figure);
@@ -1998,8 +1915,8 @@ const RIVER_VALLEY_HALF = 5.5, RIVER_DROP = 1.35, BRIDGE_Y = 0.5;
 const BRIDGE_DECK_HALF = RIVER_VALLEY_HALF - 0.5; /* połowa długości pokładu mostu */
 const BRIDGE_RAMP = 1.5; /* krótki zjazd na brzeg tuż za końcem pokładu */
 /* Rzeka/most istnieją tylko na poziomach 1-2 — dalsze poziomy mają
-   własny, inny motyw przeprawy (jaskinia, ruiny, jezioro), żeby nie
-   każdy poziom powtarzał ten sam most nad rzeką. */
+   własny, inny motyw przeprawy (górska przełęcz, ruiny, jezioro), żeby
+   nie każdy poziom powtarzał ten sam most nad rzeką. */
 function nearRiver(x, z){
   if(currentLevel > 2) return false;
   return Math.abs(z - RIVER_Z) < RIVER_VALLEY_HALF + 0.4 && Math.abs(x) < 3.6;
@@ -2036,9 +1953,9 @@ function nearHouse(x, z){
   return Math.abs(x) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - HOUSE_Z) < HOUSE_YARD_HALF + 0.6;
 }
 
-/* Jaskinia (poziom 3+, patrz buildCaveTunnel) — strefa wykluczenia, żeby
-   zwykłe drzewa/skały/kwiaty z rozrzutu roślinności nie wyrastały w
-   środku tunelu, zasłaniając go i wbijając się w skalne ściany. */
+/* Górska przełęcz (poziom 3, patrz buildMountainPass) — strefa
+   wykluczenia, żeby zwykłe drzewa/skały/kwiaty z rozrzutu roślinności
+   nie wyrastały wprost na ścieżce ani na pochodniach/głazach przełęczy. */
 const CAVE_Z_START = -29.5, CAVE_Z_END = -37.5, CAVE_HALF_WIDTH = 4.6;
 function nearCave(x, z){
   return currentLevel === 3 && Math.abs(x) < CAVE_HALF_WIDTH &&
@@ -2611,16 +2528,12 @@ const KENNEY_MODEL_FILES = {
   ruinCrossColumn: 'graveyard/cross-column.glb',
   ruinCrypt: 'graveyard/crypt-small.glb',
   ruinCandle: 'graveyard/candle.glb',
-  ghostFigure: 'graveyard/character-ghost.glb',
-  skeletonFigure: 'graveyard/character-skeleton.glb',
   marketShelfBoxes: 'market/shelf-boxes.glb',
   marketShelfBags: 'market/shelf-bags.glb',
   marketFreezer: 'market/freezer.glb',
   survivalBarrel: 'survival/barrel.glb',
   survivalBox: 'survival/box.glb',
-  survivalBoxLarge: 'survival/box-large.glb',
-  cliffRock: 'nature/cliff_block_rock.glb',
-  cliffCaveRock: 'nature/cliff_cave_rock.glb'
+  survivalBoxLarge: 'survival/box-large.glb'
 };
 const resolvedKenney = {};
 const kenneyModelPromises = Object.keys(KENNEY_MODEL_FILES).map(function(key){
@@ -3019,7 +2932,11 @@ function showKeyboardPuzzle(){
     if(i !== 2 && i !== 6){
       const black = document.createElement('div');
       black.className = 'piano-black-key';
-      black.style.left = 'calc(' + ((i+1)*100/7) + '% - ' + (100/7*0.065) + '%)';
+      /* Wyśrodkowany na granicy między klawiszem i oraz i+1 — szerokość
+         czarnego klawisza to 7% (patrz .piano-black-key), więc odsunięcie
+         w lewo o połowę tej szerokości (3.5%) faktycznie go centruje na
+         granicy, zamiast tylko nieznacznie muskać ją z prawej strony. */
+      black.style.left = 'calc(' + ((i+1)*100/7) + '% - 3.5%)';
       keysEl.appendChild(black);
     }
   });
@@ -3403,13 +3320,15 @@ function runIntroCutscene(onDone){
   const skipBtn = document.getElementById('skipCutsceneBtn');
   if(skipBtn) skipBtn.style.display = 'block';
 
-  /* Płynny, ciągły przelot kamery wzdłuż wygładzonej krzywej nad trasą
-     (nie skoki punkt-po-punkcie) — kamera patrzy do PRZODU, w kierunku
-     lotu (styczna do krzywej), lekko w dół na ścieżkę, z delikatnym
-     rozglądaniem się na boki (sinusoidalny "wobble"), zamiast patrzeć
-     prosto w dół jak z lotu ptaka. */
+  /* Płynny, CIĄGŁY przelot kamery wzdłuż wygładzonej krzywej — bez
+     zatrzymywania/zwalniania na każdej bazie (jedno łagodne wygładzenie
+     na start i koniec całego przelotu, nie osobno na każdym odcinku).
+     Ostatnie dwie polanki są pomijane — kamera leci tylko do
+     przedostatniej, a resztę drogi do celu pokazuje już dedykowany,
+     wykadrowany "kadr mety" na środku ekranu (patrz showArrivalShot). */
   const flyHeight = 2.3;
-  const curvePts = PATH_POINTS.map(function(p){
+  const shortenedPoints = PATH_POINTS.slice(0, Math.max(2, PATH_POINTS.length - 2));
+  const curvePts = shortenedPoints.map(function(p){
     return new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z);
   });
   const startDir = new THREE.Vector3().subVectors(curvePts[0], curvePts[1]).normalize();
@@ -3422,32 +3341,13 @@ function runIntroCutscene(onDone){
   const curve = new THREE.CatmullRomCurve3(curvePts, false, 'centripetal', 0.5);
 
   const upVec = new THREE.Vector3(0, 1, 0);
-  /* Krzywa ma curvePts.length-1 odcinków, każdy o RÓWNEJ szerokości w
-     parametrze naturalnym (getPoint/getTangent) — niezależnie od realnej
-     odległości między punktami. Zamiast jednego wygładzenia na CAŁY
-     przelot (co dawało wolny start/koniec, ale bardzo szybki, gwałtowny
-     środek — czyli właśnie przeloty między bazami), każdy odcinek
-     dostaje WŁASNY, osobny wolny rozbieg/hamowanie i własny czas trwania.
-     Skrajne odcinki (najazd na pierwszą bazę / odjazd od ostatniej) są
-     krótsze, a odcinki między kolejnymi bazami — dłuższe i spokojniejsze. */
-  const segCount = curvePts.length - 1;
-  const segDurations = [];
-  for(let i=0; i<segCount; i++){
-    segDurations.push((i===0 || i===segCount-1) ? 900 : 1500);
-  }
-  const segStartTimes = [0];
-  for(let i=0; i<segCount; i++) segStartTimes.push(segStartTimes[i] + segDurations[i]);
-  const totalDuration = segStartTimes[segCount];
+  const forwardDuration = 8200; /* jeden spokojny, ciągły przelot, bez przystanków na bazach */
   const t0 = performance.now();
 
   function stepForward(now){
     if(cutsceneSkip){ startBackward(); return; }
-    const elapsed = Math.min(totalDuration, now - t0);
-    let segIdx = 0;
-    while(segIdx < segCount-1 && elapsed >= segStartTimes[segIdx+1]) segIdx++;
-    const localT = Math.min(1, (elapsed - segStartTimes[segIdx]) / segDurations[segIdx]);
-    const localE = localT*localT*(3-2*localT); /* łagodny rozbieg/hamowanie NA KAŻDYM odcinku */
-    const e = Math.min(1, (segIdx + localE) / segCount);
+    const t = Math.min(1, (now - t0) / forwardDuration);
+    const e = t*t*(3-2*t); /* łagodny rozbieg/hamowanie TYLKO na starcie i końcu całego przelotu */
     /* getPoint/getTangent (parametr naturalny), NIE getPointAt/getTangentAt
        (długość łuku) — dla type:'centripetal' na otwartej krzywej ta druga
        para rzuca wyjątkiem w tej wersji three.js (pusta tabela długości). */
@@ -3455,29 +3355,23 @@ function runIntroCutscene(onDone){
     const tangent = curve.getTangent(Math.min(0.999, e)).normalize();
     camera.position.copy(pos);
     const side = new THREE.Vector3().crossVectors(tangent, upVec).normalize();
-    /* Delikatne spojrzenie w bok narastające i zanikające do zera w
-       obrębie KAŻDEGO odcinka (zero dokładnie na każdej bazie) —
-       zamiast ciągłej fali sinusoidalnej niezależnej od trasy, która
-       przy szybszym fragmencie dawała gwałtowne machanie ekranem.
-       Kierunek spojrzenia zmienia się naprzemiennie odcinek po odcinku. */
-    const glanceSign = (segIdx % 2 === 0) ? 1 : -1;
-    const wobble = Math.sin(Math.PI * localT) * 0.6 * glanceSign;
+    const wobble = Math.sin(now * 0.0006) * 0.5; /* bardzo delikatne, ciągłe rozglądanie się na boki */
     const lookAhead = pos.clone().addScaledVector(tangent, 7).addScaledVector(side, wobble);
     lookAhead.y -= 0.8;
     camera.lookAt(lookAhead);
     cutsceneLookTarget = lookAhead;
-    if(elapsed < totalDuration){
+    if(t < 1){
       requestAnimationFrame(stepForward);
     }else{
       showArrivalShot();
     }
   }
   function showArrivalShot(){
-    /* Po dolocie na miejsce — dosuwamy kamerę do idealnie wykadrowanego
-       ujęcia budynku docelowego (drzwi na środku), zamiast lecieć dalej
-       stycznie do trasy, i chwilę się na nim zatrzymujemy. */
+    /* Po skróconym przelocie — dosuwamy kamerę do idealnie wykadrowanego
+       ujęcia budynku docelowego (drzwi na środku ekranu) i chwilę się
+       na nim zatrzymujemy, zanim wrócimy do postaci. */
     const shot = getArrivalShot();
-    tweenCamera(shot.camPos, shot.lookAt, 1100, function(){
+    tweenCamera(shot.camPos, shot.lookAt, 1300, function(){
       setTimeout(startBackward, 700);
     });
   }
@@ -3623,7 +3517,7 @@ function initScene(){
     campfires.push(fire);
   }
   if(currentLevel === 3){
-    buildCaveTunnel();
+    buildMountainPass();
   }
   if(currentLevel === 4){
     scatterRuins();
@@ -3713,7 +3607,7 @@ function initScene(){
 const LEVEL_WIN_TITLES = {
   1: 'Dotarliście do serca dżungli!',
   2: 'Ukończyliście gęsty las!',
-  3: 'Przeszliście przez jaskinię!',
+  3: 'Przeszliście przez górską przełęcz!',
   4: 'Zagraliście na klawiaturze!',
   5: 'Dotarliście do sklepiku nad jeziorem!'
 };
