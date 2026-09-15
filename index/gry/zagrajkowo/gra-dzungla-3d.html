@@ -226,6 +226,7 @@
       <button type="button" onclick="jumpToLevel(3)">Poziom 3</button>
       <button type="button" onclick="jumpToLevel(4)">Poziom 4</button>
       <button type="button" onclick="jumpToLevel(5)">Poziom 5</button>
+      <button type="button" onclick="jumpToLevel(6)">Poziom 6</button>
     </div>
   </div>
 </div>
@@ -270,6 +271,7 @@
     <button class="win-btn" id="level3Btn" onclick="startLevel3()" style="display:none;">Poziom 3: górska przełęcz →</button>
     <button class="win-btn" id="level4Btn" onclick="startLevel4()" style="display:none;">Poziom 4: klawiatura →</button>
     <button class="win-btn" id="level5Btn" onclick="startLevel5()" style="display:none;">Poziom 5: nad jeziorem →</button>
+    <button class="win-btn" id="level6Btn" onclick="startLevel6()" style="display:none;">Poziom 6: w sklepiku →</button>
     <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
   </div>
 </div>
@@ -441,7 +443,14 @@ document.querySelectorAll('.diff-btn').forEach(function(b){
 });
 
 /* Ukryty kod "dora" — całkiem niepozorne pole na ekranie startowym, nikt
-   nie musi go zauważyć. Włącza ciemniejszy motyw i nocne poziomy 2/4/5. */
+   nie musi go zauważyć. Włącza ciemniejszy motyw i nocne poziomy 2/4/5.
+   Celowo BEZ zapisu w localStorage — tryb nocny ma działać tylko w
+   bieżącej sesji/karcie, nigdy nie ma "zostać włączony" na stałe po
+   ponownym wejściu na stronę. Każde świeże wejście na stronę to zawsze
+   zwykła, dzienna wersja gry, bez żadnego kodu. Kod "ador" (odwrotność
+   "dora") jest awaryjnym, jednoznacznym przełącznikiem z powrotem na
+   zwykłą grę — w odróżnieniu od "dora" (przełącznik) zawsze wyłącza tryb
+   nocny, niezależnie od bieżącego stanu. */
 let nightMode = false;
 /* Czy AKTUALNIE wyświetlana scena renderuje się w trybie nocnym (nightMode
    ORAZ bieżący poziom w ogóle ma noc — patrz isNight w initScene) — osobno
@@ -449,10 +458,8 @@ let nightMode = false;
    wpisanego kodu. Używane przy dobieraniu przyciemnionych materiałów dla
    bezcieniowych modeli z paczki natury (patrz convertToUnlitMaterial). */
 let sceneIsNight = false;
-try{ nightMode = localStorage.getItem('dzunglaNightMode') === '1'; }catch(e){}
 function setNightMode(on){
   nightMode = on;
-  try{ localStorage.setItem('dzunglaNightMode', on ? '1' : ''); }catch(e){}
   document.body.classList.toggle('night-theme', on);
 }
 setNightMode(nightMode);
@@ -461,11 +468,11 @@ if(secretCodeInput){
   secretCodeInput.addEventListener('input', function(e){
     const val = e.target.value.trim().toLowerCase();
     if(val === 'dora'){
-      /* Przełącznik, nie tylko włącznik — bez tego, jak ktoś raz wpisał
-         "dora" (np. dziecko z ciekawości), tryb nocny zapisywał się w
-         localStorage na zawsze i wracał przy każdej kolejnej wizycie, bez
-         żadnego sposobu na wyłączenie go z powrotem. */
       setNightMode(!nightMode);
+      e.target.value = '';
+      e.target.blur();
+    }else if(val === 'ador'){
+      setNightMode(false);
       e.target.value = '';
       e.target.blur();
     }else if(val === 'akord'){
@@ -680,7 +687,11 @@ function initMenuCritters(){
   scene.add(ground);
 
   const PEN_HALF_X = 5.6, PEN_HALF_Z = 3.6;
-  const builders = [buildSheep, buildDuck, buildSparrow, buildSheep, buildDuck];
+  /* Więcej różnych gatunków niż tylko owieczka/kaczka/wróbel — te same
+     modele co "towarzysze" pojawiający się przy rozwiązanych bazach w
+     grze (patrz ANIMAL_BUILDERS), pomijając motyla (lata, nie ucieka
+     biegiem po ziemi jak reszta). */
+  const builders = [buildSheep, buildDuck, buildSparrow, buildTurtle, buildFrog, buildSquirrel, buildToucan, buildHedgehog, buildFoxCub];
   const critters = builders.map(function(build){
     const g = build();
     const x = (Math.random()*2-1)*PEN_HALF_X*0.7;
@@ -789,7 +800,7 @@ let score = 0, walking = false;
 let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — ta sama
   trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
 const LEVEL_BADGE_TEXT = {
-  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5'
+  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5', 6: '🛒 Poziom 6'
 };
 let currentPuzzle = null;
 let sceneRunning = false;
@@ -803,21 +814,32 @@ const LEVEL5_PATH_POINTS = [
   {x:0, z:0}, {x:3, z:-8}, {x:7, z:-15}, {x:12, z:-21},
   {x:15, z:-28}, {x:11, z:-34}, {x:5, z:-37}, {x:0, z:-43.5}
 ];
-/* Poziom 3: nieco szerszy, dłuższy wąż niż domyślna trasa (większa
-   amplituda zakrętów + głębszy zasięg w z), ale w paśmie samej przełęczy
-   (CAVE_Z_START..CAVE_Z_END, patrz buildMountainPass) trzyma się blisko
-   środka — głazy/pochodnie tej przełęczy są rozstawione na sztywno wokół
-   x=0, nie podążają za trasą jak na poziomie 5. */
+/* Poziom 3: ścieżka trzyma się prawej strony mapy (x dodatnie), a wzdłuż
+   lewej strony biegnie długa rzeka (patrz buildLevel3River) — stąd łagodny
+   dryf w x∈[0,5], bez wracania na ujemną stronę jak w domyślnej trasie.
+   Odcinek P4→P5 to sama przełęcz (patrz LEVEL3_PASS_SEGMENT i
+   buildMountainPass), która teraz podąża za trasą zamiast stać na sztywno
+   wokół x=0. */
 const LEVEL3_PATH_POINTS = [
-  {x:0, z:0}, {x:3.3, z:-7}, {x:-3.3, z:-14}, {x:3, z:-21.5},
-  {x:0.5, z:-29.5}, {x:-1, z:-35}, {x:3.3, z:-42}, {x:-1.5, z:-47}
+  {x:0, z:0}, {x:3, z:-7}, {x:5, z:-14}, {x:4, z:-21.5},
+  {x:5, z:-29.5}, {x:4, z:-35}, {x:5, z:-42}, {x:3, z:-47}
 ];
+/* Odcinek trasy poziomu 3, którym ścieżka przecina samą przełęcz — reszta
+   trasy jest zwykłym szlakiem przez las, nie przez góry. */
+const LEVEL3_PASS_SEGMENT = LEVEL3_PATH_POINTS.slice(4, 6);
 /* Odcinek trasy poziomu 5, którym ścieżka faktycznie przecina wschodnie
    pasmo gór (patrz scatterMountains) — używany do rozstawienia głazów i
    pochodni po obu stronach, tak żeby to wyglądało na prawdziwą przełęcz
    (jak górska przełęcz poziomu 3), a nie przypadkową lukę w lesie. */
 const LEVEL5_PASS_SEGMENT = [
   {x:7, z:-15}, {x:12, z:-21}, {x:15, z:-28}, {x:11, z:-34}
+];
+/* Poziom 6: wnętrze sklepiku — ścieżka wije się zygzakiem między rzędami
+   półek (patrz buildShopInterior), naprzemiennie w lewo i w prawo, żeby
+   przypominało chodzenie alejkami sklepu. */
+const LEVEL6_PATH_POINTS = [
+  {x:0, z:0}, {x:2.7, z:-6.5}, {x:-2.7, z:-13}, {x:2.7, z:-19.5},
+  {x:-2.7, z:-26}, {x:2.7, z:-32.5}, {x:-2.7, z:-39}, {x:0, z:-45}
 ];
 let PATH_POINTS = DEFAULT_PATH_POINTS;
 
@@ -1253,7 +1275,7 @@ function scatterWildlife(){
       if(distToPath(x, z) < 1.8) continue;
       if(nearRiver(x, z)) continue;
       if(nearHouse(x, z)) continue;
-      if(nearCave(x, z)) continue;
+      if(nearCave(x, z) || nearRiverL3(x, z)) continue;
       const group = spec.build();
       group.position.set(x, terrainHeight(x, z), z);
       group.rotation.y = Math.random()*Math.PI*2;
@@ -1361,6 +1383,13 @@ function buildCaveMouth(){
   return g;
 }
 let tinyFrogs = [];
+/* Obiekty wystarczająco duże/wysokie, żeby mogły zasłonić postać albo
+   znacznik nutki kamerze (drzewa/skały/krzaki — nie trawa czy kwiatki,
+   za małe i za liczne, żeby sprawdzać je co klatkę) — patrz
+   updateOccludingObjects, gdzie stają się częściowo przezroczyste, kiedy
+   akurat wchodzą między kamerę a to, na co gracz ma patrzeć. Resetowana
+   raz na poziom w scatterTrees (wywoływane jako pierwsze z tej trójki). */
+let potentialOccluders = [];
 function scatterRiverDecor(){
   tinyFrogs = [];
   for(let i=0;i<10;i++){
@@ -1607,20 +1636,22 @@ function buildTorch(){
    a w cieniu między głazami widać parę świecących oczu. */
 function buildMountainPass(){
   const dora = nightMode;
-  const zStart = CAVE_Z_START, zEnd = CAVE_Z_END;
-  function lerpZ(a, b, t){ return a + (b-a)*t; }
+  const pts = LEVEL3_PASS_SEGMENT;
 
   /* Głazy po obu stronach ścieżki — te same prawdziwe modele skał co
      gdzie indziej w grze (scatterRocks), z proceduralnym fallbackiem,
      gdyby model nie był gotowy. (Kenney ma też "cliff_block_rock", ale
      to modularny klocek do budowania ściany klifu, nie pojedynczy głaz —
      jako pojedynczy obiekt wygląda jak czarna skrzynia, więc go nie
-     używamy tutaj.) */
+     używamy tutaj.) Rozstawione wzdłuż odcinka przełęczy (pointAndNormalAlong),
+     nie na sztywno wokół x=0 — ścieżka poziomu 3 skręca. */
   const rockMat = new THREE.MeshStandardMaterial({color: dora?0x5c5850:0x8a8478, roughness:1});
   for(let i=0;i<11;i++){
+    const t = Math.random();
     const side = Math.random()<0.5 ? -1 : 1;
-    const x = side*(2.1 + Math.random()*1.7);
-    const z = lerpZ(zStart+1, zEnd-1, Math.random());
+    const p = pointAndNormalAlong(pts, t);
+    const off = side*(2.1 + Math.random()*1.7);
+    const x = p.x + p.nx*off, z = p.z + p.nz*off;
     let boulder = resolvedModels.rock ? randomNatureMesh(resolvedModels.rock) : null;
     if(!boulder){
       boulder = new THREE.Mesh(new THREE.DodecahedronGeometry(0.55 + Math.random()*0.35, 0), rockMat);
@@ -1635,11 +1666,14 @@ function buildMountainPass(){
   /* Pochodnie po obu stronach ścieżki, całą drogą przez przełęcz. */
   const torchCount = 7;
   for(let i=0;i<torchCount;i++){
-    const z = lerpZ(zStart+0.6, zEnd-0.6, i/(torchCount-1));
+    const t = i/(torchCount-1);
     const side = i % 2 === 0 ? -1 : 1;
+    const p = pointAndNormalAlong(pts, t);
+    const off = side*2.9;
+    const x = p.x + p.nx*off, z = p.z + p.nz*off;
     const torch = buildTorch();
-    torch.position.set(side*2.9, terrainHeight(side*2.9, z), z);
-    torch.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
+    torch.position.set(x, terrainHeight(x, z), z);
+    torch.rotation.y = Math.atan2(-side*p.nx, -side*p.nz);
     if(dora) torch.userData.flicker = 1.8 + Math.random()*0.8; /* nerwowsze migotanie w trybie dora */
     scene.add(torch);
     campfires.push(torch);
@@ -1649,7 +1683,9 @@ function buildMountainPass(){
      nieruchoma i bardzo dyskretna (delikatny niepokojący akcent, bez
      żadnej postaci czy szczegółów — tylko dwa małe punkty światła). */
   if(dora){
-    const ex = 4.1, ez = lerpZ(zStart, zEnd, 0.5) + (Math.random()-0.5)*4;
+    const mid = pointAndNormalAlong(pts, 0.5);
+    const off = 4.1 + (Math.random()-0.5)*1.5;
+    const ex = mid.x + mid.nx*off, ez = mid.z + mid.nz*off;
     const ey = terrainHeight(ex, ez) + 1.3;
     const eyeMat = new THREE.MeshBasicMaterial({color:0xff2f2f});
     [-0.09, 0.09].forEach(function(dx){
@@ -1663,9 +1699,104 @@ function buildMountainPass(){
   }
 }
 
+/* ══ Poziom 3: długa rzeka wzdłuż lewej strony mapy (patrz L3_RIVER_X —
+   ścieżka trzyma się prawej, x dodatnie). Bez mostu/brodu — gracz nigdy
+   jej nie przechodzi, tylko idzie wzdłuż niej przez cały poziom. Lilie
+   wodne z kumkającymi żabkami jak przy rzece poziomów 1-2, plus kilka
+   większych żab, które co jakiś czas wyskakują z wody, przeskakują przez
+   samą ścieżkę na drugi brzeg i wracają (patrz updateLevel3CrossingFrogs). */
+function buildLevel3River(){
+  const zLen = L3_RIVER_Z_START - L3_RIVER_Z_END;
+  const zMid = (L3_RIVER_Z_START + L3_RIVER_Z_END) / 2;
+
+  const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.2, metalness:0.15, transparent:true, opacity:0.88});
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(L3_RIVER_HALF_WIDTH*2, zLen), waterMat);
+  water.rotation.x = -Math.PI/2;
+  water.position.set(L3_RIVER_X, 0.05, zMid);
+  scene.add(water);
+
+  const bankMat = new THREE.MeshStandardMaterial({color:0xc9a96b, roughness:1});
+  [-1, 1].forEach(function(side){
+    const bank = new THREE.Mesh(new THREE.PlaneGeometry(0.7, zLen), bankMat);
+    bank.rotation.x = -Math.PI/2;
+    bank.position.set(L3_RIVER_X + side*(L3_RIVER_HALF_WIDTH + 0.32), 0.06, zMid);
+    scene.add(bank);
+  });
+}
+
+let level3CrossingFrogs = [];
+function scatterLevel3RiverDecor(){
+  const zLen = L3_RIVER_Z_START - L3_RIVER_Z_END;
+
+  /* Szuwary na obu brzegach */
+  for(let i=0;i<16;i++){
+    const side = Math.random()<0.5 ? -1 : 1;
+    const x = L3_RIVER_X + side*(L3_RIVER_HALF_WIDTH + 0.3 + Math.random()*0.6);
+    const z = L3_RIVER_Z_START - Math.random()*zLen;
+    const cat = buildCattail();
+    cat.position.set(x, terrainHeight(x, z), z);
+    cat.rotation.y = Math.random()*Math.PI*2;
+    scene.add(cat);
+  }
+
+  /* Lilie wodne + malutkie kumkające żabki na wodzie (ten sam
+     buildTinyFrog/tinyFrogs co przy rzece poziomów 1-2 — jedna wspólna
+     animacja pulsowania w updateTinyFrogs). */
+  for(let i=0;i<14;i++){
+    const x = L3_RIVER_X + (Math.random()*2-1)*L3_RIVER_HALF_WIDTH*0.75;
+    const z = L3_RIVER_Z_START - Math.random()*zLen;
+    const pad = buildLilyPad();
+    pad.position.set(x, 0.13, z);
+    scene.add(pad);
+    if(Math.random() < 0.45){
+      const frog = buildTinyFrog();
+      frog.position.set(x + (Math.random()-0.5)*0.1, 0.14, z + (Math.random()-0.5)*0.1);
+      frog.rotation.y = Math.random()*Math.PI*2;
+      frog.userData.croakPhase = Math.random()*Math.PI*2;
+      frog.userData.baseScale = frog.scale.x;
+      scene.add(frog);
+      tinyFrogs.push(frog);
+    }
+  }
+
+  /* Kilka większych żab skaczących z rzeki przez ścieżkę i z powrotem. */
+  level3CrossingFrogs = [];
+  const crossCount = 4;
+  for(let i=0;i<crossCount;i++){
+    const homeZ = L3_RIVER_Z_START - (i+0.5)*(zLen/crossCount) + (Math.random()-0.5)*3;
+    const frog = buildFrog();
+    frog.scale.multiplyScalar(0.55);
+    scene.add(frog);
+    level3CrossingFrogs.push({
+      group: frog,
+      homeZ: homeZ,
+      phase: Math.random()*Math.PI*2,
+      period: 7 + Math.random()*3,
+      farX: 6.5 + Math.random()*1.5
+    });
+  }
+}
+/* Trójkątna fala 0→1→0 na pozycji x (rzeka → daleki brzeg za ścieżką →
+   rzeka), z kilkoma podskokami w Y na każdym przejściu (nie jeden długi
+   lot, tylko seria żabich hopnięć) — i obrót w stronę aktualnego ruchu. */
+function updateLevel3CrossingFrogs(){
+  level3CrossingFrogs.forEach(function(f){
+    const cyc = ((idleT + f.phase) % f.period) / f.period;
+    const outward = cyc < 0.5;
+    const swing = outward ? cyc*2 : (1-cyc)*2;
+    const eased = swing*swing*(3-2*swing);
+    const x = L3_RIVER_X + eased * (f.farX - L3_RIVER_X);
+    const z = f.homeZ;
+    const hop = Math.abs(Math.sin(cyc * Math.PI * 10));
+    f.group.position.set(x, terrainHeight(x, z) + hop*0.22, z);
+    f.group.rotation.y = outward ? Math.PI/2 : -Math.PI/2;
+  });
+}
+
 /* Punkt i kierunek prostopadły do łamanej w danym miejscu t∈[0,1] —
-   pozwala rozstawiać obiekty "po bokach" trasy, która (w przeciwieństwie
-   do poziomu 3) nie biegnie prosto wzdłuż osi Z, tylko zakręca. */
+   pozwala rozstawiać obiekty "po bokach" trasy, nawet gdy ta skręca
+   (używane przez przełęcze poziomów 3 i 5, patrz buildMountainPass /
+   buildMountainPassLevel5). */
 function pointAndNormalAlong(pts, t){
   const segLens = [];
   let totalLen = 0;
@@ -1858,7 +1989,7 @@ function scatterRuins(){
     const z = -Math.random()*40 + 1;
     if(distToPath(x, z) < 2.2) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     if(Math.abs(z - RIVER_Z) < 3) continue; /* nie zaśmiecaj okolic bramy */
     if(Math.hypot(x-poolX, z-poolZ) < 2.2) continue;
     const broken = Math.random() < 0.4;
@@ -1873,7 +2004,7 @@ function scatterRuins(){
     const z = -Math.random()*38 + 1;
     if(distToPath(x, z) < 2.2) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     let debris = Math.random() < 0.5 ? kenneyMesh('ruinDebris', 2.6) : kenneyMesh('ruinBrickWall', 2.0);
     if(!debris) debris = buildBrokenStatue(dora);
     debris.position.set(x, terrainHeight(x, z), z);
@@ -2141,6 +2272,97 @@ function buildDarkFigure(){
   return g;
 }
 
+/* Poziom 6: wnętrze sklepiku — podłoga, ściany, sufit z lampami oraz
+   rzędy regałów po obu stronach zygzakowatej ścieżki (LEVEL6_PATH_POINTS),
+   tworzące "alejki". Na co dzień jasne i kolorowe; w trybie "dora"
+   (sceneIsNight) gaśnie do zakurzonego, obskurnego sklepu — ciemniejsze
+   materiały, gołe żarówki zamiast paneli, przekrzywione regały. */
+function buildShopInterior(){
+  const isN = sceneIsNight;
+  const roomHalfW = 6.0, roomZStart = 4, roomZEnd = -49, roomH = 4.6;
+  const roomZMid = (roomZStart + roomZEnd) / 2, roomZLen = roomZStart - roomZEnd;
+
+  const floorMat = new THREE.MeshStandardMaterial({color: isN ? 0x2b2620 : 0xf2e9c9, roughness: isN ? 0.95 : 0.5});
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), floorMat);
+  floor.rotation.x = -Math.PI/2;
+  floor.position.set(0, 0, roomZMid);
+  scene.add(floor);
+
+  const wallMat = new THREE.MeshStandardMaterial({color: isN ? 0x3a3128 : 0xfff3d0, roughness:0.9});
+  [-1, 1].forEach(function(side){
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMat);
+    wall.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
+    wall.position.set(side*roomHalfW, roomH/2, roomZMid);
+    scene.add(wall);
+  });
+  const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomH), wallMat);
+  backWall.position.set(0, roomH/2, roomZEnd);
+  scene.add(backWall);
+  const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomH), wallMat);
+  frontWall.rotation.y = Math.PI;
+  frontWall.position.set(0, roomH/2, roomZStart);
+  scene.add(frontWall);
+
+  const ceilMat = new THREE.MeshStandardMaterial({color: isN ? 0x1c1712 : 0xffffff, roughness:0.9, side:THREE.DoubleSide});
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), ceilMat);
+  ceiling.rotation.x = Math.PI/2;
+  ceiling.position.set(0, roomH, roomZMid);
+  scene.add(ceiling);
+
+  /* Oświetlenie sufitowe co ok. 8 jednostek wzdłuż całej alejki — jasne
+     panele na co dzień, gołe migoczące żarówki w wersji "dora". */
+  for(let z=roomZStart-4; z>=roomZEnd+2; z-=8){
+    if(isN){
+      const bulbMat = new THREE.MeshStandardMaterial({color:0x2a2620, emissive:0xffdd88, emissiveIntensity:0.6});
+      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), bulbMat);
+      bulb.position.set(0, roomH-0.3, z);
+      scene.add(bulb);
+      const lamp = new THREE.PointLight(0xffcc77, 0.55, 9);
+      lamp.position.set(0, roomH-0.3, z);
+      scene.add(lamp);
+    }else{
+      const panelMat = new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xfff6d0, emissiveIntensity:0.9});
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.06, 1.1), panelMat);
+      panel.position.set(0, roomH-0.05, z);
+      scene.add(panel);
+      const lamp = new THREE.PointLight(0xfff6da, 0.7, 12);
+      lamp.position.set(0, roomH-0.4, z);
+      scene.add(lamp);
+    }
+  }
+
+  /* Regały z paczki Kenney (Mini Market, CC0) po obu stronach ścieżki,
+     ustawione mniej więcej naprzeciw każdego zakrętu zygzaka —
+     naprzemiennie pudełka/torby, plus lodówka co trzeci przystanek.
+     W wersji "dora" lekko przekrzywione, jakby dawno nikt ich nie ustawiał. */
+  const shelfKeys = ['marketShelfBoxes', 'marketShelfBags'];
+  let spotIdx = 0;
+  for(let z=roomZStart-3; z>=roomZEnd+3; z-=6.5){
+    [-1, 1].forEach(function(side){
+      const x = side * (roomHalfW - 1.6);
+      const key = shelfKeys[spotIdx % shelfKeys.length];
+      const shelf = kenneyMesh(key, 1.5);
+      const jitter = isN ? (Math.random()-0.5)*0.35 : 0;
+      if(shelf){
+        shelf.position.set(x, 0, z + (isN ? (Math.random()-0.5)*0.6 : 0));
+        shelf.rotation.y = (side > 0 ? Math.PI : 0) + jitter;
+        scene.add(shelf);
+        potentialOccluders.push(shelf);
+      }
+      if(spotIdx % 3 === 0){
+        const freezer = kenneyMesh('marketFreezer', 1.35);
+        if(freezer){
+          freezer.position.set(x*0.86, 0, z + 1.7);
+          freezer.rotation.y = side > 0 ? Math.PI : 0;
+          scene.add(freezer);
+          potentialOccluders.push(freezer);
+        }
+      }
+      spotIdx++;
+    });
+  }
+}
+
 const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
 function buildTree(){
   const pick = TREE_BUILDERS[Math.floor(Math.random()*TREE_BUILDERS.length)];
@@ -2252,11 +2474,24 @@ function nearHouse(x, z){
 
 /* Górska przełęcz (poziom 3, patrz buildMountainPass) — strefa
    wykluczenia, żeby zwykłe drzewa/skały/kwiaty z rozrzutu roślinności
-   nie wyrastały wprost na ścieżce ani na pochodniach/głazach przełęczy. */
-const CAVE_Z_START = -29.5, CAVE_Z_END = -37.5, CAVE_HALF_WIDTH = 4.6;
+   nie wyrastały wprost na ścieżce ani na pochodniach/głazach przełęczy.
+   Liczona względem samej trasy (distToPath), nie sztywnego pasa wokół
+   x=0 — ścieżka poziomu 3 skręca, więc przełęcz musi za nią podążać. */
+const CAVE_Z_START = -29.5, CAVE_Z_END = -35, CAVE_HALF_WIDTH = 4.6;
 function nearCave(x, z){
-  return currentLevel === 3 && Math.abs(x) < CAVE_HALF_WIDTH &&
-    z <= CAVE_Z_START + 1.2 && z >= CAVE_Z_END - 1.2;
+  return currentLevel === 3 && z <= CAVE_Z_START + 1.2 && z >= CAVE_Z_END - 1.2 &&
+    distToPath(x, z) < CAVE_HALF_WIDTH;
+}
+
+/* Długa rzeka wzdłuż lewej strony mapy na poziomie 3 (patrz
+   buildLevel3River) — teren pod nią i tuż wokół musi być płaski, inaczej
+   zwykłe pofałdowanie terenu (daleko od ścieżki, więc bez spłaszczenia
+   przez dystans do trasy) przebijałoby się przez płaską taflę wody. */
+const L3_RIVER_X = -6.5, L3_RIVER_HALF_WIDTH = 2.6;
+const L3_RIVER_Z_START = 4, L3_RIVER_Z_END = -49;
+function nearRiverL3(x, z){
+  return currentLevel === 3 && z <= L3_RIVER_Z_START && z >= L3_RIVER_Z_END &&
+    Math.abs(x - L3_RIVER_X) < L3_RIVER_HALF_WIDTH + 1.3;
 }
 
 /* Teren nie jest już idealnie płaski — łagodne wzniesienia z dala od
@@ -2264,8 +2499,10 @@ function nearCave(x, z){
    wgłębienie doliny rzeki. Używane zarówno do odkształcenia siatki
    ziemi, jak i do ustawiania wysokości Y rozrzuconych obiektów. */
 function terrainHeight(x, z){
+  if(currentLevel === 6) return 0; /* wnętrze sklepiku (poziom 6) — płaska podłoga */
   if(nearHouse(x, z)) return 0;
   if(nearCave(x, z)) return 0;
+  if(nearRiverL3(x, z)) return 0;
   let h = Math.sin(x*0.35 + z*0.05)*0.45 + Math.sin(x*0.11 - z*0.17)*0.75 + Math.cos(z*0.22)*0.3;
   const flatT = Math.min(1, distToPath(x, z)/3.4);
   h *= flatT;
@@ -2374,6 +2611,7 @@ function scatterTrees(){
      poziom 2-3: gęsty las (istniejące). */
   const count = currentLevel === 4 ? 14 : (currentLevel === 5 ? 80 : (currentLevel >= 2 ? 54 : 26));
   const halfWidth = currentLevel === 5 ? 12 : 9;
+  potentialOccluders = [];
   for(let i=0;i<count;i++){
     const x = (Math.random()*2-1) * halfWidth;
     const z = -Math.random()*44 + 2;
@@ -2381,7 +2619,7 @@ function scatterTrees(){
     if(Math.hypot(x, z) < 4.5) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     const tree = buildTree();
     tree.position.set(x, terrainHeight(x, z), z);
     const s = 1.8 + Math.random()*1.3; /* dużo większe niż wcześniej */
@@ -2389,6 +2627,7 @@ function scatterTrees(){
        własną skalę korygującą jednostki z FBX (patrz randomNatureMesh) */
     spinAroundUp(tree, Math.random()*Math.PI*2);
     scene.add(tree);
+    potentialOccluders.push(tree);
   }
 }
 
@@ -2419,7 +2658,7 @@ function scatterGrassTufts(){
     if(distToPath(x, z) < 1.1) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     const tuft = buildGrassTuft();
     tuft.position.set(x, terrainHeight(x, z), z);
     spinAroundUp(tuft, Math.random()*Math.PI*2);
@@ -2438,7 +2677,7 @@ function scatterRocks(){
     if(distToPath(x, z) < 1.5) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     const rock = randomNatureMesh(resolvedModels.rock);
     if(!rock) continue;
     rock.position.set(x, terrainHeight(x, z), z);
@@ -2447,6 +2686,7 @@ function scatterRocks(){
     const s = 0.7 + Math.random()*0.7;
     rock.scale.multiplyScalar(s);
     scene.add(rock);
+    potentialOccluders.push(rock);
   }
 }
 
@@ -2459,7 +2699,7 @@ function scatterFlowers(){
     if(distToPath(x, z) < 1.6) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     const key = pools[Math.floor(Math.random()*pools.length)];
     const flower = randomNatureMesh(resolvedModels[key]);
     if(!flower) continue;
@@ -2478,12 +2718,13 @@ function scatterBushes(){
     if(distToPath(x, z) < 1.8) continue;
     if(nearRiver(x, z)) continue;
     if(nearHouse(x, z)) continue;
-    if(nearCave(x, z)) continue;
+    if(nearCave(x, z) || nearRiverL3(x, z)) continue;
     const bush = randomNatureMesh(resolvedModels.bush);
     if(!bush) continue;
     bush.position.set(x, terrainHeight(x, z), z);
     spinAroundUp(bush, Math.random()*Math.PI*2);
     scene.add(bush);
+    potentialOccluders.push(bush);
   }
 }
 
@@ -3643,6 +3884,15 @@ function tweenCamera(toPos, toLook, duration, onDone){
    sklepik ma drzwi na ścianie +X (patrzy w bok, na parking) — stąd
    różne osie podejścia dla obu budynków (patrz buildHouse/buildShop). */
 function getArrivalShot(){
+  /* Poziom 6 (wnętrze sklepiku) nie ma budynku na końcu trasy — sam
+     poziom JEST budynkiem — więc zamiast kadru na drzwiach dajemy
+     spojrzenie w głąb ostatniej alejki, w stronę tylnej ściany sklepu. */
+  if(currentLevel === 6){
+    const last = LEVEL6_PATH_POINTS[LEVEL6_PATH_POINTS.length-1];
+    const camPos = new THREE.Vector3(last.x, 2.0, last.z + 6);
+    const lookAt = new THREE.Vector3(last.x, 1.5, last.z - 2);
+    return {camPos, lookAt};
+  }
   /* Sklepik (poziom 5) ma teraz front (drzwi+markiza) zwrócony w stronę
      +Z, tak jak domek — tylko drzwi są przesunięte od środka (x=1.0),
      więc kadr centruje się na NICH, nie na środku całego budynku. */
@@ -3666,11 +3916,11 @@ function runIntroCutscene(onDone){
   /* Płynny, CIĄGŁY przelot kamery wzdłuż wygładzonej krzywej — bez
      zatrzymywania/zwalniania na każdej bazie (jedno łagodne wygładzenie
      na start i koniec całego przelotu, nie osobno na każdym odcinku).
-     Ostatnie dwie polanki są pomijane — kamera leci tylko do
-     przedostatniej, a resztę drogi do celu pokazuje już dedykowany,
-     wykadrowany "kadr mety" na środku ekranu (patrz showArrivalShot). */
+     Kamera leci przez WSZYSTKIE bazy oprócz ostatniej — tę ostatnią
+     pomija, bo tam zaczyna się dedykowany, wykadrowany "kadr mety" na
+     środku ekranu (patrz showArrivalShot), pokazujący docelowy budynek. */
   const flyHeight = 2.3;
-  const shortenedPoints = PATH_POINTS.slice(0, Math.max(2, PATH_POINTS.length - 2));
+  const shortenedPoints = PATH_POINTS.slice(0, Math.max(2, PATH_POINTS.length - 1));
   const curvePts = shortenedPoints.map(function(p){
     return new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z);
   });
@@ -3752,6 +4002,88 @@ function updateCamera(){
   camera.lookAt(lookTarget);
 }
 
+/* ══ Przezroczystość obiektów zasłaniających widok — jeśli drzewo (albo
+   skała/krzak) akurat stoi między kamerą a postacią lub aktywną świecącą
+   nutką, ten JEDEN obiekt płynnie robi się półprzezroczysty, żeby dalej
+   było widać, gdzie jest postać/cel — zamiast twardego, mylącego "ściana
+   zasłania wszystko". Sprawdzane tylko wśród potentialOccluders (drzewa/
+   skały/krzaki — duże, nieliczne), nie całej sceny, żeby nie kosztowało
+   zbyt wiele co klatkę (trawa/kwiatki są za małe, żeby w ogóle zasłaniać,
+   więc nie trzeba ich sprawdzać). */
+let occludingObjects = new Map();
+let occlusionRaycaster = null; /* tworzony leniwie w updateOccludingObjects —
+  THREE nie jest jeszcze zdefiniowane, kiedy ten skrypt się wykonuje
+  (three.min.js ładuje się dopiero na końcu strony, patrz komentarz przy
+  startGame) */
+function collectOcclusionMeshes(obj){
+  const meshes = [];
+  obj.traverse(function(o){ if(o.isMesh && o.material && !Array.isArray(o.material)) meshes.push(o); });
+  return meshes;
+}
+function updateOccludingObjects(){
+  if(!scene || !camera || !character || !potentialOccluders.length) return;
+  if(!occlusionRaycaster) occlusionRaycaster = new THREE.Raycaster();
+
+  const targets = [character.position.clone().add(new THREE.Vector3(0, 0.7, 0))];
+  if(waypoints){
+    const activeWp = waypoints.find(function(w){ return w.active && w.markerGroup && w.markerGroup.visible; });
+    if(activeWp) targets.push(activeWp.pos.clone().add(new THREE.Vector3(0, 0.6, 0)));
+  }
+
+  const stillOccluding = new Set();
+  targets.forEach(function(to){
+    const from = camera.position;
+    const dir = new THREE.Vector3().subVectors(to, from);
+    const dist = dir.length();
+    if(dist < 0.4) return;
+    dir.normalize();
+    occlusionRaycaster.set(from, dir);
+    occlusionRaycaster.near = 0.1;
+    occlusionRaycaster.far = dist - 0.35; /* nie łap samego celu na końcu promienia */
+    const hits = occlusionRaycaster.intersectObjects(potentialOccluders, true);
+    hits.forEach(function(hit){
+      let top = hit.object;
+      while(top.parent && potentialOccluders.indexOf(top) === -1) top = top.parent;
+      stillOccluding.add(top);
+    });
+  });
+
+  /* Materiały drzew/skał/krzaków są celowo WSPÓLNE między wieloma
+     instancjami (patrz convertToUnlitMaterial/randomNatureMesh) — nie
+     wolno ściemniać ich wprost, bo przygasłoby każde drzewo tego samego
+     typu na całej mapie naraz. Dlatego dopiero gdy dany egzemplarz
+     zaczyna zasłaniać widok, klonujemy jego materiały na czas przygaszenia
+     i podmieniamy z powrotem na oryginał (współdzielony), kiedy przestaje
+     zasłaniać. */
+  stillOccluding.forEach(function(top){
+    if(!occludingObjects.has(top)){
+      const meshes = collectOcclusionMeshes(top);
+      const entries = meshes.map(function(mesh){
+        const orig = mesh.material;
+        const clone = orig.clone();
+        mesh.material = clone;
+        return {mesh: mesh, orig: orig, clone: clone, baseOpacity: orig.opacity};
+      });
+      occludingObjects.set(top, {entries: entries, t: 0});
+    }
+  });
+
+  occludingObjects.forEach(function(state, top){
+    const stillIn = stillOccluding.has(top);
+    state.t += (stillIn ? 1 : -1) * 0.09;
+    state.t = Math.max(0, Math.min(1, state.t));
+    state.entries.forEach(function(e){
+      e.clone.transparent = true;
+      e.clone.opacity = Math.max(0.28, e.baseOpacity - state.t*0.6);
+      e.clone.depthWrite = state.t < 0.5;
+    });
+    if(state.t <= 0 && !stillIn){
+      state.entries.forEach(function(e){ e.mesh.material = e.orig; });
+      occludingObjects.delete(top);
+    }
+  });
+}
+
 function animate(now){
   if(!sceneRunning) return;
   requestAnimationFrame(animate);
@@ -3768,20 +4100,20 @@ function animate(now){
   updateCompanions();
   updateWildlife();
   updateTinyFrogs();
+  updateLevel3CrossingFrogs();
   updateCampfires();
   if(!inCutscene) updateCamera();
+  updateOccludingObjects();
   renderer.render(scene, camera);
 }
 
 function initScene(){
   PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS :
-    (currentLevel === 3 ? LEVEL3_PATH_POINTS : DEFAULT_PATH_POINTS);
+    (currentLevel === 3 ? LEVEL3_PATH_POINTS : (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS));
+  potentialOccluders = [];
   scene = new THREE.Scene();
-  const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5);
+  const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
   sceneIsNight = isNight;
-  const skyColor = isNight ? 0x0c1230 : 0xa9e6fb;
-  scene.background = new THREE.Color(skyColor);
-  scene.fog = new THREE.Fog(skyColor, isNight ? 14 : 20, isNight ? 55 : 72);
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
@@ -3790,98 +4122,120 @@ function initScene(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
   resizeRenderer();
 
-  if(isNight){
-    scene.add(new THREE.AmbientLight(0x3a4a7a, 0.55));
-    const moonLight = new THREE.DirectionalLight(0xaebfff, 0.4);
-    moonLight.position.set(20, 40, -30);
-    scene.add(moonLight);
-    scene.add(buildMoon());
-    scene.add(buildStars());
+  if(currentLevel === 6){
+    /* Wnętrze sklepiku (poziom 6) — jasne, kolorowe oświetlenie na co
+       dzień; w wersji "dora" gaśnie do zakurzonego, mrocznego sklepu
+       (patrz buildShopInterior dla samych ścian/półek). */
+    const shopBg = isNight ? 0x14110d : 0xfff3d0;
+    scene.background = new THREE.Color(shopBg);
+    scene.fog = new THREE.Fog(shopBg, isNight ? 7 : 15, isNight ? 24 : 40);
+    scene.add(new THREE.AmbientLight(isNight ? 0x2a251c : 0xfff6e0, isNight ? 0.5 : 1.1));
+    const fillLight = new THREE.DirectionalLight(isNight ? 0x6a5a3a : 0xffffff, isNight ? 0.25 : 0.55);
+    fillLight.position.set(4, 8, -10);
+    scene.add(fillLight);
   }else{
-    scene.add(new THREE.AmbientLight(0xe4f7db, 0.95));
-    const sunLight = new THREE.DirectionalLight(0xfff6dc, 1.05);
-    sunLight.position.set(-8, 20, -12);
-    scene.add(sunLight);
-    scene.add(buildSun());
-  }
-
-  const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
-  grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
-  grassTex.repeat.set(10, 15);
-  const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1, color: isNight ? 0x2a3550 : 0xe6ffe0});
-  /* Teren nie jest już płaski — odkształcamy siatkę wg terrainHeight()
-     (płasko przy ścieżce, łagodne wzniesienia dalej, wgłębienie przy rzece).
-     Lokalne Z wierzchołka PlaneGeometry staje się światową wysokością Y po
-     obrocie o -90° wokół X, stąd przeliczenie współrzędnych poniżej. */
-  const groundGeo = new THREE.PlaneGeometry(60, 90, 40, 60);
-  const gPos = groundGeo.attributes.position;
-  for(let i=0;i<gPos.count;i++){
-    const wx = gPos.getX(i), wz = -gPos.getY(i) - 20;
-    gPos.setZ(i, terrainHeight(wx, wz));
-  }
-  groundGeo.computeVertexNormals();
-  const ground = new THREE.Mesh(groundGeo, groundMat);
-  ground.rotation.x = -Math.PI/2;
-  ground.position.z = -20;
-  scene.add(ground);
-
-  buildTrail();
-  if(currentLevel <= 2){
-    buildRiverAndBridge();
-  }
-  if(currentLevel === 5){
-    buildShopAndParking();
-  }else{
-    buildHouseAndFence();
-  }
-  scatterTrees();
-  scatterGrassTufts();
-  scatterRocks();
-  scatterFlowers();
-  scatterBushes();
-  scatterMountains();
-  scatterStartMeadow();
-  if(currentLevel <= 2){
-    scatterRiverDecor();
-  }
-  scatterWildlife();
-  campfires = [];
-  if(currentLevel >= 2){
-    const car = buildCar();
-    const cx = 6.5, cz = -25;
-    car.position.set(cx, terrainHeight(cx, cz), cz);
-    car.rotation.y = 0.6;
-    scene.add(car);
-
-    /* opuszczony obozowisko tuż obok samochodziku — namioty + ognisko */
-    const campSpots = [{x:4.3, z:-26.2}, {x:5.6, z:-27.4}];
-    campSpots.forEach(function(p){
-      const tent = buildTent();
-      tent.position.set(p.x, terrainHeight(p.x, p.z), p.z);
-      tent.rotation.y = Math.random()*Math.PI*2;
-      scene.add(tent);
-    });
-    const fire = buildCampfire();
-    const fx = 4.9, fz = -25.3;
-    fire.position.set(fx, terrainHeight(fx, fz), fz);
-    scene.add(fire);
-    campfires.push(fire);
-  }
-  if(currentLevel === 3){
-    buildMountainPass();
-  }
-  if(currentLevel === 4){
-    scatterRuins();
-  }
-  if(currentLevel === 5){
-    buildMountainPassLevel5();
-    buildLakeArea();
+    const skyColor = isNight ? 0x0c1230 : 0xa9e6fb;
+    scene.background = new THREE.Color(skyColor);
+    scene.fog = new THREE.Fog(skyColor, isNight ? 14 : 20, isNight ? 55 : 72);
     if(isNight){
-      const figure = buildDarkFigure();
-      const fx = -19, fz = -61;
-      figure.position.set(fx, terrainHeight(fx, fz), fz);
-      figure.rotation.y = Math.PI/5;
-      scene.add(figure);
+      scene.add(new THREE.AmbientLight(0x3a4a7a, 0.55));
+      const moonLight = new THREE.DirectionalLight(0xaebfff, 0.4);
+      moonLight.position.set(20, 40, -30);
+      scene.add(moonLight);
+      scene.add(buildMoon());
+      scene.add(buildStars());
+    }else{
+      scene.add(new THREE.AmbientLight(0xe4f7db, 0.95));
+      const sunLight = new THREE.DirectionalLight(0xfff6dc, 1.05);
+      sunLight.position.set(-8, 20, -12);
+      scene.add(sunLight);
+      scene.add(buildSun());
+    }
+  }
+
+  campfires = [];
+  if(currentLevel === 6){
+    buildShopInterior();
+  }else{
+    const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
+    grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
+    grassTex.repeat.set(10, 15);
+    const groundMat = new THREE.MeshStandardMaterial({map:grassTex, roughness:1, color: isNight ? 0x2a3550 : 0xe6ffe0});
+    /* Teren nie jest już płaski — odkształcamy siatkę wg terrainHeight()
+       (płasko przy ścieżce, łagodne wzniesienia dalej, wgłębienie przy rzece).
+       Lokalne Z wierzchołka PlaneGeometry staje się światową wysokością Y po
+       obrocie o -90° wokół X, stąd przeliczenie współrzędnych poniżej. */
+    const groundGeo = new THREE.PlaneGeometry(60, 90, 40, 60);
+    const gPos = groundGeo.attributes.position;
+    for(let i=0;i<gPos.count;i++){
+      const wx = gPos.getX(i), wz = -gPos.getY(i) - 20;
+      gPos.setZ(i, terrainHeight(wx, wz));
+    }
+    groundGeo.computeVertexNormals();
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI/2;
+    ground.position.z = -20;
+    scene.add(ground);
+
+    buildTrail();
+    if(currentLevel <= 2){
+      buildRiverAndBridge();
+    }
+    if(currentLevel === 5){
+      buildShopAndParking();
+    }else{
+      buildHouseAndFence();
+    }
+    scatterTrees();
+    scatterGrassTufts();
+    scatterRocks();
+    scatterFlowers();
+    scatterBushes();
+    scatterMountains();
+    scatterStartMeadow();
+    if(currentLevel <= 2){
+      scatterRiverDecor();
+    }
+    scatterWildlife();
+    if(currentLevel >= 2){
+      const car = buildCar();
+      const cx = 6.5, cz = -25;
+      car.position.set(cx, terrainHeight(cx, cz), cz);
+      car.rotation.y = 0.6;
+      scene.add(car);
+
+      /* opuszczony obozowisko tuż obok samochodziku — namioty + ognisko */
+      const campSpots = [{x:4.3, z:-26.2}, {x:5.6, z:-27.4}];
+      campSpots.forEach(function(p){
+        const tent = buildTent();
+        tent.position.set(p.x, terrainHeight(p.x, p.z), p.z);
+        tent.rotation.y = Math.random()*Math.PI*2;
+        scene.add(tent);
+      });
+      const fire = buildCampfire();
+      const fx = 4.9, fz = -25.3;
+      fire.position.set(fx, terrainHeight(fx, fz), fz);
+      scene.add(fire);
+      campfires.push(fire);
+    }
+    if(currentLevel === 3){
+      buildMountainPass();
+      buildLevel3River();
+      scatterLevel3RiverDecor();
+    }
+    if(currentLevel === 4){
+      scatterRuins();
+    }
+    if(currentLevel === 5){
+      buildMountainPassLevel5();
+      buildLakeArea();
+      if(isNight){
+        const figure = buildDarkFigure();
+        const fx = -19, fz = -61;
+        figure.position.set(fx, terrainHeight(fx, fz), fz);
+        figure.rotation.y = Math.PI/5;
+        scene.add(figure);
+      }
     }
   }
   const levelBadge = document.getElementById('levelBadge');
@@ -3961,7 +4315,8 @@ const LEVEL_WIN_TITLES = {
   2: 'Ukończyliście gęsty las!',
   3: 'Przeszliście przez górską przełęcz!',
   4: 'Zagraliście na klawiaturze!',
-  5: 'Dotarliście do sklepiku nad jeziorem!'
+  5: 'Dotarliście do sklepiku nad jeziorem!',
+  6: 'Zrobiliście zakupy w całym sklepiku!'
 };
 function showWin(){
   document.getElementById('winTitle').textContent = LEVEL_WIN_TITLES[currentLevel] || LEVEL_WIN_TITLES[1];
@@ -3971,6 +4326,7 @@ function showWin(){
   document.getElementById('level3Btn').style.display = currentLevel === 2 ? 'inline-block' : 'none';
   document.getElementById('level4Btn').style.display = currentLevel === 3 ? 'inline-block' : 'none';
   document.getElementById('level5Btn').style.display = currentLevel === 4 ? 'inline-block' : 'none';
+  document.getElementById('level6Btn').style.display = currentLevel === 5 ? 'inline-block' : 'none';
   document.getElementById('winOverlay').classList.add('show');
   spawnWinCelebration();
 }
@@ -3993,6 +4349,7 @@ function startLevel2(){ goToLevel(2); }
 function startLevel3(){ goToLevel(3); }
 function startLevel4(){ goToLevel(4); }
 function startLevel5(){ goToLevel(5); }
+function startLevel6(){ goToLevel(6); }
 
 function restartGame(){
   sceneRunning = false;
