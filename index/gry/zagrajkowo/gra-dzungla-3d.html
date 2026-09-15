@@ -23,7 +23,13 @@
   .sound-toggle.active{border-color:var(--gold);background:#fdf8ec;}
 
   /* ══ WYBÓR POSTACI ══ */
-  .char-select{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:14px 16px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
+  .char-select{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:14px 16px 24px;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,rgba(232,245,224,0.9),rgba(250,249,247,0.94)),url('/index/gry/zagrajkowo/3d-piano/grafika-3d-piano/dzungla-tlo.webp') center/cover;}
+  /* Biegające zwierzątka w tle ekranu wyboru postaci (patrz initMenuCritters) —
+     leżą pod całą resztą treści (stąd position:relative + z-index:1 na
+     pozostałych dzieciach .char-select), a pointer-events:none na canvasie,
+     żeby nie blokował klikania w przyciski/karty nad nim. */
+  #menuCritterCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;pointer-events:none;}
+  .char-select > *:not(#menuCritterCanvas){position:relative;z-index:1;}
   .char-select h2{font-family:'Playfair Display',serif;color:var(--navy);font-size:clamp(1.1rem,4.5vw,1.5rem);margin:0;text-align:center;}
   .char-select p{color:var(--text-mid);font-size:0.82rem;text-align:center;max-width:380px;margin:0;line-height:1.4;}
   .char-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
@@ -155,6 +161,14 @@
   body.night-theme .char-card .char-name{color:#dbe0f5;}
   body.night-theme .clef-settings-label{color:#9aa3c4;}
   body.night-theme .clef-btn{background:#1c1c2a;border-color:#2f2f42;color:#c8cde6;}
+  /* Bez tych dwóch reguł zaznaczenie (.selected/.active) było niewidoczne
+     w trybie nocnym — reguły "body.night-theme .char-card" i
+     "body.night-theme .clef-btn" wyżej mają większą swoistość CSS niż
+     ".char-card.selected"/".clef-btn.active" (dodatkowy selektor "body"),
+     więc po prostu je nadpisywały z powrotem na zwykły, nieodróżnialny
+     wygląd. */
+  body.night-theme .char-card.selected{background:#2a2a52;border-color:#6f7fd6;}
+  body.night-theme .clef-btn.active{background:var(--gold);border-color:var(--gold);color:#1a1a2e;}
 
   /* ══ Cutscene przelotu kamery przed poziomem ══ */
   .skip-cutscene-btn{position:absolute;bottom:18px;right:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 18px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;}
@@ -174,6 +188,7 @@
 </div>
 
 <div class="char-select" id="charSelect">
+  <canvas id="menuCritterCanvas" aria-hidden="true"></canvas>
   <h2>Wybierz swojego towarzysza!</h2>
   <p>Razem ruszycie przez dżunglę i będziecie rozwiązywać zagadki muzyczne, żeby odkrywać kolejne polanki.</p>
   <div class="clef-settings">
@@ -446,7 +461,11 @@ if(secretCodeInput){
   secretCodeInput.addEventListener('input', function(e){
     const val = e.target.value.trim().toLowerCase();
     if(val === 'dora'){
-      setNightMode(true);
+      /* Przełącznik, nie tylko włącznik — bez tego, jak ktoś raz wpisał
+         "dora" (np. dziecko z ciekawości), tryb nocny zapisywał się w
+         localStorage na zawsze i wracał przy każdej kolejnej wizycie, bez
+         żadnego sposobu na wyłączenie go z powrotem. */
+      setNightMode(!nightMode);
       e.target.value = '';
       e.target.blur();
     }else if(val === 'akord'){
@@ -463,6 +482,7 @@ function jumpToLevel(level){
   if(!chosenChar) chosenChar = 'cat';
   document.getElementById('charSelect').style.display = 'none';
   document.getElementById('sceneWrap').style.display = 'block';
+  stopMenuCritters();
   goToLevel(level);
 }
 
@@ -621,8 +641,145 @@ function startGame(){
   }
   document.getElementById('charSelect').style.display = 'none';
   document.getElementById('sceneWrap').style.display = 'block';
+  stopMenuCritters();
   initScene();
 }
+
+/* ══ Zwierzątka na ekranie wyboru postaci — czysto dekoracyjne, biegają
+   po łące w tle i uciekają, gdy kursor (albo dotknięty punkt na ekranie
+   dotykowym) znajdzie się blisko nich. Osobna, lekka scena three.js
+   (własne scene/camera/renderer), niezależna od głównej gry — startuje,
+   jak tylko three.js się wczyta, i zatrzymuje się w startGame()/
+   jumpToLevel() (żeby nie renderować dwóch scen naraz), a wraca w
+   restartGame(), gdy gracz znów zobaczy ten ekran. */
+let menuCritterState = null;
+function initMenuCritters(){
+  if(typeof THREE === 'undefined'){ setTimeout(initMenuCritters, 60); return; }
+  const canvas = document.getElementById('menuCritterCanvas');
+  const wrap = document.getElementById('charSelect');
+  if(!canvas || !wrap) return;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
+  camera.position.set(0, 6.6, 8.2);
+  camera.lookAt(0, 0, 0);
+
+  const renderer = new THREE.WebGLRenderer({canvas: canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+
+  scene.add(new THREE.AmbientLight(0xeaffe0, 1.05));
+  const sun = new THREE.DirectionalLight(0xfff6dc, 0.65);
+  sun.position.set(-4, 8, 5);
+  scene.add(sun);
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(40, 40),
+    new THREE.MeshStandardMaterial({color:0x8fd47a, roughness:1})
+  );
+  ground.rotation.x = -Math.PI/2;
+  scene.add(ground);
+
+  const PEN_HALF_X = 5.6, PEN_HALF_Z = 3.6;
+  const builders = [buildSheep, buildDuck, buildSparrow, buildSheep, buildDuck];
+  const critters = builders.map(function(build){
+    const g = build();
+    const x = (Math.random()*2-1)*PEN_HALF_X*0.7;
+    const z = (Math.random()*2-1)*PEN_HALF_Z*0.7;
+    g.position.set(x, 0, z);
+    const heading = Math.random()*Math.PI*2;
+    g.rotation.y = heading;
+    scene.add(g);
+    return {group:g, x:x, z:z, heading:heading, wanderT:Math.random()*Math.PI*2, speed:0.55+Math.random()*0.35};
+  });
+
+  /* Punkt "zagrożenia" — pozycja kursora/dotyku rzutowana na płaszczyznę
+     łąki (y=0). Zaczyna daleko poza wybiegiem, więc nic nie ucieka, dopóki
+     gracz się nie ruszy; powoli "wygasa" (dangerFade), jeśli kursor
+     przestanie się poruszać, żeby zwierzątka nie stały w miejscu z paniki
+     w nieskończoność po jednym dotknięciu. */
+  const dangerPoint = new THREE.Vector3(999, 0, 999);
+  let dangerFade = 0;
+  const raycaster = new THREE.Raycaster();
+  const groundPlane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+
+  function updateDanger(clientX, clientY){
+    const rect = canvas.getBoundingClientRect();
+    if(!rect.width || !rect.height) return;
+    const nx = ((clientX-rect.left)/rect.width)*2-1;
+    const ny = -((clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera({x:nx, y:ny}, camera);
+    const hit = new THREE.Vector3();
+    if(raycaster.ray.intersectPlane(groundPlane, hit)){
+      dangerPoint.copy(hit);
+      dangerFade = 1;
+    }
+  }
+  function onPointerMove(e){ updateDanger(e.clientX, e.clientY); }
+  function onPointerDown(e){ updateDanger(e.clientX, e.clientY); }
+  wrap.addEventListener('pointermove', onPointerMove);
+  wrap.addEventListener('pointerdown', onPointerDown);
+
+  function resize(){
+    const w = wrap.clientWidth, h = wrap.clientHeight;
+    if(!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const FLEE_RADIUS = 2.7;
+  let lastNow = performance.now();
+  function tick(now){
+    if(!menuCritterState.running) return;
+    const dt = Math.min(0.06, (now-lastNow)/1000);
+    lastNow = now;
+    dangerFade = Math.max(0, dangerFade - dt*0.15);
+
+    critters.forEach(function(c){
+      const dx = c.x - dangerPoint.x, dz = c.z - dangerPoint.z;
+      const dist = Math.hypot(dx, dz);
+      let vx, vz;
+      if(dangerFade > 0.05 && dist < FLEE_RADIUS){
+        c.heading = Math.atan2(dx, dz);
+        const fleeSpeed = c.speed * 2.6 * Math.min(1, dangerFade+0.4);
+        vx = Math.sin(c.heading)*fleeSpeed;
+        vz = Math.cos(c.heading)*fleeSpeed;
+      }else{
+        c.wanderT += dt;
+        c.heading += Math.sin(c.wanderT*0.7)*dt*0.6;
+        vx = Math.sin(c.heading)*c.speed;
+        vz = Math.cos(c.heading)*c.speed;
+      }
+      c.x += vx*dt;
+      c.z += vz*dt;
+      if(c.x > PEN_HALF_X){ c.x = PEN_HALF_X; c.heading = Math.PI - c.heading; }
+      if(c.x < -PEN_HALF_X){ c.x = -PEN_HALF_X; c.heading = Math.PI - c.heading; }
+      if(c.z > PEN_HALF_Z){ c.z = PEN_HALF_Z; c.heading = -c.heading; }
+      if(c.z < -PEN_HALF_Z){ c.z = -PEN_HALF_Z; c.heading = -c.heading; }
+      c.group.position.set(c.x, 0, c.z);
+      c.group.rotation.y = c.heading;
+    });
+
+    renderer.render(scene, camera);
+    menuCritterState.rafId = requestAnimationFrame(tick);
+  }
+
+  menuCritterState = {running:false, rafId:null, tick:tick};
+  startMenuCritters();
+}
+function startMenuCritters(){
+  if(!menuCritterState || menuCritterState.running) return;
+  menuCritterState.running = true;
+  menuCritterState.rafId = requestAnimationFrame(menuCritterState.tick);
+}
+function stopMenuCritters(){
+  if(!menuCritterState || !menuCritterState.running) return;
+  menuCritterState.running = false;
+  if(menuCritterState.rafId) cancelAnimationFrame(menuCritterState.rafId);
+}
+initMenuCritters();
 
 /* ══ Scena 3D ══ */
 let scene, camera, renderer, raycaster, character, idleT = 0;
@@ -3844,6 +4001,7 @@ function restartGame(){
   document.getElementById('winOverlay').classList.remove('show');
   document.getElementById('charSelect').style.display = 'flex';
   document.getElementById('sceneWrap').style.display = 'none';
+  startMenuCritters();
   if(renderer){
     renderer.domElement.removeEventListener('pointerdown', onCanvasPointerDown);
     renderer.domElement.removeEventListener('pointermove', onCanvasPointerMove);
