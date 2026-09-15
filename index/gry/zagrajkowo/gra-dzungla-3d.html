@@ -646,6 +646,15 @@ const LEVEL5_PATH_POINTS = [
   {x:0, z:0}, {x:3, z:-8}, {x:7, z:-15}, {x:12, z:-21},
   {x:15, z:-28}, {x:11, z:-34}, {x:5, z:-37}, {x:0, z:-43.5}
 ];
+/* Poziom 3: nieco szerszy, dłuższy wąż niż domyślna trasa (większa
+   amplituda zakrętów + głębszy zasięg w z), ale w paśmie samej przełęczy
+   (CAVE_Z_START..CAVE_Z_END, patrz buildMountainPass) trzyma się blisko
+   środka — głazy/pochodnie tej przełęczy są rozstawione na sztywno wokół
+   x=0, nie podążają za trasą jak na poziomie 5. */
+const LEVEL3_PATH_POINTS = [
+  {x:0, z:0}, {x:3.3, z:-7}, {x:-3.3, z:-14}, {x:3, z:-21.5},
+  {x:0.5, z:-29.5}, {x:-1, z:-35}, {x:3.3, z:-42}, {x:-1.5, z:-47}
+];
 /* Odcinek trasy poziomu 5, którym ścieżka faktycznie przecina wschodnie
    pasmo gór (patrz scatterMountains) — używany do rozstawienia głazów i
    pochodni po obu stronach, tak żeby to wyglądało na prawdziwą przełęcz
@@ -3524,7 +3533,12 @@ function runIntroCutscene(onDone){
   function stepForward(now){
     if(cutsceneSkip){ startBackward(); return; }
     const t = Math.min(1, (now - t0) / forwardDuration);
-    const e = t*t*(3-2*t); /* łagodny rozbieg/hamowanie TYLKO na starcie i końcu całego przelotu */
+    /* Łagodny rozbieg TYLKO na starcie — żadnego hamowania na końcu, bo to
+       właśnie ono sprawiało, że kamera zwalniała do zera tuż przed ostatnią
+       bazą i "zawisała" tam, zanim doleciała do kadru mety. Kwadratowe
+       przyspieszenie (bez wygładzenia końca) utrzymuje tempo aż do samego
+       końca przelotu, po czym płynnie przejmuje je showArrivalShot(). */
+    const e = t*t;
     /* getPoint/getTangent (parametr naturalny), NIE getPointAt/getTangentAt
        (długość łuku) — dla type:'centripetal' na otwartej krzywej ta druga
        para rzuca wyjątkiem w tej wersji three.js (pusta tabela długości). */
@@ -3603,7 +3617,8 @@ function animate(now){
 }
 
 function initScene(){
-  PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS : DEFAULT_PATH_POINTS;
+  PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS :
+    (currentLevel === 3 ? LEVEL3_PATH_POINTS : DEFAULT_PATH_POINTS);
   scene = new THREE.Scene();
   const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5);
   sceneIsNight = isNight;
