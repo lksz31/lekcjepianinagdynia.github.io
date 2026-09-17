@@ -287,7 +287,21 @@ function renderLetters(){
   row.innerHTML = LETTERS_ORDER.map(l =>
     '<div class="letter-target" data-letter="'+l+'"><span class="lt-label">'+l+'</span></div>'
   ).join('');
+  syncLetterTargetSizes();
 }
+
+/* Niektóre przeglądarki (starsze tablety) potrafią zignorować CSS
+   aspect-ratio na elemencie o szerokości w %, co zapada wysokość kosza do
+   0 i robi go całkowicie niewidocznym mimo poprawnego tła. Wysokość
+   liczymy więc też jawnie w JS z rzeczywistej, wyrenderowanej szerokości —
+   działa niezależnie od wsparcia aspect-ratio w danej przeglądarce. */
+function syncLetterTargetSizes(){
+  document.querySelectorAll('.letter-target').forEach(function(el){
+    const w = el.getBoundingClientRect().width;
+    if(w > 0) el.style.height = Math.round(w * 80/66) + 'px';
+  });
+}
+window.addEventListener('resize', syncLetterTargetSizes);
 
 /* ══ Dźwięk błędu ══ */
 function playErrorBeep(){

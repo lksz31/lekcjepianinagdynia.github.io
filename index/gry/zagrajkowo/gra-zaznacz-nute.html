@@ -115,7 +115,20 @@ const GAME_NOTES = [
 ];
 
 const FLOWERS = ['aster.png','dzwonek.png','frezja.png','gerbera.png','groszek-pachnacy.png','hibiskus.png','lilia.png','mak.png','ostrozen.png','piwonia.png','roza.png','slonecznik.png','stokrotka.png','szafirek.png','tulipan.png'];
+/* Naturalne proporcje (wysokość/szerokość) każdego pliku kwiatka — bez tego
+   wymuszenie kwadratowego pudełka na obrazku o innych proporcjach lekko go
+   rozciąga/spłaszcza, tak jak wcześniej działo się z pszczółką (patrz niżej). */
+const FLOWER_RATIOS = {
+  'aster.png':1.147, 'dzwonek.png':1.081, 'frezja.png':0.863, 'gerbera.png':1.305,
+  'groszek-pachnacy.png':1.19, 'hibiskus.png':0.94, 'lilia.png':1.007, 'mak.png':0.936,
+  'ostrozen.png':1.141, 'piwonia.png':0.993, 'roza.png':1.078, 'slonecznik.png':1.182,
+  'stokrotka.png':1.13, 'szafirek.png':1.517, 'tulipan.png':1.276
+};
 const BEE_URL = '/index/fiszki/concept-art/pszczola.png';
+/* Naturalne proporcje pszczółki (2400×1309, szeroka, nie kwadratowa) —
+   wymuszanie jej w kwadratowe pudełko ściskało ją w pionie prawie 2×,
+   stąd "zniekształcona" pszczółka. */
+const BEE_RATIO = 1309/2400;
 
 const TOTAL_ROUNDS = 10;
 let round = 0, score = 0, targetNote = null, roundOrder = [], roundLocked = false;
@@ -259,7 +272,7 @@ function flyAwayAsBee(noteEl, noteX, noteY){
   const startX = svgRect.left + noteX*scale;
   const startY = svgRect.top + noteY*scale;
 
-  const bw = 46, bh = 46, margin = 20;
+  const bw = 58, bh = Math.round(bw*BEE_RATIO), margin = 20;
   /* Kwiatki mają obsiewać całą powierzchnię ekranu, nie tylko wąski pasek obok karty */
   const edgeX = margin + Math.random()*Math.max(10, window.innerWidth-margin*2-bw);
   const edgeY = margin + Math.random()*Math.max(10, window.innerHeight-margin*2-bh);
@@ -301,14 +314,15 @@ function flyAwayAsBee(noteEl, noteX, noteY){
 
 function spawnFieldFlower(x, y){
   const flower = FLOWERS[Math.floor(Math.random()*FLOWERS.length)];
-  const fs = 28 + Math.round(Math.random()*12);
+  const fw = 50 + Math.round(Math.random()*22);
+  const fh = Math.round(fw * (FLOWER_RATIOS[flower] || 1));
   const img = document.createElement('img');
   img.src = '/index/fiszki/concept-art/'+flower;
   img.className = 'field-flower';
-  img.style.width = fs+'px';
-  img.style.height = fs+'px';
-  img.style.left = (x-fs/2)+'px';
-  img.style.top = (y-fs/2)+'px';
+  img.style.width = fw+'px';
+  img.style.height = fh+'px';
+  img.style.left = (x-fw/2)+'px';
+  img.style.top = (y-fh/2)+'px';
   img.style.transform = 'scale(0)';
   document.getElementById('fieldLayer').appendChild(img);
   requestAnimationFrame(function(){

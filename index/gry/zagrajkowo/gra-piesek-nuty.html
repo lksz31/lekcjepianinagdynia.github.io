@@ -141,7 +141,7 @@ let slotLetters = [];   /* dla trybów swap/staff — litera na każdej z 7 pozy
 let slotClefs = [];     /* dla trybu staff — klucz przypisany do każdej pozycji */
 let selIdx = null;
 let nextIndex = 0;
-let direction = 'up';   /* 'up' = od najniższej do najwyższej, 'down' = odwrotnie — losowane co grę */
+const direction = 'up';   /* zawsze od najniższej do najwyższej */
 let TARGET = LETTERS.slice();
 
 /* W trybie "oba klucze" pierwsza połowa dróżki jest w kluczu basowym,
@@ -559,9 +559,7 @@ function updateDirectionBadge(){
   const showIt = (gameMode==='swap' || gameMode==='staff');
   badge.classList.toggle('show', showIt);
   if(showIt){
-    badge.innerHTML = direction==='up'
-      ? '⬆️ Ułóż od najniższej do najwyższej'
-      : '⬇️ Ułóż od najwyższej do najniższej';
+    badge.innerHTML = '⬆️ Ułóż od najniższej do najwyższej';
   }
 }
 
@@ -583,8 +581,7 @@ function restartGame(){
   }else{
     document.getElementById('totalVal').textContent = PATH_WAYPOINTS.length;
     nextIndex = 0; selIdx = null;
-    direction = Math.random() < 0.5 ? 'up' : 'down';
-    TARGET = direction==='up' ? LETTERS.slice() : LETTERS.slice().reverse();
+    TARGET = LETTERS.slice();
     do{ slotLetters = shuffled(LETTERS); }while(slotLetters.every((l,i)=>l===TARGET[i]));
     slotClefs = clefsForPath();
     updateDirectionBadge();
