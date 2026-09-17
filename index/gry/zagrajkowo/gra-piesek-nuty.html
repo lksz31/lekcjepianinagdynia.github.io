@@ -50,11 +50,17 @@
   .dog-marker.hopping img{animation:dogHop 0.55s ease;}
   @keyframes dogHop{0%{transform:translateY(0);}45%{transform:translateY(-24px);}100%{transform:translateY(0);}}
 
-  .match-slot{position:absolute;transform:translate(-50%,-50%);width:44px;height:52px;border-radius:10px;border:2px dashed rgba(255,255,255,0.8);background:rgba(30,58,138,0.15);}
+  .match-slot{position:absolute;transform:translate(-50%,-50%);width:44px;height:52px;border-radius:10px;border:2px dashed rgba(255,255,255,0.8);background:rgba(30,58,138,0.15);display:flex;align-items:center;justify-content:center;}
   .match-slot.hover{border-color:var(--gold);background:rgba(212,175,55,0.25);}
-  .match-slot.correct{border-style:solid;border-color:var(--green);background:rgba(240,253,244,0.85);}
-  .match-slot.wrong{border-style:solid;border-color:var(--red);background:rgba(254,242,242,0.85);}
-  .match-tile{position:absolute;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:10px;background:rgba(248,250,252,0.95);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;color:var(--navy);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;box-shadow:0 3px 6px rgba(0,0,0,0.25);}
+  .match-slot.filled{border-style:solid;background:rgba(30,58,138,0.08);}
+  /* Kafelki z literami mieszkają w porządnej tacce POD mapą (jak w
+     pozostałych grach), nie rozrzucone losowo po całej mapie — łatwiej je
+     trafić palcem i nic nie "znika" w tle. Trafiają na mapę dopiero jako
+     dziecko konkretnej .match-slot (wyśrodkowane przez jej flex), więc nie
+     potrzebują już własnego position:absolute — tylko podczas przeciągania
+     (position:fixed ustawiane z JS). */
+  .match-tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:820px;width:100%;}
+  .match-tile{width:40px;height:40px;flex-shrink:0;border-radius:10px;background:rgba(248,250,252,0.95);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;color:var(--navy);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;box-shadow:0 3px 6px rgba(0,0,0,0.25);}
   .match-tile.dragging{z-index:200;cursor:grabbing;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.3));}
   .match-tile.locked{opacity:0;pointer-events:none;}
 
@@ -98,6 +104,8 @@
   <div class="path-card">
     <div class="path-row" id="pathRow"></div>
   </div>
+
+  <div class="match-tray" id="matchTray" style="display:none;"></div>
 
   <button class="check-btn" id="checkBtn" style="display:none;" onclick="checkMatch()">Sprawdź</button>
 
@@ -180,6 +188,7 @@ function setMode(m){
   gameMode = m;
   document.querySelectorAll('#modeRow .mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===m));
   document.getElementById('checkBtn').style.display = (m==='match') ? 'inline-block' : 'none';
+  document.getElementById('matchTray').style.display = (m==='match') ? 'flex' : 'none';
   document.getElementById('clefToggle').style.display = (m==='swap') ? 'none' : 'flex';
   restartGame();
 }
@@ -376,6 +385,7 @@ function pickMatchTargets(){
 
 function renderMatch(){
   const row = document.getElementById('pathRow');
+  const tray = document.getElementById('matchTray');
   const sg = 6.2;
   const isBoth = clefMode === 'both';
   const staffTopT = isBoth ? 6 : 10;
@@ -395,7 +405,12 @@ function renderMatch(){
     return out;
   }
 
-  let s = '<svg viewBox="0 0 100 '+vbH+'" preserveAspectRatio="none" style="position:absolute;left:4%;top:4%;width:92%;height:'+heightPct+'%;">';
+  /* Bez preserveAspectRatio="none" na SAMYM <svg> — inaczej cały pięcioliniowy
+     podgląd (razem z kluczem) rozciąga się nierównomiernie do dowolnego
+     kształtu pudełka CSS, co zniekształcało klucz. (preserveAspectRatio="none"
+     na SAMYM obrazku klucza w drawStaff wyżej jest bezpieczne — jego cw/ch są
+     policzone dokładnie pod proporcje klucza, więc rozciąganie nic nie psuje). */
+  let s = '<svg viewBox="0 0 100 '+vbH+'" style="position:absolute;left:4%;top:4%;width:92%;height:'+heightPct+'%;">';
   if(isBoth){
     s += drawStaff(staffTopT, CLEFS.treble);
     s += drawStaff(staffTopB, CLEFS.bass);
@@ -418,21 +433,35 @@ function renderMatch(){
     slotXs.push(4 + (20+i*stepX)*0.92);
   }
   slotXs.forEach((x,i)=>{
-    html += '<div class="match-slot" data-idx="'+i+'" style="left:'+x+'%;top:34%;"></div>';
+    html += '<div class="match-slot'+(matchPlaced[i]?' filled':'')+'" data-idx="'+i+'" style="left:'+x+'%;top:34%;"></div>';
   });
-
-  const usedSpots = [];
-  matchTileLetters.forEach((letter,i)=>{
-    let lp, tp;
-    do{
-      lp = 6 + Math.random()*88;
-      tp = 55 + Math.random()*38;
-    }while(usedSpots.some(function(p){return Math.abs(p.lp-lp)<9 && Math.abs(p.tp-tp)<10;}));
-    usedSpots.push({lp,tp});
-    html += '<div class="match-tile" data-tid="'+i+'" data-letter="'+letter+'" style="left:'+lp+'%;top:'+tp+'%;">'+letter+'</div>';
-  });
-
   row.innerHTML = html;
+
+  /* Kafelki-litery: nieumieszczone mieszkają w tacce pod mapą (zwykły
+     przepływ flex — łatwe do trafienia palcem), umieszczone są dziećmi
+     swojej .match-slot (wyśrodkowane przez jej flex). */
+  tray.innerHTML = '';
+  matchTileLetters.forEach((letter,i)=>{
+    if(matchPlaced.some(function(p){return p && p.tid === i;})) return;
+    const tile = document.createElement('div');
+    tile.className = 'match-tile';
+    tile.dataset.tid = i;
+    tile.dataset.letter = letter;
+    tile.textContent = letter;
+    tray.appendChild(tile);
+  });
+  matchPlaced.forEach((p,i)=>{
+    if(!p) return;
+    const slot = row.querySelector('.match-slot[data-idx="'+i+'"]');
+    if(!slot) return;
+    const tile = document.createElement('div');
+    tile.className = 'match-tile'+(p.locked?' locked':'');
+    tile.dataset.tid = p.tid;
+    tile.dataset.letter = p.letter;
+    tile.textContent = p.letter;
+    slot.appendChild(tile);
+  });
+
   attachMatchTileEvents();
 }
 
@@ -446,10 +475,15 @@ function onMatchTileDown(e){
   const el = e.currentTarget;
   if(el.classList.contains('locked')) return;
   e.preventDefault();
-  el.classList.add('dragging');
-  el.style.position='fixed';
+  const fromSlot = el.closest('.match-slot');
+  const fromSlotIdx = fromSlot ? parseInt(fromSlot.dataset.idx,10) : null;
   const rect = el.getBoundingClientRect();
   const offX = e.clientX-(rect.left+rect.width/2), offY = e.clientY-(rect.top+rect.height/2);
+  /* Wyjmij z bieżącego rodzica (tacki albo luki), żeby swobodnie fruwał
+     jako position:fixed nad całą stroną, niezależną od układu tacki/mapy. */
+  document.body.appendChild(el);
+  el.classList.add('dragging');
+  el.style.position='fixed';
   el.style.left=(rect.left+rect.width/2)+'px';
   el.style.top=(rect.top+rect.height/2)+'px';
   el.style.transform='translate(-50%,-50%)';
@@ -474,47 +508,28 @@ function onMatchTileDown(e){
     const under = document.elementFromPoint(ev.clientX,ev.clientY);
     el.style.pointerEvents='';
     const slot = under && under.closest ? under.closest('.match-slot') : null;
-    el.classList.remove('dragging');
-    el.style.position=''; el.style.left=''; el.style.top=''; el.style.transform='';
+    const tid = parseInt(el.dataset.tid,10);
+    if(fromSlotIdx !== null) matchPlaced[fromSlotIdx] = null; /* zabieramy z poprzedniej luki, jeśli tam była */
     if(slot){
       const idx = parseInt(slot.dataset.idx,10);
-      if(matchPlaced[idx]) return renderMatch(); /* zajęte, wróć */
-      matchPlaced[idx] = {letter: el.dataset.letter, tid: parseInt(el.dataset.tid,10)};
-      renderMatch();
-      applyPlacedState();
+      if(!matchPlaced[idx]){
+        matchPlaced[idx] = {letter: el.dataset.letter, tid: tid};
+      }
     }
+    renderMatch();
   }
   document.addEventListener('pointermove', move);
   document.addEventListener('pointerup', finish);
   document.addEventListener('pointercancel', finish);
 }
 
-function applyPlacedState(){
-  matchPlaced.forEach((p,i)=>{
-    if(!p) return;
-    const slot = document.querySelector('.match-slot[data-idx="'+i+'"]');
-    const tile = document.querySelector('.match-tile[data-tid="'+p.tid+'"]');
-    if(slot){
-      slot.style.display='none';
-      if(tile){
-        tile.style.left = slot.style.left;
-        tile.style.top = slot.style.top;
-        tile.dataset.slotIdx = i;
-      }
-    }
-  });
-}
-
 function checkMatch(){
   const feedback = document.getElementById('feedbackMsg');
   let filled = 0, correct = 0;
   matchPlaced.forEach((p,i)=>{
-    const tile = p ? document.querySelector('.match-tile[data-tid="'+p.tid+'"]') : null;
-    if(!p || !tile) return;
+    if(!p) return;
     filled++;
-    const ok = p.letter === matchTargets[i];
-    if(ok){ correct++; tile.classList.add('locked'); }
-    else{ tile.style.outline='2px solid var(--red)'; }
+    if(p.letter === matchTargets[i]){ correct++; p.locked = true; }
   });
   document.getElementById('scoreVal').textContent = correct;
   if(filled < MATCH_LEN){
@@ -526,14 +541,8 @@ function checkMatch(){
     feedback.textContent = '';
     setTimeout(showWin, 300);
   }else{
-    matchPlaced = matchPlaced.map((p,i)=>{
-      if(!p) return p;
-      const tile = document.querySelector('.match-tile[data-tid="'+p.tid+'"]');
-      if(tile && tile.classList.contains('locked')) return p;
-      return null;
-    });
+    matchPlaced = matchPlaced.map(function(p){ return (p && p.locked) ? p : null; });
     renderMatch();
-    applyPlacedState();
     feedback.textContent = 'Prawie! Popraw czerwone kafelki i sprawdź ponownie.';
     feedback.className = 'feedback-msg bad';
   }

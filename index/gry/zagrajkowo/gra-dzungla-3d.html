@@ -180,7 +180,7 @@
 <body>
 
 <div class="top-bar">
-  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link" onclick="return handleBackLinkClick(event)">‹ Wróć do gier</a>
   <span class="game-title-bar">🐾 Dżungla Muzyczna 3D</span>
   <span class="top-bar-right">
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
@@ -282,6 +282,24 @@
 </div>
 
 <script>
+/* Gdy ta gra jest osadzona w ramce (popup na zagrajkowo.html), zwykłe
+   przejście po href nawigowałoby CAŁĄ ramkę na zagrajkowo.html — czyli
+   gracz zobaczyłby całą stronę Zagrajkowa wciśniętą w małe okienko popupu,
+   zamiast po prostu wyjść z gry. Jeśli okno-rodzic wystawia requestClose
+   (ten sam origin), prosimy je więc o zamknięcie popupu zamiast nawigować;
+   w przeciwnym razie (gra otwarta samodzielnie, nie w ramce) link działa
+   zwyczajnie. */
+function handleBackLinkClick(e){
+  try{
+    if(window.parent && window.parent !== window && typeof window.parent.requestClose === 'function'){
+      e.preventDefault();
+      window.parent.requestClose();
+      return false;
+    }
+  }catch(err){ /* inne pochodzenie — zwykła nawigacja */ }
+  return true;
+}
+
 /* ══ Dźwięki (Web Audio) — jeden wspólny AudioContext dla wszystkiego ══ */
 let audioCtx = null;
 let soundEnabled = true;
