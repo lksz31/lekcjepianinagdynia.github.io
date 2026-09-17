@@ -40,27 +40,19 @@
 
   .content-row{display:flex;gap:18px;align-items:flex-start;justify-content:center;width:100%;max-width:900px;}
 
-  /* Obrazek notatnika (16 poziomych linii w oryginale, natywny odstęp
-     ~27.3px przy natywnej szerokości 1024px) ma linie o wiele za ciasne,
-     żeby zmieścić w nich czytelny tekst i 52px-wysokie kafelki-luki (.gap)
-     — stąd oryginalny problem: tekst po prostu spływał poza obrazek na
-     czyste tło bez linii. Naprawa: background-size dostaje WYRAŹNĄ
-     wysokość w px (zamiast "auto" trzymającego proporcje obrazka), więc
-     obrazek rozciąga się w pionie NIEZALEŻNIE od szerokości, tak żeby
-     jego linie wypadły dokładnie co 54px — czyli tyle, ile wynosi
-     line-height tekstu (i tyle, żeby kafelek-luka się zmieścił w jednej
-     linijce, bez "rozpychania" jej i psucia wyrównania kolejnych linii).
-     Druga warstwa tła (powtarzalny gradient w tym samym kolorze i z tym
-     samym odstępem) dorysowuje linie POD obrazkiem — widoczne tylko tam,
-     gdzie tekst jest dłuższy niż obrazek, żeby list NIGDY nie spływał na
-     puste tło bez linii, niezależnie od długości czy szerokości ekranu. */
-  .letter-card{background-color:#f8f1d6;background-image:
-      url('/index/gry/zagrajkowo/gra-list-nutami/grafiki/notatnik.webp'),
-      repeating-linear-gradient(to bottom, transparent 0, transparent 53px, #2d7d8b 53px, #2d7d8b 54px);
-    background-repeat:no-repeat, repeat;
-    background-position:top center, 0 194px;
-    background-size:100% 1106px, auto;
-    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);padding:194px 11% 24px 19%;max-width:640px;width:100%;font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;flex:1;min-width:0;}
+  /* Obrazek notatnika ma naturalne proporcje "biurko + kartka" (1024×559 —
+     szeroki, niski kadr), więc wcześniejsze wymuszanie mu sztywnej wysokości
+     w px (żeby "rozciągnąć" go pod długi tekst) psuło jego proporcje —
+     ołówek, gumka i drewno biurka wychodziły nienaturalnie wydłużone.
+     Naprawa: obrazek jest teraz osobnym elementem <img> na górze karty,
+     renderowanym w naturalnych proporcjach (bez żadnego rozciągania), a
+     sam tekst listu leci NIŻEJ, we własnej sekcji z liniami rysowanymi
+     czysto przez CSS (repeating-linear-gradient) — linie się więc nigdy
+     nie rozjeżdżają z obrazkiem i mogą ciągnąć się tak długo, jak trzeba,
+     niezależnie od długości tekstu czy szerokości ekranu. */
+  .letter-card{background:#f8f1d6;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);max-width:640px;width:100%;overflow:hidden;flex:1;min-width:0;}
+  .letter-header-img{display:block;width:100%;height:auto;}
+  .letter-body{padding:18px 8% 26px;background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 53px, rgba(45,125,139,0.55) 53px, rgba(45,125,139,0.55) 54px);font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;}
 
   .gap{display:inline-flex;align-items:center;justify-content:center;width:40px;height:52px;vertical-align:middle;margin:0 3px;border-radius:8px;border:2px dashed #cbd5e1;background:#fafafa;transition:0.2s;}
   .gap.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
@@ -125,7 +117,10 @@
       <button class="check-btn" onclick="checkAll()">Sprawdź</button>
       <div class="feedback-msg" id="feedbackMsg"></div>
     </div>
-    <div class="letter-card" id="letterCard"></div>
+    <div class="letter-card">
+      <img class="letter-header-img" src="/index/gry/zagrajkowo/gra-list-nutami/grafiki/notatnik.webp" alt="" draggable="false">
+      <div class="letter-body" id="letterCard"></div>
+    </div>
   </div>
 </div>
 
@@ -158,14 +153,14 @@ const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
    Każda nuta zaczyna właśnie to słowo (wielka litera = początek zdania/słowa). */
 const TEMPLATE_NATURAL = [
   {t:'Drogi Muzyku!\n\n'},
-  {b:'C',base:'C'}, {t:'ieszę się, że grasz na pianinie.\n'},
-  {b:'D',base:'D'}, {t:'źwięki mają swoje nazwy — jedna z pierwszych melodii, którą zagrasz, może nazywać się '},
-  {b:'E',base:'E'}, {t:'tiuda.\n'},
-  {t:'Ćwicz '}, {b:'F',base:'F'}, {t:'ortepian codziennie, a szybko zauważysz postępy.\n'},
-  {t:'Kiedy '}, {b:'G',base:'G'}, {t:'rasz, słuchaj uważnie każdego dźwięku.\n'},
-  {t:'Naucz się rozpoznawać '}, {b:'A',base:'A'}, {t:'kordy — to podstawa muzyki.\n'},
-  {t:'Muzyka to prawdziwa '}, {b:'H',base:'H'}, {t:'armonia.\n\n'},
-  {t:'Do zobaczenia na lekcji!'},
+  {b:'C',base:'C'}, {t:'ieszę się, że grasz.\n'},
+  {b:'D',base:'D'}, {t:'źwięki mają nazwy.\n'},
+  {t:'Zagraj kiedyś '}, {b:'E',base:'E'}, {t:'tiudę.\n'},
+  {t:'Ćwicz '}, {b:'F',base:'F'}, {t:'ortepian codziennie.\n'},
+  {t:'Gdy '}, {b:'G',base:'G'}, {t:'rasz, słuchaj uważnie.\n'},
+  {t:'Poznaj '}, {b:'A',base:'A'}, {t:'kordy.\n'},
+  {t:'To prawdziwa '}, {b:'H',base:'H'}, {t:'armonia.\n\n'},
+  {t:'Do zobaczenia!'},
 ];
 
 /* Tryb z krzyżykami i bemolami — luka to teraz 2-3 litery (nazwa dźwięku
@@ -173,14 +168,14 @@ const TEMPLATE_NATURAL = [
    Trzeba się domyślić całego słowa z kontekstu zdania. */
 const TEMPLATE_ACCIDENTAL = [
   {t:'Drogi Muzyku!\n\n'},
-  {t:'Kiedy w klasie panuje głęboka '}, {b:'cis',base:'C',acc:'#'}, {t:'za, dobrze słychać każdy dźwięk.\n'},
-  {t:'Na starym pianinie jedna '}, {b:'des',base:'D',acc:'b'}, {t:'ka lekko skrzypi, ale to nic nie szkodzi.\n'},
-  {t:'To naprawdę dobry inter'}, {b:'es',base:'E',acc:'b'}, {t:' — uczyć się grać!\n'},
-  {t:'Po lekcji poczęstuję Cię '}, {b:'fis',base:'F',acc:'#'}, {t:'taszkami.\n'},
-  {t:'Ukłon na koniec koncertu to piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t.\n'},
-  {t:'Kiedyś może zostaniesz ma'}, {b:'gis',base:'G',acc:'#'}, {t:'trem muzyki.\n'},
-  {t:'Poświęcaj muzyce dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u.\n\n'},
-  {t:'Do zobaczenia na lekcji!'},
+  {t:'Lubię '}, {b:'cis',base:'C',acc:'#'}, {t:'zę przed grą.\n'},
+  {t:'Stara '}, {b:'des',base:'D',acc:'b'}, {t:'ka skrzypi.\n'},
+  {t:'To dobry inter'}, {b:'es',base:'E',acc:'b'}, {t:'.\n'},
+  {t:'Zjedz '}, {b:'fis',base:'F',acc:'#'}, {t:'taszki.\n'},
+  {t:'Piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t ukłonu.\n'},
+  {t:'Bądź ma'}, {b:'gis',base:'G',acc:'#'}, {t:'trem muzyki.\n'},
+  {t:'Miej dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u.\n\n'},
+  {t:'Do zobaczenia!'},
 ];
 
 function currentTemplate(){ return currentMode==='accidental' ? TEMPLATE_ACCIDENTAL : TEMPLATE_NATURAL; }

@@ -172,6 +172,9 @@
 
   /* ══ Cutscene przelotu kamery przed poziomem ══ */
   .skip-cutscene-btn{position:absolute;bottom:18px;right:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 18px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;}
+  /* Tryb "dora": pełnoekranowe wyciemnienie na 3. pomyłkę, tuż przed
+     restartem poziomu (patrz triggerDoraCaught). */
+  .dora-blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s ease;z-index:16;}
 </style>
 </head>
 <body>
@@ -183,6 +186,7 @@
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
     <button type="button" class="sound-toggle" id="compassToggle" onclick="toggleCompass()" aria-label="Obracaj widok, obracając telefon" title="Obracaj widok, obracając telefon lub tablet">🧭</button>
     <span class="score-box" id="levelBadge" style="display:none;">🌲 Poziom 2</span>
+    <span class="score-box" id="doraLivesBadge" style="display:none;"></span>
     <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
   </span>
 </div>
@@ -236,6 +240,7 @@
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
   <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
   <button type="button" class="skip-cutscene-btn" id="skipCutsceneBtn" onclick="cutsceneSkip=true;" style="display:none;">Pomiń ▶</button>
+  <div class="dora-blackout" id="doraBlackout"></div>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -3259,7 +3264,7 @@ function onCanvasPointerUp(e){
   const wasTap = !dragMoved;
   dragMoved = false;
   if(!wasTap) return;
-  if(walking || currentPuzzle) return;
+  if(walking || currentPuzzle || doraEventActive) return;
   const rect = renderer.domElement.getBoundingClientRect();
   const x = ((e.clientX-rect.left)/rect.width)*2-1;
   const y = -((e.clientY-rect.top)/rect.height)*2+1;
@@ -3551,6 +3556,7 @@ function checkBasketAnswer(){
       t.classList.add('wrong-flash');
       setTimeout(function(){ t.classList.remove('wrong-flash'); }, 400);
     });
+    registerDoraMistake();
   }
 }
 
@@ -3690,6 +3696,7 @@ function onFruitPick(letter, octaveIdx, tileEl){
       tileEl.classList.add('wrong-flash');
       setTimeout(function(){ tileEl.classList.remove('wrong-flash'); }, 400);
     }
+    registerDoraMistake();
   }
 }
 
@@ -3714,6 +3721,128 @@ function completeStationSuccess(){
       document.getElementById('hintBadge').style.opacity = '1';
     }
   }, 500);
+}
+
+/* ══ Tryb "dora" — punkty życia i "ktoś nas obserwuje" ══
+   Aktywne tylko w nocnym trybie (sceneIsNight) od poziomu 2 wzwyż. Każda
+   pomyłka w zagadce odejmuje jedno serce i na chwilę przełącza kamerę na
+   ciemną postać czającą się coraz bliżej za plecami postaci (ten sam kierunek
+   "do tyłu", co cfg.back z cameraOffsetForAspect — patrz updateCamera). Po
+   trzeciej pomyłce ta postać dopada kamerę, ekran robi się czarny i poziom
+   zaczyna się od nowa. Własny, niezależny od runIntroCutscene tween kamery
+   (tweenRaw), żeby nie kolidować z cutsceneSkip/przyciskiem "Pomiń". */
+let doraLives = 3;
+let doraEventActive = false;
+
+function updateDoraLivesUI(){
+  const el = document.getElementById('doraLivesBadge');
+  if(!el) return;
+  const show = sceneIsNight && currentLevel >= 2;
+  if(!show){ el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  el.textContent = '❤️'.repeat(Math.max(0, doraLives)) + '🖤'.repeat(Math.max(0, 3 - doraLives));
+}
+
+function tweenRaw(fromPos, fromLook, toPos, toLook, duration, onDone){
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const e = t*t*(3-2*t);
+    camera.position.lerpVectors(fromPos, toPos, e);
+    const look = new THREE.Vector3().lerpVectors(fromLook, toLook, e);
+    camera.lookAt(look);
+    if(t < 1) requestAnimationFrame(step);
+    else if(onDone) onDone();
+  }
+  requestAnimationFrame(step);
+}
+
+function registerDoraMistake(){
+  if(!sceneIsNight || currentLevel < 2 || doraEventActive || !scene || !character) return;
+  doraLives--;
+  updateDoraLivesUI();
+  if(doraLives <= 0){
+    triggerDoraCaught();
+  }else{
+    triggerDoraStalkerShot(3 - doraLives);
+  }
+}
+
+function triggerDoraStalkerShot(mistakeNum){
+  doraEventActive = true;
+  inCutscene = true;
+  const cfg = cameraOffsetForAspect();
+  const backDir = cfg.back.clone().setY(0).normalize();
+  const distances = {1: 16, 2: 9};
+  const dist = distances[mistakeNum] || 5;
+
+  const figure = buildDarkFigure();
+  const fPos = character.position.clone().addScaledVector(backDir, dist);
+  fPos.y = terrainHeight(fPos.x, fPos.z);
+  figure.position.copy(fPos);
+  scene.add(figure);
+
+  const camPos = character.position.clone().addScaledVector(backDir, Math.max(2, dist - 4));
+  camPos.y = character.position.y + 1.7;
+  const lookAt = fPos.clone(); lookAt.y += 1.1;
+
+  const fromPos = camera.position.clone();
+  const fromLook = character.position.clone(); fromLook.y += cfg.lookY;
+
+  tweenRaw(fromPos, fromLook, camPos, lookAt, 450, function(){
+    setTimeout(function(){
+      const backPos = character.position.clone().add(cfg.back);
+      const backLook = character.position.clone(); backLook.y += cfg.lookY;
+      tweenRaw(camera.position.clone(), lookAt, backPos, backLook, 450, function(){
+        scene.remove(figure);
+        inCutscene = false;
+        doraEventActive = false;
+      });
+    }, 700);
+  });
+}
+
+function triggerDoraCaught(){
+  doraEventActive = true;
+  inCutscene = true;
+  currentPuzzle = null;
+  hidePuzzle();
+  const cfg = cameraOffsetForAspect();
+  const backDir = cfg.back.clone().setY(0).normalize();
+  const startDist = 9;
+
+  const figure = buildDarkFigure();
+  scene.add(figure);
+  camera.position.copy(character.position.clone().add(cfg.back));
+  camera.position.y = character.position.y + 1.7;
+
+  const t0 = performance.now();
+  const duration = 950;
+  function step(now){
+    const t = Math.min(1, (now-t0)/duration);
+    const e = t*t;
+    const dist = startDist*(1-e) + 0.4*e;
+    const pos = character.position.clone().addScaledVector(backDir, dist);
+    pos.y = terrainHeight(pos.x, pos.z) + 1.1*e;
+    figure.position.copy(pos);
+    figure.scale.setScalar(1 + e*e*8);
+    camera.lookAt(pos.x, pos.y, pos.z);
+    if(t < 1){
+      requestAnimationFrame(step);
+    }else{
+      const blackout = document.getElementById('doraBlackout');
+      if(blackout) blackout.style.opacity = '1';
+      setTimeout(function(){
+        const lvl = currentLevel;
+        doraEventActive = false;
+        goToLevel(lvl);
+        setTimeout(function(){
+          if(blackout) blackout.style.opacity = '0';
+        }, 500);
+      }, 550);
+    }
+  }
+  requestAnimationFrame(step);
 }
 
 /* ══ Efekty świętowania ══ */
@@ -4114,6 +4243,8 @@ function initScene(){
   scene = new THREE.Scene();
   const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
   sceneIsNight = isNight;
+  doraLives = 3;
+  doraEventActive = false;
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
@@ -4245,6 +4376,7 @@ function initScene(){
   }else{
     levelBadge.style.display = 'none';
   }
+  updateDoraLivesUI();
 
   raycaster = new THREE.Raycaster();
 
