@@ -98,6 +98,11 @@
     <button type="button" class="clef-btn" data-clef="both" onclick="setClefMode('both')">🎼𝄢 Oba klucze</button>
   </div>
 
+  <div class="clef-toggle" id="octaveToggle" style="display:none;">
+    <button type="button" class="clef-btn active" data-oct="off" onclick="setOctavesOn(false)">Bez oktaw</button>
+    <button type="button" class="clef-btn" data-oct="on" onclick="setOctavesOn(true)">C¹ Z oktawami</button>
+  </div>
+
   <p class="instructions" id="instrText"></p>
   <div class="direction-badge" id="directionBadge"></div>
 
@@ -135,6 +140,19 @@ const CLEFS = {
   }
 };
 let clefMode = 'treble'; /* 'treble' | 'bass' | 'both' */
+/* Oktawy — na razie tylko w trybie "Dopasuj litery": część nut losowo
+   trafia oktawę wyżej (ten sam dźwięk co do litery, ale wyżej na
+   pięciolinii, z dodatkowymi liniami dodanymi i małą "¹" przy literze).
+   Domyślnie wyłączone, żeby nie zmieniać istniejącego, prostszego
+   zachowania — włącza je osobny przełącznik widoczny tylko w tym trybie. */
+let octavesOn = false;
+function setOctavesOn(on){
+  octavesOn = on;
+  document.querySelectorAll('#octaveToggle .clef-btn').forEach(function(b){
+    b.classList.toggle('active', (b.dataset.oct==='on') === on);
+  });
+  restartGame();
+}
 
 /* Punkty (%, %) rozłożone wzdłuż wydeptanej dróżki na mapie */
 const PATH_WAYPOINTS = [
@@ -190,6 +208,7 @@ function setMode(m){
   document.getElementById('checkBtn').style.display = (m==='match') ? 'inline-block' : 'none';
   document.getElementById('matchTray').style.display = (m==='match') ? 'flex' : 'none';
   document.getElementById('clefToggle').style.display = (m==='swap') ? 'none' : 'flex';
+  document.getElementById('octaveToggle').style.display = (m==='match') ? 'flex' : 'none';
   restartGame();
 }
 
@@ -377,7 +396,11 @@ function walkDogHome(){
 
 function pickMatchTargets(){
   matchTargets = [];
-  for(let i=0;i<MATCH_LEN;i++) matchTargets.push(LETTERS[Math.floor(Math.random()*LETTERS.length)]);
+  for(let i=0;i<MATCH_LEN;i++){
+    const letter = LETTERS[Math.floor(Math.random()*LETTERS.length)];
+    const oct = octavesOn && Math.random() < 0.5 ? 1 : 0;
+    matchTargets.push({letter: letter, oct: oct});
+  }
   matchTileLetters = shuffled(matchTargets);
   matchPlaced = matchTargets.map(()=>null);
   matchClefs = matchTargets.map(()=>pickClefFor());
@@ -418,12 +441,27 @@ function renderMatch(){
     s += drawStaff(staffTopT, CLEFS[clefMode]);
   }
   const startX = 20, stepX = 76/(MATCH_LEN-1);
-  matchTargets.forEach((letter,i)=>{
+  matchTargets.forEach((t,i)=>{
     const nx = startX+i*stepX;
     const cfg = isBoth ? CLEFS[matchClefs[i]] : CLEFS[clefMode];
     const staffTop = isBoth ? (matchClefs[i]==='treble' ? staffTopT : staffTopB) : staffTopT;
-    const ny = staffTop+(cfg.staffY[letter]*sg/2);
+    /* Oktawa wyżej = 7 kroków diatonicznych w górę pięciolinii (mniejszy
+       staffY = wyżej), stąd -7 na każdą oktawę — nuta wtedy zwykle wypada
+       nad pięciolinią, więc dorysowujemy potrzebne linie dodane. */
+    const ny = staffTop+((cfg.staffY[t.letter]-t.oct*7)*sg/2);
+    const botLine = staffTop+4*sg, topLine = staffTop, ledW = sg*0.55;
+    if(ny > botLine + sg*0.5){
+      let ly = botLine+sg;
+      while(ly <= ny+sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>'; ly += sg; }
+    }
+    if(ny < topLine - sg*0.5){
+      let ly = topLine-sg;
+      while(ly >= ny-sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>'; ly -= sg; }
+    }
     s += '<ellipse cx="'+nx+'" cy="'+ny.toFixed(1)+'" rx="1.9" ry="1.4" fill="none" stroke="#1e3a8a" stroke-width="0.6" opacity="0.55" transform="rotate(-15,'+nx+','+ny.toFixed(1)+')"/>';
+    if(t.oct === 1){
+      s += '<text x="'+(nx+2.6).toFixed(1)+'" y="'+(ny-1.4).toFixed(1)+'" font-size="2.4" fill="#8a6d1a" opacity="0.75">¹</text>';
+    }
   });
   s += '</svg>';
 
@@ -441,13 +479,14 @@ function renderMatch(){
      przepływ flex — łatwe do trafienia palcem), umieszczone są dziećmi
      swojej .match-slot (wyśrodkowane przez jej flex). */
   tray.innerHTML = '';
-  matchTileLetters.forEach((letter,i)=>{
+  matchTileLetters.forEach((t,i)=>{
     if(matchPlaced.some(function(p){return p && p.tid === i;})) return;
     const tile = document.createElement('div');
     tile.className = 'match-tile';
     tile.dataset.tid = i;
-    tile.dataset.letter = letter;
-    tile.textContent = letter;
+    tile.dataset.letter = t.letter;
+    tile.dataset.oct = t.oct;
+    tile.innerHTML = t.letter + (t.oct===1 ? '<sup>1</sup>' : '');
     tray.appendChild(tile);
   });
   matchPlaced.forEach((p,i)=>{
@@ -458,7 +497,8 @@ function renderMatch(){
     tile.className = 'match-tile'+(p.locked?' locked':'');
     tile.dataset.tid = p.tid;
     tile.dataset.letter = p.letter;
-    tile.textContent = p.letter;
+    tile.dataset.oct = p.oct;
+    tile.innerHTML = p.letter + (p.oct===1 ? '<sup>1</sup>' : '');
     slot.appendChild(tile);
   });
 
@@ -513,7 +553,7 @@ function onMatchTileDown(e){
     if(slot){
       const idx = parseInt(slot.dataset.idx,10);
       if(!matchPlaced[idx]){
-        matchPlaced[idx] = {letter: el.dataset.letter, tid: tid};
+        matchPlaced[idx] = {letter: el.dataset.letter, oct: parseInt(el.dataset.oct,10)||0, tid: tid};
       }
     }
     renderMatch();
@@ -529,7 +569,7 @@ function checkMatch(){
   matchPlaced.forEach((p,i)=>{
     if(!p) return;
     filled++;
-    if(p.letter === matchTargets[i]){ correct++; p.locked = true; }
+    if(p.letter === matchTargets[i].letter && p.oct === matchTargets[i].oct){ correct++; p.locked = true; }
   });
   document.getElementById('scoreVal').textContent = correct;
   if(filled < MATCH_LEN){
