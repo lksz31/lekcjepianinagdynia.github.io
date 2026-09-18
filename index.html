@@ -1058,67 +1058,49 @@
       <div class="zk-map-scene">
         <img class="zk-map-day" src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
         <img class="zk-map-night" src="/index/gry/zagrajkowo/zagrajkowo-mapa-nocny-jesien.webp" alt="Mapa Zagrajkowa (tryb nocny)">
-        <button class="zk-hotspot" style="left:15%;top:30%;width:12%;height:30%;" onclick="zkOpenGame(1)" aria-label="Dopasuj nutkę do literki"><span class="zk-label">Dopasuj nutkę</span></button>
-        <button class="zk-hotspot" style="left:30%;top:26%;width:9%;height:42%;" onclick="zkOpenGame(2)" aria-label="Umieść nutę"><span class="zk-label">Umieść nutę</span></button>
-        <button class="zk-hotspot" style="left:35%;top:17%;width:13%;height:30%;" onclick="zkOpenGame(3)" aria-label="Zaznacz właściwą nutę"><span class="zk-label">Zaznacz nutę</span></button>
-        <button class="zk-hotspot" style="left:46%;top:38%;width:12%;height:28%;" onclick="zkOpenGame(4)" aria-label="Piesek i nuty"><span class="zk-label">Piesek i nuty</span></button>
-        <button class="zk-hotspot" style="left:56%;top:35%;width:12%;height:30%;" onclick="zkOpenGame(5)" aria-label="Napisz list nutami"><span class="zk-label">List nutami</span></button>
-        <button class="zk-hotspot" style="left:65%;top:22%;width:13%;height:31%;" onclick="zkOpenGame(6)" aria-label="Ułóż klucz wiolinowy"><span class="zk-label">Klucz z puzzli</span></button>
-        <button class="zk-hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="zkOpenGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="zk-label">Dopasuj nazwę</span></button>
+        <a class="zk-hotspot" style="left:15%;top:30%;width:12%;height:30%;" href="/index/gry/zagrajkowo/gra-dopasuj-nute.html" aria-label="Dopasuj nutkę do literki"><span class="zk-label">Dopasuj nutkę</span></a>
+        <a class="zk-hotspot" style="left:30%;top:26%;width:9%;height:42%;" href="/index/gry/zagrajkowo/gra-narysuj-nute.html" aria-label="Umieść nutę"><span class="zk-label">Umieść nutę</span></a>
+        <a class="zk-hotspot" style="left:35%;top:17%;width:13%;height:30%;" href="/index/gry/zagrajkowo/gra-zaznacz-nute.html" aria-label="Zaznacz właściwą nutę"><span class="zk-label">Zaznacz nutę</span></a>
+        <a class="zk-hotspot" style="left:46%;top:38%;width:12%;height:28%;" href="/index/gry/zagrajkowo/gra-piesek-nuty.html" aria-label="Piesek i nuty"><span class="zk-label">Piesek i nuty</span></a>
+        <a class="zk-hotspot" style="left:56%;top:35%;width:12%;height:30%;" href="/index/gry/zagrajkowo/gra-list-nutami.html" aria-label="Napisz list nutami"><span class="zk-label">List nutami</span></a>
+        <a class="zk-hotspot" style="left:65%;top:22%;width:13%;height:31%;" href="/index/gry/zagrajkowo/gra-puzzle-klucz.html" aria-label="Ułóż klucz wiolinowy"><span class="zk-label">Klucz z puzzli</span></a>
+        <a class="zk-hotspot" style="left:73%;top:28%;width:14%;height:34%;" href="/index/gry/zagrajkowo/gra-dopasuj-nazwe.html" aria-label="Dopasuj nazwę do obrazka"><span class="zk-label">Dopasuj nazwę</span></a>
       </div>
       <div class="zk-jungle-wrap">
         <iframe class="zk-jungle-preview" src="/index/gry/zagrajkowo/gra-dzungla-3d.html?ambient=1" tabindex="-1" aria-hidden="true" loading="lazy"></iframe>
         <div class="zk-jungle-scrim"></div>
-        <button type="button" class="zk-jungle-cta" onclick="zkOpenGame(8)">
+        <a class="zk-jungle-cta" href="/index/gry/zagrajkowo/gra-dzungla-3d.html">
           <span>
             <span class="zk-jungle-badge">Nowość! Gra 3D</span>
             <span class="zk-jungle-title">Dżungla Muzyczna</span>
             <span class="zk-jungle-desc">Wybierz kotka lub piesa i rusz przez trójwymiarową dżunglę, rozwiązując zagadki muzyczne na każdej polance!</span>
           </span>
           <span class="zk-jungle-arrow">→</span>
-        </button>
+        </a>
       </div>
     </div>
 
   </div>
 </section>
 
-<!-- ══ ZAGRAJKOWO POPUP ══ -->
 <style>
   .zk-map-scene{position:relative;border-radius:24px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.1);line-height:0;max-width:1000px;margin:0 auto;}
   .zk-map-scene img{width:100%;display:block;}
   .zk-map-scene img.zk-map-night{display:none;}
   :root.dark-mode .zk-map-day{display:none;}
   :root.dark-mode .zk-map-night{display:block;}
-  .zk-hotspot{position:absolute;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;}
+  .zk-hotspot{position:absolute;display:block;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;text-decoration:none;}
   .zk-hotspot:hover{background:radial-gradient(ellipse,rgba(255,255,255,0.3),transparent 70%);}
   .zk-hotspot:hover .zk-label{opacity:1;transform:translateX(-50%) translateY(0);}
   .zk-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:#1e3a8a;color:white;font-size:0.7rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
-  .zk-popup-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
-  .zk-popup-overlay.show{display:flex;}
-  .zk-popup-box{background:white;border-radius:20px;width:100%;max-width:840px;max-height:min(88vh,760px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.4);}
-  /* Gra 3D (Dżungla Muzyczna) to pełnoekranowa scena WebGL, nie strona z
-     przewijaną treścią — zamiast dopasowywać wysokość ramki do treści (jak
-     w pozostałych grach), po prostu dajemy jej dużo większe okienko. */
-  .zk-popup-box.jungle{max-width:1300px;max-height:min(94vh,880px);height:min(94vh,880px);}
-  .zk-popup-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#1e3a8a;color:white;flex-shrink:0;}
-  .zk-popup-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;}
-  .zk-popup-close{background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:0.2s;flex-shrink:0;}
-  .zk-popup-close:hover{background:rgba(255,255,255,0.3);}
-  /* overflow-y:auto (nie hidden) — gry, których zawartość jest wyższa niż
-     sztywna wysokość okienka (np. dłuższe listy/plansze na wąskich/wysokich
-     tabletach), muszą dać się przewinąć, inaczej dół po prostu znika bez
-     żadnej wskazówki, że coś jeszcze tam jest. */
-  .zk-popup-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;background:#faf9f7;}
-  .zk-popup-body iframe{width:100%;height:100%;border:none;display:block;}
 
   /* Baner ma w tle żywą scenę 3D z gry (przyciemnioną przez scrim) zamiast
      płaskiego gradientu — osobna ramka w trybie ?ambient=1 (sama startuje i
      w kółko leci przez cutscenki kolejnych poziomów). <iframe> nie może być
-     dzieckiem <button>, stąd osobny .zk-jungle-wrap: ramka+scrim leżą pod
-     spodem jako czysto dekoracyjne warstwy (pointer-events:none), a przycisk
-     nad nimi ma przezroczyste tło, więc scena prześwituje, ale klik zawsze
-     trafia w przycisk. */
+     dzieckiem <a>, stąd osobny .zk-jungle-wrap: ramka+scrim leżą pod spodem
+     jako czysto dekoracyjne warstwy (pointer-events:none), a link nad nimi
+     ma przezroczyste tło, więc scena prześwituje, ale klik zawsze trafia w
+     link. */
   .zk-jungle-wrap{position:relative;border-radius:24px;overflow:hidden;margin-top:24px;max-width:1000px;width:100%;margin-left:auto;margin-right:auto;box-shadow:0 10px 30px rgba(12,43,26,0.25);background:linear-gradient(135deg,#0c2b1a,#1e4a2f);}
   .zk-jungle-preview{position:absolute;inset:0;width:100%;height:100%;border:none;pointer-events:none;opacity:0.65;}
   .zk-jungle-scrim{position:absolute;inset:0;background:linear-gradient(135deg,rgba(12,43,26,0.88),rgba(30,74,47,0.8));pointer-events:none;}
@@ -1131,74 +1113,6 @@
   @media(max-width:560px){.zk-jungle-cta{flex-wrap:wrap;}.zk-jungle-arrow{display:none;}}
   @media(prefers-reduced-motion:reduce){.zk-jungle-preview{display:none;}}
 </style>
-<div class="zk-popup-overlay" id="zkPopupOverlay" onclick="if(event.target===this)zkCloseGame()">
-  <div class="zk-popup-box">
-    <div class="zk-popup-header">
-      <span class="zk-popup-title" id="zkPopupTitle">Gra</span>
-      <button class="zk-popup-close" onclick="zkCloseGame()" aria-label="Zamknij">✕</button>
-    </div>
-    <div class="zk-popup-body" id="zkPopupBody"></div>
-  </div>
-</div>
-<script>
-  const ZK_GAMES = {
-    1: {title:'🎯 Dopasuj nutkę do literki', url:'/index/gry/zagrajkowo/gra-dopasuj-nute.html'},
-    2: {title:'✏️ Umieść nutę', url:'/index/gry/zagrajkowo/gra-narysuj-nute.html'},
-    3: {title:'⭕ Zaznacz właściwą nutę', url:'/index/gry/zagrajkowo/gra-zaznacz-nute.html'},
-    4: {title:'🐶 Piesek i nuty', url:'/index/gry/zagrajkowo/gra-piesek-nuty.html'},
-    5: {title:'✉️ Napisz list nutami', url:'/index/gry/zagrajkowo/gra-list-nutami.html'},
-    6: {title:'🧩 Ułóż klucz wiolinowy', url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
-    7: {title:'🔗 Dopasuj nazwę do obrazka', url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
-    8: {title:'🐾 Dżungla Muzyczna 3D', url:'/index/gry/zagrajkowo/gra-dzungla-3d.html'},
-  };
-  let zkScrollY = 0;
-  function zkOpenGame(id){
-    const g = ZK_GAMES[id];
-    if(!g) return;
-    document.getElementById('zkPopupTitle').textContent = g.title;
-    document.querySelector('.zk-popup-box').classList.toggle('jungle', id === 8);
-    const body = document.getElementById('zkPopupBody');
-    body.innerHTML = '<iframe src="'+g.url+'" title="'+g.title+'"></iframe>';
-    /* Gry 2D to strony z przewijaną treścią — ramka dostaje wysokość
-       dopasowaną do RZECZYWISTEJ zawartości (ta sama domena, więc scrollHeight
-       jej dokumentu jest dostępny), a to popup-body przewija się, gdy ta
-       wysokość przekroczy okienko. Gra 3D (id 8) to za to pełnoekranowa
-       scena WebGL, która ma po prostu wypełnić dane jej okienko (patrz
-       .zk-popup-box.jungle) — bez tego dopasowania. */
-    if(id !== 8){
-      const iframe = body.querySelector('iframe');
-      iframe.addEventListener('load', function(){
-        try{
-          const doc = iframe.contentDocument;
-          const resize = function(){
-            iframe.style.height = doc.documentElement.scrollHeight + 'px';
-          };
-          resize();
-          if(window.ResizeObserver){
-            new ResizeObserver(resize).observe(doc.body);
-          }
-        }catch(err){ /* inne pochodzenie — zostaw height:100% z CSS */ }
-      });
-    }
-    document.getElementById('zkPopupOverlay').classList.add('show');
-    zkScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = (-zkScrollY)+'px';
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-  }
-  function zkCloseGame(){
-    document.getElementById('zkPopupOverlay').classList.remove('show');
-    document.getElementById('zkPopupBody').innerHTML = '';
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.width = '';
-    window.scrollTo(0, zkScrollY);
-  }
-</script>
 
 <!-- ══ NARZĘDZIA DLA UCZNIÓW ══ -->
 <section class="promo-section">

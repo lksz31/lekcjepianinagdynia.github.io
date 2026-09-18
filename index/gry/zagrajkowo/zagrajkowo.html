@@ -35,7 +35,7 @@
   .city-wrap{max-width:1000px;margin:0 auto;padding:44px 4% 70px;}
   .map-scene{position:relative;border-radius:28px;overflow:hidden;box-shadow:0 14px 40px rgba(30,58,138,0.16);border:1px solid rgba(30,58,138,0.08);line-height:0;}
   .map-scene img{width:100%;display:block;}
-  .hotspot{position:absolute;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;}
+  .hotspot{position:absolute;display:block;background:transparent;border:none;padding:0;cursor:pointer;border-radius:16px;transition:0.2s;text-decoration:none;}
   .hotspot:hover{background:radial-gradient(ellipse,rgba(255,255,255,0.3),transparent 70%);}
   .hotspot:hover .b-label{opacity:1;transform:translateX(-50%) translateY(0);}
   .b-label{position:absolute;top:-8px;left:50%;transform:translateX(-50%) translateY(4px);opacity:0;transition:0.2s;background:var(--navy);color:white;font-size:0.7rem;font-weight:700;padding:6px 12px;border-radius:50px;white-space:nowrap;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,0.25);}
@@ -64,42 +64,6 @@
   .jungle-cta-arrow{margin-left:auto;font-size:1.4rem;flex-shrink:0;opacity:0.8;}
   @media(max-width:560px){.jungle-cta{flex-wrap:wrap;}.jungle-cta-arrow{display:none;}}
   @media(prefers-reduced-motion:reduce){.jungle-cta-preview{display:none;}}
-
-  /* ══ POPUP GRY ══ */
-  .popup-overlay{position:fixed;inset:0;background:rgba(10,18,40,0.72);backdrop-filter:blur(3px);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;}
-  .popup-overlay.show{display:flex;}
-  .popup-box{background:white;border-radius:20px;width:100%;max-width:840px;max-height:min(88vh,760px);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.4);}
-  /* Gra 3D (Dżungla Muzyczna) to pełnoekranowa scena WebGL, nie strona z
-     przewijaną treścią — zamiast dopasowywać wysokość ramki do treści (jak
-     w pozostałych grach), po prostu dajemy jej dużo większe okienko. */
-  .popup-box.jungle{max-width:1300px;max-height:min(94vh,880px);height:min(94vh,880px);}
-  .popup-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--navy);color:white;flex-shrink:0;}
-  .popup-title{font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;}
-  .popup-close-btn{background:rgba(255,255,255,0.15);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;transition:0.2s;flex-shrink:0;}
-  .popup-close-btn:hover{background:rgba(255,255,255,0.3);}
-  /* overflow-y:auto (nie hidden) — gry, których zawartość jest wyższa niż
-     sztywna wysokość okienka (np. dłuższe listy/plansze na wąskich/wysokich
-     tabletach), muszą dać się przewinąć, inaczej dół po prostu znika bez
-     żadnej wskazówki, że coś jeszcze tam jest (patrz zkOpenGame w dzieci.html
-     — ten sam problem i ta sama naprawa). */
-  .popup-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative;background:var(--bg);}
-  .popup-body iframe{width:100%;height:100%;border:none;display:block;}
-  .popup-soon{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;}
-  .popup-soon .ps-icon{font-size:3.6rem;}
-  .popup-soon h3{font-family:'Playfair Display',serif;color:var(--navy);font-size:1.3rem;margin:0;}
-  .popup-soon p{color:var(--text-mid);font-size:0.9rem;max-width:340px;margin:0;line-height:1.6;}
-
-  /* ══ POTWIERDZENIE WYJŚCIA ══ */
-  .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:3100;display:none;align-items:center;justify-content:center;padding:16px;}
-  .confirm-overlay.show{display:flex;}
-  .confirm-box{background:white;border-radius:18px;padding:28px 26px;max-width:320px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
-  .confirm-box .c-icon{font-size:2.2rem;margin-bottom:10px;}
-  .confirm-box h4{font-family:'Playfair Display',serif;color:var(--navy);margin:0 0 8px;font-size:1.1rem;}
-  .confirm-box p{color:var(--text-mid);font-size:0.85rem;margin:0 0 20px;line-height:1.5;}
-  .confirm-btns{display:flex;gap:10px;}
-  .confirm-btns button{flex:1;padding:11px;border-radius:50px;font-weight:700;font-size:0.82rem;cursor:pointer;border:none;}
-  .btn-stay{background:var(--bg);color:var(--navy);border:1.5px solid var(--border)!important;}
-  .btn-exit{background:#dc2626;color:white;}
 
   .site-footer{background:var(--card-bg);border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:20px;}
   .footer-main{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;padding:2.4rem 0;align-items:start;}
@@ -140,27 +104,27 @@
 <div class="city-wrap">
   <div class="map-scene">
     <img src="/index/gry/zagrajkowo/zagrajkowo-mapa.webp" alt="Mapa Zagrajkowa">
-    <button class="hotspot" style="left:15%;top:30%;width:12%;height:30%;" onclick="openGame(1)" aria-label="Dopasuj nutkę do literki"><span class="b-label">Dopasuj nutkę</span></button>
-    <button class="hotspot" style="left:30%;top:26%;width:9%;height:42%;" onclick="openGame(2)" aria-label="Umieść nutę"><span class="b-label">Umieść nutę</span></button>
-    <button class="hotspot" style="left:35%;top:17%;width:13%;height:30%;" onclick="openGame(3)" aria-label="Zaznacz właściwą nutę"><span class="b-label">Zaznacz nutę</span></button>
-    <button class="hotspot" style="left:46%;top:38%;width:12%;height:28%;" onclick="openGame(4)" aria-label="Piesek i nuty"><span class="b-label">Piesek i nuty</span></button>
-    <button class="hotspot" style="left:56%;top:35%;width:12%;height:30%;" onclick="openGame(5)" aria-label="Napisz list nutami"><span class="b-label">List nutami</span></button>
-    <button class="hotspot" style="left:65%;top:22%;width:13%;height:31%;" onclick="openGame(6)" aria-label="Ułóż klucz wiolinowy"><span class="b-label">Klucz z puzzli</span></button>
-    <button class="hotspot" style="left:73%;top:28%;width:14%;height:34%;" onclick="openGame(7)" aria-label="Dopasuj nazwę do obrazka"><span class="b-label">Dopasuj nazwę</span></button>
+    <a class="hotspot" style="left:15%;top:30%;width:12%;height:30%;" href="/index/gry/zagrajkowo/gra-dopasuj-nute.html" aria-label="Dopasuj nutkę do literki"><span class="b-label">Dopasuj nutkę</span></a>
+    <a class="hotspot" style="left:30%;top:26%;width:9%;height:42%;" href="/index/gry/zagrajkowo/gra-narysuj-nute.html" aria-label="Umieść nutę"><span class="b-label">Umieść nutę</span></a>
+    <a class="hotspot" style="left:35%;top:17%;width:13%;height:30%;" href="/index/gry/zagrajkowo/gra-zaznacz-nute.html" aria-label="Zaznacz właściwą nutę"><span class="b-label">Zaznacz nutę</span></a>
+    <a class="hotspot" style="left:46%;top:38%;width:12%;height:28%;" href="/index/gry/zagrajkowo/gra-piesek-nuty.html" aria-label="Piesek i nuty"><span class="b-label">Piesek i nuty</span></a>
+    <a class="hotspot" style="left:56%;top:35%;width:12%;height:30%;" href="/index/gry/zagrajkowo/gra-list-nutami.html" aria-label="Napisz list nutami"><span class="b-label">List nutami</span></a>
+    <a class="hotspot" style="left:65%;top:22%;width:13%;height:31%;" href="/index/gry/zagrajkowo/gra-puzzle-klucz.html" aria-label="Ułóż klucz wiolinowy"><span class="b-label">Klucz z puzzli</span></a>
+    <a class="hotspot" style="left:73%;top:28%;width:14%;height:34%;" href="/index/gry/zagrajkowo/gra-dopasuj-nazwe.html" aria-label="Dopasuj nazwę do obrazka"><span class="b-label">Dopasuj nazwę</span></a>
   </div>
   <p class="city-legend">Kliknij w domek, żeby zagrać! 🎉</p>
 
   <div class="jungle-cta-wrap">
     <iframe class="jungle-cta-preview" src="/index/gry/zagrajkowo/gra-dzungla-3d.html?ambient=1" tabindex="-1" aria-hidden="true" loading="lazy"></iframe>
     <div class="jungle-cta-scrim"></div>
-    <button type="button" class="jungle-cta" onclick="openGame(8)">
+    <a class="jungle-cta" href="/index/gry/zagrajkowo/gra-dzungla-3d.html">
       <span>
         <span class="jungle-cta-badge">Nowość! Gra 3D</span>
         <span class="jungle-cta-title">Dżungla Muzyczna</span>
         <span class="jungle-cta-desc">Wybierz kotka lub piesa i rusz przez trójwymiarową dżunglę, rozwiązując zagadki muzyczne na każdej polance!</span>
       </span>
       <span class="jungle-cta-arrow">→</span>
-    </button>
+    </a>
   </div>
 
 </div>
@@ -179,131 +143,6 @@
   </div>
   <div class="footer-bottom">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</div>
 </footer>
-
-<!-- POPUP GRY -->
-<div class="popup-overlay" id="popupOverlay" onclick="if(event.target===this)requestClose()">
-  <div class="popup-box">
-    <div class="popup-header">
-      <span class="popup-title" id="popupTitle">Gra</span>
-      <button class="popup-close-btn" onclick="requestClose()" aria-label="Zamknij">✕</button>
-    </div>
-    <div class="popup-body" id="popupBody"></div>
-  </div>
-</div>
-
-<!-- POTWIERDZENIE WYJŚCIA -->
-<div class="confirm-overlay" id="confirmOverlay">
-  <div class="confirm-box">
-    <div class="c-icon">🤔</div>
-    <h4>Na pewno wyjść?</h4>
-    <p>Twój postęp w tej grze zostanie utracony.</p>
-    <div class="confirm-btns">
-      <button class="btn-stay" onclick="cancelClose()">Zostań</button>
-      <button class="btn-exit" onclick="confirmClose()">Tak, wyjdź</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const GAMES = {
-  1: {title:'🎯 Dopasuj nutkę do literki', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nute.html'},
-  2: {title:'✏️ Umieść nutę', ready:true, url:'/index/gry/zagrajkowo/gra-narysuj-nute.html'},
-  3: {title:'⭕ Zaznacz właściwą nutę', ready:true, url:'/index/gry/zagrajkowo/gra-zaznacz-nute.html'},
-  4: {title:'🐶 Piesek i nuty', ready:true, url:'/index/gry/zagrajkowo/gra-piesek-nuty.html'},
-  5: {title:'✉️ Napisz list nutami', ready:true, url:'/index/gry/zagrajkowo/gra-list-nutami.html'},
-  6: {title:'🧩 Ułóż klucz wiolinowy', ready:true, url:'/index/gry/zagrajkowo/gra-puzzle-klucz.html'},
-  7: {title:'🔗 Dopasuj nazwę do obrazka', ready:true, url:'/index/gry/zagrajkowo/gra-dopasuj-nazwe.html'},
-  8: {title:'🐾 Dżungla Muzyczna 3D', ready:true, url:'/index/gry/zagrajkowo/gra-dzungla-3d.html'},
-};
-
-let popupScrollY = 0;
-
-function lockBodyScroll(){
-  popupScrollY = window.scrollY;
-  document.body.style.position = 'fixed';
-  document.body.style.top = (-popupScrollY)+'px';
-  document.body.style.left = '0';
-  document.body.style.right = '0';
-  document.body.style.width = '100%';
-}
-
-function unlockBodyScroll(){
-  document.body.style.position = '';
-  document.body.style.top = '';
-  document.body.style.left = '';
-  document.body.style.right = '';
-  document.body.style.width = '';
-  window.scrollTo(0, popupScrollY);
-}
-
-function openGame(id){
-  const g = GAMES[id];
-  if(!g) return;
-  document.getElementById('popupTitle').textContent = g.title;
-  const box = document.querySelector('.popup-box');
-  box.classList.toggle('jungle', id === 8);
-  const body = document.getElementById('popupBody');
-  if(g.ready){
-    body.innerHTML = '<iframe src="'+g.url+'" title="'+g.title+'"></iframe>';
-    /* Gry 2D to strony z przewijaną treścią — ramka dostaje wysokość
-       dopasowaną do RZECZYWISTEJ zawartości (ramka jest tego samego
-       pochodzenia, więc scrollHeight jej dokumentu jest dostępny), a to
-       popup-body przewija się, gdy ta wysokość przekroczy okienko. Gra 3D
-       (id 8) to za to pełnoekranowa scena WebGL, która ma po prostu
-       wypełnić dane jej okienko (patrz .popup-box.jungle) — bez tego
-       dopasowania. */
-    if(id !== 8){
-      const iframe = body.querySelector('iframe');
-      iframe.addEventListener('load', function(){
-        try{
-          const doc = iframe.contentDocument;
-          const resize = function(){
-            iframe.style.height = doc.documentElement.scrollHeight + 'px';
-          };
-          resize();
-          if(window.ResizeObserver){
-            new ResizeObserver(resize).observe(doc.body);
-          }
-        }catch(err){ /* inne pochodzenie — zostaw height:100% z CSS */ }
-      });
-    }
-  }else{
-    body.innerHTML = '<div class="popup-soon"><div class="ps-icon">🚧</div><h3>Ta gra jest w budowie</h3><p>Pracuję nad nią — wróć tu za jakiś czas, powinna się wkrótce pojawić!</p></div>';
-  }
-  document.getElementById('popupOverlay').classList.add('show');
-  lockBodyScroll();
-}
-/* requestClose (niżej) jest deklaracją funkcji na najwyższym poziomie, więc
-   i tak trafia na window — gry osadzone w ramce (np. Dżungla Muzyczna) mogą
-   więc poprosić okno-rodzica o zamknięcie się zamiast nawigować całą ramkę
-   z powrotem na zagrajkowo.html (patrz gra-dzungla-3d.html —
-   window.parent.requestClose). */
-
-function requestClose(){
-  document.getElementById('confirmOverlay').classList.add('show');
-}
-
-function cancelClose(){
-  document.getElementById('confirmOverlay').classList.remove('show');
-}
-
-function confirmClose(){
-  document.getElementById('confirmOverlay').classList.remove('show');
-  document.getElementById('popupOverlay').classList.remove('show');
-  document.getElementById('popupBody').innerHTML = '';
-  unlockBodyScroll();
-}
-
-document.addEventListener('keydown', function(e){
-  if(e.key === 'Escape'){
-    if(document.getElementById('confirmOverlay').classList.contains('show')){
-      cancelClose();
-    }else if(document.getElementById('popupOverlay').classList.contains('show')){
-      requestClose();
-    }
-  }
-});
-</script>
 
 </body>
 </html>

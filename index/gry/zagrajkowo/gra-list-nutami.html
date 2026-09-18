@@ -40,19 +40,12 @@
 
   .content-row{display:flex;gap:18px;align-items:flex-start;justify-content:center;width:100%;max-width:900px;}
 
-  /* Obrazek notatnika ma naturalne proporcje "biurko + kartka" (1024×559 —
-     szeroki, niski kadr), więc wcześniejsze wymuszanie mu sztywnej wysokości
-     w px (żeby "rozciągnąć" go pod długi tekst) psuło jego proporcje —
-     ołówek, gumka i drewno biurka wychodziły nienaturalnie wydłużone.
-     Naprawa: obrazek jest teraz osobnym elementem <img> na górze karty,
-     renderowanym w naturalnych proporcjach (bez żadnego rozciągania), a
-     sam tekst listu leci NIŻEJ, we własnej sekcji z liniami rysowanymi
-     czysto przez CSS (repeating-linear-gradient) — linie się więc nigdy
-     nie rozjeżdżają z obrazkiem i mogą ciągnąć się tak długo, jak trzeba,
-     niezależnie od długości tekstu czy szerokości ekranu. */
+  /* Czysta kartka notatnika — linie rysowane wyłącznie przez CSS
+     (repeating-linear-gradient), bez żadnego obrazka tła: ciągną się tak
+     długo, jak trzeba, niezależnie od długości tekstu czy szerokości
+     ekranu, i nigdy się z niczym nie rozjeżdżają ani nie rozciągają. */
   .letter-card{background:#f8f1d6;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);max-width:640px;width:100%;overflow:hidden;flex:1;min-width:0;}
-  .letter-header-img{display:block;width:100%;height:auto;}
-  .letter-body{padding:18px 8% 26px;background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 53px, rgba(45,125,139,0.55) 53px, rgba(45,125,139,0.55) 54px);font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;}
+  .letter-body{padding:26px 8%;background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 53px, rgba(45,125,139,0.55) 53px, rgba(45,125,139,0.55) 54px);font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;}
 
   .gap{display:inline-flex;align-items:center;justify-content:center;width:40px;height:52px;vertical-align:middle;margin:0 3px;border-radius:8px;border:2px dashed #cbd5e1;background:#fafafa;transition:0.2s;}
   .gap.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
@@ -118,7 +111,6 @@
       <div class="feedback-msg" id="feedbackMsg"></div>
     </div>
     <div class="letter-card">
-      <img class="letter-header-img" src="/index/gry/zagrajkowo/gra-list-nutami/grafiki/notatnik-header.webp" alt="" draggable="false">
       <div class="letter-body" id="letterCard"></div>
     </div>
   </div>
