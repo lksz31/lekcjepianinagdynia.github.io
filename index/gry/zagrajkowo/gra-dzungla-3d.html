@@ -13,6 +13,13 @@
   body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;height:100vh;display:flex;flex-direction:column;}
 
   .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:20;}
+  /* Tryb podglądu (?ambient=1, patrz AMBIENT_PREVIEW) — bez paska górnego
+     ani żadnych podpowiedzi/HUD, to tylko przyciemnione tło w tle banera. */
+  body.ambient-preview .top-bar,
+  body.ambient-preview .hint-badge,
+  body.ambient-preview .swipe-hint,
+  body.ambient-preview .skip-cutscene-btn{display:none!important;}
+  body.ambient-preview .scene-wrap{position:fixed;inset:0;}
   .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--navy);text-decoration:none;font-weight:700;font-size:0.85rem;}
   .back-link:hover{color:var(--gold);}
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
@@ -4445,6 +4452,16 @@ function initScene(){
   const swipeHintPre = document.querySelector('.swipe-hint');
   if(swipeHintPre) swipeHintPre.style.opacity = '0';
   runIntroCutscene(function(){
+    /* Tryb podglądu (patrz AMBIENT_PREVIEW) nigdy nie podpina sterowania —
+       zamiast tego po chwili przechodzi do kolejnego poziomu, więc cutscenka
+       leci w kółko, jakby "ktoś" grał sam, bez oczekiwania na dotyk. */
+    if(AMBIENT_PREVIEW){
+      setTimeout(function(){
+        ambientLevelCycle = ambientLevelCycle >= 6 ? 1 : ambientLevelCycle + 1;
+        goToLevel(ambientLevelCycle);
+      }, 2200);
+      return;
+    }
     renderer.domElement.addEventListener('pointerdown', onCanvasPointerDown);
     renderer.domElement.addEventListener('pointermove', onCanvasPointerMove);
     renderer.domElement.addEventListener('pointerup', onCanvasPointerUp);
@@ -4530,6 +4547,23 @@ function restartGame(){
 if(!window.DeviceOrientationEvent){
   const cb = document.getElementById('compassToggle');
   if(cb) cb.style.display = 'none';
+}
+
+/* Tryb podglądu "na żywo" (?ambient=1) — używany jako przyciemnione,
+   klikalno-nieme tło w banerze Dżungli Muzycznej na zagrajkowo.html (patrz
+   .jungle-cta-preview tam). Sam wybiera postać i startuje grę, pomija
+   ekran wyboru i cały HUD, a po każdej cutscence (patrz runIntroCutscene
+   wyżej) przechodzi do kolejnego poziomu w pętli 1→6→1 — wygląda to jak
+   demo, które "samo się przechodzi", bez czekania na dotyk/klik. */
+const AMBIENT_PREVIEW = new URLSearchParams(location.search).get('ambient') === '1';
+let ambientLevelCycle = 1;
+if(AMBIENT_PREVIEW){
+  document.body.classList.add('ambient-preview');
+  (function tryAmbientAutoStart(){
+    if(typeof THREE === 'undefined' || !modelsReady){ setTimeout(tryAmbientAutoStart, 100); return; }
+    selectChar(Math.random() < 0.5 ? 'cat' : 'dog');
+    startGame();
+  })();
 }
 </script>
 <script src="/index/gry/zagrajkowo/vendor/three.min.js"></script>
