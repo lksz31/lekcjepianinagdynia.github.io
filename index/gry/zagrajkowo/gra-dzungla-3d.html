@@ -187,7 +187,7 @@
 <body>
 
 <div class="top-bar">
-  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link" onclick="return handleBackLinkClick(event)">‹ Wróć do gier</a>
+  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
   <span class="game-title-bar">🐾 Dżungla Muzyczna 3D</span>
   <span class="top-bar-right">
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
@@ -289,34 +289,6 @@
 </div>
 
 <script>
-/* Gdy ta gra jest osadzona w ramce (popup na zagrajkowo.html, dzieci.html
-   albo index.html — każda z nich ma własną, osobną kopię tego samego
-   mechanizmu popupu, stąd dwie różne nazwy funkcji zamykającej), zwykłe
-   przejście po href nawigowałoby CAŁĄ ramkę na zagrajkowo.html — czyli
-   gracz zobaczyłby całą stronę Zagrajkowa wciśniętą w małe okienko popupu,
-   zamiast po prostu wyjść z gry. Jeśli okno-rodzic wystawia requestClose
-   (zagrajkowo.html — z potwierdzeniem "na pewno wyjść?") albo zkCloseGame
-   (dzieci.html/index.html — zamyka od razu), prosimy je więc o zamknięcie
-   popupu zamiast nawigować; w przeciwnym razie (gra otwarta samodzielnie,
-   nie w ramce) link działa zwyczajnie. */
-function handleBackLinkClick(e){
-  try{
-    if(window.parent && window.parent !== window){
-      if(typeof window.parent.requestClose === 'function'){
-        e.preventDefault();
-        window.parent.requestClose();
-        return false;
-      }
-      if(typeof window.parent.zkCloseGame === 'function'){
-        e.preventDefault();
-        window.parent.zkCloseGame();
-        return false;
-      }
-    }
-  }catch(err){ /* inne pochodzenie — zwykła nawigacja */ }
-  return true;
-}
-
 /* ══ Dźwięki (Web Audio) — jeden wspólny AudioContext dla wszystkiego ══ */
 let audioCtx = null;
 let soundEnabled = true;
@@ -3974,7 +3946,7 @@ function walkTo(idx){
 }
 
 /* Ogólny "tween" postaci do dowolnego punktu, niezależny od systemu
-   zagadek — używany do biegu na okrążenie po wygraniu (patrz runVictoryLap). */
+   zagadek — używany do wejścia do budynku po wygraniu (patrz runVictoryLap). */
 function tweenCharacterTo(targetX, targetZ, duration, onDone){
   const start = character.position.clone();
   const t0 = performance.now();
@@ -3998,17 +3970,48 @@ function tweenCharacterTo(targetX, targetZ, duration, onDone){
   requestAnimationFrame(step);
 }
 
-const VICTORY_LAP_POINTS = [
-  {x:2.6, z:HOUSE_Z+1.6}, {x:0, z:HOUSE_Z+3.4}, {x:-2.6, z:HOUSE_Z+1.6}, {x:0, z:HOUSE_Z-0.3}
-];
-function runVictoryLap(onDone){
-  let i = 0;
-  function next(){
-    if(i >= VICTORY_LAP_POINTS.length){ onDone(); return; }
-    const p = VICTORY_LAP_POINTS[i++];
-    tweenCharacterTo(p.x, p.z, 550, next);
+/* Drzwi domku/sklepiku, do których postać podchodzi po wygranej — ten sam
+   punkt, który kadruje kamera w getArrivalShot(), więc postać "wchodzi"
+   dokładnie tam, gdzie widzieliśmy drzwi w cutscence na starcie poziomu. */
+function doorApproachPoint(){
+  const isShop = currentLevel === 5;
+  const doorX = isShop ? 1.0 : 0;
+  const doorZ = HOUSE_Z - 1.4 + (isShop ? 1.3 : 1.12);
+  return {x: doorX, z: doorZ};
+}
+/* Kilka podskoków w miejscu (bez biegania po całej polance), a potem
+   spokojny krok do drzwi budynku — dopiero wtedy pokazujemy menu wygranej. */
+function characterHopInPlace(times, onDone){
+  const baseX = character.position.x, baseZ = character.position.z;
+  const baseY = groundLevelAt(baseX, baseZ);
+  let hop = 0;
+  const hopDuration = 420;
+  function doHop(){
+    if(hop >= times){ character.position.y = baseY; onDone(); return; }
+    hop++;
+    const t0 = performance.now();
+    function step(now){
+      const t = Math.min(1, (now-t0)/hopDuration);
+      character.position.y = baseY + Math.sin(t*Math.PI) * 0.55;
+      if(t < 1){
+        requestAnimationFrame(step);
+      }else{
+        character.position.y = baseY;
+        doHop();
+      }
+    }
+    requestAnimationFrame(step);
   }
-  next();
+  doHop();
+}
+function runVictoryLap(onDone){
+  characterHopInPlace(3, function(){
+    /* Poziom 6 (wnętrze sklepiku) nie ma osobnego budynku, do którego
+       trzeba by jeszcze dojść — postać już tam jest. */
+    if(currentLevel === 6){ onDone(); return; }
+    const door = doorApproachPoint();
+    tweenCharacterTo(door.x, door.z, 900, onDone);
+  });
 }
 
 /* ══ Cutscene przed każdym poziomem — kamera przelatuje nad całą trasą aż
@@ -4077,78 +4080,36 @@ function runIntroCutscene(onDone){
   const skipBtn = document.getElementById('skipCutsceneBtn');
   if(skipBtn) skipBtn.style.display = 'block';
 
-  /* Płynny, CIĄGŁY przelot kamery wzdłuż wygładzonej krzywej — bez
-     zatrzymywania/zwalniania na każdej bazie (jedno łagodne wygładzenie
-     na start i koniec całego przelotu, nie osobno na każdym odcinku).
-     Kamera leci przez WSZYSTKIE bazy oprócz ostatniej — tę ostatnią
-     pomija, bo tam zaczyna się dedykowany, wykadrowany "kadr mety" na
-     środku ekranu (patrz showArrivalShot), pokazujący docelowy budynek. */
-  const flyHeight = 2.3;
-  const shortenedPoints = PATH_POINTS.slice(0, Math.max(2, PATH_POINTS.length - 1));
-  const curvePts = shortenedPoints.map(function(p){
-    return new THREE.Vector3(p.x, terrainHeight(p.x, p.z) + flyHeight, p.z);
-  });
-  const startDir = new THREE.Vector3().subVectors(curvePts[0], curvePts[1]).normalize();
-  curvePts.unshift(curvePts[0].clone().addScaledVector(startDir, 4));
-  const endDir = new THREE.Vector3().subVectors(curvePts[curvePts.length-1], curvePts[curvePts.length-2]).normalize();
-  curvePts.push(curvePts[curvePts.length-1].clone().addScaledVector(endDir, 3));
-  /* "centripetal" (nie "catmullrom"/uniform) jest tu konieczne — ścieżka
-     zygzakuje w x, a uniform Catmull-Rom robi przy takich ostrych zakrętach
-     pętle/nawroty (kamera skacze do tyłu). Centripetal tego unika. */
-  const curve = new THREE.CatmullRomCurve3(curvePts, false, 'centripetal', 0.5);
+  /* Prosta cutscenka: kamera leci prosto od postaci do kadru mety (docelowy
+     budynek), chwilę tam zostaje, po czym wraca — bez przelotu przez całą
+     krętą trasę. Czas lotu zależy od dystansu, żeby tempo wyglądało tak
+     samo na krótszych i dłuższych poziomach. */
+  const initCam = cameraOffsetForAspect();
+  const startPos = character.position.clone().add(initCam.back);
+  const startLook = character.position.clone();
+  startLook.y += initCam.lookY;
+  camera.position.copy(startPos);
+  camera.lookAt(startLook);
+  cutsceneLookTarget = startLook.clone();
 
-  const upVec = new THREE.Vector3(0, 1, 0);
-  const forwardDuration = 8200; /* jeden spokojny, ciągły przelot, bez przystanków na bazach */
-  const t0 = performance.now();
-
-  function stepForward(now){
-    if(cutsceneSkip){ startBackward(); return; }
-    const t = Math.min(1, (now - t0) / forwardDuration);
-    /* Łagodny rozbieg TYLKO na starcie — żadnego hamowania na końcu, bo to
-       właśnie ono sprawiało, że kamera zwalniała do zera tuż przed ostatnią
-       bazą i "zawisała" tam, zanim doleciała do kadru mety. Kwadratowe
-       przyspieszenie (bez wygładzenia końca) utrzymuje tempo aż do samego
-       końca przelotu, po czym płynnie przejmuje je showArrivalShot(). */
-    const e = t*t;
-    /* getPoint/getTangent (parametr naturalny), NIE getPointAt/getTangentAt
-       (długość łuku) — dla type:'centripetal' na otwartej krzywej ta druga
-       para rzuca wyjątkiem w tej wersji three.js (pusta tabela długości). */
-    const pos = curve.getPoint(e);
-    const tangent = curve.getTangent(Math.min(0.999, e)).normalize();
-    camera.position.copy(pos);
-    const side = new THREE.Vector3().crossVectors(tangent, upVec).normalize();
-    const wobble = Math.sin(now * 0.0006) * 0.5; /* bardzo delikatne, ciągłe rozglądanie się na boki */
-    const lookAhead = pos.clone().addScaledVector(tangent, 7).addScaledVector(side, wobble);
-    lookAhead.y -= 0.8;
-    camera.lookAt(lookAhead);
-    cutsceneLookTarget = lookAhead;
-    if(t < 1){
-      requestAnimationFrame(stepForward);
-    }else{
-      showArrivalShot();
-    }
-  }
   function showArrivalShot(){
-    /* Po skróconym przelocie — dosuwamy kamerę do idealnie wykadrowanego
-       ujęcia budynku docelowego (drzwi na środku ekranu) i chwilę się
-       na nim zatrzymujemy, zanim wrócimy do postaci. */
     const shot = getArrivalShot();
-    tweenCamera(shot.camPos, shot.lookAt, 1300, function(){
-      setTimeout(startBackward, 700);
+    const flyDuration = Math.min(4500, Math.max(2200, startPos.distanceTo(shot.camPos) * 90));
+    tweenCamera(shot.camPos, shot.lookAt, flyDuration, function(){
+      setTimeout(startBackward, 900);
     });
   }
   function startBackward(){
-    const initCam = cameraOffsetForAspect();
     const finalPos = character.position.clone().add(initCam.back);
     const finalLook = character.position.clone();
     finalLook.y += initCam.lookY;
-    tweenCamera(finalPos, finalLook, 1100, function(){
+    tweenCamera(finalPos, finalLook, 1600, function(){
       inCutscene = false;
       if(skipBtn) skipBtn.style.display = 'none';
       onDone();
     });
   }
-  requestAnimationFrame(stepForward);
+  showArrivalShot();
 }
 
 function onArrive(idx){
