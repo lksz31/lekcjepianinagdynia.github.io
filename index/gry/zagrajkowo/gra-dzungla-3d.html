@@ -289,19 +289,29 @@
 </div>
 
 <script>
-/* Gdy ta gra jest osadzona w ramce (popup na zagrajkowo.html), zwykłe
+/* Gdy ta gra jest osadzona w ramce (popup na zagrajkowo.html, dzieci.html
+   albo index.html — każda z nich ma własną, osobną kopię tego samego
+   mechanizmu popupu, stąd dwie różne nazwy funkcji zamykającej), zwykłe
    przejście po href nawigowałoby CAŁĄ ramkę na zagrajkowo.html — czyli
    gracz zobaczyłby całą stronę Zagrajkowa wciśniętą w małe okienko popupu,
    zamiast po prostu wyjść z gry. Jeśli okno-rodzic wystawia requestClose
-   (ten sam origin), prosimy je więc o zamknięcie popupu zamiast nawigować;
-   w przeciwnym razie (gra otwarta samodzielnie, nie w ramce) link działa
-   zwyczajnie. */
+   (zagrajkowo.html — z potwierdzeniem "na pewno wyjść?") albo zkCloseGame
+   (dzieci.html/index.html — zamyka od razu), prosimy je więc o zamknięcie
+   popupu zamiast nawigować; w przeciwnym razie (gra otwarta samodzielnie,
+   nie w ramce) link działa zwyczajnie. */
 function handleBackLinkClick(e){
   try{
-    if(window.parent && window.parent !== window && typeof window.parent.requestClose === 'function'){
-      e.preventDefault();
-      window.parent.requestClose();
-      return false;
+    if(window.parent && window.parent !== window){
+      if(typeof window.parent.requestClose === 'function'){
+        e.preventDefault();
+        window.parent.requestClose();
+        return false;
+      }
+      if(typeof window.parent.zkCloseGame === 'function'){
+        e.preventDefault();
+        window.parent.zkCloseGame();
+        return false;
+      }
     }
   }catch(err){ /* inne pochodzenie — zwykła nawigacja */ }
   return true;
