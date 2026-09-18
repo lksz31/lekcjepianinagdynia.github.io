@@ -36,16 +36,20 @@
     .instructions{font-size:0.72rem;line-height:1.35;max-width:360px;}
     .clef-toggle{gap:6px;}
     .clef-btn{padding:5px 12px;font-size:0.68rem;}
+    .letter-body{font-size:1.08rem;padding:6px 6% 2px;}
+    .letter-line{padding:12px 0;}
   }
 
   .content-row{display:flex;gap:18px;align-items:flex-start;justify-content:center;width:100%;max-width:900px;}
 
-  /* Czysta kartka notatnika — linie rysowane wyłącznie przez CSS
-     (repeating-linear-gradient), bez żadnego obrazka tła: ciągną się tak
-     długo, jak trzeba, niezależnie od długości tekstu czy szerokości
-     ekranu, i nigdy się z niczym nie rozjeżdżają ani nie rozciągają. */
+  /* Czysta kartka notatnika, bez żadnego obrazka tła. Każda "linijka" listu
+     to osobny blok (.letter-line) z border-bottom — linijka rysuje się
+     dokładnie tam, gdzie faktycznie kończy się jej własna zawartość
+     (tekst + luki), więc nigdy nie rozjeżdża się z tekstem czy lukami,
+     niezależnie od czcionki, długości tekstu czy szerokości ekranu. */
   .letter-card{background:#f8f1d6;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.22);max-width:640px;width:100%;overflow:hidden;flex:1;min-width:0;}
-  .letter-body{padding:26px 8%;background-image:repeating-linear-gradient(to bottom, transparent 0, transparent 53px, rgba(45,125,139,0.55) 53px, rgba(45,125,139,0.55) 54px);font-family:'VT323',monospace;font-size:1.2rem;line-height:54px;color:#1e4a7a;}
+  .letter-body{padding:10px 8% 2px;font-family:'VT323',monospace;font-size:1.3rem;color:#1e4a7a;}
+  .letter-line{border-bottom:2px solid rgba(45,125,139,0.55);padding:16px 0;line-height:1.5;}
 
   .gap{display:inline-flex;align-items:center;justify-content:center;width:40px;height:52px;vertical-align:middle;margin:0 3px;border-radius:8px;border:2px dashed #cbd5e1;background:#fafafa;transition:0.2s;}
   .gap.dragover{border-color:var(--gold);background:#fffbf0;transform:scale(1.08);}
@@ -86,7 +90,7 @@
 <body>
 
 <div class="top-bar">
-  <a href="/index/gry/zagrajkowo/zagrajkowo.html" class="back-link">‹ Wróć do gier</a>
+  <a href="/index.html" class="back-link">‹ Wróć do gier</a>
   <span class="game-title-bar">✉️ Napisz list nutami</span>
   <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
 </div>
@@ -142,35 +146,44 @@ let currentMode = 'natural'; /* 'natural' = same litery C D E F G A H, 'accident
 const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
 
 /* Luki to WYŁĄCZNIE litery ukryte wewnątrz prawdziwych słów listu — nigdy osobno.
-   Każda nuta zaczyna właśnie to słowo (wielka litera = początek zdania/słowa). */
-const TEMPLATE_NATURAL = [
-  {t:'Drogi Muzyku!\n\n'},
-  {b:'C',base:'C'}, {t:'ieszę się, że grasz.\n'},
-  {b:'D',base:'D'}, {t:'źwięki mają nazwy.\n'},
-  {t:'Zagraj kiedyś '}, {b:'E',base:'E'}, {t:'tiudę.\n'},
-  {t:'Ćwicz '}, {b:'F',base:'F'}, {t:'ortepian codziennie.\n'},
-  {t:'Gdy '}, {b:'G',base:'G'}, {t:'rasz, słuchaj uważnie.\n'},
-  {t:'Poznaj '}, {b:'A',base:'A'}, {t:'kordy.\n'},
-  {t:'To prawdziwa '}, {b:'H',base:'H'}, {t:'armonia.\n\n'},
-  {t:'Do zobaczenia!'},
+   Każda nuta zaczyna właśnie to słowo (wielka litera = początek zdania/słowa).
+   Każdy wariant to dokładnie 3 linijki (tablica linijek, linijka = tablica
+   części tekst/luka) — przy każdym starcie/restarcie losowany jest jeden
+   wariant, więc list za każdym razem wygląda trochę inaczej. */
+const TEMPLATES_NATURAL = [
+  [
+    [{t:'Drogi Muzyku! '}, {b:'C',base:'C'}, {t:'ieszę się, że grasz, a '}, {b:'D',base:'D'}, {t:'źwięki poznajesz coraz lepiej.'}],
+    [{t:'Zagraj kiedyś '}, {b:'E',base:'E'}, {t:'tiudę na '}, {b:'F',base:'F'}, {t:'ortepianie codziennie.'}],
+    [{t:'Gdy '}, {b:'G',base:'G'}, {t:'rasz, poznawaj '}, {b:'A',base:'A'}, {t:'kordy — to prawdziwa '}, {b:'H',base:'H'}, {t:'armonia!'}],
+  ],
+  [
+    [{t:'Kochany Pianisto! '}, {b:'A',base:'A'}, {t:'kordy brzmią pięknie, gdy grasz je powoli.'}],
+    [{t:'Ćwicz '}, {b:'C',base:'C'}, {t:'odziennie i słuchaj, jak '}, {b:'G',base:'G'}, {t:'rają inni.'}],
+    [{t:'Pamiętaj o nutach '}, {b:'D',base:'D'}, {t:', '}, {b:'E',base:'E'}, {t:' i '}, {b:'F',base:'F'}, {t:' — a poczujesz prawdziwą '}, {b:'H',base:'H'}, {t:'armonię!'}],
+  ],
 ];
 
 /* Tryb z krzyżykami i bemolami — luka to teraz 2-3 litery (nazwa dźwięku
    chromatycznego) ukryte w środku prawdziwego słowa, np. "cis" w "cisza".
    Trzeba się domyślić całego słowa z kontekstu zdania. */
-const TEMPLATE_ACCIDENTAL = [
-  {t:'Drogi Muzyku!\n\n'},
-  {t:'Lubię '}, {b:'cis',base:'C',acc:'#'}, {t:'zę przed grą.\n'},
-  {t:'Stara '}, {b:'des',base:'D',acc:'b'}, {t:'ka skrzypi.\n'},
-  {t:'To dobry inter'}, {b:'es',base:'E',acc:'b'}, {t:'.\n'},
-  {t:'Zjedz '}, {b:'fis',base:'F',acc:'#'}, {t:'taszki.\n'},
-  {t:'Piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t ukłonu.\n'},
-  {t:'Bądź ma'}, {b:'gis',base:'G',acc:'#'}, {t:'trem muzyki.\n'},
-  {t:'Miej dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u.\n\n'},
-  {t:'Do zobaczenia!'},
+const TEMPLATES_ACCIDENTAL = [
+  [
+    [{t:'Drogi Muzyku! Lubię '}, {b:'cis',base:'C',acc:'#'}, {t:'zę przed grą, a stara '}, {b:'des',base:'D',acc:'b'}, {t:'ka skrzypi.'}],
+    [{t:'To dobry inter'}, {b:'es',base:'E',acc:'b'}, {t:', więc zjedz '}, {b:'fis',base:'F',acc:'#'}, {t:'taszki na piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t ukłonu.'}],
+    [{t:'Bądź ma'}, {b:'gis',base:'G',acc:'#'}, {t:'trem muzyki i miej dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u. Do zobaczenia!'}],
+  ],
+  [
+    [{t:'Witaj, Muzyku! Usłysz '}, {b:'cis',base:'C',acc:'#'}, {t:'zę nocy i '}, {b:'des',base:'D',acc:'b'}, {t:'zcz za oknem.'}],
+    [{t:'To bardzo inter'}, {b:'es',base:'E',acc:'b'}, {t:'ujący koncert — zjedz '}, {b:'fis',base:'F',acc:'#'}, {t:'taszki na przerwie.'}],
+    [{t:'Zrób piękny '}, {b:'ges',base:'G',acc:'b'}, {t:'t, poznaj ma'}, {b:'gis',base:'G',acc:'#'}, {t:'stra i miej dużo cz'}, {b:'as',base:'A',acc:'b'}, {t:'u!'}],
+  ],
 ];
 
-function currentTemplate(){ return currentMode==='accidental' ? TEMPLATE_ACCIDENTAL : TEMPLATE_NATURAL; }
+function pickVariant(){
+  const templates = currentMode==='accidental' ? TEMPLATES_ACCIDENTAL : TEMPLATES_NATURAL;
+  return templates[Math.floor(Math.random()*templates.length)];
+}
+let currentLines = [];
 
 function miniStaffSVG(base, acc){
   const cfg = CLEFS[currentClef];
@@ -243,24 +256,34 @@ function setMode(mode){
   document.querySelectorAll('.mode-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.mode === mode);
   });
-  document.getElementById('totalVal').textContent = currentTemplate().filter(function(p){return p.b;}).length;
   restartGame();
 }
 
 function renderLetter(){
   const card = document.getElementById('letterCard');
-  let html = '';
+  card.innerHTML = '';
   let bi = 0;
   blanks = [];
-  currentTemplate().forEach(function(part){
-    if(part.t){ html += part.t.replace(/\n/g,'<br>'); }
-    else if(part.b){
-      const id = bi++;
-      blanks.push({id:id, letter:part.b, base:part.base, acc:part.acc||null});
-      html += '<span class="gap" id="gap-'+id+'" data-id="'+id+'" data-letter="'+part.b+'"></span>';
-    }
+  currentLines.forEach(function(line){
+    const lineDiv = document.createElement('div');
+    lineDiv.className = 'letter-line';
+    line.forEach(function(part){
+      if(part.t){
+        lineDiv.appendChild(document.createTextNode(part.t));
+      }else if(part.b){
+        const id = bi++;
+        blanks.push({id:id, letter:part.b, base:part.base, acc:part.acc||null});
+        const span = document.createElement('span');
+        span.className = 'gap';
+        span.id = 'gap-'+id;
+        span.dataset.id = id;
+        span.dataset.letter = part.b;
+        lineDiv.appendChild(span);
+      }
+    });
+    card.appendChild(lineDiv);
   });
-  card.innerHTML = html;
+  document.getElementById('totalVal').textContent = blanks.length;
 }
 
 function renderTray(){
@@ -419,6 +442,7 @@ function showWin(){
 }
 
 function restartGame(){
+  currentLines = pickVariant();
   document.getElementById('scoreVal').textContent = '0';
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('feedbackMsg').className = 'feedback-msg';
@@ -427,7 +451,6 @@ function restartGame(){
   renderTray();
 }
 
-document.getElementById('totalVal').textContent = currentTemplate().filter(function(p){return p.b;}).length;
 document.querySelector('.clef-btn[data-clef="'+currentClef+'"]').classList.add('active');
 document.querySelector('.mode-btn[data-mode="'+currentMode+'"]').classList.add('active');
 restartGame();
