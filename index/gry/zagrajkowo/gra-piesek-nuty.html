@@ -80,7 +80,7 @@
 <body>
 
 <div class="top-bar">
-  <a href="/index.html" class="back-link">‹ Wróć do gier</a>
+  <a href="/index.html#zagrajkowo" class="back-link">‹ Wróć do gier</a>
   <span class="game-title-bar">🐶 Piesek i nuty</span>
   <span class="score-box">🐾 <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
 </div>
@@ -409,18 +409,36 @@ function pickMatchTargets(){
 function renderMatch(){
   const row = document.getElementById('pathRow');
   const tray = document.getElementById('matchTray');
-  const sg = 6.2;
   const isBoth = clefMode === 'both';
-  const staffTopT = isBoth ? 6 : 10;
-  const staffTopB = 34;
-  const vbH = isBoth ? 50 : 34;
+
+  /* Pudełko podglądu pięciolinii zajmuje wPct% × heightPct% karty mapy,
+     która ma STAŁE proporcje (aspect-ratio:1433/736 w CSS .path-card).
+     Domyślne preserveAspectRatio="xMidYMid meet" na <svg> dopasowuje całą
+     treść do WĘŻSZEGO z dwóch wymiarów pudełka — jeśli viewBox ma inne
+     proporcje niż samo pudełko w pikselach, treść zostaje "wyśrodkowana"
+     w wąskim pasku pośrodku i wygląda na stłoczoną/nachodzącą na siebie
+     (dokładnie to, co zgłosił użytkownik w trybie "Oba klucze": oba klucze
+     ściśnięte blisko siebie zamiast rozciągać się na całą szerokość).
+     Dlatego viewBox liczymy TAK, żeby jego proporcje dokładnie zgadzały
+     się z proporcjami pudełka w pikselach — wtedy meet nic nie ściska. */
+  const CARD_ASPECT = 736/1433; /* wysokość/szerokość .path-card */
+  const wPct = 92;
   const heightPct = isBoth ? 38 : 26;
+  const vbH = heightPct * CARD_ASPECT * 100/wPct;
+
+  /* Odstępy liczone jako ułamek sg, żeby klucz (który wystaje poza 4 linie
+     pięciolinii) zawsze mieścił się w pudełku bez ucinania, niezależnie od
+     wyliczonego wyżej vbH. */
+  const MARGIN = 0.65, GAP = 1.0;
+  const sg = isBoth ? vbH/(2*MARGIN+8+GAP) : vbH/(2*MARGIN+4);
+  const staffTopT = MARGIN*sg;
+  const staffTopB = staffTopT+4*sg+GAP*sg;
 
   function drawStaff(staffTop, cfg){
     let out = '';
     for(let i=0;i<5;i++){
       const ly = staffTop+i*sg;
-      out += '<line x1="10" y1="'+ly+'" x2="98" y2="'+ly+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>';
+      out += '<line x1="10" y1="'+ly.toFixed(2)+'" x2="98" y2="'+ly.toFixed(2)+'" stroke="#1e3a8a" stroke-width="'+(sg*0.08).toFixed(2)+'" opacity="0.6"/>';
     }
     const ch = sg*4.4, cw = ch*cfg.ratio;
     const cy = (staffTop+cfg.refIdx*sg)-cfg.pct*ch;
@@ -433,7 +451,7 @@ function renderMatch(){
      kształtu pudełka CSS, co zniekształcało klucz. (preserveAspectRatio="none"
      na SAMYM obrazku klucza w drawStaff wyżej jest bezpieczne — jego cw/ch są
      policzone dokładnie pod proporcje klucza, więc rozciąganie nic nie psuje). */
-  let s = '<svg viewBox="0 0 100 '+vbH+'" style="position:absolute;left:4%;top:4%;width:92%;height:'+heightPct+'%;">';
+  let s = '<svg viewBox="0 0 100 '+vbH.toFixed(2)+'" style="position:absolute;left:4%;top:4%;width:'+wPct+'%;height:'+heightPct+'%;">';
   if(isBoth){
     s += drawStaff(staffTopT, CLEFS.treble);
     s += drawStaff(staffTopB, CLEFS.bass);
@@ -449,18 +467,18 @@ function renderMatch(){
        staffY = wyżej), stąd -7 na każdą oktawę — nuta wtedy zwykle wypada
        nad pięciolinią, więc dorysowujemy potrzebne linie dodane. */
     const ny = staffTop+((cfg.staffY[t.letter]-t.oct*7)*sg/2);
-    const botLine = staffTop+4*sg, topLine = staffTop, ledW = sg*0.55;
+    const botLine = staffTop+4*sg, topLine = staffTop, ledW = sg*0.55, lineW = sg*0.08;
     if(ny > botLine + sg*0.5){
       let ly = botLine+sg;
-      while(ly <= ny+sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>'; ly += sg; }
+      while(ly <= ny+sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="'+lineW.toFixed(2)+'" opacity="0.6"/>'; ly += sg; }
     }
     if(ny < topLine - sg*0.5){
       let ly = topLine-sg;
-      while(ly >= ny-sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="0.5" opacity="0.6"/>'; ly -= sg; }
+      while(ly >= ny-sg*0.3){ s += '<line x1="'+(nx-ledW).toFixed(1)+'" y1="'+ly.toFixed(1)+'" x2="'+(nx+ledW).toFixed(1)+'" y2="'+ly.toFixed(1)+'" stroke="#1e3a8a" stroke-width="'+lineW.toFixed(2)+'" opacity="0.6"/>'; ly -= sg; }
     }
-    s += '<ellipse cx="'+nx+'" cy="'+ny.toFixed(1)+'" rx="1.9" ry="1.4" fill="none" stroke="#1e3a8a" stroke-width="0.6" opacity="0.55" transform="rotate(-15,'+nx+','+ny.toFixed(1)+')"/>';
+    s += '<ellipse cx="'+nx+'" cy="'+ny.toFixed(1)+'" rx="'+(sg*0.306).toFixed(2)+'" ry="'+(sg*0.226).toFixed(2)+'" fill="none" stroke="#1e3a8a" stroke-width="'+(sg*0.097).toFixed(2)+'" opacity="0.55" transform="rotate(-15,'+nx+','+ny.toFixed(1)+')"/>';
     if(t.oct === 1){
-      s += '<text x="'+(nx+2.6).toFixed(1)+'" y="'+(ny-1.4).toFixed(1)+'" font-size="2.4" fill="#8a6d1a" opacity="0.75">¹</text>';
+      s += '<text x="'+(nx+sg*0.42).toFixed(1)+'" y="'+(ny-sg*0.226).toFixed(1)+'" font-size="'+(sg*0.387).toFixed(2)+'" fill="#8a6d1a" opacity="0.75">¹</text>';
     }
   });
   s += '</svg>';
