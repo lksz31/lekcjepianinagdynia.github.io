@@ -1201,7 +1201,10 @@ const PATH_HISTORY_MAX = 320;
 const COMPANION_GAP = 14; /* klatek odstępu między kolejnymi towarzyszami w "wężyku" */
 
 function spawnCompanion(waypointIdx){
-  const kind = ANIMAL_BUILDERS[(waypointIdx-1) % ANIMAL_BUILDERS.length];
+  /* Poziom 6 (sklepik) — zamiast zwierzątek dołączających do "wężyka" za
+     postacią, mają iść torby z zakupami (patrz buildShoppingBag): to
+     sklep, nie dżungla, więc zbierane rzeczy powinny pasować do miejsca. */
+  const kind = currentLevel === 6 ? buildShoppingBag : ANIMAL_BUILDERS[(waypointIdx-1) % ANIMAL_BUILDERS.length];
   const animal = kind();
   const wp = waypoints[waypointIdx].pos;
   animal.position.set(wp.x, groundLevelAt(wp.x, wp.z), wp.z);
@@ -2457,6 +2460,9 @@ function buildFruitStand(){
     fruit.position.set(-0.32 + col*0.32, 0.62 + row*0.11, -0.18 + (row%2)*0.2);
     g.add(fruit);
   }
+  /* Stoisko wyglądało zbyt drobnie na tle sklepu ("stoiska sa zbyt male")
+     — skalujemy całą grupę w górę, zamiast przeliczać każdy wymiar osobno. */
+  g.scale.setScalar(1.8);
   return g;
 }
 
@@ -2498,6 +2504,34 @@ function buildShopClerk(){
   );
   hitArea.position.y = 1.0;
   g.add(hitArea);
+  return g;
+}
+
+/* Torba z zakupami — towarzysz na poziomie 6 zamiast zwierzątka (patrz
+   spawnCompanion): to sklep, więc zamiast kolejnych zwierzątek "wężyk" za
+   postacią ma tworzyć się z pełnych torebek. Losowy kolor torby przy
+   każdym wywołaniu, dla odrobiny urozmaicenia. */
+const SHOPPING_BAG_COLORS = [0xdba24a, 0xd9736b, 0x6ba3d9, 0x6bbf7e, 0xd9c76b];
+function buildShoppingBag(){
+  const g = new THREE.Group();
+  const bagColor = SHOPPING_BAG_COLORS[Math.floor(Math.random()*SHOPPING_BAG_COLORS.length)];
+  const bagMat = new THREE.MeshStandardMaterial({color:bagColor, roughness:0.85});
+  const bag = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.42, 0.24), bagMat);
+  bag.position.y = 0.23;
+  g.add(bag);
+  const handleMat = new THREE.MeshStandardMaterial({color:0xfff8ec, roughness:0.9});
+  [-1, 1].forEach(function(side){
+    const handle = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.016, 6, 10, Math.PI), handleMat);
+    handle.rotation.z = Math.PI/2;
+    handle.position.set(side*0.1, 0.46, 0);
+    g.add(handle);
+  });
+  const itemColors = [0xe0472c, 0xf3a53d, 0xc7dd4a];
+  for(let i=0;i<2;i++){
+    const item = new THREE.Mesh(new THREE.SphereGeometry(0.085, 8, 6), new THREE.MeshStandardMaterial({color:itemColors[i % itemColors.length], roughness:0.6}));
+    item.position.set(-0.07 + i*0.14, 0.47, 0.02);
+    g.add(item);
+  }
   return g;
 }
 
@@ -2619,8 +2653,8 @@ function buildShopInterior(){
   let spotIdx = 0;
   [2, -3, -8, -13].forEach(function(z){
     [-1, 1].forEach(function(side){
-      const x = side * (roomHalfW - 1.6);
-      const shelf = kenneyMesh(shelfKeys[spotIdx % 2], 1.5);
+      const x = side * (roomHalfW - 1.9);
+      const shelf = kenneyMesh(shelfKeys[spotIdx % 2], 1.9);
       if(shelf){
         shelf.position.set(x, 0, z);
         shelf.rotation.y = side > 0 ? Math.PI : 0;
@@ -2636,39 +2670,42 @@ function buildShopInterior(){
      (beczka + skrzynki z paczki "survival") przy prawej, plus kilka
      regałów dla urozmaicenia. */
   [-19, -22.5, -26, -29.5, -33].forEach(function(z){
-    const fridge = kenneyMesh('marketFreezer', 1.4);
+    const fridge = kenneyMesh('marketFreezer', 1.85);
     if(fridge){
-      fridge.position.set(-(roomHalfW-1), 0, z);
+      /* Trochę dalej od ściany niż wcześniej (odstęp rósł wraz ze skalą,
+         żeby powiększona lodówka nie przebijała ścianki — "stoiska sa
+         zbyt male"). */
+      fridge.position.set(-(roomHalfW-1.3), 0, z);
       fridge.rotation.y = 0;
       scene.add(fridge);
       potentialOccluders.push(fridge);
     }
   });
   [-20, -32].forEach(function(z){
-    const shelf = kenneyMesh('marketShelfBags', 1.5);
+    const shelf = kenneyMesh('marketShelfBags', 2.0);
     if(shelf){
-      shelf.position.set(roomHalfW-1.6, 0, z);
+      shelf.position.set(roomHalfW-1.9, 0, z);
       shelf.rotation.y = Math.PI;
       scene.add(shelf);
       potentialOccluders.push(shelf);
     }
   });
-  const toolBarrel = kenneyMesh('survivalBarrel', 1.3);
+  const toolBarrel = kenneyMesh('survivalBarrel', 1.8);
   if(toolBarrel){
-    toolBarrel.position.set(roomHalfW-1.4, 0, -25.3);
+    toolBarrel.position.set(roomHalfW-1.7, 0, -25.3);
     scene.add(toolBarrel);
     potentialOccluders.push(toolBarrel);
   }
-  const toolBoxLarge = kenneyMesh('survivalBoxLarge', 1.3);
+  const toolBoxLarge = kenneyMesh('survivalBoxLarge', 1.75);
   if(toolBoxLarge){
-    toolBoxLarge.position.set(roomHalfW-1.5, 0, -26.6);
+    toolBoxLarge.position.set(roomHalfW-1.8, 0, -26.7);
     toolBoxLarge.rotation.y = Math.PI/6;
     scene.add(toolBoxLarge);
     potentialOccluders.push(toolBoxLarge);
   }
-  const toolBox = kenneyMesh('survivalBox', 1.2);
+  const toolBox = kenneyMesh('survivalBox', 1.6);
   if(toolBox){
-    toolBox.position.set(roomHalfW-2.3, 0, -25.7);
+    toolBox.position.set(roomHalfW-2.7, 0, -25.7);
     toolBox.rotation.y = -Math.PI/8;
     scene.add(toolBox);
     potentialOccluders.push(toolBox);
@@ -2679,9 +2716,9 @@ function buildShopInterior(){
      przy tylnej ścianie (patrz LEVEL6_CHECKOUT/buildCheckoutCounter). */
   [-37, -37].forEach(function(z, i){
     const side = i === 0 ? -1 : 1;
-    const shelf = kenneyMesh(shelfKeys[i % 2], 1.5);
+    const shelf = kenneyMesh(shelfKeys[i % 2], 1.9);
     if(shelf){
-      shelf.position.set(side*(roomHalfW-1.6), 0, z);
+      shelf.position.set(side*(roomHalfW-1.9), 0, z);
       shelf.rotation.y = side > 0 ? Math.PI : 0;
       scene.add(shelf);
       potentialOccluders.push(shelf);
