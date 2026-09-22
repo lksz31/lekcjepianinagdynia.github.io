@@ -100,6 +100,18 @@
   .puzzle-staff{background:#fdf8ec;border-radius:10px;padding:6px;display:flex;justify-content:center;margin-bottom:12px;}
   .puzzle-staff svg{width:130px;height:auto;display:block;}
 
+  /* ══ Dialog z liskiem z Animapolis (tylko poziom 3, tryb dora) ══ */
+  .npc-text{color:#f0d99a;font-size:0.82rem;line-height:1.55;text-align:center;margin-bottom:12px;}
+  .npc-choices{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+  .npc-choice-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .npc-choice-text{color:#f0d99a;font-size:0.78rem;font-weight:600;}
+  .npc-choice-note{color:var(--gold);font-weight:800;font-size:0.78rem;flex-shrink:0;white-space:nowrap;}
+  .npc-notes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;}
+  .npc-note-tile{width:38px;height:38px;border-radius:10px;background:#f5eeda;border:2px solid #a97c40;display:flex;align-items:center;justify-content:center;font-weight:900;color:#5a3d1c;font-size:0.9rem;cursor:pointer;transition:0.15s;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
+  .npc-note-tile:active{transform:scale(0.9);}
+  .npc-note-tile.wrong-flash{animation:puzzleShake 0.4s ease;border-color:var(--red);}
+  .npc-action-btn{display:block;margin:4px auto 0;}
+
   .input-mode-row{display:flex;gap:8px;justify-content:center;margin-bottom:10px;}
   .mode-btn{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.25);border-radius:50px;padding:6px 14px;font-size:0.72rem;font-weight:700;color:#f0d99a;cursor:pointer;transition:0.2s;}
   .mode-btn.active{background:var(--gold);border-color:var(--gold);color:#3d2a17;}
@@ -283,6 +295,16 @@
     <div class="piano-puzzle" id="pianoPuzzle" style="display:none;">
       <div class="piano-keys" id="pianoKeys"></div>
     </div>
+  </div>
+
+  <!-- Lisek z Animapolis (tylko poziom 3, tryb dora — patrz spawnNpcFox) -->
+  <div class="puzzle-panel npc-panel" id="npcPanel">
+    <div class="puzzle-title">🦊 Lisek z Animapolis</div>
+    <div class="npc-text" id="npcText"></div>
+    <div class="npc-choices" id="npcChoices"></div>
+    <div class="npc-notes" id="npcNotes"></div>
+    <button type="button" class="win-btn npc-action-btn" id="npcContinueBtn" style="display:none;" onclick="npcContinue()">Dalej ▶</button>
+    <button type="button" class="win-btn npc-action-btn" id="npcCloseBtn" style="display:none;" onclick="closeNpcDialogue()">Rozumiem</button>
   </div>
 </div>
 
@@ -500,7 +522,7 @@ document.querySelectorAll('.diff-btn').forEach(function(b){
 });
 
 /* Ukryty kod "dora" — całkiem niepozorne pole na ekranie startowym, nikt
-   nie musi go zauważyć. Włącza ciemniejszy motyw i nocne poziomy 2/4/5.
+   nie musi go zauważyć. Włącza ciemniejszy motyw i nocne poziomy 2/3/4/5/6.
    Celowo BEZ zapisu w localStorage — tryb nocny ma działać tylko w
    bieżącej sesji/karcie, nigdy nie ma "zostać włączony" na stałe po
    ponownym wejściu na stronę. Każde świeże wejście na stronę to zawsze
@@ -511,7 +533,7 @@ document.querySelectorAll('.diff-btn').forEach(function(b){
 let nightMode = false;
 /* Czy AKTUALNIE wyświetlana scena renderuje się w trybie nocnym (nightMode
    ORAZ bieżący poziom w ogóle ma noc — patrz isNight w initScene) — osobno
-   od samego kodu "dora", bo poziomy 1/3 zawsze wyglądają "dziennie" mimo
+   od samego kodu "dora", bo poziom 1 zawsze wygląda "dziennie" mimo
    wpisanego kodu. Używane przy dobieraniu przyciemnionych materiałów dla
    bezcieniowych modeli z paczki natury (patrz convertToUnlitMaterial). */
 let sceneIsNight = false;
@@ -1764,21 +1786,34 @@ function buildMountainPass(){
    samą ścieżkę na drugi brzeg i wracają (patrz updateLevel3CrossingFrogs). */
 function buildLevel3River(){
   const zLen = L3_RIVER_Z_START - L3_RIVER_Z_END;
-  const zMid = (L3_RIVER_Z_START + L3_RIVER_Z_END) / 2;
-
   const waterMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.2, metalness:0.15, transparent:true, opacity:0.88});
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(L3_RIVER_HALF_WIDTH*2, zLen), waterMat);
-  water.rotation.x = -Math.PI/2;
-  water.position.set(L3_RIVER_X, 0.05, zMid);
-  scene.add(water);
-
   const bankMat = new THREE.MeshStandardMaterial({color:0xc9a96b, roughness:1});
-  [-1, 1].forEach(function(side){
-    const bank = new THREE.Mesh(new THREE.PlaneGeometry(0.7, zLen), bankMat);
-    bank.rotation.x = -Math.PI/2;
-    bank.position.set(L3_RIVER_X + side*(L3_RIVER_HALF_WIDTH + 0.32), 0.06, zMid);
-    scene.add(bank);
-  });
+
+  /* Zbudowana z kilkunastu krótkich odcinków (nie jednej prostej wstęgi),
+     każdy wyśrodkowany na l3RiverCenterX() dla swojego z — poza trybem
+     dora l3RiverCenterX() zwraca tę samą stałą dla każdego odcinka, więc
+     efekt jest identyczny jak poprzednia pojedyncza płyta; w trybie dora
+     kolejne odcinki są przesunięte względem siebie i razem dają wrażenie
+     wijącej się rzeki. Odcinki nachodzą na siebie o 2%, żeby nie było
+     widać szwów między nimi. */
+  const segments = 14, segLen = zLen / segments;
+  for(let i=0;i<segments;i++){
+    const segZStart = L3_RIVER_Z_START - i*segLen;
+    const segZMid = segZStart - segLen/2;
+    const cx = l3RiverCenterX(segZMid);
+
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(L3_RIVER_HALF_WIDTH*2, segLen*1.02), waterMat);
+    water.rotation.x = -Math.PI/2;
+    water.position.set(cx, 0.05, segZMid);
+    scene.add(water);
+
+    [-1, 1].forEach(function(side){
+      const bank = new THREE.Mesh(new THREE.PlaneGeometry(0.7, segLen*1.02), bankMat);
+      bank.rotation.x = -Math.PI/2;
+      bank.position.set(cx + side*(L3_RIVER_HALF_WIDTH + 0.32), 0.06, segZMid);
+      scene.add(bank);
+    });
+  }
 }
 
 let level3CrossingFrogs = [];
@@ -1788,8 +1823,8 @@ function scatterLevel3RiverDecor(){
   /* Szuwary na obu brzegach */
   for(let i=0;i<16;i++){
     const side = Math.random()<0.5 ? -1 : 1;
-    const x = L3_RIVER_X + side*(L3_RIVER_HALF_WIDTH + 0.3 + Math.random()*0.6);
     const z = L3_RIVER_Z_START - Math.random()*zLen;
+    const x = l3RiverCenterX(z) + side*(L3_RIVER_HALF_WIDTH + 0.3 + Math.random()*0.6);
     const cat = buildCattail();
     cat.position.set(x, terrainHeight(x, z), z);
     cat.rotation.y = Math.random()*Math.PI*2;
@@ -1800,8 +1835,8 @@ function scatterLevel3RiverDecor(){
      buildTinyFrog/tinyFrogs co przy rzece poziomów 1-2 — jedna wspólna
      animacja pulsowania w updateTinyFrogs). */
   for(let i=0;i<14;i++){
-    const x = L3_RIVER_X + (Math.random()*2-1)*L3_RIVER_HALF_WIDTH*0.75;
     const z = L3_RIVER_Z_START - Math.random()*zLen;
+    const x = l3RiverCenterX(z) + (Math.random()*2-1)*L3_RIVER_HALF_WIDTH*0.75;
     const pad = buildLilyPad();
     pad.position.set(x, 0.13, z);
     scene.add(pad);
@@ -1821,15 +1856,17 @@ function scatterLevel3RiverDecor(){
   const crossCount = 4;
   for(let i=0;i<crossCount;i++){
     const homeZ = L3_RIVER_Z_START - (i+0.5)*(zLen/crossCount) + (Math.random()-0.5)*3;
+    const riverX = l3RiverCenterX(homeZ);
     const frog = buildFrog();
     frog.scale.multiplyScalar(0.55);
     scene.add(frog);
     level3CrossingFrogs.push({
       group: frog,
       homeZ: homeZ,
+      riverX: riverX,
       phase: Math.random()*Math.PI*2,
       period: 7 + Math.random()*3,
-      farX: 6.5 + Math.random()*1.5
+      farX: riverX + 13 + Math.random()*1.5
     });
   }
 }
@@ -1842,7 +1879,7 @@ function updateLevel3CrossingFrogs(){
     const outward = cyc < 0.5;
     const swing = outward ? cyc*2 : (1-cyc)*2;
     const eased = swing*swing*(3-2*swing);
-    const x = L3_RIVER_X + eased * (f.farX - L3_RIVER_X);
+    const x = f.riverX + eased * (f.farX - f.riverX);
     const z = f.homeZ;
     const hop = Math.abs(Math.sin(cyc * Math.PI * 10));
     f.group.position.set(x, terrainHeight(x, z) + hop*0.22, z);
@@ -2546,9 +2583,19 @@ function nearCave(x, z){
    przez dystans do trasy) przebijałoby się przez płaską taflę wody. */
 const L3_RIVER_X = -6.5, L3_RIVER_HALF_WIDTH = 2.6;
 const L3_RIVER_Z_START = 4, L3_RIVER_Z_END = -49;
+/* Linia środkowa rzeki w danym z — poza trybem dora to zwyczajnie stała
+   L3_RIVER_X (prosta rzeka jak dotychczas). W trybie dora rzeka wije się
+   (dwa nałożone sinusy o różnych okresach, żeby nie wyglądała na w pełni
+   regularny "wężyk") — używana wszędzie tam, gdzie liczy się aktualna
+   pozycja rzeki (budowa siatki wody, rozrzut roślinności, żabki, test
+   "czy blisko rzeki"), więc krzywizna jest spójna we wszystkich miejscach. */
+function l3RiverCenterX(z){
+  if(!nightMode) return L3_RIVER_X;
+  return L3_RIVER_X + Math.sin(z*0.065)*2.6 + Math.sin(z*0.021 + 1.3)*1.4;
+}
 function nearRiverL3(x, z){
   return currentLevel === 3 && z <= L3_RIVER_Z_START && z >= L3_RIVER_Z_END &&
-    Math.abs(x - L3_RIVER_X) < L3_RIVER_HALF_WIDTH + 1.3;
+    Math.abs(x - l3RiverCenterX(z)) < L3_RIVER_HALF_WIDTH + 1.3;
 }
 
 /* Teren nie jest już idealnie płaski — łagodne wzniesienia z dala od
@@ -3316,11 +3363,15 @@ function onCanvasPointerUp(e){
   const wasTap = !dragMoved;
   dragMoved = false;
   if(!wasTap) return;
-  if(walking || currentPuzzle || doraEventActive) return;
+  if(walking || currentPuzzle || doraEventActive || npcDialogueActive) return;
   const rect = renderer.domElement.getBoundingClientRect();
   const x = ((e.clientX-rect.left)/rect.width)*2-1;
   const y = -((e.clientY-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera({x:x,y:y}, camera);
+  if(npcFox){
+    const npcHits = raycaster.intersectObject(npcFox, true);
+    if(npcHits.length){ openNpcDialogue(); return; }
+  }
   const nextIdx = currentIdx + 1;
   if(nextIdx >= waypoints.length) return;
   const marker = waypoints[nextIdx].markerGroup;
@@ -3922,6 +3973,102 @@ function triggerDoraCaught(){
   }, 400);
 }
 
+/* ══ Lisek z Animapolis — tylko poziom 3, tryb dora (patrz spawnNpcFox w
+   initScene) ══
+   Stoi przy opuszczonym obozowisku i czeka, aż postać go dotknie. Rozmowa
+   to wybór JEDNEJ z trzech kwestii (co chcemy powiedzieć) — każda ma
+   przypisaną własną nutkę, którą trzeba trafić w tacce, żeby faktycznie
+   "powiedzieć" tę kwestię (złe trafienie = potrząśnięcie, próbuj dalej).
+   Dopiero po udanej rozmowie lisek zdradza niepokojącą tajemnicę
+   Animapolis. */
+let npcFox = null;
+let npcDialogueActive = false;
+
+const NPC_CHOICES = [
+  {text:'To urocze miejsce, podoba mi się!', note:'G'},
+  {text:'Dawno tu mieszkasz?', note:'D'},
+  {text:'Miło Cię poznać!', note:'A'}
+];
+
+function spawnNpcFox(){
+  npcFox = buildFoxCub();
+  npcFox.scale.setScalar(1.7);
+  const fx = 3.2, fz = -25.9;
+  npcFox.position.set(fx, terrainHeight(fx, fz), fz);
+  npcFox.rotation.y = Math.PI*0.15;
+  scene.add(npcFox);
+}
+
+function updateNpcFox(){
+  if(!npcFox) return;
+  const groundY = terrainHeight(npcFox.position.x, npcFox.position.z);
+  npcFox.position.y = groundY + Math.abs(Math.sin(idleT*1.7))*0.035;
+  /* Delikatny obrót w stronę postaci — sprawia wrażenie, że nas zauważa,
+     nawet kiedy jeszcze nie zaczęliśmy rozmowy. */
+  if(character && !npcDialogueActive){
+    const dx = character.position.x - npcFox.position.x, dz = character.position.z - npcFox.position.z;
+    if(Math.hypot(dx, dz) > 0.05) npcFox.rotation.y = Math.atan2(dx, dz);
+  }
+}
+
+function openNpcDialogue(){
+  if(npcDialogueActive) return;
+  npcDialogueActive = true;
+  document.getElementById('npcText').textContent = 'Hej, hej! Nie widziałem/-am Cię tutaj wcześniej. Witaj w Animapolis — mieszka się tu wyśmienicie!';
+  document.getElementById('npcContinueBtn').style.display = 'none';
+  document.getElementById('npcCloseBtn').style.display = 'none';
+  renderNpcChoices();
+  document.getElementById('npcPanel').classList.add('show');
+}
+
+function renderNpcChoices(){
+  const choicesWrap = document.getElementById('npcChoices');
+  choicesWrap.style.display = 'flex';
+  choicesWrap.innerHTML = '';
+  NPC_CHOICES.forEach(function(c){
+    const row = document.createElement('div');
+    row.className = 'npc-choice-btn';
+    row.innerHTML = '<span class="npc-choice-text">'+c.text+'</span><span class="npc-choice-note">🎵 '+c.note+'</span>';
+    choicesWrap.appendChild(row);
+  });
+
+  const notesWrap = document.getElementById('npcNotes');
+  notesWrap.style.display = 'flex';
+  notesWrap.innerHTML = '';
+  shuffled(LETTERS_ORDER).forEach(function(letter){
+    const tile = document.createElement('div');
+    tile.className = 'npc-note-tile';
+    tile.textContent = letter.toLowerCase();
+    tile.addEventListener('pointerdown', function(){ onNpcNoteTap(letter, tile); });
+    notesWrap.appendChild(tile);
+  });
+}
+
+function onNpcNoteTap(letter, tileEl){
+  const matched = NPC_CHOICES.some(function(c){ return c.note === letter; });
+  if(!matched){
+    tileEl.classList.add('wrong-flash');
+    setTimeout(function(){ tileEl.classList.remove('wrong-flash'); }, 400);
+    return;
+  }
+  playSuccessChime();
+  document.getElementById('npcChoices').style.display = 'none';
+  document.getElementById('npcNotes').style.display = 'none';
+  document.getElementById('npcText').textContent = 'Cieszę się, że tu jesteś! Chodź bliżej, mam Ci coś do powiedzenia...';
+  document.getElementById('npcContinueBtn').style.display = 'block';
+}
+
+function npcContinue(){
+  document.getElementById('npcContinueBtn').style.display = 'none';
+  document.getElementById('npcText').textContent = 'Wiesz... ostatnio zauważyliśmy coś dziwnego. Zwierzątka, które fałszowały nuty, jedno po drugim znikały. Zostały tylko te, które grają czysto i naprawdę dobrze poznały nutki. Nikt jednak nie wie, z jakiej przyczyny...';
+  document.getElementById('npcCloseBtn').style.display = 'block';
+}
+
+function closeNpcDialogue(){
+  npcDialogueActive = false;
+  document.getElementById('npcPanel').classList.remove('show');
+}
+
 /* ══ Efekty świętowania ══ */
 function spawn3DBurst(position){
   if(!scene) return;
@@ -4297,6 +4444,7 @@ function animate(now){
   updateTinyFrogs();
   updateLevel3CrossingFrogs();
   updateCampfires();
+  updateNpcFox();
   if(!inCutscene) updateCamera();
   updateOccludingObjects();
   renderer.render(scene, camera);
@@ -4307,7 +4455,7 @@ function initScene(){
     (currentLevel === 3 ? LEVEL3_PATH_POINTS : (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS));
   potentialOccluders = [];
   scene = new THREE.Scene();
-  const isNight = nightMode && (currentLevel === 2 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
+  const isNight = nightMode && (currentLevel === 2 || currentLevel === 3 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
   sceneIsNight = isNight;
   doraLives = 3;
   doraEventActive = false;
@@ -4351,6 +4499,10 @@ function initScene(){
   }
 
   campfires = [];
+  npcFox = null;
+  npcDialogueActive = false;
+  const npcPanelEl = document.getElementById('npcPanel');
+  if(npcPanelEl) npcPanelEl.classList.remove('show');
   if(currentLevel === 6){
     buildShopInterior();
   }else{
@@ -4419,6 +4571,7 @@ function initScene(){
       buildMountainPass();
       buildLevel3River();
       scatterLevel3RiverDecor();
+      if(nightMode) spawnNpcFox();
     }
     if(currentLevel === 4){
       scatterRuins();
