@@ -2562,8 +2562,19 @@ function groundLevelAt(x, z){
 
 /* Domek z płotkiem na końcu ścieżki — cel wędrówki, "serce dżungli". */
 const HOUSE_Z = -44, HOUSE_YARD_HALF = 4.2;
+/* Poziom 3 ma dłuższą i inaczej ukształtowaną trasę (przełęcz + jaskinia +
+   rzeka wzdłuż lewej strony, patrz LEVEL3_PATH_POINTS — kończy się w
+   (3,-47), nie w okolicy (0,-44) jak domyślna trasa), więc domek na jego
+   końcu też stoi w innym miejscu — dokładnie tam, gdzie ta trasa faktycznie
+   się kończy, zamiast w stałym punkcie wyliczonym pod krótszą, domyślną
+   ścieżkę. houseX/houseZ() to jedyne źródło prawdy o pozycji domku — cała
+   reszta (budowa domku, strefa wykluczenia, kadr przybycia, punkt podejścia
+   pod drzwi) czyta z nich, więc nic nie trzeba synchronizować ręcznie. */
+const HOUSE_X_L3 = 1.5, HOUSE_Z_L3 = -51;
+function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : 0; }
+function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : HOUSE_Z; }
 function nearHouse(x, z){
-  return Math.abs(x) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - HOUSE_Z) < HOUSE_YARD_HALF + 0.6;
+  return Math.abs(x - houseX()) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - houseZ()) < HOUSE_YARD_HALF + 0.6;
 }
 
 /* Górska przełęcz (poziom 3, patrz buildMountainPass) — strefa
@@ -2700,11 +2711,12 @@ function buildFence(){
 }
 
 function buildHouseAndFence(){
+  const hx = houseX(), hz = houseZ();
   const house = buildHouse();
-  house.position.set(0, 0, HOUSE_Z - 1.4);
+  house.position.set(hx, 0, hz - 1.4);
   scene.add(house);
   const fence = buildFence();
-  fence.position.set(0, 0, HOUSE_Z);
+  fence.position.set(hx, 0, hz);
   scene.add(fence);
 }
 
@@ -4192,8 +4204,9 @@ function tweenCharacterTo(targetX, targetZ, duration, onDone){
    dokładnie tam, gdzie widzieliśmy drzwi w cutscence na starcie poziomu. */
 function doorApproachPoint(){
   const isShop = currentLevel === 5;
-  const doorX = isShop ? 1.0 : 0;
-  const doorZ = HOUSE_Z - 1.4 + (isShop ? 1.3 : 1.12);
+  const hx = houseX(), hz = houseZ();
+  const doorX = hx + (isShop ? 1.0 : 0);
+  const doorZ = hz - 1.4 + (isShop ? 1.3 : 1.12);
   return {x: doorX, z: doorZ};
 }
 /* Kilka podskoków w miejscu (bez biegania po całej polance), a potem
@@ -4279,14 +4292,14 @@ function getArrivalShot(){
   }
   /* Sklepik (poziom 5) ma teraz front (drzwi+markiza) zwrócony w stronę
      +Z, tak jak domek — tylko drzwi są przesunięte od środka (x=1.0),
-     więc kadr centruje się na NICH, nie na środku całego budynku. */
+     więc kadr centruje się na NICH, nie na środku całego budynku. Ten sam
+     punkt drzwi co doorApproachPoint() — patrz houseX/houseZ dla poziomu 3. */
   const isShop = currentLevel === 5;
-  const doorX = isShop ? 1.0 : 0;
-  const doorZ = HOUSE_Z - 1.4 + (isShop ? 1.3 : 1.12);
+  const door = doorApproachPoint();
   const dist = isShop ? 6.5 : 6;
-  const camX = doorX, camZ = doorZ + dist;
+  const camX = door.x, camZ = door.z + dist;
   const camPos = new THREE.Vector3(camX, terrainHeight(camX, camZ) + (isShop ? 2.0 : 2.1), camZ);
-  const lookAt = new THREE.Vector3(doorX, isShop ? 1.4 : 1.35, doorZ);
+  const lookAt = new THREE.Vector3(door.x, isShop ? 1.4 : 1.35, door.z);
   return {camPos, lookAt};
 }
 
