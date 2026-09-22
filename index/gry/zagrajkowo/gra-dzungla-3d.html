@@ -297,9 +297,11 @@
     </div>
   </div>
 
-  <!-- Lisek z Animapolis (tylko poziom 3, tryb dora — patrz spawnNpcFox) -->
+  <!-- Panel dialogowy NPC — wspólny dla liska z Animapolis (poziom 3, tryb
+       dora, patrz spawnNpcFox) i ekspedientów sklepiku (poziom 6, patrz
+       spawnShopClerks) — treść/tytuł ustawiane dynamicznie w openNpcDialogue. -->
   <div class="puzzle-panel npc-panel" id="npcPanel">
-    <div class="puzzle-title">🦊 Lisek z Animapolis</div>
+    <div class="puzzle-title" id="npcPanelTitle">🦊 Lisek z Animapolis</div>
     <div class="npc-text" id="npcText"></div>
     <div class="npc-choices" id="npcChoices"></div>
     <div class="npc-notes" id="npcNotes"></div>
@@ -924,13 +926,26 @@ const LEVEL3_PASS_SEGMENT = LEVEL3_PATH_POINTS.slice(4, 6);
 const LEVEL5_PASS_SEGMENT = [
   {x:7, z:-15}, {x:12, z:-21}, {x:15, z:-28}, {x:11, z:-34}
 ];
-/* Poziom 6: wnętrze sklepiku — ścieżka wije się zygzakiem między rzędami
-   półek (patrz buildShopInterior), naprzemiennie w lewo i w prawo, żeby
-   przypominało chodzenie alejkami sklepu. */
+/* Poziom 6: wnętrze sklepiku, podzielone na 3 pomieszczenia (patrz
+   buildShopInterior/SHOP_DOORS) — ścieżka wije się zygzakiem między
+   rzędami półek, naprzemiennie w lewo i w prawo, żeby przypominało
+   chodzenie alejkami sklepu. Punkty na osi x=0 oznaczone "noPuzzle" to
+   przejścia w drzwiach między pomieszczeniami (patrz onArrive) — nie ma
+   tam żadnej zagadki, świecąca nutka po prostu prowadzi dalej przez
+   próg. Ostatni punkt trasy prowadzi do kasy (patrz LEVEL6_CHECKOUT). */
 const LEVEL6_PATH_POINTS = [
-  {x:0, z:0}, {x:2.7, z:-6.5}, {x:-2.7, z:-13}, {x:2.7, z:-19.5},
-  {x:-2.7, z:-26}, {x:2.7, z:-32.5}, {x:-2.7, z:-39}, {x:0, z:-45}
+  {x:0, z:0}, {x:2.7, z:-6.5}, {x:-2.7, z:-13}, {x:0, z:-16.25, noPuzzle:true},
+  {x:2.7, z:-19.5}, {x:-2.7, z:-26}, {x:2.7, z:-32.5}, {x:0, z:-35.75, noPuzzle:true},
+  {x:-2.7, z:-39}, {x:0, z:-45}
 ];
+/* Środek drzwi między pomieszczeniami (patrz buildShopInterior) — te same
+   dwie wartości Z co punkty "noPuzzle" powyżej, żeby przejście w ścianie
+   dokładnie pokrywało się z miejscem, którym naprawdę idzie ścieżka. */
+const SHOP_DOOR_Z = [-16.25, -35.75];
+const SHOP_DOOR_HALF = 1.3;
+/* Kasa — właściwy koniec poziomu 6, tuż przed tylną ścianą sklepu (patrz
+   doorApproachPoint/getArrivalShot dla poziomu 6). */
+const LEVEL6_CHECKOUT = {x: 0, z: -47};
 let PATH_POINTS = DEFAULT_PATH_POINTS;
 
 function buildCharacter(kind){
@@ -2390,23 +2405,136 @@ function buildDarkFigure(){
   return g;
 }
 
-/* Poziom 6: wnętrze sklepiku — podłoga, ściany, sufit z lampami oraz
-   rzędy regałów po obu stronach zygzakowatej ścieżki (LEVEL6_PATH_POINTS),
-   tworzące "alejki". Na co dzień jasne i kolorowe; w trybie "dora"
-   (sceneIsNight) gaśnie do zakurzonego, obskurnego sklepu — ciemniejsze
-   materiały, gołe żarówki zamiast paneli, przekrzywione regały. */
+/* Kontuar kasy — koniec poziomu 6 (patrz LEVEL6_CHECKOUT), z prostą
+   kasą fiskalną i taśmą, żeby jasno czytało się jako "tu się płaci". */
+function buildCheckoutCounter(){
+  const g = new THREE.Group();
+  const counterMat = new THREE.MeshStandardMaterial({color:0xe4d7b3, roughness:0.75});
+  const base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.9, 0.8), counterMat);
+  base.position.y = 0.45;
+  g.add(base);
+  const topMat = new THREE.MeshStandardMaterial({color:0xfffdf5, roughness:0.4});
+  const top = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.06, 0.9), topMat);
+  top.position.y = 0.93;
+  g.add(top);
+  const beltMat = new THREE.MeshStandardMaterial({color:0x2a2a2a, roughness:0.9});
+  const belt = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.04, 0.68), beltMat);
+  belt.position.set(0.72, 0.96, 0);
+  g.add(belt);
+  const registerMat = new THREE.MeshStandardMaterial({color:0x3a3a3a, roughness:0.6});
+  const register = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.28), registerMat);
+  register.position.set(-0.65, 1.07, 0);
+  g.add(register);
+  const screenMat = new THREE.MeshStandardMaterial({color:0x0a0a0a, emissive:0x2a6fd8, emissiveIntensity:0.6});
+  const screen = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.16, 0.03), screenMat);
+  screen.position.set(-0.65, 1.28, 0.13);
+  screen.rotation.x = -0.3;
+  g.add(screen);
+  return g;
+}
+
+/* Prosta "owocowa" skrzynka — drewniana kratka + kilka kolorowych kulek na
+   wierzchu (jabłka/pomarańcze/limonki) — nie ma gotowego modelu Kenney na
+   stoisko z owocami, więc budujemy je z prostych brył, tak jak inne drobne
+   proceduralne obiekty w tym pliku (patrz np. buildTrashCan). */
+function buildFruitStand(){
+  const g = new THREE.Group();
+  const crateMat = new THREE.MeshStandardMaterial({color:0x9a6b3c, roughness:0.9});
+  const crate = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.55, 0.75), crateMat);
+  crate.position.y = 0.275;
+  g.add(crate);
+  const legMat = new THREE.MeshStandardMaterial({color:0x7a5230, roughness:0.9});
+  [[-0.48,-0.3],[0.48,-0.3],[-0.48,0.3],[0.48,0.3]].forEach(function(p){
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.55, 0.08), legMat);
+    leg.position.set(p[0], 0.275, p[1]);
+    g.add(leg);
+  });
+  const fruitColors = [0xe0472c, 0xf3a53d, 0xc7dd4a, 0xe0472c, 0xf3a53d];
+  for(let i=0;i<9;i++){
+    const color = fruitColors[i % fruitColors.length];
+    const fruit = new THREE.Mesh(new THREE.SphereGeometry(0.13, 10, 8), new THREE.MeshStandardMaterial({color:color, roughness:0.6}));
+    const row = Math.floor(i/3), col = i%3;
+    fruit.position.set(-0.32 + col*0.32, 0.62 + row*0.11, -0.18 + (row%2)*0.2);
+    g.add(fruit);
+  }
+  return g;
+}
+
+/* Ekspedient(ka) sklepiku — prosty proceduralny ludzik (nogi/tors/głowa jak
+   buildDarkFigure, plus ramiona jak w buildBrokenStatue) w koszulce i
+   fartuchu, żeby wyglądał na kogoś, kto tu pracuje. Niewidzialny, szerszy
+   obszar trafienia jak w buildMarker — dzieciom łatwiej trafić w dużą
+   sylwetkę niż w cienkie ramiona/tors. */
+function buildShopClerk(){
+  const g = new THREE.Group();
+  const skinMat = new THREE.MeshStandardMaterial({color:0xecb98a, roughness:0.8});
+  const shirtMat = new THREE.MeshStandardMaterial({color:0x4f95d6, roughness:0.85});
+  const apronMat = new THREE.MeshStandardMaterial({color:0x2e8a55, roughness:0.85});
+  const legs = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.14, 0.9, 8), shirtMat);
+  legs.position.y = 0.45;
+  g.add(legs);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.2, 0.75, 8), shirtMat);
+  body.position.y = 1.25;
+  g.add(body);
+  const apron = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.55, 0.06), apronMat);
+  apron.position.set(0, 1.05, 0.19);
+  g.add(apron);
+  [-1, 1].forEach(function(side){
+    const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.55, 6), shirtMat);
+    arm.position.set(side*0.29, 1.25, 0);
+    arm.rotation.z = side*Math.PI/9;
+    g.add(arm);
+  });
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 12, 10), skinMat);
+  head.position.y = 1.82;
+  g.add(head);
+  const hairMat = new THREE.MeshStandardMaterial({color:0x4a3220, roughness:0.9});
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 8, 0, Math.PI*2, 0, Math.PI/1.7), hairMat);
+  hair.position.y = 1.88;
+  g.add(hair);
+  const hitArea = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.55, 0.55, 2.1, 10),
+    new THREE.MeshBasicMaterial({visible:false})
+  );
+  hitArea.position.y = 1.0;
+  g.add(hitArea);
+  return g;
+}
+
+/* Dwóch ekspedientów: jeden w pierwszej sali (między regałami), drugi za
+   kasą w ostatniej (patrz LEVEL6_CHECKOUT/buildCheckoutCounter) — sklep
+   ma być obsłużony, zarówno na co dzień, jak i w trybie "dora" (patrz
+   "ma byc juz jasno bo jest to sklep, aja byc tez ekspedienci"). */
+function spawnShopClerks(){
+  const spots = [
+    {x:-4.5, z:-8.5, ry:Math.PI*0.25},
+    {x:0.85, z:-48.2, ry:0}
+  ];
+  spots.forEach(function(p){
+    const clerk = buildShopClerk();
+    clerk.position.set(p.x, terrainHeight(p.x, p.z), p.z);
+    clerk.rotation.y = p.ry;
+    scene.add(clerk);
+    interactiveNpcs.push({mesh: clerk, config: NPC_CLERK_CONFIG});
+  });
+}
+
+/* Poziom 6: wnętrze sklepiku, podzielone na 3 sale (patrz SHOP_DOOR_Z) —
+   spożywcza, chłodnia+narzędzia, warzywniak+kasa — połączone drzwiami w
+   ściankach działowych, którymi dokładnie przechodzi ścieżka (patrz
+   LEVEL6_PATH_POINTS). Zawsze jasno i kolorowo, również w trybie "dora"
+   (patrz initScene) — to zwyczajny, czynny sklep, nie opuszczona ruina. */
 function buildShopInterior(){
-  const isN = sceneIsNight;
   const roomHalfW = 6.0, roomZStart = 4, roomZEnd = -49, roomH = 4.6;
   const roomZMid = (roomZStart + roomZEnd) / 2, roomZLen = roomZStart - roomZEnd;
 
-  const floorMat = new THREE.MeshStandardMaterial({color: isN ? 0x2b2620 : 0xf2e9c9, roughness: isN ? 0.95 : 0.5});
+  const floorMat = new THREE.MeshStandardMaterial({color:0xf2e9c9, roughness:0.5});
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), floorMat);
   floor.rotation.x = -Math.PI/2;
   floor.position.set(0, 0, roomZMid);
   scene.add(floor);
 
-  const wallMat = new THREE.MeshStandardMaterial({color: isN ? 0x3a3128 : 0xfff3d0, roughness:0.9});
+  const wallMat = new THREE.MeshStandardMaterial({color:0xfff3d0, roughness:0.9});
   [-1, 1].forEach(function(side){
     const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMat);
     wall.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
@@ -2421,64 +2549,159 @@ function buildShopInterior(){
   frontWall.position.set(0, roomH/2, roomZStart);
   scene.add(frontWall);
 
-  const ceilMat = new THREE.MeshStandardMaterial({color: isN ? 0x1c1712 : 0xffffff, roughness:0.9, side:THREE.DoubleSide});
+  const ceilMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.9, side:THREE.DoubleSide});
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), ceilMat);
   ceiling.rotation.x = Math.PI/2;
   ceiling.position.set(0, roomH, roomZMid);
   scene.add(ceiling);
 
-  /* Oświetlenie sufitowe co ok. 8 jednostek wzdłuż całej alejki — jasne
-     panele na co dzień, gołe migoczące żarówki w wersji "dora". */
-  for(let z=roomZStart-4; z>=roomZEnd+2; z-=8){
-    if(isN){
-      const bulbMat = new THREE.MeshStandardMaterial({color:0x2a2620, emissive:0xffdd88, emissiveIntensity:0.6});
-      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), bulbMat);
-      bulb.position.set(0, roomH-0.3, z);
-      scene.add(bulb);
-      const lamp = new THREE.PointLight(0xffcc77, 0.55, 9);
-      lamp.position.set(0, roomH-0.3, z);
-      scene.add(lamp);
-    }else{
-      const panelMat = new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xfff6d0, emissiveIntensity:0.9});
-      const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.06, 1.1), panelMat);
-      panel.position.set(0, roomH-0.05, z);
-      scene.add(panel);
-      const lamp = new THREE.PointLight(0xfff6da, 0.7, 12);
-      lamp.position.set(0, roomH-0.4, z);
-      scene.add(lamp);
-    }
+  /* Lamperia — pas boazerii na dole wszystkich ścian ("ma byc tez
+     lamperia tam"), lekko odsunięty od ściany, żeby uniknąć z-fightingu. */
+  const wainscotMat = new THREE.MeshStandardMaterial({color:0x8a6a45, roughness:0.85});
+  const wainscotH = 1.0;
+  [-1, 1].forEach(function(side){
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.04, wainscotH, roomZLen), wainscotMat);
+    w.position.set(side*(roomHalfW-0.03), wainscotH/2, roomZMid);
+    scene.add(w);
+  });
+  const backWainscot = new THREE.Mesh(new THREE.BoxGeometry(roomHalfW*2-0.1, wainscotH, 0.04), wainscotMat);
+  backWainscot.position.set(0, wainscotH/2, roomZEnd+0.03);
+  scene.add(backWainscot);
+  const frontWainscot = backWainscot.clone();
+  frontWainscot.position.z = roomZStart-0.03;
+  scene.add(frontWainscot);
+
+  /* Ścianki działowe między salami, z przejściem na środku (patrz
+     SHOP_DOOR_Z/SHOP_DOOR_HALF) — dokładnie tam, gdzie ścieżka ma punkt
+     "noPuzzle" (patrz LEVEL6_PATH_POINTS). Pełne bryły (nie pojedyncza
+     płaszczyzna), więc wyglądają poprawnie z obu sal naraz. */
+  function buildPartitionWall(z){
+    const segW = roomHalfW - SHOP_DOOR_HALF;
+    const wallThick = 0.14;
+    [-1, 1].forEach(function(side){
+      const seg = new THREE.Mesh(new THREE.BoxGeometry(segW, roomH, wallThick), wallMat);
+      seg.position.set(side*(SHOP_DOOR_HALF + segW/2), roomH/2, z);
+      scene.add(seg);
+      potentialOccluders.push(seg);
+    });
+    const lintelH = 1.1;
+    const lintel = new THREE.Mesh(new THREE.BoxGeometry(SHOP_DOOR_HALF*2, lintelH, wallThick), wallMat);
+    lintel.position.set(0, roomH - lintelH/2, z);
+    scene.add(lintel);
+  }
+  SHOP_DOOR_Z.forEach(buildPartitionWall);
+
+  /* Sufit kasetonowy — siatka "kaset" (ciemniejsza ramka + jasny, świecący
+     panel pośrodku) w dwóch rzędach na całej długości sklepu, zamiast
+     pojedynczego rzędu lamp na środku ("Lampy maja byc na suficie jako
+     taki sufit kasetonowy"). */
+  function ceilingFixture(x, z){
+    const frameMat = new THREE.MeshStandardMaterial({color:0xb0b4ba, roughness:0.6});
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.07, 1.6), frameMat);
+    frame.position.set(x, roomH-0.02, z);
+    scene.add(frame);
+    const panelMat = new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xfff6d0, emissiveIntensity:1.0});
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 1.2), panelMat);
+    panel.position.set(x, roomH-0.09, z);
+    scene.add(panel);
+    const lamp = new THREE.PointLight(0xfff6da, 0.5, 8.5);
+    lamp.position.set(x, roomH-0.35, z);
+    scene.add(lamp);
+  }
+  for(let z=roomZStart-2; z>=roomZEnd+2; z-=4.5){
+    ceilingFixture(-2.6, z);
+    ceilingFixture(2.6, z);
   }
 
-  /* Regały z paczki Kenney (Mini Market, CC0) po obu stronach ścieżki,
-     ustawione mniej więcej naprzeciw każdego zakrętu zygzaka —
-     naprzemiennie pudełka/torby, plus lodówka co trzeci przystanek.
-     W wersji "dora" lekko przekrzywione, jakby dawno nikt ich nie ustawiał. */
+  /* Sala 1 (spożywcza) — regały z paczki Kenney (Mini Market, CC0),
+     naprzemiennie pudełka/torby po obu stronach ścieżki. */
   const shelfKeys = ['marketShelfBoxes', 'marketShelfBags'];
   let spotIdx = 0;
-  for(let z=roomZStart-3; z>=roomZEnd+3; z-=6.5){
+  [2, -3, -8, -13].forEach(function(z){
     [-1, 1].forEach(function(side){
       const x = side * (roomHalfW - 1.6);
-      const key = shelfKeys[spotIdx % shelfKeys.length];
-      const shelf = kenneyMesh(key, 1.5);
-      const jitter = isN ? (Math.random()-0.5)*0.35 : 0;
+      const shelf = kenneyMesh(shelfKeys[spotIdx % 2], 1.5);
       if(shelf){
-        shelf.position.set(x, 0, z + (isN ? (Math.random()-0.5)*0.6 : 0));
-        shelf.rotation.y = (side > 0 ? Math.PI : 0) + jitter;
+        shelf.position.set(x, 0, z);
+        shelf.rotation.y = side > 0 ? Math.PI : 0;
         scene.add(shelf);
         potentialOccluders.push(shelf);
       }
-      if(spotIdx % 3 === 0){
-        const freezer = kenneyMesh('marketFreezer', 1.35);
-        if(freezer){
-          freezer.position.set(x*0.86, 0, z + 1.7);
-          freezer.rotation.y = side > 0 ? Math.PI : 0;
-          scene.add(freezer);
-          potentialOccluders.push(freezer);
-        }
-      }
       spotIdx++;
     });
+  });
+
+  /* Sala 2 (chłodnia + narzędzia) — lodówki rzędem przy lewej ściance
+     ("Masz umiescic tez lodowki przy sciance"), stoisko z narzędziami
+     (beczka + skrzynki z paczki "survival") przy prawej, plus kilka
+     regałów dla urozmaicenia. */
+  [-19, -22.5, -26, -29.5, -33].forEach(function(z){
+    const fridge = kenneyMesh('marketFreezer', 1.4);
+    if(fridge){
+      fridge.position.set(-(roomHalfW-1), 0, z);
+      fridge.rotation.y = 0;
+      scene.add(fridge);
+      potentialOccluders.push(fridge);
+    }
+  });
+  [-20, -32].forEach(function(z){
+    const shelf = kenneyMesh('marketShelfBags', 1.5);
+    if(shelf){
+      shelf.position.set(roomHalfW-1.6, 0, z);
+      shelf.rotation.y = Math.PI;
+      scene.add(shelf);
+      potentialOccluders.push(shelf);
+    }
+  });
+  const toolBarrel = kenneyMesh('survivalBarrel', 1.3);
+  if(toolBarrel){
+    toolBarrel.position.set(roomHalfW-1.4, 0, -25.3);
+    scene.add(toolBarrel);
+    potentialOccluders.push(toolBarrel);
   }
+  const toolBoxLarge = kenneyMesh('survivalBoxLarge', 1.3);
+  if(toolBoxLarge){
+    toolBoxLarge.position.set(roomHalfW-1.5, 0, -26.6);
+    toolBoxLarge.rotation.y = Math.PI/6;
+    scene.add(toolBoxLarge);
+    potentialOccluders.push(toolBoxLarge);
+  }
+  const toolBox = kenneyMesh('survivalBox', 1.2);
+  if(toolBox){
+    toolBox.position.set(roomHalfW-2.3, 0, -25.7);
+    toolBox.rotation.y = -Math.PI/8;
+    scene.add(toolBox);
+    potentialOccluders.push(toolBox);
+  }
+
+  /* Sala 3 (warzywniak + kasa) — dwa stoiska z owocami po obu stronach
+     ("stoiska z owocami i tak dalej"), para regałów bliżej drzwi, i kasa
+     przy tylnej ścianie (patrz LEVEL6_CHECKOUT/buildCheckoutCounter). */
+  [-37, -37].forEach(function(z, i){
+    const side = i === 0 ? -1 : 1;
+    const shelf = kenneyMesh(shelfKeys[i % 2], 1.5);
+    if(shelf){
+      shelf.position.set(side*(roomHalfW-1.6), 0, z);
+      shelf.rotation.y = side > 0 ? Math.PI : 0;
+      scene.add(shelf);
+      potentialOccluders.push(shelf);
+    }
+  });
+  const fruitA = buildFruitStand();
+  fruitA.position.set(-4.2, 0, -40.5);
+  fruitA.rotation.y = Math.PI/10;
+  scene.add(fruitA);
+  potentialOccluders.push(fruitA);
+  const fruitB = buildFruitStand();
+  fruitB.position.set(4.2, 0, -43);
+  fruitB.rotation.y = -Math.PI/8;
+  scene.add(fruitB);
+  potentialOccluders.push(fruitB);
+
+  const checkout = buildCheckoutCounter();
+  checkout.position.set(LEVEL6_CHECKOUT.x, 0, LEVEL6_CHECKOUT.z);
+  scene.add(checkout);
+  potentialOccluders.push(checkout);
 }
 
 const TREE_BUILDERS = [buildTreeConifer, buildTreeBroadleaf, buildTreePalm];
@@ -2794,6 +3017,25 @@ function scatterTrees(){
       scene.add(tree);
       potentialOccluders.push(tree);
     }
+
+    /* Za polaną (patrz LEVEL4_CLEARING) nie ma już gór zamykających dolinę
+       (patrz scatterMountains) — zamiast tego kolejny, szeroki pas drzew,
+       ciągnący się daleko poza granicę realnej mapy. Mgła (patrz initScene,
+       fogFar dla poziomu 4) i tak chowa prawdziwy koniec renderowania, więc
+       całość sprawia wrażenie lasu, który "ciągnie się i ciągnie" bez
+       wyraźnego krańca, zamiast urywać się ścianą szczytów. */
+    for(let i=0;i<110;i++){
+      const x = (Math.random()*2-1) * 38;
+      const z = LEVEL4_CLEARING.z - 6 - Math.random()*55;
+      if(distToPath(x, z) < 2.4) continue;
+      const tree = buildTree();
+      tree.position.set(x, terrainHeight(x, z), z);
+      const s = 1.7 + Math.random()*1.5;
+      tree.scale.multiplyScalar(s);
+      spinAroundUp(tree, Math.random()*Math.PI*2);
+      scene.add(tree);
+      potentialOccluders.push(tree);
+    }
   }
 }
 
@@ -3050,17 +3292,23 @@ function scatterMountains(){
       scene.add(mtn);
     }
   });
-  /* grzbiet zamykający dolinę na końcu ścieżki */
-  for(let i=0;i<9;i++){
-    const peakHeight = 12 + Math.random()*10;
-    const baseRadius = 4.5 + Math.random()*3;
-    const spot = mountainSpotAvoidingPath(function(){
-      return {x: (Math.random()*2-1)*16, z: -60 - Math.random()*12};
-    }, baseRadius);
-    if(!spot) continue;
-    const mtn = buildMountain(peakHeight, baseRadius);
-    mtn.position.set(spot.x, terrainHeight(spot.x, spot.z), spot.z);
-    scene.add(mtn);
+  /* grzbiet zamykający dolinę na końcu ścieżki — poziom 4 pomija go
+     celowo: tam za polaną w lesie (patrz LEVEL4_CLEARING) ma być tylko
+     coraz więcej drzew, żeby las sprawiał wrażenie, że ciągnie się bez
+     końca, zamiast wyraźnie kończyć się ścianą gór (patrz dodatkowy pas
+     drzew w scatterTrees). */
+  if(currentLevel !== 4){
+    for(let i=0;i<9;i++){
+      const peakHeight = 12 + Math.random()*10;
+      const baseRadius = 4.5 + Math.random()*3;
+      const spot = mountainSpotAvoidingPath(function(){
+        return {x: (Math.random()*2-1)*16, z: -60 - Math.random()*12};
+      }, baseRadius);
+      if(!spot) continue;
+      const mtn = buildMountain(peakHeight, baseRadius);
+      mtn.position.set(spot.x, terrainHeight(spot.x, spot.z), spot.z);
+      scene.add(mtn);
+    }
   }
   /* grzbiet zamykający widok też za plecami gracza, na starcie — inaczej
      przy obróceniu widoku widać "koniec mapy" i pustą łąkę bez oprawy */
@@ -3459,9 +3707,10 @@ function onCanvasPointerUp(e){
   const x = ((e.clientX-rect.left)/rect.width)*2-1;
   const y = -((e.clientY-rect.top)/rect.height)*2+1;
   raycaster.setFromCamera({x:x,y:y}, camera);
-  if(npcFox){
-    const npcHits = raycaster.intersectObject(npcFox, true);
-    if(npcHits.length){ openNpcDialogue(); return; }
+  for(let i=0;i<interactiveNpcs.length;i++){
+    const npc = interactiveNpcs[i];
+    const npcHits = raycaster.intersectObject(npc.mesh, true);
+    if(npcHits.length){ openNpcDialogue(npc.config); return; }
   }
   const nextIdx = currentIdx + 1;
   if(nextIdx >= waypoints.length) return;
@@ -4086,23 +4335,48 @@ function triggerDoraCaught(){
   }, 400);
 }
 
-/* ══ Lisek z Animapolis — tylko poziom 3, tryb dora (patrz spawnNpcFox w
-   initScene) ══
-   Stoi przy opuszczonym obozowisku i czeka, aż postać go dotknie. Rozmowa
-   to wybór JEDNEJ z trzech kwestii (co chcemy powiedzieć) — każda ma
-   przypisaną własną nutkę, którą trzeba trafić w tacce, żeby faktycznie
-   "powiedzieć" tę kwestię (złe trafienie = potrząśnięcie, próbuj dalej).
-   Dopiero po udanej rozmowie lisek zdradza niepokojącą tajemnicę
-   Animapolis. */
-let npcFox = null;
+/* ══ Dialogi NPC — wspólny mechanizm dla liska z Animapolis (poziom 3,
+   tryb dora, patrz spawnNpcFox) i ekspedientów sklepiku (poziom 6, patrz
+   spawnShopClerks) ══
+   Każdy NPC czeka, aż postać go dotknie. Rozmowa to wybór JEDNEJ z kilku
+   kwestii (co chcemy powiedzieć) — każda ma przypisaną własną nutkę,
+   którą trzeba trafić w tacce, żeby faktycznie "powiedzieć" tę kwestię
+   (złe trafienie = potrząśnięcie, próbuj dalej). Dopiero po udanej
+   rozmowie NPC mówi coś więcej (patrz pole "reveal" w konfiguracji).
+   interactiveNpcs zbiera wszystkie dotykalne NPC bieżącego poziomu
+   ({mesh, config}), żeby onCanvasPointerUp mógł je wszystkie testować
+   jednym rzutem promienia, a updateInteractiveNpcs animować wspólnie. */
 let npcDialogueActive = false;
+let activeNpcConfig = null;
+let interactiveNpcs = [];
 
-const NPC_CHOICES = [
-  {text:'To urocze miejsce, podoba mi się!', note:'G'},
-  {text:'Dawno tu mieszkasz?', note:'D'},
-  {text:'Miło Cię poznać!', note:'A'}
-];
+const NPC_FOX_CONFIG = {
+  emoji: '🦊', title: 'Lisek z Animapolis',
+  greeting: 'Hej, hej! Nie widziałem/-am Cię tutaj wcześniej. Witaj w Animapolis — mieszka się tu wyśmienicie!',
+  choices: [
+    {text:'To urocze miejsce, podoba mi się!', note:'G'},
+    {text:'Dawno tu mieszkasz?', note:'D'},
+    {text:'Miło Cię poznać!', note:'A'}
+  ],
+  afterChoiceText: 'Cieszę się, że tu jesteś! Chodź bliżej, mam Ci coś do powiedzenia...',
+  reveal: 'Wiesz... ostatnio zauważyliśmy coś dziwnego. Zwierzątka, które fałszowały nuty, jedno po drugim znikały. Zostały tylko te, które grają czysto i naprawdę dobrze poznały nutki. Nikt jednak nie wie, z jakiej przyczyny...'
+};
 
+/* Ekspedienci sklepiku (poziom 6) — sama pogawędka na luzie, bez tajemnicy,
+   żeby sklep czuł się żywy i obsłużony (patrz "aja byc tez ekspedienci"). */
+const NPC_CLERK_CONFIG = {
+  emoji: '🛒', title: 'Ekspedient ze sklepiku',
+  greeting: 'Dzień dobry! Zapraszam do naszego sklepiku — u nas znajdziesz wszystko, czego potrzeba na wyprawę!',
+  choices: [
+    {text:'Gdzie mogę zapłacić?', note:'C'},
+    {text:'Ale tu ładnie poukładane!', note:'F'},
+    {text:'Dziękuję za pomoc!', note:'E'}
+  ],
+  afterChoiceText: 'Bardzo proszę! Rozejrzyj się po wszystkich alejkach, a na koniec zapraszam do kasy.',
+  reveal: 'I jeszcze jedno — u nas płaci się wyłącznie czystymi, dobrze zagranymi nutkami. Powodzenia w zakupach!'
+};
+
+let npcFox = null;
 function spawnNpcFox(){
   npcFox = buildFoxCub();
   npcFox.scale.setScalar(1.7);
@@ -4110,24 +4384,33 @@ function spawnNpcFox(){
   npcFox.position.set(fx, terrainHeight(fx, fz), fz);
   npcFox.rotation.y = Math.PI*0.15;
   scene.add(npcFox);
+  interactiveNpcs.push({mesh: npcFox, config: NPC_FOX_CONFIG});
 }
 
-function updateNpcFox(){
-  if(!npcFox) return;
-  const groundY = terrainHeight(npcFox.position.x, npcFox.position.z);
-  npcFox.position.y = groundY + Math.abs(Math.sin(idleT*1.7))*0.035;
-  /* Delikatny obrót w stronę postaci — sprawia wrażenie, że nas zauważa,
-     nawet kiedy jeszcze nie zaczęliśmy rozmowy. */
-  if(character && !npcDialogueActive){
-    const dx = character.position.x - npcFox.position.x, dz = character.position.z - npcFox.position.z;
-    if(Math.hypot(dx, dz) > 0.05) npcFox.rotation.y = Math.atan2(dx, dz);
-  }
+/* Delikatny obrót w stronę postaci dla WSZYSTKICH dotykalnych NPC bieżącego
+   poziomu — sprawia wrażenie, że nas zauważają, nawet zanim zaczniemy
+   rozmowę — plus lekkie podbicie w miejscu (ten sam idle jak lisek miał
+   wcześniej samodzielnie). */
+function updateInteractiveNpcs(){
+  if(!character) return;
+  interactiveNpcs.forEach(function(npc){
+    const m = npc.mesh;
+    const groundY = terrainHeight(m.position.x, m.position.z);
+    m.position.y = groundY + Math.abs(Math.sin(idleT*1.7 + (m.userData.bobPhase||0)))*0.035;
+    if(!npcDialogueActive){
+      const dx = character.position.x - m.position.x, dz = character.position.z - m.position.z;
+      if(Math.hypot(dx, dz) > 0.05) m.rotation.y = Math.atan2(dx, dz);
+    }
+  });
 }
 
-function openNpcDialogue(){
+function openNpcDialogue(config){
   if(npcDialogueActive) return;
   npcDialogueActive = true;
-  document.getElementById('npcText').textContent = 'Hej, hej! Nie widziałem/-am Cię tutaj wcześniej. Witaj w Animapolis — mieszka się tu wyśmienicie!';
+  activeNpcConfig = config;
+  const titleEl = document.getElementById('npcPanelTitle');
+  if(titleEl) titleEl.textContent = config.emoji + ' ' + config.title;
+  document.getElementById('npcText').textContent = config.greeting;
   document.getElementById('npcContinueBtn').style.display = 'none';
   document.getElementById('npcCloseBtn').style.display = 'none';
   renderNpcChoices();
@@ -4135,10 +4418,11 @@ function openNpcDialogue(){
 }
 
 function renderNpcChoices(){
+  const config = activeNpcConfig;
   const choicesWrap = document.getElementById('npcChoices');
   choicesWrap.style.display = 'flex';
   choicesWrap.innerHTML = '';
-  NPC_CHOICES.forEach(function(c){
+  config.choices.forEach(function(c){
     const row = document.createElement('div');
     row.className = 'npc-choice-btn';
     row.innerHTML = '<span class="npc-choice-text">'+c.text+'</span><span class="npc-choice-note">🎵 '+c.note+'</span>';
@@ -4158,7 +4442,8 @@ function renderNpcChoices(){
 }
 
 function onNpcNoteTap(letter, tileEl){
-  const matched = NPC_CHOICES.some(function(c){ return c.note === letter; });
+  const config = activeNpcConfig;
+  const matched = config.choices.some(function(c){ return c.note === letter; });
   if(!matched){
     tileEl.classList.add('wrong-flash');
     setTimeout(function(){ tileEl.classList.remove('wrong-flash'); }, 400);
@@ -4167,13 +4452,13 @@ function onNpcNoteTap(letter, tileEl){
   playSuccessChime();
   document.getElementById('npcChoices').style.display = 'none';
   document.getElementById('npcNotes').style.display = 'none';
-  document.getElementById('npcText').textContent = 'Cieszę się, że tu jesteś! Chodź bliżej, mam Ci coś do powiedzenia...';
+  document.getElementById('npcText').textContent = config.afterChoiceText;
   document.getElementById('npcContinueBtn').style.display = 'block';
 }
 
 function npcContinue(){
   document.getElementById('npcContinueBtn').style.display = 'none';
-  document.getElementById('npcText').textContent = 'Wiesz... ostatnio zauważyliśmy coś dziwnego. Zwierzątka, które fałszowały nuty, jedno po drugim znikały. Zostały tylko te, które grają czysto i naprawdę dobrze poznały nutki. Nikt jednak nie wie, z jakiej przyczyny...';
+  document.getElementById('npcText').textContent = activeNpcConfig.reveal;
   document.getElementById('npcCloseBtn').style.display = 'block';
 }
 
@@ -4310,6 +4595,7 @@ const LEVEL4_CLEARING = {x: -1.3, z: -49.6};
    dokładnie tam, gdzie widzieliśmy drzwi w cutscence na starcie poziomu. */
 function doorApproachPoint(){
   if(currentLevel === 4) return {x: LEVEL4_CLEARING.x, z: LEVEL4_CLEARING.z};
+  if(currentLevel === 6) return {x: LEVEL6_CHECKOUT.x, z: LEVEL6_CHECKOUT.z};
   const isShop = currentLevel === 5;
   const hx = houseX(), hz = houseZ();
   const doorX = hx + (isShop ? 1.0 : 0);
@@ -4343,9 +4629,9 @@ function characterHopInPlace(times, onDone){
 }
 function runVictoryLap(onDone){
   characterHopInPlace(3, function(){
-    /* Poziom 6 (wnętrze sklepiku) nie ma osobnego budynku, do którego
-       trzeba by jeszcze dojść — postać już tam jest. */
-    if(currentLevel === 6){ onDone(); return; }
+    /* Poziom 6 (wnętrze sklepiku) kończy się przy kasie (patrz
+       LEVEL6_CHECKOUT) — postać robi jeszcze kilka kroków od ostatniej
+       zagadki do lady, tak samo jak inne poziomy podchodzą do drzwi. */
     const door = doorApproachPoint();
     tweenCharacterTo(door.x, door.z, 900, onDone);
   });
@@ -4390,11 +4676,12 @@ function tweenCamera(toPos, toLook, duration, onDone){
 function getArrivalShot(){
   /* Poziom 6 (wnętrze sklepiku) nie ma budynku na końcu trasy — sam
      poziom JEST budynkiem — więc zamiast kadru na drzwiach dajemy
-     spojrzenie w głąb ostatniej alejki, w stronę tylnej ściany sklepu. */
+     spojrzenie na ladę kasy w ostatnim pomieszczeniu (patrz
+     LEVEL6_CHECKOUT/buildShopInterior). */
   if(currentLevel === 6){
-    const last = LEVEL6_PATH_POINTS[LEVEL6_PATH_POINTS.length-1];
-    const camPos = new THREE.Vector3(last.x, 2.0, last.z + 6);
-    const lookAt = new THREE.Vector3(last.x, 1.5, last.z - 2);
+    const door = doorApproachPoint();
+    const camPos = new THREE.Vector3(door.x, 2.0, door.z + 5);
+    const lookAt = new THREE.Vector3(door.x, 1.4, door.z - 1);
     return {camPos, lookAt};
   }
   /* Sklepik (poziom 5) ma teraz front (drzwi+markiza) zwrócony w stronę
@@ -4583,7 +4870,7 @@ function animate(now){
   updateTinyFrogs();
   updateLevel3CrossingFrogs();
   updateCampfires();
-  updateNpcFox();
+  updateInteractiveNpcs();
   if(!inCutscene) updateCamera();
   updateOccludingObjects();
   renderer.render(scene, camera);
@@ -4609,14 +4896,15 @@ function initScene(){
   resizeRenderer();
 
   if(currentLevel === 6){
-    /* Wnętrze sklepiku (poziom 6) — jasne, kolorowe oświetlenie na co
-       dzień; w wersji "dora" gaśnie do zakurzonego, mrocznego sklepu
-       (patrz buildShopInterior dla samych ścian/półek). */
-    const shopBg = isNight ? 0x14110d : 0xfff3d0;
+    /* Wnętrze sklepiku (poziom 6) — zawsze jasno i kolorowo, również w
+       trybie "dora": to sklep, więc jest oświetlony i obsłużony bez
+       względu na porę (patrz spawnShopClerks) — bez przyciemniania jak
+       na innych poziomach nocnych. */
+    const shopBg = 0xfff3d0;
     scene.background = new THREE.Color(shopBg);
-    scene.fog = new THREE.Fog(shopBg, isNight ? 7 : 15, isNight ? 24 : 40);
-    scene.add(new THREE.AmbientLight(isNight ? 0x2a251c : 0xfff6e0, isNight ? 0.5 : 1.1));
-    const fillLight = new THREE.DirectionalLight(isNight ? 0x6a5a3a : 0xffffff, isNight ? 0.25 : 0.55);
+    scene.fog = new THREE.Fog(shopBg, 15, 40);
+    scene.add(new THREE.AmbientLight(0xfff6e0, 1.1));
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.55);
     fillLight.position.set(4, 8, -10);
     scene.add(fillLight);
   }else{
@@ -4650,10 +4938,12 @@ function initScene(){
   campfires = [];
   npcFox = null;
   npcDialogueActive = false;
+  interactiveNpcs = [];
   const npcPanelEl = document.getElementById('npcPanel');
   if(npcPanelEl) npcPanelEl.classList.remove('show');
   if(currentLevel === 6){
     buildShopInterior();
+    spawnShopClerks();
   }else{
     const grassTex = getTexture(TEXTURE_DIR+'trawa-tekstura.webp');
     grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping;
