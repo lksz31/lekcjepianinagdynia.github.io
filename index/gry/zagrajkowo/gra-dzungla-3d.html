@@ -10,7 +10,14 @@
   :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;--red:#dc2626;}
   *,*::before,*::after{box-sizing:border-box;}
   html{overscroll-behavior:none;}
-  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;height:100vh;display:flex;flex-direction:column;}
+  /* height:100vh na telefonach/tabletach z Safari bywa WYŻSZY niż faktycznie
+     widoczny obszar (100vh liczy się tak, jakby pasek adresu/zakładek był
+     schowany, nawet gdy jest widoczny) — dolna część strony, czyli właśnie
+     panel z zagadką (bottom:18px), wtedy ląduje POD dolną krawędzią
+     widocznego ekranu i jest nieosiągalna (przy overflow:hidden nie da się
+     nawet doscrollować). 100dvh liczy się na bieżąco względem tego, co
+     faktycznie widać, więc panel zawsze mieści się w widocznym obszarze. */
+  body{margin:0;padding:0;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow:hidden;overscroll-behavior:none;height:100vh;height:100dvh;display:flex;flex-direction:column;}
 
   .top-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 5%;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:20;}
   /* Tryb podglądu (?ambient=1, patrz AMBIENT_PREVIEW) — bez paska górnego
@@ -83,7 +90,11 @@
   @keyframes swipeHintFade{0%,55%{opacity:1;}100%{opacity:0;}}
 
   /* ══ PANEL ZAGADKI ══ */
-  .puzzle-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);width:min(92%,420px);background:#3d2a17;background-image:linear-gradient(180deg,#4a3420,#3d2a17);border:3px solid #6b4a28;border-radius:18px;padding:16px 16px 14px;box-shadow:0 14px 34px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;z-index:10;}
+  /* max-height + overflow-y:auto to bezpiecznik: nawet gdyby panel (np. na
+     bardzo niskim ekranie w poziomie) był wyższy niż dostępna przestrzeń,
+     robi się przewijalny SAM W SOBIE zamiast wystawać poza widoczny obszar
+     i być nieosiągalnym — pola do zgadywania zawsze da się zobaczyć/kliknąć. */
+  .puzzle-panel{position:absolute;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);width:min(92%,420px);max-height:calc(100% - 36px);overflow-y:auto;background:#3d2a17;background-image:linear-gradient(180deg,#4a3420,#3d2a17);border:3px solid #6b4a28;border-radius:18px;padding:16px 16px 14px;box-shadow:0 14px 34px rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity 0.3s,transform 0.3s;z-index:10;}
   .puzzle-panel.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
   .puzzle-title{color:#f0d99a;font-weight:800;font-size:0.85rem;text-align:center;margin-bottom:8px;}
   .puzzle-staff{background:#fdf8ec;border-radius:10px;padding:6px;display:flex;justify-content:center;margin-bottom:12px;}
