@@ -206,6 +206,33 @@
      restartem poziomu (patrz triggerDoraCaught). */
   .dora-blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s ease;z-index:16;display:flex;align-items:center;justify-content:center;}
   .dora-caption{color:#c0392b;font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(1.15rem,4vw,1.8rem);text-align:center;padding:0 24px;text-shadow:0 2px 14px rgba(0,0,0,0.9);}
+
+  /* Ujęcie "wzrok obcej osoby zza krzaków" po pomyłce w trybie dora (patrz
+     triggerDoraStalkerShot) — przyciemnienie + winieta z liśćmi wokół
+     krawędzi ekranu, budowana z samych gradientów (bez dodatkowej grafiki),
+     żeby wyglądało, jakby ktoś patrzył na nas zza gałęzi. */
+  .dora-stalker-vignette{
+    position:absolute; inset:0; pointer-events:none; z-index:15; opacity:0;
+    transition:opacity 0.5s ease;
+    background:
+      radial-gradient(ellipse at 50% 50%, transparent 34%, rgba(6,14,6,0.5) 74%, rgba(3,8,3,0.86) 100%),
+      radial-gradient(circle at 6% 10%, rgba(22,54,12,0.95) 0%, rgba(22,54,12,0.65) 12%, transparent 28%),
+      radial-gradient(circle at 94% 8%, rgba(20,50,14,0.95) 0%, rgba(20,50,14,0.6) 13%, transparent 29%),
+      radial-gradient(circle at 4% 92%, rgba(18,46,10,0.95) 0%, rgba(18,46,10,0.62) 12%, transparent 28%),
+      radial-gradient(circle at 96% 94%, rgba(20,50,16,0.95) 0%, rgba(20,50,16,0.64) 13%, transparent 29%),
+      radial-gradient(circle at 50% 102%, rgba(14,38,10,0.92) 0%, transparent 32%),
+      radial-gradient(circle at 50% -2%, rgba(14,38,10,0.85) 0%, transparent 27%);
+  }
+  .dora-stalker-vignette.show{opacity:1;}
+  #c3d.dora-desaturate{filter:grayscale(0.7) brightness(0.62) contrast(1.12); transition:filter 0.5s ease;}
+
+  /* Serduszko w HUD trybu dora — jedno bijące serce zamiast rzędu pełnych/
+     pustych, coraz szybsze po każdej pomyłce (patrz updateDoraLivesUI). */
+  @keyframes doraHeartbeat{
+    0%{transform:scale(1);} 15%{transform:scale(1.32);} 30%{transform:scale(1);}
+    45%{transform:scale(1.2);} 60%{transform:scale(1);} 100%{transform:scale(1);}
+  }
+  .dora-heart-icon{display:inline-block; animation:doraHeartbeat 1.1s ease-in-out infinite;}
 </style>
 </head>
 <body>
@@ -217,7 +244,7 @@
     <button type="button" class="sound-toggle" id="soundToggle" onclick="toggleSound()" aria-label="Włącz/wyłącz dźwięk">🔊</button>
     <button type="button" class="sound-toggle" id="compassToggle" onclick="toggleCompass()" aria-label="Obracaj widok, obracając telefon" title="Obracaj widok, obracając telefon lub tablet">🧭</button>
     <span class="score-box" id="levelBadge" style="display:none;">🌲 Poziom 2</span>
-    <span class="score-box" id="doraLivesBadge" style="display:none;"></span>
+    <span class="score-box" id="doraLivesBadge" style="display:none;"><span class="dora-heart-icon" id="doraHeartIcon">❤️</span></span>
     <span class="score-box">⭐ <span id="scoreVal">0</span> / <span id="totalVal">7</span></span>
   </span>
 </div>
@@ -272,6 +299,7 @@
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
   <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
   <button type="button" class="skip-cutscene-btn" id="skipCutsceneBtn" onclick="cutsceneSkip=true;" style="display:none;">Pomiń ▶</button>
+  <div class="dora-stalker-vignette" id="doraStalkerVignette"></div>
   <div class="dora-blackout" id="doraBlackout"><span class="dora-caption" id="doraCaption"></span></div>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
@@ -4361,13 +4389,24 @@ function completeStationSuccess(){
 let doraLives = 3;
 let doraEventActive = false;
 
+/* Jedno bijące serduszko zamiast rzędu pełnych/pustych — tempo bicia rośnie
+   z każdą pomyłką (patrz .dora-heart-icon/@keyframes doraHeartbeat), żeby
+   samo czuwanie HUD-u budowało napięcie, nie tylko kadr po pomyłce. Reset
+   do spokojnego tempa dzieje się sam, bo initScene() ustawia doraLives=3 i
+   od razu wywołuje tę funkcję przy starcie/restarcie poziomu. */
+const DORA_HEARTBEAT_RATES = [1.1, 0.65, 0.35];
 function updateDoraLivesUI(){
   const el = document.getElementById('doraLivesBadge');
   if(!el) return;
   const show = sceneIsNight && currentLevel >= 2;
   if(!show){ el.style.display = 'none'; return; }
   el.style.display = 'flex';
-  el.textContent = '❤️'.repeat(Math.max(0, doraLives)) + '🖤'.repeat(Math.max(0, 3 - doraLives));
+  const icon = document.getElementById('doraHeartIcon');
+  if(icon){
+    const mistakes = Math.max(0, 3 - doraLives);
+    const rate = DORA_HEARTBEAT_RATES[Math.min(mistakes, DORA_HEARTBEAT_RATES.length-1)];
+    icon.style.animationDuration = rate + 's';
+  }
 }
 
 function registerDoraMistake(){
@@ -4390,43 +4429,58 @@ function doraSideDir(backDir, mistakeNum){
   return new THREE.Vector3(-backDir.z, 0, backDir.x).multiplyScalar(side);
 }
 
+function showDoraVignette(){
+  const v = document.getElementById('doraStalkerVignette');
+  if(v) v.classList.add('show');
+  const canvas = document.getElementById('c3d');
+  if(canvas) canvas.classList.add('dora-desaturate');
+}
+function hideDoraVignette(){
+  const v = document.getElementById('doraStalkerVignette');
+  if(v) v.classList.remove('show');
+  const canvas = document.getElementById('c3d');
+  if(canvas) canvas.classList.remove('dora-desaturate');
+}
+
+/* Po pomyłce w trybie dora kamera na chwilę STAJE SIĘ wzrokiem kogoś, kto
+   obserwuje nas zza krzaków — nisko, blisko, skierowana wprost na postać
+   (patrz "ma imitowac wzrok obcej na nas osoby zza kszakow"), bez pokazania
+   samej sylwetki (to JEJ punkt widzenia, więc nie ma czego pokazywać w
+   kadrze). Do tego dłuższe niż wcześniej ujęcie, oddech w tle, przyciemniony
+   i wyszarzony ekran z winietą z liści dookoła (patrz showDoraVignette) —
+   sylwetka wraca dopiero w finałowym dopadnięciu (triggerDoraCaught). */
 function triggerDoraStalkerShot(mistakeNum){
   doraEventActive = true;
   inCutscene = true;
   const cfg = cameraOffsetForAspect();
   const backDir = cfg.back.clone().setY(0).normalize();
   const sideDir = doraSideDir(backDir, mistakeNum);
-  const distances = {1: 15, 2: 8};
-  const dist = distances[mistakeNum] || 4;
-  const sideDistances = {1: 9, 2: 6.5};
-  const sideDist = sideDistances[mistakeNum] || 5;
 
-  const figure = buildDarkFigure();
-  const fPos = character.position.clone().addScaledVector(backDir, dist);
-  fPos.y = terrainHeight(fPos.x, fPos.z);
-  figure.position.copy(fPos);
-  scene.add(figure);
+  const watchDist = 4.4 + mistakeNum*0.5;
+  const watchSide = 1.5 + mistakeNum*0.3;
+  const watchPos = character.position.clone()
+    .addScaledVector(backDir, watchDist)
+    .addScaledVector(sideDir, watchSide);
+  watchPos.y = terrainHeight(watchPos.x, watchPos.z) + 0.8;
+  camera.position.copy(watchPos);
+  camera.lookAt(character.position.x, character.position.y + 0.55, character.position.z);
 
-  /* Cięcie na sztywno, bez tweenu: boczny kadr, w którym widać naszą
-     postać z oddali, a za nią — czającą się sylwetkę. */
-  const midPoint = character.position.clone().lerp(fPos, 0.3);
-  const camPos = midPoint.clone().addScaledVector(sideDir, sideDist);
-  camPos.y = midPoint.y + 2.4;
-  camera.position.copy(camPos);
-  camera.lookAt(midPoint.x, midPoint.y + 1, midPoint.z);
-
+  showDoraVignette();
   playBreathing(mistakeNum);
+  const breathTimer = setTimeout(function(){ playBreathing(mistakeNum); }, 950);
 
+  const shotDuration = 1900 + mistakeNum*300;
   setTimeout(function(){
-    scene.remove(figure);
-    /* Powrót też cięciem, nie tweenem. */
+    clearTimeout(breathTimer);
+    hideDoraVignette();
+    /* Powrót cięciem, nie tweenem. */
     const backPos = character.position.clone().add(cfg.back);
     camera.position.copy(backPos);
     const backLook = character.position.clone(); backLook.y += cfg.lookY;
     camera.lookAt(backLook.x, backLook.y, backLook.z);
     inCutscene = false;
     doraEventActive = false;
-  }, 900);
+  }, shotDuration);
 }
 
 function triggerDoraCaught(){
@@ -5049,6 +5103,7 @@ function initScene(){
   sceneIsNight = isNight;
   doraLives = 3;
   doraEventActive = false;
+  hideDoraVignette();
 
   const wrap = document.getElementById('sceneWrap');
   camera = new THREE.PerspectiveCamera(50, wrap.clientWidth/wrap.clientHeight || 1, 0.1, 200);
