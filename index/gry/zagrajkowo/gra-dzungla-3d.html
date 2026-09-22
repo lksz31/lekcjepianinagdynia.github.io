@@ -2455,7 +2455,7 @@ function buildCheckoutCounter(){
   const base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.9, 0.8), counterMat);
   base.position.y = 0.45;
   g.add(base);
-  const topMat = new THREE.MeshStandardMaterial({color:0xfffdf5, roughness:0.4});
+  const topMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'blat-lady-tekstura.webp', 2, 1), roughness:0.4});
   const top = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.06, 0.9), topMat);
   top.position.y = 0.93;
   g.add(top);
@@ -2463,7 +2463,7 @@ function buildCheckoutCounter(){
   const belt = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.04, 0.68), beltMat);
   belt.position.set(0.72, 0.96, 0);
   g.add(belt);
-  const registerMat = new THREE.MeshStandardMaterial({color:0x3a3a3a, roughness:0.6});
+  const registerMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'metal-lodowka-tekstura.webp', 1, 1), roughness:0.6});
   const register = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.28), registerMat);
   register.position.set(-0.65, 1.07, 0);
   g.add(register);
@@ -2481,7 +2481,7 @@ function buildCheckoutCounter(){
    proceduralne obiekty w tym pliku (patrz np. buildTrashCan). */
 function buildFruitStand(){
   const g = new THREE.Group();
-  const crateMat = new THREE.MeshStandardMaterial({color:0x9a6b3c, roughness:0.9});
+  const crateMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'skrzynka-drewno-tekstura.webp', 2, 1), roughness:0.9});
   const crate = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.55, 0.75), crateMat);
   crate.position.y = 0.275;
   g.add(crate);
@@ -2550,11 +2550,16 @@ function buildShopClerk(){
    spawnCompanion): to sklep, więc zamiast kolejnych zwierzątek "wężyk" za
    postacią ma tworzyć się z pełnych torebek. Losowy kolor torby przy
    każdym wywołaniu, dla odrobiny urozmaicenia. */
-const SHOPPING_BAG_COLORS = [0xdba24a, 0xd9736b, 0x6ba3d9, 0x6bbf7e, 0xd9c76b];
+/* Jasne, ciepłe odcienie (bliskie bieli) zamiast nasyconych kolorów —
+   torba ma teraz prawdziwą teksturę papieru (torba-papierowa-tekstura.webp)
+   jako .map, a MeshStandardMaterial mnoży ją przez .color, więc nasycony
+   błękit/zieleń dawały brudny, szarawy odcień zamiast ładnej odmiany
+   papieru — te tinty tylko delikatnie rozjaśniają/przyciemniają teksturę. */
+const SHOPPING_BAG_COLORS = [0xffffff, 0xfff2df, 0xffe9cb, 0xf5ddb0];
 function buildShoppingBag(){
   const g = new THREE.Group();
   const bagColor = SHOPPING_BAG_COLORS[Math.floor(Math.random()*SHOPPING_BAG_COLORS.length)];
-  const bagMat = new THREE.MeshStandardMaterial({color:bagColor, roughness:0.85});
+  const bagMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'torba-papierowa-tekstura.webp', 1, 1), color:bagColor, roughness:0.85});
   const bag = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.42, 0.24), bagMat);
   bag.position.y = 0.23;
   g.add(bag);
@@ -2601,15 +2606,28 @@ function buildShopInterior(){
   const roomHalfW = 6.0, roomZStart = 4, roomZEnd = -49, roomH = 4.6;
   const roomZMid = (roomZStart + roomZEnd) / 2, roomZLen = roomZStart - roomZEnd;
 
-  const floorMat = new THREE.MeshStandardMaterial({color:0xf2e9c9, roughness:0.5});
+  const floorMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'podloga-sklep-tekstura.webp', 6, 26),
+    roughness:0.5
+  });
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), floorMat);
   floor.rotation.x = -Math.PI/2;
   floor.position.set(0, 0, roomZMid);
   scene.add(floor);
 
-  const wallMat = new THREE.MeshStandardMaterial({color:0xfff3d0, roughness:0.9});
+  /* Dwa klony tej samej tekstury ściany — inne powtórzenie na długich
+     ścianach bocznych niż na krótszych ścianach czołowych/działowych,
+     żeby wzór nie wyglądał na rozciągnięty na krótszych kawałkach. */
+  const wallMatLong = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sciana-sklep-tekstura.webp', 10, 1),
+    roughness:0.9
+  });
+  const wallMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sciana-sklep-tekstura.webp', 2.2, 1),
+    roughness:0.9
+  });
   [-1, 1].forEach(function(side){
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMat);
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMatLong);
     wall.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
     wall.position.set(side*roomHalfW, roomH/2, roomZMid);
     scene.add(wall);
@@ -2622,7 +2640,10 @@ function buildShopInterior(){
   frontWall.position.set(0, roomH/2, roomZStart);
   scene.add(frontWall);
 
-  const ceilMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.9, side:THREE.DoubleSide});
+  const ceilMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sufit-kaseton-tekstura.webp', 6, 26),
+    roughness:0.9, side:THREE.DoubleSide
+  });
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), ceilMat);
   ceiling.rotation.x = Math.PI/2;
   ceiling.position.set(0, roomH, roomZMid);
@@ -2630,10 +2651,17 @@ function buildShopInterior(){
 
   /* Lamperia — pas boazerii na dole wszystkich ścian ("ma byc tez
      lamperia tam"), lekko odsunięty od ściany, żeby uniknąć z-fightingu. */
-  const wainscotMat = new THREE.MeshStandardMaterial({color:0x8a6a45, roughness:0.85});
+  const wainscotMatLong = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'lamperia-drewno-tekstura.webp', 14, 1),
+    roughness:0.85
+  });
+  const wainscotMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'lamperia-drewno-tekstura.webp', 3, 1),
+    roughness:0.85
+  });
   const wainscotH = 1.0;
   [-1, 1].forEach(function(side){
-    const w = new THREE.Mesh(new THREE.BoxGeometry(0.04, wainscotH, roomZLen), wainscotMat);
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.04, wainscotH, roomZLen), wainscotMatLong);
     w.position.set(side*(roomHalfW-0.03), wainscotH/2, roomZMid);
     scene.add(w);
   });
@@ -3504,6 +3532,18 @@ function getTexture(url){
   if(!textureLoader) textureLoader = new THREE.TextureLoader();
   if(!textureCache[url]) textureCache[url] = textureLoader.load(url);
   return textureCache[url];
+}
+
+/* Klon tekstury z WŁASNYM powtórzeniem (repeat) — kilka ścian/podłóg w
+   sklepiku dzieli tę samą grafikę, ale mają różne proporcje (długa ściana
+   boczna vs krótka tylna), więc każda potrzebuje osobnego .repeat na
+   niezależnym klonie THREE.Texture (ten sam .image, inne wrapS/wrapT). */
+function tiledTexture(url, repeatX, repeatY){
+  const tex = getTexture(url).clone();
+  tex.needsUpdate = true;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(repeatX, repeatY);
+  return tex;
 }
 
 /* ══ Prawdziwe modele 3D (Ultimate Stylized Nature Pack, skonwertowane
