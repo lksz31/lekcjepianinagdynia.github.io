@@ -889,6 +889,17 @@ const DEFAULT_PATH_POINTS = [
   {x:0, z:0}, {x:2.6, z:-6}, {x:-0.4, z:-11.5}, {x:0.4, z:-17},
   {x:-2.6, z:-22.5}, {x:2.2, z:-28.5}, {x:-1.8, z:-34.5}, {x:0, z:-40.5}
 ];
+/* Poziom 4: inny, wyraźnie szerszy zakręt (większa amplituda w x niż
+   DEFAULT_PATH_POINTS) i o dwa punkty dłuższy — ale TYLKO dwa punkty
+   oznaczone "noPuzzle" (patrz waypoints w initScene i onArrive) to same
+   zakręty ścieżki bez zagadki, więc liczba faktycznych zagadek zostaje
+   taka sama (7) jak wcześniej — ścieżka jest po prostu dłuższa i bardziej
+   kręta. Kończy się w gęstym lesie (patrz scatterTrees), nie przy domku. */
+const LEVEL4_PATH_POINTS = [
+  {x:0, z:0}, {x:-3.4, z:-5.5}, {x:3.2, z:-11}, {x:-1.5, z:-15.5, noPuzzle:true},
+  {x:-4.2, z:-21}, {x:3.6, z:-27}, {x:0.5, z:-31.5, noPuzzle:true},
+  {x:-3.8, z:-37}, {x:3.0, z:-42.5}, {x:0, z:-47.5}
+];
 const LEVEL5_PATH_POINTS = [
   {x:0, z:0}, {x:3, z:-8}, {x:7, z:-15}, {x:12, z:-21},
   {x:15, z:-28}, {x:11, z:-34}, {x:5, z:-37}, {x:0, z:-43.5}
@@ -2571,8 +2582,13 @@ const HOUSE_Z = -44, HOUSE_YARD_HALF = 4.2;
    reszta (budowa domku, strefa wykluczenia, kadr przybycia, punkt podejścia
    pod drzwi) czyta z nich, więc nic nie trzeba synchronizować ręcznie. */
 const HOUSE_X_L3 = 1.5, HOUSE_Z_L3 = -51;
-function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : 0; }
-function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : HOUSE_Z; }
+/* Poziom 4 nie ma domku wcale — kończy się w polanie w gęstym lesie, bez
+   żadnego wyróżnionego obiektu (patrz LEVEL4_CLEARING) — houseX/houseZ()
+   zwracają dla niego punkt daleko poza mapą, więc nearHouse() nigdy nie
+   pasuje i strefa wykluczenia po prostu nie istnieje: drzewa mogą rosnąć
+   swobodnie aż do samej ścieżki, tak jak w prawdziwie gęstym lesie. */
+function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : (currentLevel === 4 ? 9999 : 0); }
+function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : (currentLevel === 4 ? 9999 : HOUSE_Z); }
 function nearHouse(x, z){
   return Math.abs(x - houseX()) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - houseZ()) < HOUSE_YARD_HALF + 0.6;
 }
@@ -2744,6 +2760,27 @@ function scatterTrees(){
     spinAroundUp(tree, Math.random()*Math.PI*2);
     scene.add(tree);
     potentialOccluders.push(tree);
+  }
+
+  /* Poziom 4 kończy się w gęstym lesie (patrz LEVEL4_CLEARING, doorApproachPoint) —
+     dodatkowy, wyraźnie gęściejszy krąg drzew WOKÓŁ samej polany (nie na niej),
+     żeby to miejsce czytelnie odróżniało się od rzadszego "ogrodu ruin" na
+     reszcie trasy i naprawdę wyglądało na gęsty las, nie na kolejną polanę. */
+  if(currentLevel === 4){
+    for(let i=0;i<28;i++){
+      const ang = Math.random()*Math.PI*2;
+      const r = 5 + Math.random()*9;
+      const x = LEVEL4_CLEARING.x + Math.cos(ang)*r;
+      const z = LEVEL4_CLEARING.z + Math.sin(ang)*r;
+      if(distToPath(x, z) < 2.2) continue;
+      const tree = buildTree();
+      tree.position.set(x, terrainHeight(x, z), z);
+      const s = 1.8 + Math.random()*1.3;
+      tree.scale.multiplyScalar(s);
+      spinAroundUp(tree, Math.random()*Math.PI*2);
+      scene.add(tree);
+      potentialOccluders.push(tree);
+    }
   }
 }
 
@@ -3476,6 +3513,23 @@ function buildKeyboardPuzzle(idx){
 /* Poziom 2: kilka nut (trzy) na jednej stacji zamiast jednej — trudniejsza
    minizagadka do rozwiązania w całości, zanim stacja liczy się jako zaliczona. */
 function buildPuzzleForWaypoint(idx){
+  if(currentLevel === 5){
+    /* Piąty poziom: kilka nut z rzędu do zgadnięcia na klawiaturze (nie
+       jedna, jak w poziomie 4) — ta sama kolejka pod-zagadek co w
+       poziomie 2 (patrz notesPerStation niżej), tylko każda pod-zagadka
+       to teraz klawiatura (kind:'keyboard'), nie kafelek z literą, więc
+       cały istniejący mechanizm "nuta X/Y" (showCurrentSubPuzzle/
+       showKeyboardPuzzle/onFruitPick) obsługuje to bez zmian. */
+    const notesPerStation = 2 + (idx % 2);
+    const puzzles = [];
+    for(let n=0;n<notesPerStation;n++){
+      const pos = (idx-1)*notesPerStation + n;
+      const letter = pickLetterForPosition(pos);
+      const clefName = pickClefForPosition(pos);
+      puzzles.push({kind:'keyboard', letter:letter, clef:clefName, octaveShift:0, octaveIdx:0, freqMul:1});
+    }
+    return puzzles;
+  }
   if(currentLevel >= 4){
     return [buildKeyboardPuzzle(idx)];
   }
@@ -3617,9 +3671,14 @@ function showKeyboardPuzzle(){
   document.getElementById('pianoPuzzle').style.display = 'flex';
 
   renderPuzzleStaff(currentPuzzle.letter, currentPuzzle.clef, currentPuzzle.octaveShift);
+  const stepLabel = puzzleQueue.length > 1 ? ' — nuta ' + (puzzleQueueIdx+1) + '/' + puzzleQueue.length : '';
   document.getElementById('puzzleTitle').textContent =
-    (currentPuzzle.clef === 'treble' ? 'Zagraj ten dźwięk (klucz wiolinowy)' : 'Zagraj ten dźwięk (klucz basowy)');
+    (currentPuzzle.clef === 'treble' ? 'Zagraj ten dźwięk (klucz wiolinowy)' : 'Zagraj ten dźwięk (klucz basowy)') + stepLabel;
 
+  /* Poziom 6: klawisze BEZ podpisanej litery — tylko delikatny obrazek
+     jedzonka, żeby rozpoznanie nuty opierało się na czytaniu pięciolinii,
+     nie na podpowiedzi w postaci litery. */
+  const showKeyLabel = currentLevel !== 6;
   const keysEl = document.getElementById('pianoKeys');
   keysEl.innerHTML = '';
   LETTERS_ORDER.forEach(function(letter, i){
@@ -3627,7 +3686,7 @@ function showKeyboardPuzzle(){
     const key = document.createElement('div');
     key.className = 'piano-white-key';
     key.innerHTML = '<img class="piano-key-img" src="'+food.img+'" alt="'+food.word+'">' +
-      '<span class="piano-key-label">'+letter+'</span>';
+      (showKeyLabel ? '<span class="piano-key-label">'+letter+'</span>' : '');
     key.addEventListener('pointerdown', function(e){
       e.preventDefault();
       onFruitPick(letter, currentPuzzle.octaveIdx, key);
@@ -4199,10 +4258,16 @@ function tweenCharacterTo(targetX, targetZ, duration, onDone){
   requestAnimationFrame(step);
 }
 
+/* Poziom 4 nie ma budynku — postać po wygranej robi po prostu kilka
+   kroków dalej w głąb polany, w tym samym kierunku, w którym biegła
+   ostatnia część ścieżki (przedłużenie ostatniego odcinka trasy). */
+const LEVEL4_CLEARING = {x: -1.3, z: -49.6};
+
 /* Drzwi domku/sklepiku, do których postać podchodzi po wygranej — ten sam
    punkt, który kadruje kamera w getArrivalShot(), więc postać "wchodzi"
    dokładnie tam, gdzie widzieliśmy drzwi w cutscence na starcie poziomu. */
 function doorApproachPoint(){
+  if(currentLevel === 4) return {x: LEVEL4_CLEARING.x, z: LEVEL4_CLEARING.z};
   const isShop = currentLevel === 5;
   const hx = houseX(), hz = houseZ();
   const doorX = hx + (isShop ? 1.0 : 0);
@@ -4345,7 +4410,26 @@ function runIntroCutscene(onDone){
 function onArrive(idx){
   if(idx === 0) return;
   if(waypoints[idx].solved) return;
+  if(waypoints[idx].noPuzzle){ completePassThrough(idx); return; }
   showPuzzle(idx);
+}
+
+/* Punkty ścieżki oznaczone noPuzzle (patrz LEVEL4_PATH_POINTS) to same
+   zakręty trasy — świecąca nutka wciąż prowadzi dalej, ale bez zagadki,
+   punktacji ani fajerwerków, żeby nie mylić z prawdziwie rozwiązaną
+   stacją. Towarzysz i tak dołącza, dla ciągłości "wężyka" za postacią. */
+function completePassThrough(idx){
+  waypoints[idx].solved = true;
+  hideMarker(idx);
+  spawnCompanion(idx);
+  if(idx === PATH_POINTS.length - 1){
+    setTimeout(function(){
+      runVictoryLap(function(){ setTimeout(showWin, 300); });
+    }, 300);
+  }else{
+    activateMarker(idx + 1);
+    document.getElementById('hintBadge').style.opacity = '1';
+  }
 }
 
 function updateCamera(){
@@ -4465,7 +4549,9 @@ function animate(now){
 
 function initScene(){
   PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS :
-    (currentLevel === 3 ? LEVEL3_PATH_POINTS : (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS));
+    (currentLevel === 3 ? LEVEL3_PATH_POINTS :
+    (currentLevel === 4 ? LEVEL4_PATH_POINTS :
+    (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS)));
   potentialOccluders = [];
   scene = new THREE.Scene();
   const isNight = nightMode && (currentLevel === 2 || currentLevel === 3 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
@@ -4545,7 +4631,10 @@ function initScene(){
     }
     if(currentLevel === 5){
       buildShopAndParking();
-    }else{
+    }else if(currentLevel !== 4){
+      /* Poziom 4 nie kończy się przy domku, tylko w polanie w gęstym
+         lesie (patrz LEVEL4_CLEARING i wzmocniona gęstość drzew w
+         scatterTrees) — bez żadnego wyróżnionego obiektu na końcu. */
       buildHouseAndFence();
     }
     scatterTrees();
@@ -4615,7 +4704,7 @@ function initScene(){
   waypoints = PATH_POINTS.map(function(p, i){
     const gy = groundLevelAt(p.x, p.z);
     const pos = new THREE.Vector3(p.x, gy, p.z);
-    const wp = {pos: pos, solved: i===0, active:false, markerGroup:null};
+    const wp = {pos: pos, solved: i===0, active:false, markerGroup:null, noPuzzle: !!p.noPuzzle};
     if(i > 0){
       const marker = buildMarker();
       marker.position.copy(pos);
@@ -4693,9 +4782,13 @@ const LEVEL_WIN_TITLES = {
   6: 'Zrobiliście zakupy w całym sklepiku!'
 };
 function showWin(){
+  /* Nie liczymy PATH_POINTS.length-1 wprost — punkty oznaczone noPuzzle
+     (patrz LEVEL4_PATH_POINTS) to same zakręty trasy bez zagadki, więc
+     nie wliczają się do faktycznej puli nutek do zebrania. */
+  const totalPuzzles = waypoints.filter(function(w, i){ return i > 0 && !w.noPuzzle; }).length;
   document.getElementById('winTitle').textContent = LEVEL_WIN_TITLES[currentLevel] || LEVEL_WIN_TITLES[1];
   document.getElementById('winText').textContent =
-    'Zebraliście ' + score + ' / ' + (PATH_POINTS.length-1) + ' nutek i przeszliście całą dżunglę!';
+    'Zebraliście ' + score + ' / ' + totalPuzzles + ' nutek i przeszliście całą dżunglę!';
   document.getElementById('level2Btn').style.display = currentLevel === 1 ? 'inline-block' : 'none';
   document.getElementById('level3Btn').style.display = currentLevel === 2 ? 'inline-block' : 'none';
   document.getElementById('level4Btn').style.display = currentLevel === 3 ? 'inline-block' : 'none';
