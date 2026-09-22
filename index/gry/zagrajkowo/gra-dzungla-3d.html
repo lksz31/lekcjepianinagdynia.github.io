@@ -2475,6 +2475,26 @@ function buildCheckoutCounter(){
   return g;
 }
 
+/* Wystawa jedzenia na froncie lodówki — kilka ikonek jedzonka z tej samej
+   puli co klawiatura pianina (FOOD_BY_LETTER), w prostej siatce na cienkich
+   płytkach, jak półki za szklanymi drzwiami chłodni ("i wystrawa jedzenia"). */
+function buildFridgeFoodDisplay(){
+  const g = new THREE.Group();
+  const letters = shuffled(Object.keys(FOOD_BY_LETTER)).slice(0, 4);
+  letters.forEach(function(letter, i){
+    const food = FOOD_BY_LETTER[letter];
+    const mat = new THREE.MeshStandardMaterial({map: getTexture(food.img), transparent:true, roughness:0.6});
+    /* marketFreezer to niska skrzynia (chłodnia z otwartym wierzchem, nie
+       wysoka lodówka z drzwiami) — płytki leżą płasko na jej wierzchu. */
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), mat);
+    plate.rotation.x = -Math.PI/2;
+    const col = i % 2, row = Math.floor(i/2);
+    plate.position.set(-0.32 + col*0.64, 0, -0.22 + row*0.44);
+    g.add(plate);
+  });
+  return g;
+}
+
 /* Prosta "owocowa" skrzynka — drewniana kratka + kilka kolorowych kulek na
    wierzchu (jabłka/pomarańcze/limonki) — nie ma gotowego modelu Kenney na
    stoisko z owocami, więc budujemy je z prostych brył, tak jak inne drobne
@@ -2744,8 +2764,13 @@ function buildShopInterior(){
          zbyt male"). */
       fridge.position.set(-(roomHalfW-1.3), 0, z);
       fridge.rotation.y = 0;
+      applyMetalSkin(fridge);
       scene.add(fridge);
       potentialOccluders.push(fridge);
+
+      const display = buildFridgeFoodDisplay();
+      display.position.set(-(roomHalfW-1.3), 0.67, z);
+      scene.add(display);
     }
   });
   [-20, -32].forEach(function(z){
@@ -3632,6 +3657,25 @@ function applyRuinNightTint(root){
         mat.emissive = new THREE.Color(0x453521);
         mat.emissiveIntensity = 0.9;
       }
+      o.material = mat;
+    }
+  });
+}
+
+/* Lodówki (marketFreezer, paczka Kenney) miały tylko własne, wbudowane
+   materiały — "lodowki niech tez beda teksturowe" — więc doklejamy
+   teksturę szczotkowanego metalu NA ISTNIEJĄCY kolor każdej części
+   (mnożenie, jak w applyRuinNightTint), żeby zachować rozróżnienie
+   drzwi/ramy modelu, tylko z dodaną fakturą metalu. Klon materiału na
+   mesh, bo model jest współdzielony między wszystkie klony (patrz
+   kenneyMesh). */
+function applyMetalSkin(root){
+  const metalTex = tiledTexture(TEXTURE_DIR+'metal-lodowka-tekstura.webp', 1, 1);
+  root.traverse(function(o){
+    if(o.isMesh && o.material){
+      const mat = o.material.clone();
+      mat.map = metalTex;
+      mat.needsUpdate = true;
       o.material = mat;
     }
   });
