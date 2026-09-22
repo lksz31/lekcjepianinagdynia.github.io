@@ -262,6 +262,7 @@
       <button type="button" onclick="jumpToLevel(4)">Poziom 4</button>
       <button type="button" onclick="jumpToLevel(5)">Poziom 5</button>
       <button type="button" onclick="jumpToLevel(6)">Poziom 6</button>
+      <button type="button" onclick="jumpToLevel(7)">Poziom 7</button>
     </div>
   </div>
 </div>
@@ -320,6 +321,7 @@
     <button class="win-btn" id="level4Btn" onclick="startLevel4()" style="display:none;">Poziom 4: klawiatura →</button>
     <button class="win-btn" id="level5Btn" onclick="startLevel5()" style="display:none;">Poziom 5: nad jeziorem →</button>
     <button class="win-btn" id="level6Btn" onclick="startLevel6()" style="display:none;">Poziom 6: w sklepiku →</button>
+    <button class="win-btn" id="level7Btn" onclick="startLevel7()" style="display:none;">Poziom 7: powrót do auta →</button>
     <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
   </div>
 </div>
@@ -768,6 +770,35 @@ function initMenuCritters(){
   scene.add(ground);
 
   const PEN_HALF_X = 5.6, PEN_HALF_Z = 3.6;
+
+  /* Lasek z jeziorkiem w tle menu głównego ("Na menu głównym ma byc lasek
+     z jeziorkiem") — drzewa rozrzucone wokół wybiegu zwierzątek (poza nim,
+     żeby nie zasłaniały ich wędrówki), a małe jeziorko z boku, dość daleko
+     od wybiegu, żeby zwierzątka nigdy po nim nie "chodziły". */
+  for(let i=0;i<16;i++){
+    const ang = Math.random()*Math.PI*2;
+    const r = 7.5 + Math.random()*6.5;
+    const x = Math.cos(ang)*r, z = Math.sin(ang)*r;
+    if(Math.abs(x) < PEN_HALF_X+1.5 && Math.abs(z) < PEN_HALF_Z+1.5) continue;
+    if(z > 6) continue; /* nie zasłaniaj kamery od strony widza */
+    const tree = buildTree();
+    tree.position.set(x, 0, z);
+    tree.scale.multiplyScalar(1.6 + Math.random()*1.1);
+    tree.rotation.y = Math.random()*Math.PI*2;
+    scene.add(tree);
+  }
+  const lakeMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.15, metalness:0.2, transparent:true, opacity:0.88});
+  const lake = new THREE.Mesh(new THREE.CircleGeometry(3.4, 28), lakeMat);
+  lake.rotation.x = -Math.PI/2;
+  lake.scale.set(1, 1.3, 1);
+  lake.position.set(-11, 0.03, -3.5);
+  scene.add(lake);
+  const lakeShoreMat = new THREE.MeshStandardMaterial({color:0xd8c898, roughness:1});
+  const lakeShore = new THREE.Mesh(new THREE.CircleGeometry(3.9, 28), lakeShoreMat);
+  lakeShore.rotation.x = -Math.PI/2;
+  lakeShore.scale.set(1, 1.3, 1);
+  lakeShore.position.set(-11, 0.02, -3.5);
+  scene.add(lakeShore);
   /* Więcej różnych gatunków niż tylko owieczka/kaczka/wróbel — te same
      modele co "towarzysze" pojawiający się przy rozwiązanych bazach w
      grze (patrz ANIMAL_BUILDERS), pomijając motyla (lata, nie ucieka
@@ -881,7 +912,7 @@ let score = 0, walking = false;
 let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — ta sama
   trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
 const LEVEL_BADGE_TEXT = {
-  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5', 6: '🛒 Poziom 6'
+  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5', 6: '🛒 Poziom 6', 7: '🚗 Poziom 7'
 };
 let currentPuzzle = null;
 let sceneRunning = false;
@@ -946,6 +977,14 @@ const SHOP_DOOR_HALF = 1.3;
 /* Kasa — właściwy koniec poziomu 6, tuż przed tylną ścianą sklepu (patrz
    doorApproachPoint/getArrivalShot dla poziomu 6). */
 const LEVEL6_CHECKOUT = {x: 0, z: -47};
+/* Poziom 7: powrót ze sklepu do samochodu, przez lasek — zwykła zewnętrzna
+   trasa (jak poziomy 1-3), tylko kończąca się nie przy domku, a przy
+   zaparkowanym aucie (patrz CAR_DEST_L7/buildParkingLot w initScene). */
+const LEVEL7_PATH_POINTS = [
+  {x:0, z:0}, {x:2.4, z:-6}, {x:-2.8, z:-12}, {x:3.4, z:-18},
+  {x:-3.6, z:-24.5}, {x:2.6, z:-31}, {x:-2.2, z:-37}, {x:0, z:-43}
+];
+const CAR_DEST_L7 = {x: 0, z: -46.5};
 let PATH_POINTS = DEFAULT_PATH_POINTS;
 
 function buildCharacter(kind){
@@ -2860,8 +2899,8 @@ const HOUSE_X_L3 = 1.5, HOUSE_Z_L3 = -51;
    zwracają dla niego punkt daleko poza mapą, więc nearHouse() nigdy nie
    pasuje i strefa wykluczenia po prostu nie istnieje: drzewa mogą rosnąć
    swobodnie aż do samej ścieżki, tak jak w prawdziwie gęstym lesie. */
-function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : (currentLevel === 4 ? 9999 : 0); }
-function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : (currentLevel === 4 ? 9999 : HOUSE_Z); }
+function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : ((currentLevel === 4 || currentLevel === 7) ? 9999 : 0); }
+function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : ((currentLevel === 4 || currentLevel === 7) ? 9999 : HOUSE_Z); }
 function nearHouse(x, z){
   return Math.abs(x - houseX()) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - houseZ()) < HOUSE_YARD_HALF + 0.6;
 }
@@ -4633,6 +4672,7 @@ const LEVEL4_CLEARING = {x: -1.3, z: -49.6};
 function doorApproachPoint(){
   if(currentLevel === 4) return {x: LEVEL4_CLEARING.x, z: LEVEL4_CLEARING.z};
   if(currentLevel === 6) return {x: LEVEL6_CHECKOUT.x, z: LEVEL6_CHECKOUT.z};
+  if(currentLevel === 7) return {x: CAR_DEST_L7.x, z: CAR_DEST_L7.z};
   const isShop = currentLevel === 5;
   const hx = houseX(), hz = houseZ();
   const doorX = hx + (isShop ? 1.0 : 0);
@@ -4917,10 +4957,11 @@ function initScene(){
   PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS :
     (currentLevel === 3 ? LEVEL3_PATH_POINTS :
     (currentLevel === 4 ? LEVEL4_PATH_POINTS :
-    (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS)));
+    (currentLevel === 6 ? LEVEL6_PATH_POINTS :
+    (currentLevel === 7 ? LEVEL7_PATH_POINTS : DEFAULT_PATH_POINTS))));
   potentialOccluders = [];
   scene = new THREE.Scene();
-  const isNight = nightMode && (currentLevel === 2 || currentLevel === 3 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
+  const isNight = nightMode && currentLevel >= 2;
   sceneIsNight = isNight;
   doraLives = 3;
   doraEventActive = false;
@@ -5008,10 +5049,12 @@ function initScene(){
     }
     if(currentLevel === 5){
       buildShopAndParking();
-    }else if(currentLevel !== 4){
+    }else if(currentLevel !== 4 && currentLevel !== 7){
       /* Poziom 4 nie kończy się przy domku, tylko w polanie w gęstym
          lesie (patrz LEVEL4_CLEARING i wzmocniona gęstość drzew w
-         scatterTrees) — bez żadnego wyróżnionego obiektu na końcu. */
+         scatterTrees) — bez żadnego wyróżnionego obiektu na końcu.
+         Poziom 7 też nie ma domku — kończy się przy zaparkowanym aucie
+         (patrz CAR_DEST_L7 niżej). */
       buildHouseAndFence();
     }
     scatterTrees();
@@ -5025,7 +5068,10 @@ function initScene(){
       scatterRiverDecor();
     }
     scatterWildlife();
-    if(currentLevel >= 2){
+    if(currentLevel >= 2 && currentLevel !== 7){
+      /* Poziom 7 ma już swoje WŁASNE auto jako cel trasy (patrz niżej) —
+         ten "odkrywkowy" samochodzik z obozowiskiem tylko by się z nim
+         mylił, więc na tym poziomie go pomijamy. */
       const car = buildCar();
       const cx = 6.5, cz = -25;
       car.position.set(cx, terrainHeight(cx, cz), cz);
@@ -5065,6 +5111,19 @@ function initScene(){
         figure.rotation.y = Math.PI/5;
         scene.add(figure);
       }
+    }
+    if(currentLevel === 7){
+      /* Cel trasy poziomu 7 — auto na miejscu parkingowym (patrz
+         CAR_DEST_L7/doorApproachPoint), zamiast domku jak na innych
+         poziomach: po zrobieniu zakupów w sklepiku (poziom 6) wracamy do
+         samochodu przez lasek. */
+      const lot = buildParkingLot();
+      lot.position.set(CAR_DEST_L7.x, terrainHeight(CAR_DEST_L7.x, CAR_DEST_L7.z), CAR_DEST_L7.z - 1);
+      scene.add(lot);
+      const destCar = buildCar();
+      destCar.position.set(CAR_DEST_L7.x, terrainHeight(CAR_DEST_L7.x, CAR_DEST_L7.z), CAR_DEST_L7.z);
+      destCar.rotation.y = Math.PI;
+      scene.add(destCar);
     }
   }
   const levelBadge = document.getElementById('levelBadge');
@@ -5156,7 +5215,8 @@ const LEVEL_WIN_TITLES = {
   3: 'Przeszliście przez górską przełęcz!',
   4: 'Zagraliście na klawiaturze!',
   5: 'Dotarliście do sklepiku nad jeziorem!',
-  6: 'Zrobiliście zakupy w całym sklepiku!'
+  6: 'Zrobiliście zakupy w całym sklepiku!',
+  7: 'Wróciliście do samochodu z zakupami!'
 };
 function showWin(){
   /* Nie liczymy PATH_POINTS.length-1 wprost — punkty oznaczone noPuzzle
@@ -5171,6 +5231,7 @@ function showWin(){
   document.getElementById('level4Btn').style.display = currentLevel === 3 ? 'inline-block' : 'none';
   document.getElementById('level5Btn').style.display = currentLevel === 4 ? 'inline-block' : 'none';
   document.getElementById('level6Btn').style.display = currentLevel === 5 ? 'inline-block' : 'none';
+  document.getElementById('level7Btn').style.display = currentLevel === 6 ? 'inline-block' : 'none';
   document.getElementById('winOverlay').classList.add('show');
   spawnWinCelebration();
 }
@@ -5194,6 +5255,7 @@ function startLevel3(){ goToLevel(3); }
 function startLevel4(){ goToLevel(4); }
 function startLevel5(){ goToLevel(5); }
 function startLevel6(){ goToLevel(6); }
+function startLevel7(){ goToLevel(7); }
 
 function restartGame(){
   sceneRunning = false;
