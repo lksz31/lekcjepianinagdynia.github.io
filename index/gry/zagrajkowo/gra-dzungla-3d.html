@@ -262,6 +262,7 @@
       <button type="button" onclick="jumpToLevel(4)">Poziom 4</button>
       <button type="button" onclick="jumpToLevel(5)">Poziom 5</button>
       <button type="button" onclick="jumpToLevel(6)">Poziom 6</button>
+      <button type="button" onclick="jumpToLevel(7)">Poziom 7</button>
     </div>
   </div>
 </div>
@@ -320,6 +321,7 @@
     <button class="win-btn" id="level4Btn" onclick="startLevel4()" style="display:none;">Poziom 4: klawiatura →</button>
     <button class="win-btn" id="level5Btn" onclick="startLevel5()" style="display:none;">Poziom 5: nad jeziorem →</button>
     <button class="win-btn" id="level6Btn" onclick="startLevel6()" style="display:none;">Poziom 6: w sklepiku →</button>
+    <button class="win-btn" id="level7Btn" onclick="startLevel7()" style="display:none;">Poziom 7: powrót do auta →</button>
     <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
   </div>
 </div>
@@ -768,6 +770,35 @@ function initMenuCritters(){
   scene.add(ground);
 
   const PEN_HALF_X = 5.6, PEN_HALF_Z = 3.6;
+
+  /* Lasek z jeziorkiem w tle menu głównego ("Na menu głównym ma byc lasek
+     z jeziorkiem") — drzewa rozrzucone wokół wybiegu zwierzątek (poza nim,
+     żeby nie zasłaniały ich wędrówki), a małe jeziorko z boku, dość daleko
+     od wybiegu, żeby zwierzątka nigdy po nim nie "chodziły". */
+  for(let i=0;i<16;i++){
+    const ang = Math.random()*Math.PI*2;
+    const r = 7.5 + Math.random()*6.5;
+    const x = Math.cos(ang)*r, z = Math.sin(ang)*r;
+    if(Math.abs(x) < PEN_HALF_X+1.5 && Math.abs(z) < PEN_HALF_Z+1.5) continue;
+    if(z > 6) continue; /* nie zasłaniaj kamery od strony widza */
+    const tree = buildTree();
+    tree.position.set(x, 0, z);
+    tree.scale.multiplyScalar(1.6 + Math.random()*1.1);
+    tree.rotation.y = Math.random()*Math.PI*2;
+    scene.add(tree);
+  }
+  const lakeMat = new THREE.MeshStandardMaterial({color:0x3d84ad, roughness:0.15, metalness:0.2, transparent:true, opacity:0.88});
+  const lake = new THREE.Mesh(new THREE.CircleGeometry(3.4, 28), lakeMat);
+  lake.rotation.x = -Math.PI/2;
+  lake.scale.set(1, 1.3, 1);
+  lake.position.set(-11, 0.03, -3.5);
+  scene.add(lake);
+  const lakeShoreMat = new THREE.MeshStandardMaterial({color:0xd8c898, roughness:1});
+  const lakeShore = new THREE.Mesh(new THREE.CircleGeometry(3.9, 28), lakeShoreMat);
+  lakeShore.rotation.x = -Math.PI/2;
+  lakeShore.scale.set(1, 1.3, 1);
+  lakeShore.position.set(-11, 0.02, -3.5);
+  scene.add(lakeShore);
   /* Więcej różnych gatunków niż tylko owieczka/kaczka/wróbel — te same
      modele co "towarzysze" pojawiający się przy rozwiązanych bazach w
      grze (patrz ANIMAL_BUILDERS), pomijając motyla (lata, nie ucieka
@@ -881,7 +912,7 @@ let score = 0, walking = false;
 let currentLevel = 1; /* poziom 2 odblokowuje się po ukończeniu poziomu 1 — ta sama
   trasa i zagadki, ale dużo gęstszy las i porzucony samochodzik do odkrycia */
 const LEVEL_BADGE_TEXT = {
-  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5', 6: '🛒 Poziom 6'
+  2: '🌲 Poziom 2', 3: '🔥 Poziom 3', 4: '🎹 Poziom 4', 5: '🏖️ Poziom 5', 6: '🛒 Poziom 6', 7: '🚗 Poziom 7'
 };
 let currentPuzzle = null;
 let sceneRunning = false;
@@ -946,6 +977,14 @@ const SHOP_DOOR_HALF = 1.3;
 /* Kasa — właściwy koniec poziomu 6, tuż przed tylną ścianą sklepu (patrz
    doorApproachPoint/getArrivalShot dla poziomu 6). */
 const LEVEL6_CHECKOUT = {x: 0, z: -47};
+/* Poziom 7: powrót ze sklepu do samochodu, przez lasek — zwykła zewnętrzna
+   trasa (jak poziomy 1-3), tylko kończąca się nie przy domku, a przy
+   zaparkowanym aucie (patrz CAR_DEST_L7/buildParkingLot w initScene). */
+const LEVEL7_PATH_POINTS = [
+  {x:0, z:0}, {x:2.4, z:-6}, {x:-2.8, z:-12}, {x:3.4, z:-18},
+  {x:-3.6, z:-24.5}, {x:2.6, z:-31}, {x:-2.2, z:-37}, {x:0, z:-43}
+];
+const CAR_DEST_L7 = {x: 0, z: -46.5};
 let PATH_POINTS = DEFAULT_PATH_POINTS;
 
 function buildCharacter(kind){
@@ -2416,7 +2455,7 @@ function buildCheckoutCounter(){
   const base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.9, 0.8), counterMat);
   base.position.y = 0.45;
   g.add(base);
-  const topMat = new THREE.MeshStandardMaterial({color:0xfffdf5, roughness:0.4});
+  const topMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'blat-lady-tekstura.webp', 2, 1), roughness:0.4});
   const top = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.06, 0.9), topMat);
   top.position.y = 0.93;
   g.add(top);
@@ -2424,7 +2463,7 @@ function buildCheckoutCounter(){
   const belt = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.04, 0.68), beltMat);
   belt.position.set(0.72, 0.96, 0);
   g.add(belt);
-  const registerMat = new THREE.MeshStandardMaterial({color:0x3a3a3a, roughness:0.6});
+  const registerMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'metal-lodowka-tekstura.webp', 1, 1), roughness:0.6});
   const register = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.28), registerMat);
   register.position.set(-0.65, 1.07, 0);
   g.add(register);
@@ -2436,13 +2475,33 @@ function buildCheckoutCounter(){
   return g;
 }
 
+/* Wystawa jedzenia na froncie lodówki — kilka ikonek jedzonka z tej samej
+   puli co klawiatura pianina (FOOD_BY_LETTER), w prostej siatce na cienkich
+   płytkach, jak półki za szklanymi drzwiami chłodni ("i wystrawa jedzenia"). */
+function buildFridgeFoodDisplay(){
+  const g = new THREE.Group();
+  const letters = shuffled(Object.keys(FOOD_BY_LETTER)).slice(0, 4);
+  letters.forEach(function(letter, i){
+    const food = FOOD_BY_LETTER[letter];
+    const mat = new THREE.MeshStandardMaterial({map: getTexture(food.img), transparent:true, roughness:0.6});
+    /* marketFreezer to niska skrzynia (chłodnia z otwartym wierzchem, nie
+       wysoka lodówka z drzwiami) — płytki leżą płasko na jej wierzchu. */
+    const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), mat);
+    plate.rotation.x = -Math.PI/2;
+    const col = i % 2, row = Math.floor(i/2);
+    plate.position.set(-0.32 + col*0.64, 0, -0.22 + row*0.44);
+    g.add(plate);
+  });
+  return g;
+}
+
 /* Prosta "owocowa" skrzynka — drewniana kratka + kilka kolorowych kulek na
    wierzchu (jabłka/pomarańcze/limonki) — nie ma gotowego modelu Kenney na
    stoisko z owocami, więc budujemy je z prostych brył, tak jak inne drobne
    proceduralne obiekty w tym pliku (patrz np. buildTrashCan). */
 function buildFruitStand(){
   const g = new THREE.Group();
-  const crateMat = new THREE.MeshStandardMaterial({color:0x9a6b3c, roughness:0.9});
+  const crateMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'skrzynka-drewno-tekstura.webp', 2, 1), roughness:0.9});
   const crate = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.55, 0.75), crateMat);
   crate.position.y = 0.275;
   g.add(crate);
@@ -2511,11 +2570,16 @@ function buildShopClerk(){
    spawnCompanion): to sklep, więc zamiast kolejnych zwierzątek "wężyk" za
    postacią ma tworzyć się z pełnych torebek. Losowy kolor torby przy
    każdym wywołaniu, dla odrobiny urozmaicenia. */
-const SHOPPING_BAG_COLORS = [0xdba24a, 0xd9736b, 0x6ba3d9, 0x6bbf7e, 0xd9c76b];
+/* Jasne, ciepłe odcienie (bliskie bieli) zamiast nasyconych kolorów —
+   torba ma teraz prawdziwą teksturę papieru (torba-papierowa-tekstura.webp)
+   jako .map, a MeshStandardMaterial mnoży ją przez .color, więc nasycony
+   błękit/zieleń dawały brudny, szarawy odcień zamiast ładnej odmiany
+   papieru — te tinty tylko delikatnie rozjaśniają/przyciemniają teksturę. */
+const SHOPPING_BAG_COLORS = [0xffffff, 0xfff2df, 0xffe9cb, 0xf5ddb0];
 function buildShoppingBag(){
   const g = new THREE.Group();
   const bagColor = SHOPPING_BAG_COLORS[Math.floor(Math.random()*SHOPPING_BAG_COLORS.length)];
-  const bagMat = new THREE.MeshStandardMaterial({color:bagColor, roughness:0.85});
+  const bagMat = new THREE.MeshStandardMaterial({map: tiledTexture(TEXTURE_DIR+'torba-papierowa-tekstura.webp', 1, 1), color:bagColor, roughness:0.85});
   const bag = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.42, 0.24), bagMat);
   bag.position.y = 0.23;
   g.add(bag);
@@ -2562,15 +2626,28 @@ function buildShopInterior(){
   const roomHalfW = 6.0, roomZStart = 4, roomZEnd = -49, roomH = 4.6;
   const roomZMid = (roomZStart + roomZEnd) / 2, roomZLen = roomZStart - roomZEnd;
 
-  const floorMat = new THREE.MeshStandardMaterial({color:0xf2e9c9, roughness:0.5});
+  const floorMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'podloga-sklep-tekstura.webp', 6, 26),
+    roughness:0.5
+  });
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), floorMat);
   floor.rotation.x = -Math.PI/2;
   floor.position.set(0, 0, roomZMid);
   scene.add(floor);
 
-  const wallMat = new THREE.MeshStandardMaterial({color:0xfff3d0, roughness:0.9});
+  /* Dwa klony tej samej tekstury ściany — inne powtórzenie na długich
+     ścianach bocznych niż na krótszych ścianach czołowych/działowych,
+     żeby wzór nie wyglądał na rozciągnięty na krótszych kawałkach. */
+  const wallMatLong = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sciana-sklep-tekstura.webp', 10, 1),
+    roughness:0.9
+  });
+  const wallMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sciana-sklep-tekstura.webp', 2.2, 1),
+    roughness:0.9
+  });
   [-1, 1].forEach(function(side){
-    const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMat);
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(roomZLen, roomH), wallMatLong);
     wall.rotation.y = side > 0 ? -Math.PI/2 : Math.PI/2;
     wall.position.set(side*roomHalfW, roomH/2, roomZMid);
     scene.add(wall);
@@ -2583,7 +2660,10 @@ function buildShopInterior(){
   frontWall.position.set(0, roomH/2, roomZStart);
   scene.add(frontWall);
 
-  const ceilMat = new THREE.MeshStandardMaterial({color:0xffffff, roughness:0.9, side:THREE.DoubleSide});
+  const ceilMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'sufit-kaseton-tekstura.webp', 6, 26),
+    roughness:0.9, side:THREE.DoubleSide
+  });
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomHalfW*2, roomZLen), ceilMat);
   ceiling.rotation.x = Math.PI/2;
   ceiling.position.set(0, roomH, roomZMid);
@@ -2591,10 +2671,17 @@ function buildShopInterior(){
 
   /* Lamperia — pas boazerii na dole wszystkich ścian ("ma byc tez
      lamperia tam"), lekko odsunięty od ściany, żeby uniknąć z-fightingu. */
-  const wainscotMat = new THREE.MeshStandardMaterial({color:0x8a6a45, roughness:0.85});
+  const wainscotMatLong = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'lamperia-drewno-tekstura.webp', 14, 1),
+    roughness:0.85
+  });
+  const wainscotMat = new THREE.MeshStandardMaterial({
+    map: tiledTexture(TEXTURE_DIR+'lamperia-drewno-tekstura.webp', 3, 1),
+    roughness:0.85
+  });
   const wainscotH = 1.0;
   [-1, 1].forEach(function(side){
-    const w = new THREE.Mesh(new THREE.BoxGeometry(0.04, wainscotH, roomZLen), wainscotMat);
+    const w = new THREE.Mesh(new THREE.BoxGeometry(0.04, wainscotH, roomZLen), wainscotMatLong);
     w.position.set(side*(roomHalfW-0.03), wainscotH/2, roomZMid);
     scene.add(w);
   });
@@ -2677,8 +2764,13 @@ function buildShopInterior(){
          zbyt male"). */
       fridge.position.set(-(roomHalfW-1.3), 0, z);
       fridge.rotation.y = 0;
+      applyMetalSkin(fridge);
       scene.add(fridge);
       potentialOccluders.push(fridge);
+
+      const display = buildFridgeFoodDisplay();
+      display.position.set(-(roomHalfW-1.3), 0.67, z);
+      scene.add(display);
     }
   });
   [-20, -32].forEach(function(z){
@@ -2860,8 +2952,8 @@ const HOUSE_X_L3 = 1.5, HOUSE_Z_L3 = -51;
    zwracają dla niego punkt daleko poza mapą, więc nearHouse() nigdy nie
    pasuje i strefa wykluczenia po prostu nie istnieje: drzewa mogą rosnąć
    swobodnie aż do samej ścieżki, tak jak w prawdziwie gęstym lesie. */
-function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : (currentLevel === 4 ? 9999 : 0); }
-function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : (currentLevel === 4 ? 9999 : HOUSE_Z); }
+function houseX(){ return currentLevel === 3 ? HOUSE_X_L3 : ((currentLevel === 4 || currentLevel === 7) ? 9999 : 0); }
+function houseZ(){ return currentLevel === 3 ? HOUSE_Z_L3 : ((currentLevel === 4 || currentLevel === 7) ? 9999 : HOUSE_Z); }
 function nearHouse(x, z){
   return Math.abs(x - houseX()) < HOUSE_YARD_HALF + 0.6 && Math.abs(z - houseZ()) < HOUSE_YARD_HALF + 0.6;
 }
@@ -3467,6 +3559,18 @@ function getTexture(url){
   return textureCache[url];
 }
 
+/* Klon tekstury z WŁASNYM powtórzeniem (repeat) — kilka ścian/podłóg w
+   sklepiku dzieli tę samą grafikę, ale mają różne proporcje (długa ściana
+   boczna vs krótka tylna), więc każda potrzebuje osobnego .repeat na
+   niezależnym klonie THREE.Texture (ten sam .image, inne wrapS/wrapT). */
+function tiledTexture(url, repeatX, repeatY){
+  const tex = getTexture(url).clone();
+  tex.needsUpdate = true;
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(repeatX, repeatY);
+  return tex;
+}
+
 /* ══ Prawdziwe modele 3D (Ultimate Stylized Nature Pack, skonwertowane
    z FBX do glTF ze skompresowanymi teksturami) — ładowane przez GLTFLoader,
    który dociera do window.GLTFLoader z osobnego modułu ES na końcu strony. */
@@ -3553,6 +3657,25 @@ function applyRuinNightTint(root){
         mat.emissive = new THREE.Color(0x453521);
         mat.emissiveIntensity = 0.9;
       }
+      o.material = mat;
+    }
+  });
+}
+
+/* Lodówki (marketFreezer, paczka Kenney) miały tylko własne, wbudowane
+   materiały — "lodowki niech tez beda teksturowe" — więc doklejamy
+   teksturę szczotkowanego metalu NA ISTNIEJĄCY kolor każdej części
+   (mnożenie, jak w applyRuinNightTint), żeby zachować rozróżnienie
+   drzwi/ramy modelu, tylko z dodaną fakturą metalu. Klon materiału na
+   mesh, bo model jest współdzielony między wszystkie klony (patrz
+   kenneyMesh). */
+function applyMetalSkin(root){
+  const metalTex = tiledTexture(TEXTURE_DIR+'metal-lodowka-tekstura.webp', 1, 1);
+  root.traverse(function(o){
+    if(o.isMesh && o.material){
+      const mat = o.material.clone();
+      mat.map = metalTex;
+      mat.needsUpdate = true;
       o.material = mat;
     }
   });
@@ -4633,6 +4756,7 @@ const LEVEL4_CLEARING = {x: -1.3, z: -49.6};
 function doorApproachPoint(){
   if(currentLevel === 4) return {x: LEVEL4_CLEARING.x, z: LEVEL4_CLEARING.z};
   if(currentLevel === 6) return {x: LEVEL6_CHECKOUT.x, z: LEVEL6_CHECKOUT.z};
+  if(currentLevel === 7) return {x: CAR_DEST_L7.x, z: CAR_DEST_L7.z};
   const isShop = currentLevel === 5;
   const hx = houseX(), hz = houseZ();
   const doorX = hx + (isShop ? 1.0 : 0);
@@ -4917,10 +5041,11 @@ function initScene(){
   PATH_POINTS = currentLevel === 5 ? LEVEL5_PATH_POINTS :
     (currentLevel === 3 ? LEVEL3_PATH_POINTS :
     (currentLevel === 4 ? LEVEL4_PATH_POINTS :
-    (currentLevel === 6 ? LEVEL6_PATH_POINTS : DEFAULT_PATH_POINTS)));
+    (currentLevel === 6 ? LEVEL6_PATH_POINTS :
+    (currentLevel === 7 ? LEVEL7_PATH_POINTS : DEFAULT_PATH_POINTS))));
   potentialOccluders = [];
   scene = new THREE.Scene();
-  const isNight = nightMode && (currentLevel === 2 || currentLevel === 3 || currentLevel === 4 || currentLevel === 5 || currentLevel === 6);
+  const isNight = nightMode && currentLevel >= 2;
   sceneIsNight = isNight;
   doraLives = 3;
   doraEventActive = false;
@@ -5008,10 +5133,12 @@ function initScene(){
     }
     if(currentLevel === 5){
       buildShopAndParking();
-    }else if(currentLevel !== 4){
+    }else if(currentLevel !== 4 && currentLevel !== 7){
       /* Poziom 4 nie kończy się przy domku, tylko w polanie w gęstym
          lesie (patrz LEVEL4_CLEARING i wzmocniona gęstość drzew w
-         scatterTrees) — bez żadnego wyróżnionego obiektu na końcu. */
+         scatterTrees) — bez żadnego wyróżnionego obiektu na końcu.
+         Poziom 7 też nie ma domku — kończy się przy zaparkowanym aucie
+         (patrz CAR_DEST_L7 niżej). */
       buildHouseAndFence();
     }
     scatterTrees();
@@ -5025,7 +5152,10 @@ function initScene(){
       scatterRiverDecor();
     }
     scatterWildlife();
-    if(currentLevel >= 2){
+    if(currentLevel >= 2 && currentLevel !== 7){
+      /* Poziom 7 ma już swoje WŁASNE auto jako cel trasy (patrz niżej) —
+         ten "odkrywkowy" samochodzik z obozowiskiem tylko by się z nim
+         mylił, więc na tym poziomie go pomijamy. */
       const car = buildCar();
       const cx = 6.5, cz = -25;
       car.position.set(cx, terrainHeight(cx, cz), cz);
@@ -5065,6 +5195,19 @@ function initScene(){
         figure.rotation.y = Math.PI/5;
         scene.add(figure);
       }
+    }
+    if(currentLevel === 7){
+      /* Cel trasy poziomu 7 — auto na miejscu parkingowym (patrz
+         CAR_DEST_L7/doorApproachPoint), zamiast domku jak na innych
+         poziomach: po zrobieniu zakupów w sklepiku (poziom 6) wracamy do
+         samochodu przez lasek. */
+      const lot = buildParkingLot();
+      lot.position.set(CAR_DEST_L7.x, terrainHeight(CAR_DEST_L7.x, CAR_DEST_L7.z), CAR_DEST_L7.z - 1);
+      scene.add(lot);
+      const destCar = buildCar();
+      destCar.position.set(CAR_DEST_L7.x, terrainHeight(CAR_DEST_L7.x, CAR_DEST_L7.z), CAR_DEST_L7.z);
+      destCar.rotation.y = Math.PI;
+      scene.add(destCar);
     }
   }
   const levelBadge = document.getElementById('levelBadge');
@@ -5156,7 +5299,8 @@ const LEVEL_WIN_TITLES = {
   3: 'Przeszliście przez górską przełęcz!',
   4: 'Zagraliście na klawiaturze!',
   5: 'Dotarliście do sklepiku nad jeziorem!',
-  6: 'Zrobiliście zakupy w całym sklepiku!'
+  6: 'Zrobiliście zakupy w całym sklepiku!',
+  7: 'Wróciliście do samochodu z zakupami!'
 };
 function showWin(){
   /* Nie liczymy PATH_POINTS.length-1 wprost — punkty oznaczone noPuzzle
@@ -5171,6 +5315,7 @@ function showWin(){
   document.getElementById('level4Btn').style.display = currentLevel === 3 ? 'inline-block' : 'none';
   document.getElementById('level5Btn').style.display = currentLevel === 4 ? 'inline-block' : 'none';
   document.getElementById('level6Btn').style.display = currentLevel === 5 ? 'inline-block' : 'none';
+  document.getElementById('level7Btn').style.display = currentLevel === 6 ? 'inline-block' : 'none';
   document.getElementById('winOverlay').classList.add('show');
   spawnWinCelebration();
 }
@@ -5194,6 +5339,7 @@ function startLevel3(){ goToLevel(3); }
 function startLevel4(){ goToLevel(4); }
 function startLevel5(){ goToLevel(5); }
 function startLevel6(){ goToLevel(6); }
+function startLevel7(){ goToLevel(7); }
 
 function restartGame(){
   sceneRunning = false;
