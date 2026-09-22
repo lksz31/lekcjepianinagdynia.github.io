@@ -4429,6 +4429,74 @@ function doraSideDir(backDir, mistakeNum){
   return new THREE.Vector3(-backDir.z, 0, backDir.x).multiplyScalar(side);
 }
 
+/* ══ "Więcej ludzi" w trybie dora — kilka nieruchomych sylwetek (patrz
+   buildDarkFigure) rozstawionych z dala od ścieżki na każdym poziomie
+   nocnym (poza sklepikiem, poziom 6 — tam jest zawsze jasno i ma być
+   obsłużony przez ekspedientów, nie straszony przez nieznajomych).
+   "oni sie przybnizaja do nas ale jak sie patrzymy to sie rozpierzchaja
+   i na nas nie patrza" — czysto klimatyczny mechanizm, bez żadnej kary:
+   niewidziana (poza stożkiem widzenia kamery) sylwetka powoli podchodzi
+   bliżej; jak tylko znajdzie się w kadrze, zamiera i odwraca wzrok,
+   cofając się. Test widoczności przez THREE.Frustum z macierzy kamery. */
+let lurkers = [];
+function spawnLurkers(){
+  lurkers.forEach(function(l){ if(l.mesh.parent) l.mesh.parent.remove(l.mesh); });
+  lurkers = [];
+  if(!sceneIsNight || currentLevel === 6 || !scene) return;
+  const count = 3;
+  for(let i=0;i<count;i++){
+    let x = 0, z = 0, ok = false;
+    for(let tries=0; tries<12 && !ok; tries++){
+      const ang = Math.random()*Math.PI*2;
+      const r = 9 + Math.random()*13;
+      x = Math.cos(ang)*r;
+      z = -Math.random()*42 - 3;
+      ok = distToPath(x, z) >= 6.5;
+    }
+    const figure = buildDarkFigure();
+    figure.position.set(x, terrainHeight(x, z), z);
+    scene.add(figure);
+    lurkers.push({mesh: figure});
+  }
+}
+
+const LURKER_APPROACH_SPEED = 0.012, LURKER_RETREAT_SPEED = 0.03, LURKER_STOP_DIST = 3.5;
+/* Leniwie tworzone (nie na starcie modułu!) — THREE ładuje się osobnym
+   tagiem <script> ZA tym plikiem, więc "new THREE.Frustum()" na najwyższym
+   poziomie skryptu wywaliłoby się od razu (THREE jeszcze nie istnieje) i po
+   cichu przerywało resztę pliku w trakcie pierwszego wczytania — stąd
+   wszystkie inne "new THREE...." w tym pliku też są w środku funkcji. */
+let lurkerFrustum = null, lurkerViewMatrix = null;
+function updateLurkers(){
+  if(!lurkers.length || !character || !camera) return;
+  if(!lurkerFrustum){ lurkerFrustum = new THREE.Frustum(); lurkerViewMatrix = new THREE.Matrix4(); }
+  /* Liczymy stożek widzenia sami, zamiast polegać na matrixWorldInverse z
+     ostatniego renderu — ta funkcja jest wołana PRZED renderer.render() w
+     animate(), więc kamera mogła się już przesunąć w tej klatce
+     (updateCamera) i nie chcemy testować widoczności względem poprzedniej. */
+  camera.updateMatrixWorld();
+  lurkerViewMatrix.copy(camera.matrixWorld).invert();
+  lurkerViewMatrix.multiplyMatrices(camera.projectionMatrix, lurkerViewMatrix);
+  lurkerFrustum.setFromProjectionMatrix(lurkerViewMatrix);
+  lurkers.forEach(function(l){
+    const pos = l.mesh.position;
+    const headPoint = new THREE.Vector3(pos.x, pos.y+1.1, pos.z);
+    const seen = lurkerFrustum.containsPoint(headPoint);
+    const dx = character.position.x - pos.x, dz = character.position.z - pos.z;
+    const dist = Math.hypot(dx, dz) || 1;
+    if(seen){
+      pos.x -= (dx/dist)*LURKER_RETREAT_SPEED;
+      pos.z -= (dz/dist)*LURKER_RETREAT_SPEED;
+      l.mesh.rotation.y = Math.atan2(-dx, -dz);
+    }else if(dist > LURKER_STOP_DIST){
+      pos.x += (dx/dist)*LURKER_APPROACH_SPEED;
+      pos.z += (dz/dist)*LURKER_APPROACH_SPEED;
+      l.mesh.rotation.y = Math.atan2(dx, dz);
+    }
+    pos.y = terrainHeight(pos.x, pos.z);
+  });
+}
+
 function showDoraVignette(){
   const v = document.getElementById('doraStalkerVignette');
   if(v) v.classList.add('show');
@@ -5087,6 +5155,7 @@ function animate(now){
   updateCampfires();
   updateInteractiveNpcs();
   if(!inCutscene) updateCamera();
+  updateLurkers();
   updateOccludingObjects();
   renderer.render(scene, camera);
 }
@@ -5158,6 +5227,7 @@ function initScene(){
   interactiveNpcs = [];
   const npcPanelEl = document.getElementById('npcPanel');
   if(npcPanelEl) npcPanelEl.classList.remove('show');
+  spawnLurkers();
   if(currentLevel === 6){
     buildShopInterior();
     spawnShopClerks();
