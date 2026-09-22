@@ -192,7 +192,8 @@
   .skip-cutscene-btn{position:absolute;bottom:18px;right:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 18px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;}
   /* Tryb "dora": pełnoekranowe wyciemnienie na 3. pomyłkę, tuż przed
      restartem poziomu (patrz triggerDoraCaught). */
-  .dora-blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s ease;z-index:16;}
+  .dora-blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s ease;z-index:16;display:flex;align-items:center;justify-content:center;}
+  .dora-caption{color:#c0392b;font-family:'Playfair Display',serif;font-weight:700;font-size:clamp(1.15rem,4vw,1.8rem);text-align:center;padding:0 24px;text-shadow:0 2px 14px rgba(0,0,0,0.9);}
 </style>
 </head>
 <body>
@@ -258,7 +259,7 @@
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
   <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
   <button type="button" class="skip-cutscene-btn" id="skipCutsceneBtn" onclick="cutsceneSkip=true;" style="display:none;">Pomiń ▶</button>
-  <div class="dora-blackout" id="doraBlackout"></div>
+  <div class="dora-blackout" id="doraBlackout"><span class="dora-caption" id="doraCaption"></span></div>
   <div class="puzzle-panel" id="puzzlePanel">
     <div class="puzzle-title" id="puzzleTitle">Jaki to dźwięk?</div>
     <div class="puzzle-staff"><svg id="puzzleStaffSvg" viewBox="0 0 125 96" xmlns="http://www.w3.org/2000/svg"></svg></div>
@@ -329,6 +330,39 @@ function playErrorBeep(){
     }
     tone(220, 0, 0.14);
     tone(185, 0.16, 0.20);
+  }catch(e){}
+}
+/* Delikatne sapanie/oddech — dla ujęć "stalkera" w trybie dora (patrz
+   triggerDoraStalkerShot/triggerDoraCaught). Przefiltrowany szum, nie
+   oscylator — brzmi organicznie, jak oddech, nie jak sygnał. intensity
+   (1/2/3, numer pomyłki) podbija głośność, więc z każdą pomyłką jest
+   wyraźniej słychać, że "ktoś" jest coraz bliżej. */
+function playBreathing(intensity){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const dur = 0.85;
+    const bufferSize = Math.floor(dur*ctx.sampleRate);
+    const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    let last = 0;
+    for(let i=0;i<bufferSize;i++){
+      const white = Math.random()*2-1;
+      data[i] = (last + 0.08*white) / 1.08;
+      last = data[i];
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass'; filter.frequency.value = 420; filter.Q.value = 0.6;
+    const gain = ctx.createGain();
+    const peak = 0.05 + 0.045*(intensity||1);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(peak, now+dur*0.45);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+    src.connect(filter).connect(gain).connect(ctx.destination);
+    src.start(now); src.stop(now+dur+0.05);
   }catch(e){}
 }
 function playSuccessChime(){
@@ -3743,12 +3777,14 @@ function completeStationSuccess(){
 
 /* ══ Tryb "dora" — punkty życia i "ktoś nas obserwuje" ══
    Aktywne tylko w nocnym trybie (sceneIsNight) od poziomu 2 wzwyż. Każda
-   pomyłka w zagadce odejmuje jedno serce i na chwilę przełącza kamerę na
-   ciemną postać czającą się coraz bliżej za plecami postaci (ten sam kierunek
-   "do tyłu", co cfg.back z cameraOffsetForAspect — patrz updateCamera). Po
-   trzeciej pomyłce ta postać dopada kamerę, ekran robi się czarny i poziom
-   zaczyna się od nowa. Własny, niezależny od runIntroCutscene tween kamery
-   (tweenRaw), żeby nie kolidować z cutsceneSkip/przyciskiem "Pomiń". */
+   pomyłka w zagadce odejmuje jedno serce. Kamera NIE przejeżdża do tego
+   ujęcia płynnym tweenem — cięcie jest na sztywno (ustawione od razu
+   camera.position/lookAt), jak nagły kadr w horrorze: boczne ujęcie, w
+   którym widać naszą postać z oddali, a w głębi — czającą się sylwetkę,
+   coraz bliżej z każdą pomyłką, z cichym sapaniem w tle (playBreathing).
+   Po trzeciej pomyłce sylwetka gwałtownie dobiega do postaci (krótka,
+   nagła animacja, nie tween), postać się do niej odwraca, ekran gaśnie
+   z podpisem "Nie nauczyłeś się..." i poziom zaczyna się od nowa. */
 let doraLives = 3;
 let doraEventActive = false;
 
@@ -3759,20 +3795,6 @@ function updateDoraLivesUI(){
   if(!show){ el.style.display = 'none'; return; }
   el.style.display = 'flex';
   el.textContent = '❤️'.repeat(Math.max(0, doraLives)) + '🖤'.repeat(Math.max(0, 3 - doraLives));
-}
-
-function tweenRaw(fromPos, fromLook, toPos, toLook, duration, onDone){
-  const t0 = performance.now();
-  function step(now){
-    const t = Math.min(1, (now-t0)/duration);
-    const e = t*t*(3-2*t);
-    camera.position.lerpVectors(fromPos, toPos, e);
-    const look = new THREE.Vector3().lerpVectors(fromLook, toLook, e);
-    camera.lookAt(look);
-    if(t < 1) requestAnimationFrame(step);
-    else if(onDone) onDone();
-  }
-  requestAnimationFrame(step);
 }
 
 function registerDoraMistake(){
@@ -3786,13 +3808,25 @@ function registerDoraMistake(){
   }
 }
 
+/* Boczny kąt kamery, prostopadły do osi postać↔sylwetka — ten sam wzór
+   dla stalker-shotu i finałowego dopadnięcia, żeby ujęcia były spójne.
+   Naprzemienna strona (parzysta/nieparzysta pomyłka) daje trochę
+   różnorodności zamiast identycznego kadru za każdym razem. */
+function doraSideDir(backDir, mistakeNum){
+  const side = (mistakeNum % 2 === 0) ? -1 : 1;
+  return new THREE.Vector3(-backDir.z, 0, backDir.x).multiplyScalar(side);
+}
+
 function triggerDoraStalkerShot(mistakeNum){
   doraEventActive = true;
   inCutscene = true;
   const cfg = cameraOffsetForAspect();
   const backDir = cfg.back.clone().setY(0).normalize();
-  const distances = {1: 16, 2: 9};
-  const dist = distances[mistakeNum] || 5;
+  const sideDir = doraSideDir(backDir, mistakeNum);
+  const distances = {1: 15, 2: 8};
+  const dist = distances[mistakeNum] || 4;
+  const sideDistances = {1: 9, 2: 6.5};
+  const sideDist = sideDistances[mistakeNum] || 5;
 
   const figure = buildDarkFigure();
   const fPos = character.position.clone().addScaledVector(backDir, dist);
@@ -3800,24 +3834,26 @@ function triggerDoraStalkerShot(mistakeNum){
   figure.position.copy(fPos);
   scene.add(figure);
 
-  const camPos = character.position.clone().addScaledVector(backDir, Math.max(2, dist - 4));
-  camPos.y = character.position.y + 1.7;
-  const lookAt = fPos.clone(); lookAt.y += 1.1;
+  /* Cięcie na sztywno, bez tweenu: boczny kadr, w którym widać naszą
+     postać z oddali, a za nią — czającą się sylwetkę. */
+  const midPoint = character.position.clone().lerp(fPos, 0.3);
+  const camPos = midPoint.clone().addScaledVector(sideDir, sideDist);
+  camPos.y = midPoint.y + 2.4;
+  camera.position.copy(camPos);
+  camera.lookAt(midPoint.x, midPoint.y + 1, midPoint.z);
 
-  const fromPos = camera.position.clone();
-  const fromLook = character.position.clone(); fromLook.y += cfg.lookY;
+  playBreathing(mistakeNum);
 
-  tweenRaw(fromPos, fromLook, camPos, lookAt, 450, function(){
-    setTimeout(function(){
-      const backPos = character.position.clone().add(cfg.back);
-      const backLook = character.position.clone(); backLook.y += cfg.lookY;
-      tweenRaw(camera.position.clone(), lookAt, backPos, backLook, 450, function(){
-        scene.remove(figure);
-        inCutscene = false;
-        doraEventActive = false;
-      });
-    }, 700);
-  });
+  setTimeout(function(){
+    scene.remove(figure);
+    /* Powrót też cięciem, nie tweenem. */
+    const backPos = character.position.clone().add(cfg.back);
+    camera.position.copy(backPos);
+    const backLook = character.position.clone(); backLook.y += cfg.lookY;
+    camera.lookAt(backLook.x, backLook.y, backLook.z);
+    inCutscene = false;
+    doraEventActive = false;
+  }, 900);
 }
 
 function triggerDoraCaught(){
@@ -3827,40 +3863,63 @@ function triggerDoraCaught(){
   hidePuzzle();
   const cfg = cameraOffsetForAspect();
   const backDir = cfg.back.clone().setY(0).normalize();
-  const startDist = 9;
+  const sideDir = doraSideDir(backDir, 3);
+  const startDist = 6;
 
   const figure = buildDarkFigure();
+  const fPos0 = character.position.clone().addScaledVector(backDir, startDist);
+  fPos0.y = terrainHeight(fPos0.x, fPos0.z);
+  figure.position.copy(fPos0);
   scene.add(figure);
-  camera.position.copy(character.position.clone().add(cfg.back));
-  camera.position.y = character.position.y + 1.7;
 
-  const t0 = performance.now();
-  const duration = 950;
-  function step(now){
-    const t = Math.min(1, (now-t0)/duration);
-    const e = t*t;
-    const dist = startDist*(1-e) + 0.4*e;
-    const pos = character.position.clone().addScaledVector(backDir, dist);
-    pos.y = terrainHeight(pos.x, pos.z) + 1.1*e;
-    figure.position.copy(pos);
-    figure.scale.setScalar(1 + e*e*8);
-    camera.lookAt(pos.x, pos.y, pos.z);
-    if(t < 1){
-      requestAnimationFrame(step);
-    }else{
-      const blackout = document.getElementById('doraBlackout');
-      if(blackout) blackout.style.opacity = '1';
-      setTimeout(function(){
-        const lvl = currentLevel;
-        doraEventActive = false;
-        goToLevel(lvl);
+  /* Ten sam boczny kadr co przy wcześniejszych pomyłkach — tylko sylwetka
+     jest już bardzo blisko. Kamera zostaje nieruchoma przez całe ujęcie
+     (żadnego tweenu/śledzenia) — nagłość ruchu ma być cała w sylwetce
+     i w postaci, nie w kamerze. */
+  const midPoint = character.position.clone().lerp(fPos0, 0.35);
+  const camPos = midPoint.clone().addScaledVector(sideDir, 5.5);
+  camPos.y = midPoint.y + 2.2;
+  camera.position.copy(camPos);
+  camera.lookAt(midPoint.x, midPoint.y + 1, midPoint.z);
+
+  playBreathing(3);
+
+  const startRotY = character.rotation.y;
+
+  setTimeout(function(){
+    /* Szybkie dobiegnięcie — krótka, gwałtowna animacja (nie tween jak
+       reszta gry): sylwetka dopada postać, a postać obraca się, żeby
+       spojrzeć jej w oczy. */
+    const t0 = performance.now();
+    const duration = 380;
+    function step(now){
+      const t = Math.min(1, (now-t0)/duration);
+      const e = t*t;
+      const pos = character.position.clone().addScaledVector(backDir, startDist*(1-e));
+      pos.y = terrainHeight(pos.x, pos.z);
+      figure.position.copy(pos);
+      figure.scale.setScalar(1 + e*e*2.5);
+      character.rotation.y = startRotY + Math.PI*Math.min(1, t*1.4);
+      if(t < 1){
+        requestAnimationFrame(step);
+      }else{
+        const blackout = document.getElementById('doraBlackout');
+        const caption = document.getElementById('doraCaption');
+        if(caption) caption.textContent = 'Nie nauczyłeś się...';
+        if(blackout) blackout.style.opacity = '1';
         setTimeout(function(){
-          if(blackout) blackout.style.opacity = '0';
-        }, 500);
-      }, 550);
+          const lvl = currentLevel;
+          doraEventActive = false;
+          character.rotation.y = startRotY;
+          goToLevel(lvl);
+          setTimeout(function(){
+            if(blackout) blackout.style.opacity = '0';
+          }, 500);
+        }, 650);
+      }
     }
-  }
-  requestAnimationFrame(step);
+    requestAnimationFrame(step);
+  }, 400);
 }
 
 /* ══ Efekty świętowania ══ */
