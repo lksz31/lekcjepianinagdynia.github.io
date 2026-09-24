@@ -202,6 +202,12 @@
 
   /* ══ Cutscene przelotu kamery przed poziomem ══ */
   .skip-cutscene-btn{position:absolute;bottom:18px;right:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 18px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;}
+  /* Przycisk "wyśrodkuj widok" — dziecko, które przeciągnięciem (albo
+     kompasem) obróci kamerę i się zgubi, ma jeden prosty sposób na powrót
+     do widoku "do przodu", zamiast zgadywać, w którą stronę i jak długo
+     przeciągać z powrotem (patrz orbitAngle/DRAG_ROTATE_SPEED). */
+  .recenter-view-btn{position:absolute;bottom:18px;left:16px;background:rgba(10,20,10,0.55);backdrop-filter:blur(4px);color:#fff;border:1.5px solid rgba(255,255,255,0.4);border-radius:50px;padding:8px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;z-index:8;display:flex;align-items:center;gap:5px;}
+  body.ambient-preview .recenter-view-btn{display:none!important;}
   /* Tryb "dora": pełnoekranowe wyciemnienie na 3. pomyłkę, tuż przed
      restartem poziomu (patrz triggerDoraCaught). */
   .dora-blackout{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.5s ease;z-index:16;display:flex;align-items:center;justify-content:center;}
@@ -299,6 +305,7 @@
   <div class="hint-badge" id="hintBadge">Dotknij świecącą nutkę na ścieżce, żeby ruszyć dalej</div>
   <div class="swipe-hint">👆 przesuń palcem, żeby się rozejrzeć</div>
   <button type="button" class="skip-cutscene-btn" id="skipCutsceneBtn" onclick="cutsceneSkip=true;" style="display:none;">Pomiń ▶</button>
+  <button type="button" class="recenter-view-btn" id="recenterViewBtn" onclick="orbitAngle=0;" aria-label="Wyśrodkuj widok, żeby patrzeć do przodu">🧭 Do przodu</button>
   <div class="dora-stalker-vignette" id="doraStalkerVignette"></div>
   <div class="dora-blackout" id="doraBlackout"><span class="dora-caption" id="doraCaption"></span></div>
   <div class="puzzle-panel" id="puzzlePanel">
@@ -5507,6 +5514,11 @@ const AMBIENT_PREVIEW = new URLSearchParams(location.search).get('ambient') === 
 let ambientLevelCycle = 1;
 if(AMBIENT_PREVIEW){
   document.body.classList.add('ambient-preview');
+  /* "Klikalno-nieme tło" — miało być nieme od razu, ale nic tu nie
+     wyłączało dźwięku, więc odgłosy gry (oddech doras, dźwięk sukcesu,
+     ambient dżungli...) były słyszalne na stronie głównej, mimo że sam
+     baner jest tylko podglądem w tle (patrz .jungle-cta-preview). */
+  soundEnabled = false;
   (function tryAmbientAutoStart(){
     if(typeof THREE === 'undefined' || !modelsReady){ setTimeout(tryAmbientAutoStart, 100); return; }
     selectChar(Math.random() < 0.5 ? 'cat' : 'dog');
