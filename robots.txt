@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /index/briefy/
+Allow: /
+
+Sitemap: https://lekcjepianinagdynia.pl/sitemap.xml
