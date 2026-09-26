@@ -420,7 +420,7 @@ body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);min
     <button class="modal-close" onclick="closeBookingModal()">✕</button>
     <div class="modal-left">
       <h3>Lekcja próbna</h3>
-      <div class="modal-price"><span id="m-price">99 zł / h</span></div>
+      <div class="modal-price"><span id="m-price">119 zł / h</span></div>
       <p style="font-size:0.8rem;font-weight:700;margin-bottom:8px;color:var(--navy);">Miejsce:</p>
       <div class="m-tile selected" id="m-l-s" onclick="mSetLoc('s')"><b>W studio</b><br><small>Gdynia Mały Kack</small></div>
       <div class="m-tile" id="m-l-u" onclick="mSetLoc('u')"><b>U ucznia</b><br><small>Dojazd do Ciebie</small></div>
@@ -790,7 +790,7 @@ function mSetPiano(v){
   document.getElementById('m-p-n').classList.toggle('selected',!v);
   mUpdatePrice();
 }
-function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
+function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?139:119)+' zł / h';}
 async function wyslijModal(){
   const s=document.getElementById('modal-status');const submitBtn=document.querySelector('.modal-submit-btn');
   const name=document.getElementById('m-name').value.trim();
@@ -804,7 +804,7 @@ async function wyslijModal(){
     tresc:document.getElementById('m-msg').value.trim(),
     miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',
     pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),
-    cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',
+    cena:(mLoc==='u'&&!mPiano?139:119)+' zł/h',
     data:new Date().toLocaleString('pl-PL')
   };
   try{

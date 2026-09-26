@@ -9,7 +9,7 @@
 <script>(function(){try{if(localStorage.getItem('darkMode')==='1')document.documentElement.classList.add('dark-mode');}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lekcje Pianina Gdynia – Łukasz Ganczarek</title>
-<meta name="description" content="Lekcje pianina w Gdyni (Mały Kack) i Sopocie — dla dzieci od 6 lat i osób dorosłych. Indywidualne podejście, dojazd do ucznia. Umów lekcję próbną: 99 zł/h.">
+<meta name="description" content="Lekcje pianina w Gdyni (Mały Kack) i Sopocie — dla dzieci od 6 lat i osób dorosłych. Indywidualne podejście, dojazd do ucznia. Umów lekcję próbną: 119 zł/h.">
 <link rel="canonical" href="https://lekcjepianinagdynia.pl/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Lekcje Pianina Gdynia – Łukasz Ganczarek">
@@ -30,7 +30,7 @@
   "url": "https://lekcjepianinagdynia.pl/",
   "telephone": "+48514338875",
   "email": "lukaszgkorepetycje@gmail.com",
-  "priceRange": "99-119 PLN",
+  "priceRange": "119-139 PLN",
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "5",
@@ -123,7 +123,7 @@
     {
       "@type": "Question",
       "name": "Ile kosztuje lekcja pianina w Gdyni?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 99 zł. Przy zajęciach z dojazdem do ucznia bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525)." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem do ucznia bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525)." }
     },
     {
       "@type": "Question",
@@ -1146,7 +1146,7 @@
     <div class="faq-list" id="faqList">
       <details class="faq-item" open>
         <summary><span class="faq-q"><span class="faq-icon-emoji">💰</span>Ile kosztuje lekcja pianina w Gdyni?</span></summary>
-        <div class="faq-answer">Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 99 zł. Przy zajęciach z dojazdem bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525).</div>
+        <div class="faq-answer">Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525).</div>
       </details>
       <details class="faq-item">
         <summary><span class="faq-q"><span class="faq-icon-emoji">🧒</span>Od jakiego wieku można zacząć naukę gry na pianinie?</span></summary>
@@ -1336,6 +1336,7 @@ function toggleForm(show){
   if(show){document.getElementById('res-choice').style.display='block';document.getElementById('res-simple').style.display='none';document.getElementById('res-status').innerText='';}
 }
 const PROMO_CODE='lekcjaprobna',PROMO_DISCOUNT=0.6;
+const LESSON_BASE_PRICE=119; /* cena bazowa godziny lekcji — jedno miejsce zamiast trzech zdublowanych stałych */
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
 // "Poproś o kontakt" / "Umów lekcję" — prosty formularz kontaktowy z opcją
 // przejścia do kalendarza wolnych terminów zamiast wypełniania szczegółów rezerwacji.
@@ -1991,7 +1992,7 @@ function calDeliveryFee(){
 function calUpdatePriceBox(){
   const box = document.getElementById('calPriceBox');
   if(!box) return;
-  const lessonBase = 99;
+  const lessonBase = LESSON_BASE_PRICE;
   const codeOk = document.getElementById('calPromo').value.trim().toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
@@ -2088,7 +2089,7 @@ function calBuildSummary(){
   const promo = document.getElementById('calPromo').value.trim();
   const codeOk = promo.toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
-  const lessonBase = 99;
+  const lessonBase = LESSON_BASE_PRICE;
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
   const total = lessonPrice + deliveryFee;
 
@@ -2180,12 +2181,12 @@ async function submitCalBooking(){
   const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
   const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
 
-  /* Cena: baza 99 zł (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu */
-  const baseBefore = 99;
+  /* Cena: baza (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu */
+  const baseBefore = LESSON_BASE_PRICE;
   const baseAfter = promoOk ? baseBefore*(1-PROMO_DISCOUNT) : baseBefore;
   const deliveryFee = calDeliveryFee();
   const totalPrice = baseAfter + deliveryFee;
-  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza 99 zł -60% rabat)' : '99 zł (cena bazowa)')
+  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza '+baseBefore+' zł -60% rabat)' : baseBefore+' zł (cena bazowa)')
     + (deliveryFee ? ' + '+deliveryFee+' zł (dowóz, bez rabatu)' : '');
 
   let pianoOpis = '—';

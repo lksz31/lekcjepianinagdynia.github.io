@@ -20,7 +20,7 @@ function mSetPiano(v){
   document.getElementById('m-p-n').classList.toggle('selected',!v);
   mUpdatePrice();
 }
-function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?119:99)+' zł / h';}
+function mUpdatePrice(){document.getElementById('m-price').textContent=(mLoc==='u'&&!mPiano?139:119)+' zł / h';}
 
 async function wyslijModal(){
   const s=document.getElementById('modal-status');const submitBtn=document.querySelector('.modal-submit-btn');
@@ -35,7 +35,7 @@ async function wyslijModal(){
     tresc:document.getElementById('m-msg').value.trim(),
     miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',
     pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),
-    cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',
+    cena:(mLoc==='u'&&!mPiano?139:119)+' zł/h',
     data:new Date().toLocaleString('pl-PL')
   };
   try{
