@@ -239,8 +239,13 @@
   .hero h1 em{font-style:italic;color:var(--gold);}
   .hero-sub{font-size:clamp(0.9rem,2.5vw,1.05rem);color:#64748b;max-width:520px;line-height:1.7;margin:0 auto 40px;opacity:0;animation:fadeUp 0.8s ease forwards 0.6s;padding:0 10px;}
   .hero-btns{display:flex;gap:15px;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp 0.8s ease forwards 0.8s;padding:0 20px;}
+  .cta-wrap{position:relative;display:inline-block;}
+  .cta-hand{position:absolute;right:-16px;bottom:-24px;font-size:1.9rem;line-height:1;pointer-events:none;transform-origin:70% 15%;animation:ctaHandTap 1.6s ease-in-out infinite;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.35));z-index:3;}
+  @keyframes ctaHandTap{0%,100%{transform:translateY(0) rotate(-18deg);}50%{transform:translateY(7px) rotate(-18deg);}}
+  @media(max-width:600px){.cta-hand{font-size:1.5rem;right:-8px;bottom:-18px;}}
   .btn-primary{background:var(--navy-solid);color:white;padding:15px 35px;border-radius:50px;font-weight:700;text-decoration:none;font-size:0.9rem;transition:0.3s;display:inline-block;}
   .btn-primary:hover{background:var(--gold);transform:translateY(-2px);}
+  .btn-primary:hover+.cta-hand,.cta-wrap:hover .cta-hand{opacity:0;}
   .btn-outline{background:transparent;color:var(--navy);padding:15px 35px;border-radius:50px;font-weight:700;text-decoration:none;font-size:0.9rem;border:2px solid var(--navy);transition:0.3s;display:inline-block;}
   .btn-outline:hover{background:var(--navy-solid);color:white;transform:translateY(-2px);}
   .scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#94a3b8;font-size:0.8rem;opacity:0;animation:bounce 2s infinite 1.5s,fadeUp 0.8s ease forwards 1.2s;}
@@ -774,7 +779,10 @@
     <h1>Lekcje pianina<br>z <em>pasją</em></h1>
     <p class="hero-sub">Profesjonalne lekcje fortepianu dla dzieci i osób dorosłych od 6 roku życia. Studio w Gdyni (Mały Kack) lub dojazd do Ciebie.</p>
     <div class="hero-btns">
-      <a href="#terminy" class="btn-primary">Zarezerwuj termin</a>
+      <span class="cta-wrap">
+        <a href="#terminy" class="btn-primary">Zarezerwuj termin</a>
+        <span class="cta-hand" aria-hidden="true">👆</span>
+      </span>
       <a href="#o-mnie" class="btn-outline">Poznaj nauczyciela</a>
     </div>
   </div>
