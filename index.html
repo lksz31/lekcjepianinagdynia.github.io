@@ -370,6 +370,12 @@
   .form-overlay.open{opacity:1;pointer-events:auto;}
   .close-btn{position:absolute;top:16px;right:20px;font-size:1.5rem;color:var(--navy);cursor:pointer;font-weight:bold;background:none;border:none;font-family:'Poppins',sans-serif;}
   .form-content{width:100%;max-width:480px;max-height:90vh;overflow-y:auto;text-align:center;color:var(--navy);background:var(--card-bg);border-radius:28px;padding:32px 28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);position:relative;box-sizing:border-box;}
+  .cal-modal-overlay{position:fixed;inset:0;background:rgba(10,20,60,0.7);backdrop-filter:blur(6px);z-index:2300;display:flex;align-items:flex-start;justify-content:center;padding:16px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity 0.3s;overflow-y:auto;}
+  .cal-modal-overlay.open{opacity:1;pointer-events:auto;}
+  .cal-modal-content{width:100%;max-width:688px;margin:24px auto;position:relative;box-sizing:border-box;}
+  .cal-modal-close{position:absolute;top:-14px;right:-14px;background:var(--card-bg);border-radius:50%;width:38px;height:38px;box-shadow:0 4px 14px rgba(0,0,0,0.3);z-index:5;}
+  .cal-modal-content .cal-widget-wrap{margin:0;}
+  @media(max-width:600px){.cal-modal-content{max-width:100%;margin:12px auto;}.cal-modal-close{top:-10px;right:-6px;}}
   .form-choice-btn{width:100%;background:var(--gold);color:#fff;border:none;padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;margin-bottom:10px;transition:0.2s;}
   .form-choice-btn:hover{opacity:0.9;}
   .form-choice-btn-outline{width:100%;background:transparent;color:var(--navy);border:1.5px solid var(--navy);padding:13px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;font-size:0.84rem;transition:0.2s;}
@@ -886,7 +892,7 @@
       <button class="btn-open-form" onclick="toggleForm(true)">POPROŚ O KONTAKT</button>
     </div>
 
-    <div class="cal-widget-wrap">
+    <div class="cal-widget-wrap" id="calWidgetWrap">
       <div class="cal-widget-header">
         <div>
           <div class="cal-widget-title">Wybierz wolny termin zajęć i umów lekcję</div>
@@ -987,6 +993,7 @@
         </div>
       </div>
     </div>
+    <div id="calWidgetHome"></div>
   </div>
 </section>
 
@@ -1012,6 +1019,13 @@
       <button class="form-back-link" onclick="formBackToChoice('desktop')">← Wróć</button>
       <div id="res-status" style="margin-top:12px;font-weight:600;font-size:0.85rem;"></div>
     </div>
+  </div>
+</div>
+
+<div class="cal-modal-overlay" id="calModalOverlay" onclick="if(event.target===this)closeCalModal()">
+  <div class="cal-modal-content">
+    <button class="close-btn cal-modal-close" onclick="closeCalModal()">✕</button>
+    <div id="calModalSlot"></div>
   </div>
 </div>
 
@@ -1348,10 +1362,23 @@ const LESSON_BASE_PRICE=99; /* cena bazowa godziny lekcji — jedno miejsce zami
 function formatPLN(n){return n.toFixed(2).replace('.',',').replace(',00','');}
 // "Poproś o kontakt" / "Umów lekcję" — prosty formularz kontaktowy z opcją
 // przejścia do kalendarza wolnych terminów zamiast wypełniania szczegółów rezerwacji.
+function openCalModal(){
+  const wrap=document.getElementById('calWidgetWrap');
+  const slot=document.getElementById('calModalSlot');
+  if(wrap&&slot&&wrap.parentElement!==slot) slot.appendChild(wrap);
+  document.getElementById('calModalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeCalModal(){
+  const wrap=document.getElementById('calWidgetWrap');
+  const home=document.getElementById('calWidgetHome');
+  if(wrap&&home&&wrap.parentElement!==home.parentElement) home.before(wrap);
+  document.getElementById('calModalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
 function formGoCalendar(which){
   if(which==='desktop') toggleForm(false); else closeBookingModal();
-  const target=document.getElementById('terminy');
-  if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+  openCalModal();
 }
 function formShowSimple(which){
   const p=which==='desktop'?'res':'m';
