@@ -1357,10 +1357,14 @@ function formBackToChoice(which){
 }
 function val(){const n=document.getElementById('res-name').value;const p=document.getElementById('res-phone').value;const e=document.getElementById('res-email').value;document.getElementById('subBtn').classList.toggle('active',n.length>2&&p.length>=9&&e.includes('@'));}
 async function wyslij(){
-  if(!document.getElementById('subBtn').classList.contains('active'))return;
+  val();
   const s=document.getElementById('res-status'),btn=document.getElementById('subBtn');
+  const name=document.getElementById('res-name').value.trim();
+  const phone=document.getElementById('res-phone').value.trim();
+  const email=document.getElementById('res-email').value.trim();
+  if(name.length<=2||phone.length<9||!email.includes('@')){s.innerText='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
   s.innerText='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
-  const payload={typ:'rezerwacja-terminy',imie_nazwisko:document.getElementById('res-name').value.trim(),telefon:document.getElementById('res-phone').value.trim(),email:document.getElementById('res-email').value.trim(),tresc:document.getElementById('res-msg').value.trim(),data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
+  const payload={typ:'rezerwacja-terminy',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('res-msg').value.trim(),data:new Date().toLocaleString('pl-PL'),owner_email:OWNER_EMAIL};
   try{
     const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const text=await r.text();

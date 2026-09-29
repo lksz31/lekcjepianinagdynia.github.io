@@ -40,8 +40,10 @@ async function wyslijModal(){
   };
   try{
     const ctrl=new AbortController();const tid=setTimeout(()=>ctrl.abort(),8000);
-    await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctrl.signal});
+    const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctrl.signal});
     clearTimeout(tid);
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
     s.textContent='✅ Wysłano!';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
     setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
   }catch(e){
