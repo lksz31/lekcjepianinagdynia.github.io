@@ -808,7 +808,9 @@ async function wyslijModal(){
     data:new Date().toLocaleString('pl-PL')
   };
   try{
-    await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const r=await fetch('https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
     s.textContent='✅ Wysłano! Sprawdź email.';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
     setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
   }catch(e){

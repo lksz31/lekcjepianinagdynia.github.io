@@ -1413,14 +1413,18 @@ function val(){
   btn.classList.toggle('active',ok2);btn.style.cursor=ok2?'pointer':'not-allowed';
 }
 async function wyslij(){
-  if(!document.getElementById('subBtn').classList.contains('active'))return;
+  val();
   const s=document.getElementById('res-status');const btn=document.getElementById('subBtn');
+  const nameVal=document.getElementById('res-name').value.trim();
+  const phoneVal=document.getElementById('res-phone').value.trim();
+  const emailVal=document.getElementById('res-email').value.trim();
+  if(nameVal.length<=2||phoneVal.length<9||!emailVal.includes('@')){s.textContent='⚠️ Wypełnij imię, telefon i email.';s.style.color='#ef4444';return;}
   s.textContent='⏳ Wysyłanie...';s.style.color='var(--navy)';btn.disabled=true;btn.classList.remove('active');
   const payload={
     typ:'rezerwacja-fiszki',
-    imie_nazwisko:document.getElementById('res-name').value.trim(),
-    telefon:document.getElementById('res-phone').value.trim(),
-    email:document.getElementById('res-email').value.trim(),
+    imie_nazwisko:nameVal,
+    telefon:phoneVal,
+    email:emailVal,
     tresc:document.getElementById('res-msg').value.trim(),
     miejsce:isStudio?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',
     pianino:isStudio?'—':(hasPiano?'Tak':'Nie — dowóz instrumentu'),
@@ -1455,7 +1459,9 @@ async function wyslijModal(){
   submitBtn.disabled=true;submitBtn.textContent='Wysyłanie...';s.textContent='';
   const payload={typ:'lekcja-probna-fiszki',imie_nazwisko:name,telefon:phone,email:email,tresc:document.getElementById('m-msg').value.trim(),miejsce:mLoc==='s'?'Studio — Gdynia Mały Kack':'U ucznia — dojazd',pianino:mLoc==='s'?'—':(mPiano?'Tak':'Nie — dowóz instrumentu'),cena:(mLoc==='u'&&!mPiano?119:99)+' zł/h',data:new Date().toLocaleString('pl-PL')};
   try{
-    await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const text=await r.text();
+    if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
     s.textContent='✅ Wysłano!';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
     setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
   }catch(e){s.textContent='❌ Błąd. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.textContent='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
