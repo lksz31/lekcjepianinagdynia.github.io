@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/index/grafiki-index/favicon-48.png" type="image/png" sizes="48x48">
+<link rel="icon" href="/index/grafiki-index/favicon-96.png" type="image/png" sizes="96x96">
+<link rel="apple-touch-icon" href="/index/grafiki-index/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief No. 7 – Fortepian | Skąd się wzięło pianino?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#d4af37;--gold-light:#f0d060;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+  .site-header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.93);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 5%;}
+  .header-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 0;gap:1rem;}
+  .header-left{display:flex;align-items:center;gap:14px;}
+  .logo-img{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 4px 12px rgba(30,58,138,0.15);}
+  .series-label{font-size:0.65rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1px;}
+  .series-title{font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:600;color:var(--navy);}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:white;padding:8px 18px;border-radius:50px;font-size:0.78rem;font-weight:700;text-decoration:none;transition:0.25s;white-space:nowrap;flex-shrink:0;}
+  .back-btn:hover{background:var(--gold);transform:translateY(-1px);}
+  .back-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  @media(max-width:500px){.back-btn span{display:none;}.back-btn{padding:8px 12px;}}
+  .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,8px);z-index:1000;box-shadow:0 -5px 20px rgba(0,0,0,0.08);}
+  .mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;}
+  .mobile-nav a{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:#94a3b8;font-size:0.57rem;font-weight:600;gap:3px;transition:0.2s;flex:1;max-width:72px;}
+  .mobile-nav a .mn-icon{font-size:1.15rem;}
+  .mobile-nav a:hover,.mobile-nav a.mn-home{color:var(--navy);}
+  .mobile-nav a.mn-cta{background:var(--navy);color:white!important;padding:7px 10px;border-radius:50px;flex-direction:row;gap:4px;font-size:0.65rem;max-width:none;flex:none;}
+  .mobile-nav a.mn-cta:hover{background:var(--gold);}
+  @media(max-width:700px){.mobile-nav{display:block;}body{padding-bottom:68px;}}
+  .hero{background:var(--navy);padding:60px 5% 55px;position:relative;overflow:hidden;}
+  .hero::before{content:'\266A';position:absolute;font-size:22rem;font-family:serif;color:rgba(255,255,255,0.03);top:-60px;right:-40px;pointer-events:none;line-height:1;}
+  .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(to right,var(--gold),var(--gold-light),var(--gold));}
+  .hero-inner{max-width:960px;margin:0 auto;position:relative;z-index:1;}
+  .brief-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.1s;}
+  .brief-badge-line{width:32px;height:2px;background:var(--gold);flex-shrink:0;}
+  .brief-badge-text{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold);}
+  .hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,5vw,3.4rem);color:white;line-height:1.15;margin-bottom:18px;opacity:0;animation:fadeUp 0.7s ease forwards 0.25s;}
+  .hero h1 em{font-style:italic;color:var(--gold);}
+  .hero-lead{font-size:clamp(0.88rem,2vw,1.05rem);color:rgba(255,255,255,0.6);max-width:560px;line-height:1.7;font-weight:300;padding-left:18px;border-left:3px solid var(--gold);opacity:0;animation:fadeUp 0.7s ease forwards 0.4s;}
+  .article-wrap{max-width:960px;margin:0 auto;padding:44px 5% 50px;}
+  .article-card{background:white;border-radius:28px;border:1px solid var(--border);box-shadow:0 4px 28px rgba(0,0,0,0.07);padding:50px 58px;opacity:0;transform:translateY(24px);transition:opacity 0.8s cubic-bezier(0.2,0.8,0.2,1),transform 0.8s cubic-bezier(0.2,0.8,0.2,1);}
+  .article-card.visible{opacity:1;transform:translateY(0);}
+  @media(max-width:700px){.article-card{padding:26px 22px;}}
+  .article-card .art-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:14px;display:block;}
+  .article-card h2{font-family:'Playfair Display',serif;font-size:clamp(1.45rem,3vw,2rem);color:var(--navy);margin-bottom:26px;line-height:1.2;}
+  .article-card p{font-size:1rem;line-height:1.9;color:var(--text);margin-bottom:20px;text-align:justify;hyphens:auto;}
+  .article-card p:last-child{margin-bottom:0;}
+  .article-card strong{color:var(--navy);font-weight:600;}
+  .clearfix::after{content:'';display:table;clear:both;}
+  .article-card h3{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--navy);margin:32px 0 14px;padding-left:16px;border-left:3px solid var(--gold);clear:both;}
+  .blockquote{margin:28px 0;padding:16px 24px;border-left:4px solid var(--navy);background:#f0f4ff;border-radius:0 12px 12px 0;clear:both;}
+  .blockquote p{font-family:'Playfair Display',serif!important;font-style:italic;color:var(--navy)!important;font-size:1.05rem!important;line-height:1.65!important;margin:0!important;text-align:left!important;}
+  .compare-table{width:100%;border-collapse:collapse;margin:24px 0;clear:both;}
+  .compare-table th{background:var(--navy);color:white;padding:10px 14px;font-size:0.8rem;font-weight:600;text-align:left;}
+  .compare-table td{padding:9px 14px;font-size:0.85rem;border-bottom:1px solid var(--border);}
+  .compare-table tr:nth-child(even) td{background:#f8fafc;}
+  .compare-table td:first-child{font-weight:700;color:var(--navy);}
+  .video-link{display:flex;align-items:center;gap:14px;margin:20px 0;padding:14px 18px;background:#f8fafc;border:1px solid var(--border);border-radius:14px;text-decoration:none;transition:0.2s;clear:both;}
+  .video-link:hover{border-color:var(--navy);background:#f0f4ff;}
+  .video-link-icon{width:40px;height:40px;border-radius:50%;background:#ff0000;color:white;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+  .video-link-text{font-size:0.9rem;color:var(--navy);font-weight:600;line-height:1.4;display:flex;flex-direction:column;}
+  .video-link-sub{font-size:0.75rem;color:var(--text-mid);font-weight:400;margin-top:2px;}
+  .tags-section{margin-top:36px;padding-top:26px;border-top:1px solid var(--border);clear:both;}
+  .tags-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .tags-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{border:1.5px solid var(--navy);color:var(--navy);padding:5px 16px;border-radius:50px;font-size:0.75rem;font-weight:600;transition:0.2s;cursor:default;}
+  .tag:hover{background:var(--navy);color:white;}
+  .sources-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .sources-inner{background:#f8fafc;border-radius:20px;border:1px solid var(--border);padding:24px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.1s,transform 0.7s 0.1s;}
+  .sources-inner.visible{opacity:1;transform:translateY(0);}
+  .src-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .sources-inner ol{padding-left:18px;font-size:0.8rem;color:var(--text-mid);line-height:1.8;}
+  .sources-inner a{color:var(--navy);font-weight:500;}
+  .sources-inner a:hover{color:var(--gold);}
+  .cal-wrap{max-width:960px;margin:0 auto;padding:0 5% 50px;}
+  .cal-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:28px 32px;opacity:0;transform:translateY(16px);transition:opacity 0.7s 0.2s,transform 0.7s 0.2s;}
+  .cal-inner.visible{opacity:1;transform:translateY(0);}
+  .cal-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:12px;display:block;}
+  .cal-cta-btn{display:inline-block;background:var(--navy);color:#fff;padding:13px 28px;border-radius:50px;font-weight:700;font-size:0.85rem;text-decoration:none;transition:0.2s;}
+  .cal-cta-btn:hover{background:var(--gold);color:var(--navy);}
+  .site-footer-main{background:white;border-top:1px solid #e8eaee;padding:0 5%;font-family:'Poppins',sans-serif;margin-top:10px;}
+  .footer-main-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:3rem;padding:3rem 0 2.5rem;align-items:start;}
+  @media(max-width:900px){.footer-main-inner{grid-template-columns:1fr 1fr;gap:2rem;}}
+  @media(max-width:560px){.footer-main-inner{grid-template-columns:1fr;padding:2rem 0;}}
+  .footer-brand-row{display:flex;align-items:center;gap:12px;margin-bottom:1.2rem;}
+  .footer-logo-img{width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+  .footer-nm{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a1a22;}
+  .footer-tg{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8a8a9a;margin-top:2px;}
+  .footer-rl{height:2px;background:linear-gradient(to right,#1e3a8a 28px,#e0e3ea 28px);margin-bottom:1.1rem;}
+  .footer-contacts{display:flex;flex-direction:column;gap:7px;}
+  .footer-cr{display:flex;align-items:baseline;gap:14px;}
+  .footer-cl{font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#aaa;min-width:38px;}
+  .footer-cv{font-size:13px;color:var(--navy);text-decoration:none;}
+  .footer-cv:hover{color:var(--gold);}
+  .footer-ct{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#aaa;margin-bottom:0.75rem;}
+  .footer-lnks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
+  .footer-lnks a{font-size:13.5px;color:#3d3d4a;text-decoration:none;transition:color 0.2s;}
+  .footer-lnks a:hover{color:var(--navy);}
+  .footer-bot-inner{max-width:1100px;margin:0 auto;}
+  .footer-bot{border-top:1px solid #e8eaee;padding:0.85rem 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .footer-cop{font-size:11px;color:#c0c0cc;}
+  .footer-loc{font-size:12px;color:#aaa;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  .quiz-wrap{max-width:960px;margin:0 auto;padding:0 5% 40px;}
+  .quiz-inner{background:white;border-radius:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.06);padding:32px 40px;}
+  @media(max-width:700px){.quiz-inner{padding:22px 18px;}}
+  .quiz-label{font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--gold);margin-bottom:10px;display:block;}
+  .quiz-lead{font-size:0.88rem;color:var(--text-mid);margin-bottom:24px;line-height:1.6;}
+  .quiz-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+  .quiz-num{font-size:0.72rem;font-weight:700;color:var(--text-mid);white-space:nowrap;}
+  .quiz-bar{flex:1;height:5px;background:#e8eaee;border-radius:99px;overflow:hidden;}
+  .quiz-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width 0.4s ease;}
+  .quiz-question{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy);font-weight:600;line-height:1.45;margin-bottom:18px;}
+  .quiz-answers{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+  .quiz-btn{background:#f8fafc;border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-family:'Poppins',sans-serif;font-size:0.88rem;color:var(--text);text-align:left;cursor:pointer;transition:0.2s;line-height:1.4;}
+  .quiz-btn:hover:not(:disabled){border-color:var(--navy);background:#f0f4ff;color:var(--navy);}
+  .quiz-btn.correct{border-color:#16a34a;background:#f0fdf4;color:#15803d;font-weight:600;}
+  .quiz-btn.wrong{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
+  .quiz-btn:disabled{cursor:default;}
+  .quiz-explain{font-size:0.85rem;line-height:1.65;color:var(--text);background:#f8fafc;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid var(--gold);}
+  .quiz-next{background:var(--navy);color:white;border:none;padding:10px 22px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-next:hover{background:var(--gold);}
+  .quiz-score-box{text-align:center;padding:20px 0;}
+  .quiz-score-emoji{font-size:3rem;margin-bottom:10px;}
+  .quiz-score-num{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:700;color:var(--navy);}
+  .quiz-score-pct{font-size:1rem;color:var(--text-mid);margin-bottom:12px;}
+  .quiz-score-msg{font-size:0.95rem;color:var(--text);margin-bottom:22px;line-height:1.5;}
+  .quiz-retry{background:var(--navy);color:white;border:none;padding:10px 26px;border-radius:50px;font-family:'Poppins',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:0.2s;}
+  .quiz-retry:hover{background:var(--gold);}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <img class="logo-img" src="https://imgur.com/7HNwsrN.png" alt="Logo">
+      <div><div class="series-label">Seria</div><div class="series-title">Skąd się wzięło pianino?</div></div>
+    </div>
+    <a href="https://lekcjepianinagdynia.pl" class="back-btn">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Strona główna</span>
+    </a>
+  </div>
+</header>
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="/index.html"><span class="mn-icon">🏠</span>Główna</a>
+    <a href="/index.html#o-mnie"><span class="mn-icon">👤</span>O mnie</a>
+    <a href="/index.html#terminy" class="mn-cta">🎹 Kontakt</a>
+    <a href="/index/fiszki.html"><span class="mn-icon">🎼</span>Fiszki</a>
+    <a href="/index/podrecznik/podrecznik.html"><span class="mn-icon">📖</span>Podręcznik</a>
+  </div>
+</nav>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="brief-badge"><div class="brief-badge-line"></div><div class="brief-badge-text">Brief No. 7</div></div>
+    <h1>Skąd się wzięło pianino? cz. 3 –<br><em>Fortepian</em></h1>
+    <p class="hero-lead">Od dynamiki forte-piano, przez podwójne wyjście i struny krzyżowe, aż po fortepian preparowany Johna Cage'a — jak młoteczek pokonał klawesyn i otworzył drzwi do muzyki współczesnej.</p>
+  </div>
+</div>
+<div class="article-wrap">
+  <div class="article-card clearfix" id="article">
+    <span class="art-label">Klasycyzm · Romantyzm · Muzyka współczesna</span>
+    <h2>Fortepian — triumf dynamiki i mechanizmu młoteczkowego</h2>
+    <p>Fortepian jest instrumentem znacznie <strong>głośniejszym</strong> od klawesynu — stworzonym z myślą o salach koncertowych i grze z orkiestrą. Jednocześnie dysponuje on znacznie większą <strong>dynamiką</strong>: siła uderzenia w klawisz decyduje o tym, czy dźwięk będzie głośniejszy, czy cichszy — podobnie jak w klawikordzie. W klawikordzie związanym jednak kilka klawiszy grało na jednej, dzielonej strunie, przez co dźwięk był słabszy. Fortepian, dzięki osobnym strunom i mechanizmowi młoteczkowemu, pozwolił tę barierę przełamać.</p>
+    <h3>Forte, piano — skąd nazwa</h3>
+    <p>To właśnie od tej różnicy w dynamice — <strong>forte</strong> (głośno) i <strong>piano</strong> (cicho) — nowy instrument zyskał nazwę <strong>fortepiano</strong> (lub pianoforte). Wykorzystuje on mechanizm młoteczkowy i produkowany był w wielu wielkościach, w tym w wersji stojącej pionowo — czyli jako <strong>pianino</strong>.</p>
+    <h3>Podwójne wyjście — mechanizm, który pozwolił na legato</h3>
+    <p>Mechanizm młoteczkowy był z czasem udoskonalany, aby umożliwić szybsze powtarzanie tego samego dźwięku. Wcześniej, po naciśnięciu klawisza i uderzeniu młoteczka w struny, nie dało się zagrać tego samego dźwięku ponownie bez całkowitego puszczenia klawisza. Po wynalezieniu mechanizmu <strong>podwójnego wyjścia</strong> młoteczek po uderzeniu pozostawał blisko struny, gotowy do kolejnego uderzenia — co umożliwiło ścisłe łączenie dźwięków, czyli grę <strong>legato</strong>.</p>
+    <h3>Struny: układ krzyżowy i liczba strun na dźwięk</h3>
+    <p>Początkowo struny fortepianu miały układ prosty (równoległy). Z czasem wprowadzono układ <strong>krzyżowy</strong> — struny niższych rejestrów krzyżowały się ze strunami innych rejestrów, dzięki czemu cały instrument mógł być mniejszy. Zwiększono też liczbę strun przypadających na jeden dźwięk: pojedyncze dla rejestrów niskich, podwójne dla średnich i potrójne dla wysokich.</p>
+    <table class="compare-table">
+      <tr><th>Rejestr</th><th>Liczba strun na dźwięk</th></tr>
+      <tr><td>Niski (bas)</td><td>pojedyncze (dziś: podwójne, grubsze, obciągnięte drutem miedzianym)</td></tr>
+      <tr><td>Średni</td><td>podwójne</td></tr>
+      <tr><td>Wysoki</td><td>potrójne (nieobciągnięte drutem)</td></tr>
+    </table>
+    <p>Dziś struny basowe są podwójne, grubsze i obciągnięte drutem miedzianym, natomiast pozostałe — zazwyczaj potrójne — nie są obciągane drutem. Niższe rejestry wciąż przechodzą krzyżowo nad wyższymi.</p>
+    <h3>Tłumiki i pedały</h3>
+    <p>Struny tłumione były początkowo w sposób prymitywny — pręty z tłumikami umieszczone od dołu można było unosić kolanem lub stopą (pedałem). W późniejszych konstrukcjach zastosowano tłumiki działające od góry.</p>
+    <h3>Ciekawostki: fortepiany nietypowe i struny alikwotowe</h3>
+    <p>Wśród historycznych i eksperymentalnych konstrukcji zdarzały się fortepiany z wieloma klawiaturami (nawet sześcioma), z klawiaturami łukowymi, a także z systemem <strong>alikwotowym</strong>. W tym ostatnim, ponad strunami uderzanymi przez młoteczki, znajdują się dodatkowe struny naciągnięte o oktawę wyżej, w które młoteczek nigdy nie uderza. Uderzony dźwięk składa się głównie z tonu podstawowego, ale też z cichszych, wyższych składowych — <strong>alikwotów</strong>. Ich wibracja może poruszyć nieuderzone struny stroju alikwotowego, wzbogacając barwę instrumentu.</p>
+    <h3>Fortepian XX wieku: muzyka eksperymentalna</h3>
+    <p>We współczesnej muzyce — np. u Johna Cage'a — stosuje się techniki gry na fortepianie zarówno z udziałem klawiatury, jak i bez niej. Gra z udziałem klawiatury, przy jednoczesnej ingerencji w struny, to tzw. <strong>fortepian preparowany</strong> — pomiędzy struny wkłada się gumki oraz inne, brzęczące przedmioty, zmieniając barwę poszczególnych dźwięków.</p>
+    <a class="video-link" href="https://www.youtube.com/watch?v=2CDKwtnsLGU" target="_blank" rel="noopener">
+      <span class="video-link-icon">▶</span>
+      <span class="video-link-text">Fortepian preparowany — nagranie<span class="video-link-sub">youtube.com/watch?v=2CDKwtnsLGU</span></span>
+    </a>
+    <p>Inną techniką jest naciskanie całych obszarów klawiatury jednocześnie — tzw. <strong>klastery</strong>. Do ich wykonania może służyć przedramię, dłoń, a nawet specjalne drewniane listwy o różnych długościach, jak w <em>Grach weneckich</em> Witolda Lutosławskiego.</p>
+    <a class="video-link" href="https://www.youtube.com/watch?v=zKXvBiP9dYU" target="_blank" rel="noopener">
+      <span class="video-link-icon">▶</span>
+      <span class="video-link-text">Witold Lutosławski, <em>Gry weneckie</em> — klastery dźwiękowe<span class="video-link-sub">youtube.com/watch?v=zKXvBiP9dYU</span></span>
+    </a>
+    <div class="tags-section">
+      <span class="tags-label">Pojęcia kluczowe</span>
+      <div class="tags-wrap">
+        <span class="tag">Fortepian / pianoforte</span>
+        <span class="tag">Pianino</span>
+        <span class="tag">Mechanizm młoteczkowy</span>
+        <span class="tag">Podwójne wyjście</span>
+        <span class="tag">Legato</span>
+        <span class="tag">Układ krzyżowy strun</span>
+        <span class="tag">Struny alikwotowe</span>
+        <span class="tag">Fortepian preparowany</span>
+        <span class="tag">Klastery</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="quiz-wrap">
+  <div class="quiz-inner">
+    <span class="quiz-label">🎵 Sprawdź się — krótki quiz</span>
+    <p class="quiz-lead">Kilka pytań z treści briefa. Kliknij odpowiedź i sprawdź, ile zapamiętałeś!</p>
+    <div id="quiz-container"></div>
+    <div id="quiz-result" style="display:none;"></div>
+  </div>
+</div>
+<div class="sources-wrap">
+  <div class="sources-inner" id="src">
+    <span class="src-label">Źródła</span>
+    <ol>
+      <li>Kazimierz Sikorski, <em>Instrumentoznawstwo</em>, wyd. III (Kraków: Polskie Wydawnictwo Muzyczne, 1975).</li>
+      <li>Fortepian preparowany — nagranie wideo: <a href="https://www.youtube.com/watch?v=2CDKwtnsLGU" target="_blank">youtube.com/watch?v=2CDKwtnsLGU</a>.</li>
+      <li>Witold Lutosławski, <em>Gry weneckie</em> — nagranie wideo: <a href="https://www.youtube.com/watch?v=zKXvBiP9dYU" target="_blank">youtube.com/watch?v=zKXvBiP9dYU</a>.</li>
+    </ol>
+  </div>
+</div>
+<div class="cal-wrap">
+  <div class="cal-inner" id="cal">
+    <span class="cal-label">📅 Wolne terminy zajęć</span>
+    <p style="margin:0 0 18px;color:var(--text-mid);font-size:0.92rem;line-height:1.6;">Sprawdź aktualne wolne terminy i umów lekcję na stronie głównej.</p>
+    <a href="/index.html#terminy" class="cal-cta-btn">Zobacz wolne terminy</a>
+  </div>
+</div>
+<footer class="site-footer-main">
+  <div class="footer-main-inner">
+    <div>
+      <div class="footer-brand-row">
+        <img src="https://imgur.com/7HNwsrN.png" alt="Logo" class="footer-logo-img">
+        <div><div class="footer-nm">Łukasz Ganczarek</div><div class="footer-tg">Nauka gry na pianinie</div></div>
+      </div>
+      <div class="footer-rl"></div>
+      <div class="footer-contacts">
+        <div class="footer-cr"><span class="footer-cl">Tel</span><a href="tel:514338875" class="footer-cv">514 338 875</a></div>
+        <div class="footer-cr"><span class="footer-cl">Email</span><a href="mailto:lukaszgkorepetycje@gmail.com" class="footer-cv">lukaszgkorepetycje@gmail.com</a></div>
+        <div class="footer-cr"><span class="footer-cl">WWW</span><a href="https://lekcjepianinagdynia.pl" class="footer-cv">lekcjepianinagdynia.pl</a></div>
+      </div>
+    </div>
+    <div>
+      <div class="footer-ct">Nawigacja</div>
+      <ul class="footer-lnks">
+        <li><a href="/index.html">Strona główna</a></li>
+        <li><a href="/index.html#kontakt">Dla ucznia</a></li>
+        <li><a href="/index.html#terminy">Wolne terminy</a></li>
+        <li><a href="/index.html#kontakt">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-ct">Strona główna</div>
+      <ul class="footer-lnks">
+        <li><a href="https://buki.org.pl/user-123621/" target="_blank">Profil Buki.org</a></li>
+        <li><a href="https://www.superprof.pl/lekcje-pianina-60min-99zl-podstaw-srednioozawansowanych-umow-mna-lekcje-514-338-875.html" target="_blank">Profil Superprof</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bot-inner">
+    <div class="footer-bot">
+      <span class="footer-loc">♪ Gdynia · online</span>
+      <span class="footer-cop">© 2026 Łukasz Ganczarek. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </div>
+</footer>
+<script>
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08});
+['article','src','cal'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+const questions = [
+  {
+    q: "Skąd wzięła się nazwa „fortepiano”?",
+    answers: [
+      "Od nazwiska wynalazcy, Bartolomeo Forte",
+      "Od zdolności do gry dynamicznej: forte (głośno) i piano (cicho)",
+      "Od włoskiego miasta Forte, gdzie powstał pierwszy egzemplarz",
+      "Od liczby pedałów w instrumencie"
+    ],
+    correct: 1,
+    explain: "Nazwa pochodzi od dynamicznych możliwości instrumentu — forte (głośno) i piano (cicho). W przeciwieństwie do klawesynu, siła uderzenia w klawisz fortepianu bezpośrednio wpływała na głośność dźwięku."
+  },
+  {
+    q: "Co umożliwił wynalazek podwójnego wyjścia?",
+    answers: [
+      "Granie dwóch dźwięków jednym klawiszem",
+      "Szybkie powtarzanie tego samego dźwięku i grę legato, bez konieczności całkowitego puszczania klawisza",
+      "Automatyczne strojenie instrumentu",
+      "Zmianę barwy dźwięku za pomocą pedału"
+    ],
+    correct: 1,
+    explain: "Wcześniej, po uderzeniu młoteczka w strunę, trzeba było całkowicie puścić klawisz, by zagrać ten sam dźwięk ponownie. Podwójne wyjście sprawiało, że młoteczek po uderzeniu zostawał blisko struny, co pozwalało na szybkie powtórzenia i ścisłe łączenie dźwięków (legato)."
+  },
+  {
+    q: "Na czym polega krzyżowy układ strun w fortepianie?",
+    answers: [
+      "Struny są splecione ze sobą fizycznie, jak warkocz",
+      "Struny niższych rejestrów krzyżują się ze strunami innych rejestrów, co pozwala zmniejszyć instrument",
+      "Klawisze są ułożone na krzyż zamiast w linii prostej",
+      "To technika strojenia, polegająca na krzyżowaniu dźwięków sąsiednich oktaw"
+    ],
+    correct: 1,
+    explain: "W układzie krzyżowym struny niższych rejestrów przechodzą (krzyżują się) nad strunami innych rejestrów. Dzięki temu cały instrument mógł zostać zbudowany w mniejszych gabarytach niż przy układzie prostym (równoległym)."
+  },
+  {
+    q: "Ile strun przypada dziś zwykle na dźwięk w rejestrze wysokim fortepianu?",
+    answers: [
+      "Jedna, cienka struna",
+      "Dwie, grube struny obciągnięte drutem miedzianym",
+      "Trzy struny, nieobciągnięte drutem",
+      "Cztery struny, splecione razem"
+    ],
+    correct: 2,
+    explain: "Rejestr wysoki ma zwykle trzy (potrójne) struny na dźwięk, nieobciągnięte drutem. Struny basowe są natomiast podwójne, grubsze i obciągnięte drutem miedzianym."
+  },
+  {
+    q: "Czym są struny alikwotowe w niektórych fortepianach?",
+    answers: [
+      "Strunami zastępującymi młoteczki",
+      "Dodatkowymi strunami nastrojonymi o oktawę wyżej, w które młoteczek nie uderza, lecz które wibrują pod wpływem alikwotów dźwięku uderzonego",
+      "Strunami używanymi wyłącznie do strojenia instrumentu",
+      "Strunami sterowanymi osobnym, szóstym manuałem"
+    ],
+    correct: 1,
+    explain: "Ponad strunami uderzanymi przez młoteczki umieszczone są dodatkowe struny nastrojone o oktawę wyżej. Młoteczek nigdy w nie nie uderza — wibrują one same, pobudzone przez alikwoty (wyższe składowe) dźwięku, który został uderzony, wzbogacając barwę instrumentu."
+  },
+  {
+    q: "Czym jest fortepian preparowany?",
+    answers: [
+      "Fortepianem nastrojonym w stroju nierównym, jak dawny klawesyn",
+      "Fortepianem, w którego struny włożono gumki lub inne, brzęczące przedmioty, zmieniające barwę dźwięku",
+      "Fortepianem granym wyłącznie klasterami, bez użycia klawiatury",
+      "Fortepianem elektronicznym naśladującym brzmienie akustyczne"
+    ],
+    correct: 1,
+    explain: "Fortepian preparowany (technika stosowana m.in. przez Johna Cage'a) polega na umieszczeniu pomiędzy strunami gumek lub innych, brzęczących przedmiotów. Gra odbywa się nadal z udziałem klawiatury, ale uzyskana barwa dźwięku jest zupełnie inna niż w fortepianie niepreparowanym."
+  }
+];
+
+let current = 0, score = 0, answered = false;
+
+function renderQuestion() {
+  const c = document.getElementById('quiz-container');
+  const q = questions[current];
+  c.innerHTML = `
+    <div class="quiz-progress">
+      <span class="quiz-num">Pytanie ${current+1} / ${questions.length}</span>
+      <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(current/questions.length)*100}%"></div></div>
+    </div>
+    <div class="quiz-question">${q.q}</div>
+    <div class="quiz-answers">
+      ${q.answers.map((a,i)=>`<button class="quiz-btn" onclick="answer(${i})">${a}</button>`).join('')}
+    </div>
+    <div class="quiz-explain" id="quiz-explain" style="display:none;"></div>
+    <button class="quiz-next" id="quiz-next" style="display:none;" onclick="nextQ()">Następne pytanie →</button>
+  `;
+  answered = false;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.quiz-btn');
+  btns.forEach((b,i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    else if (i === idx && idx !== q.correct) b.classList.add('wrong');
+  });
+  if (idx === q.correct) score++;
+  const exp = document.getElementById('quiz-explain');
+  exp.style.display = 'block';
+  exp.innerHTML = (idx === q.correct ? '✅ ' : '❌ ') + q.explain;
+  const nx = document.getElementById('quiz-next');
+  nx.style.display = 'block';
+  nx.textContent = current < questions.length-1 ? 'Następne pytanie →' : 'Zobacz wynik 🎯';
+}
+
+function nextQ() {
+  current++;
+  if (current >= questions.length) { showResult(); } else { renderQuestion(); }
+}
+
+function showResult() {
+  document.getElementById('quiz-container').style.display = 'none';
+  const r = document.getElementById('quiz-result');
+  r.style.display = 'block';
+  const pct = Math.round((score/questions.length)*100);
+  let msg, emoji;
+  if (pct === 100) { msg = 'Perfekcja! John Cage byłby pod wrażeniem.'; emoji = '🏆'; }
+  else if (pct >= 66) { msg = 'Świetny wynik! Mechanizm młoteczkowy nie ma przed Tobą tajemnic.'; emoji = '🎹'; }
+  else if (pct >= 33) { msg = 'Nieźle, ale warto powtórzyć temat podwójnego wyjścia.'; emoji = '😅'; }
+  else { msg = 'Wróć do briefa — legato i klastery czekają na Twój powrót!'; emoji = '🎵'; }
+  r.innerHTML = `
+    <div class="quiz-score-box">
+      <div class="quiz-score-emoji">${emoji}</div>
+      <div class="quiz-score-num">${score} / ${questions.length}</div>
+      <div class="quiz-score-pct">${pct}%</div>
+      <div class="quiz-score-msg">${msg}</div>
+      <button class="quiz-retry" onclick="restartQuiz()">↺ Spróbuj jeszcze raz</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quiz-container').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuestion();
+}
+
+document.addEventListener('DOMContentLoaded', renderQuestion);
+</script>
+</body>
+</html>
