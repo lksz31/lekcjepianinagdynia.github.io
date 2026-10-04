@@ -6,7 +6,7 @@
 <link rel="icon" href="/index/grafiki-index/favicon-48.png" type="image/png" sizes="48x48">
 <link rel="icon" href="/index/grafiki-index/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/index/grafiki-index/apple-touch-icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Posprzątaj Łąkę Nutkami | Nauka Nut</title>
 <meta name="description" content="Posprzątaj Łąkę Nutkami — gra z serii Zagrajkowo, w której dziecko dopasowuje nutki do właściwych miejsc na pięciolinii. Darmowa gra edukacyjna dla najmłodszych uczniów pianina.">
 <link rel="canonical" href="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-dopasuj-nute.html">
@@ -342,11 +342,25 @@ function syncLetterTargetSizes(){
 }
 window.addEventListener('resize', syncLetterTargetSizes);
 
+/* ══ Dźwięki (Web Audio) — jeden wspólny AudioContext dla wszystkiego.
+   Wcześniej każde wywołanie tworzyło NOWY AudioContext, a przeglądarki
+   (zwłaszcza Chrome/Safari) ograniczają liczbę jednocześnie żywych
+   kontekstów i usypiają nieużywane — po kilku dźwiękach kolejne konteksty
+   zostawały "suspended" i dźwięk milknął bez błędu w konsoli. ══ */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new Ctx();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
 /* ══ Dźwięk błędu ══ */
 function playErrorBeep(){
   try{
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new Ctx();
+    const ctx = getAudioCtx();
     const now = ctx.currentTime;
     function tone(freq, start, dur){
       const osc = ctx.createOscillator(), gain = ctx.createGain();
@@ -366,8 +380,7 @@ function playErrorBeep(){
 /* ══ Dźwięk poprawnej odpowiedzi — dzwoneczki jak przy gwiazdkach ══ */
 function playSuccessChime(){
   try{
-    const Ctx = window.AudioContext || window.webkitAudioContext;
-    const ctx = new Ctx();
+    const ctx = getAudioCtx();
     const now = ctx.currentTime;
     function tone(freq, start, dur, vol){
       const osc = ctx.createOscillator(), gain = ctx.createGain();
