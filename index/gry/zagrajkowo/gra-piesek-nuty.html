@@ -6,7 +6,7 @@
 <link rel="icon" href="/index/grafiki-index/favicon-48.png" type="image/png" sizes="48x48">
 <link rel="icon" href="/index/grafiki-index/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/index/grafiki-index/apple-touch-icon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Piesek i Nuty | Zagrajkowo</title>
 <meta name="description" content="Piesek i Nuty — gra z serii Zagrajkowo, w której dziecko pomaga pieskowi odnajdywać właściwe nuty. Darmowa gra edukacyjna dla najmłodszych uczniów pianina.">
 <link rel="canonical" href="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-piesek-nuty.html">
@@ -319,11 +319,40 @@ function positionDog(){
 }
 function setDogFrame(n){ const img = document.getElementById('dogImg'); if(img) img.src = DOG_DIR+'pies-skok-'+n+'.webp'; }
 
+/* ══ Dźwięk skoku pieska (Web Audio) — jeden wspólny AudioContext,
+   żeby nie wyczerpać limitu kontekstów przeglądarki przy wielu skokach
+   z rzędu (ten sam problem naprawiony w gra-dopasuj-nute.html). ══ */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new Ctx();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playHopSound(){
+  try{
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(440, now+0.09);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.18, now+0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now+0.14);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now+0.16);
+  }catch(e){}
+}
+
 function animateDogHop(onDone){
   const marker = document.getElementById('dogMarker');
   if(!marker){ if(onDone) onDone(); return; }
   const target = computeDogPos();
   setDogFrame(1);
+  playHopSound();
   marker.classList.add('hopping');
   setTimeout(()=>{ setDogFrame(2); marker.style.left=target.left+'%'; marker.style.top=target.top+'%'; }, 90);
   setTimeout(()=> setDogFrame(3), 320);
