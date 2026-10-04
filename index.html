@@ -1767,7 +1767,10 @@ async function fetchEventLocationsForRange(rangeStart, rangeEnd){
       const data = await res.json();
       (data.items||[]).forEach(ev=>{
         if(!ev.start || !ev.start.dateTime || !ev.end || !ev.end.dateTime) return; /* pomijamy wydarzenia całodniowe */
-        const key = ev.start.dateTime+'|'+ev.end.dateTime;
+        /* Normalizujemy do UTC ISO, bo events.list zwraca dateTime z przesunięciem
+           strefy wydarzenia (np. "+02:00"), a freeBusy — zawsze w UTC ("Z"); bez
+           tego klucze nigdy by się nie zgadzały i atTeacher byłby zawsze nieznany. */
+        const key = new Date(ev.start.dateTime).toISOString()+'|'+new Date(ev.end.dateTime).toISOString();
         map.set(key, ev.location || '');
       });
     }catch(err){
@@ -1814,8 +1817,8 @@ function isCandidateValid(start, end, mode, windows, busy){
 
 /* Zwraca zbiór trybów ('mnie'/'uczen') faktycznie możliwych do zarezerwowania
    o dokładnej godzinie:minucie — sprawdzając realny bufor wobec zajętości,
-   nie tylko strukturę okien. Dzięki temu sloty mogą zaczynać się co 30 min,
-   a nie tylko pełną godzinę. */
+   nie tylko strukturę okien. Dzięki temu sloty mogą zaczynać się co 5 min,
+   a nie tylko o pełnej lub połowie godziny. */
 function candidateModesAt(dayDate, hour, minute, windows, busy){
   const start = new Date(dayDate); start.setHours(hour, minute, 0, 0);
   const modes = new Set();
@@ -1849,14 +1852,14 @@ function computeDayState(dayDate){
   const rangeStart = Math.min.apply(null, windows.map(w=>w.start));
   const rangeEnd = Math.max.apply(null, windows.map(w=>w.end));
 
-  /* Kandydaci co 30 minut (nie tylko pełne godziny) — jeśli coś koliduje,
-     następny możliwy start liczony jest 30 min dalej, o ile mieści się
-     wymagany odstęp (5 min, gdy obie lekcje są potwierdzone u nauczyciela;
-     w pozostałych przypadkach — w tym gdy lokalizacji sąsiedniej lekcji nie
-     da się ustalić — 30 min) przed kolejnym
-     wydarzeniem. */
+  /* Kandydaci co 5 minut (nie tylko pełne/połówkowe godziny) — najmniejsza
+     jednostka używana w buforach (5 min u nauczyciela). Dzięki temu grafik
+     jest maksymalnie wypełniony: żaden realnie wolny start (np. 10:05 po
+     5-minutowej przerwie od poprzedniej lekcji u nauczyciela, albo 10:30
+     odcięte wymaganym 30-minutowym odstępem w pozostałych przypadkach) nie
+     zostaje pominięty przez sztywną siatkę co 30 minut. */
   const candidates = [];
-  for(let totalMin=rangeStart*60; totalMin<rangeEnd*60; totalMin+=30){
+  for(let totalMin=rangeStart*60; totalMin<rangeEnd*60; totalMin+=5){
     const hour = Math.floor(totalMin/60), minute = totalMin%60;
     const start = new Date(dayDate); start.setHours(hour, minute, 0, 0);
     if(isToday && start <= now) continue;
