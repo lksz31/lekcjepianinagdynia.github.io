@@ -31,7 +31,7 @@
   "url": "https://lekcjepianinagdynia.pl/",
   "telephone": "+48514338875",
   "email": "lukaszgkorepetycje@gmail.com",
-  "priceRange": "119-139 PLN",
+  "priceRange": "119-138 PLN",
   "aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "5",
@@ -124,7 +124,7 @@
     {
       "@type": "Question",
       "name": "Ile kosztuje lekcja pianina w Gdyni?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem do ucznia bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525)." }
+      "acceptedAnswer": { "@type": "Answer", "text": "Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem do ucznia bez własnego pianina doliczana jest opłata za dowóz instrumentu (+19 zł/h za Roland GO:PIANO88PX lub +49 zł/h za Yamaha P-525)." }
     },
     {
       "@type": "Question",
@@ -680,13 +680,13 @@
   .slot-pill.selected svg circle,.slot-pill.selected svg path{stroke:#fff !important;}
   .no-slots{color:var(--text-mid);font-size:0.82rem;}
 
-  .range-picker{display:none;}
+  .range-picker{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
   .range-picker.show{display:block;}
-  .range-back{background:none;border:none;color:var(--navy);font-size:0.82rem;font-weight:700;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px;}
-  .range-back:hover{color:var(--gold);}
+  .range-back{background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-mid);font-size:0.82rem;font-weight:700;cursor:pointer;padding:9px 14px;}
+  .range-back:hover{color:var(--navy);border-color:var(--navy);}
   .range-picker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .range-picker-row input[type="time"]{padding:9px 12px;border-radius:10px;border:1px solid var(--border);font-size:0.9rem;font-weight:700;color:var(--navy);font-family:inherit;}
-  .range-picker-hint{color:var(--text-mid);font-size:0.78rem;margin:8px 0 14px;}
+  .range-picker-row select{padding:9px 12px;border-radius:10px;border:1px solid var(--border);font-size:0.9rem;font-weight:700;color:var(--navy);font-family:inherit;background:#fff;}
+  .range-picker-hint{color:var(--navy);font-size:0.82rem;font-weight:700;margin:0 0 10px;}
   .range-confirm-btn{padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--navy),#2d4fb0);color:#fff;font-weight:700;font-size:0.84rem;cursor:pointer;transition:0.2s;}
   .range-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(30,58,138,0.3);}
   .range-confirm-err{color:#dc2626;font-size:0.78rem;margin-top:8px;display:none;}
@@ -694,8 +694,8 @@
 
   .book-panel{margin-top:18px;padding:20px;border-radius:16px;background:var(--navy-solid);display:none;position:relative;}
   .book-panel.show{display:block;}
-  .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;margin:0 36px 4px 0;}
-  .book-when{color:rgba(255,255,255,0.65);font-size:0.78rem;margin-bottom:12px;}
+  .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.15rem;margin:0 36px 6px 0;}
+  .book-when{color:#fff;font-size:0.92rem;font-weight:700;margin-bottom:14px;}
   .mode-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;background:rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;}
   .mode-row input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--gold);cursor:pointer;}
   .mode-row input[type=checkbox]:disabled{cursor:not-allowed;opacity:0.5;}
@@ -741,6 +741,8 @@
   .close-book{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1;cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;padding:0;}
   .close-book:hover{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.4);transform:rotate(90deg);}
   .cw-piano-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+  .cw-duration-row{grid-template-columns:repeat(3,1fr);}
+  .cw-duration-row .cw-piano-tile{text-align:center;}
   .cw-piano-tile{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;transition:0.2s;font-size:0.78rem;color:rgba(255,255,255,0.85);}
   .cw-piano-tile b{display:block;font-size:0.82rem;color:#fff;}
   .cw-piano-tile.selected{border-color:var(--gold);background:rgba(212,175,55,0.16);}
@@ -937,12 +939,12 @@
         <div class="slots-heading" id="slotsHeading"></div>
         <div class="slots-grid" id="slotsGrid"></div>
         <div class="range-picker" id="rangePicker">
-          <button class="range-back" onclick="backToRanges()">← Wróć do przedziałów</button>
-          <div class="range-picker-row">
-            <input type="time" id="rangeTimeInput" step="300">
-            <button class="range-confirm-btn" onclick="confirmRangeTime()">Wybierz →</button>
-          </div>
           <div class="range-picker-hint" id="rangePickerHint"></div>
+          <div class="range-picker-row">
+            <select id="rangeTimeInput"></select>
+            <button class="range-confirm-btn" onclick="confirmRangeTime()">Wybierz →</button>
+            <button class="range-back" onclick="backToRanges()">Anuluj</button>
+          </div>
           <div class="range-confirm-err" id="rangeConfirmErr"></div>
         </div>
       </div>
@@ -958,6 +960,9 @@
 
           <div id="calModeArea"></div>
 
+          <p class="pd-instr-note">Długość lekcji:</p>
+          <div class="cw-piano-row cw-duration-row" id="calDurationRow"></div>
+
           <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
 
           <div id="calPianoArea" style="display:none;">
@@ -968,8 +973,8 @@
             <div id="calInstrumentArea" style="display:none;">
               <p class="pd-instr-note">Wybierz pianino, które ma zostać do Ciebie dostarczone:</p>
               <div class="cw-piano-row">
-                <div class="cw-piano-tile tile-silver selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>20 zł</div>
-                <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>60 zł</div>
+                <div class="cw-piano-tile tile-silver selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>19 zł</div>
+                <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>49 zł</div>
               </div>
             </div>
           </div>
@@ -1191,7 +1196,7 @@
     <div class="faq-list" id="faqList">
       <details class="faq-item" open>
         <summary><span class="faq-q"><span class="faq-icon-emoji">💰</span>Ile kosztuje lekcja pianina w Gdyni?</span></summary>
-        <div class="faq-answer">Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem bez własnego pianina doliczana jest opłata za dowóz instrumentu (+20 zł/h za Roland GO:PIANO88PX lub +60 zł/h za Yamaha P-525).</div>
+        <div class="faq-answer">Godzinna lekcja w studio w Gdyni (Mały Kack) kosztuje 119 zł. Przy zajęciach z dojazdem bez własnego pianina doliczana jest opłata za dowóz instrumentu (+19 zł/h za Roland GO:PIANO88PX lub +49 zł/h za Yamaha P-525).</div>
       </details>
       <details class="faq-item">
         <summary><span class="faq-q"><span class="faq-icon-emoji">🧒</span>Od jakiego wieku można zacząć naukę gry na pianinie?</span></summary>
@@ -1637,6 +1642,7 @@ const CALENDAR_IDS = [
 ];
 const TEACHER_ADDRESS = 'Lipnowska 17/2, Gdynia';
 const DAYS_AHEAD = 14;
+const LESSON_DURATIONS = [60, 90, 120]; /* minuty — cena skaluje się liniowo względem LESSON_BASE_PRICE/h */
 
 const MNIE_DURATION = 60;
 const BUFFER_SAME_TEACHER = 5;  /* obie lekcje (istniejąca i nowa) potwierdzone u nauczyciela */
@@ -2036,6 +2042,16 @@ function computeRanges(candidates){
 
 function hhmm(h,m){ return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
 
+/* Dodaje minuty do pary godzina/minuta (w obrębie doby). Używane do
+   pokazania skrajnej możliwej godziny ZAKOŃCZENIA lekcji w etykiecie
+   przedziału — endHour/endMinute w range to ostatni możliwy START
+   (bazowej, godzinnej lekcji), więc do wyświetlenia trzeba dodać
+   standardową długość lekcji. */
+function addMinutesToHM(h,m,delta){
+  const total = h*60+m+delta;
+  return {h:Math.floor(total/60)%24, m:total%60};
+}
+
 let calRanges = [];
 
 function selectCalDay(key){
@@ -2051,7 +2067,6 @@ function selectCalDay(key){
 
   document.getElementById('rangePicker').classList.remove('show');
   const grid = document.getElementById('slotsGrid');
-  grid.style.display = '';
   const candidates = state.candidates || [];
   calRanges = computeRanges(candidates);
   if(calRanges.length===0){
@@ -2060,58 +2075,76 @@ function selectCalDay(key){
     grid.innerHTML = calRanges.map((r,i)=>{
       const info = colorInfoForModes(r.modes);
       const isSingle = r.startHour===r.endHour && r.startMinute===r.endMinute;
-      const label = isSingle ? hhmm(r.startHour,r.startMinute) : hhmm(r.startHour,r.startMinute)+'–'+hhmm(r.endHour,r.endMinute);
-      return '<button class="slot-pill slot-pill-'+info.key+'" title="'+info.tooltip+'" onclick="'+(isSingle?'openCalBook(\''+key+'\','+r.startHour+','+r.startMinute+')':'pickCalRange('+i+')')+'"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
+      /* r.endHour/r.endMinute to ostatni możliwy START godzinnej lekcji —
+         do etykiety pokazujemy skrajną możliwą godzinę ZAKOŃCZENIA, czyli
+         ten start + standardowa długość lekcji (MNIE_DURATION). */
+      const lastEnd = addMinutesToHM(r.endHour, r.endMinute, MNIE_DURATION);
+      const label = hhmm(r.startHour,r.startMinute)+'–'+hhmm(lastEnd.h,lastEnd.m);
+      return '<button class="slot-pill slot-pill-'+info.key+'" data-range-i="'+i+'" title="'+info.tooltip+'" onclick="'+(isSingle?'openCalBook(\''+key+'\','+r.startHour+','+r.startMinute+')':'pickCalRange('+i+')')+'"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
     }).join('');
   }
   document.getElementById('detailPanel').classList.add('show');
   document.getElementById('calBookPanel').classList.remove('show');
 }
 
+/* Generuje listę rzeczywiście dostępnych godzin startu w danym przedziale
+   (co 5 minut) — w przeciwieniu do natywnego <input type="time">, który
+   pozwala przewijać/wpisać dowolną z 24 godzin niezależnie od min/max,
+   <select> pokazuje wyłącznie opcje faktycznie pasujące do przedziału. */
 function pickCalRange(rangeIndex){
   const r = calRanges[rangeIndex];
   if(!r) return;
-  document.getElementById('slotsGrid').style.display = 'none';
+
+  document.querySelectorAll('#slotsGrid .slot-pill').forEach(p=>p.classList.remove('selected'));
+  const clicked = document.querySelector('#slotsGrid .slot-pill[data-range-i="'+rangeIndex+'"]');
+  if(clicked) clicked.classList.add('selected');
+
+  /* Nowy wybór przedziału unieważnia wcześniej potwierdzoną (lub w trakcie
+     wypełniania) rezerwację z innego przedziału/dnia — ukrywamy ją, żeby
+     nie pokazywać sprzecznych, nieaktualnych danych obok nowego wyboru. */
+  document.getElementById('calBookPanel').classList.remove('show');
+
   const picker = document.getElementById('rangePicker');
   picker.classList.add('show');
-  picker.dataset.start = hhmm(r.startHour,r.startMinute);
-  picker.dataset.end = hhmm(r.endHour,r.endMinute);
-  const input = document.getElementById('rangeTimeInput');
-  input.min = picker.dataset.start;
-  input.max = picker.dataset.end;
-  input.value = picker.dataset.start;
-  document.getElementById('rangePickerHint').textContent =
-    'Dostępny przedział: '+picker.dataset.start+'–'+picker.dataset.end+'. Wybierz dokładną godzinę startu (co 5 minut).';
+  picker.dataset.rangeIndex = rangeIndex;
+
+  const select = document.getElementById('rangeTimeInput');
+  const options = [];
+  for(let t=r.startHour*60+r.startMinute; t<=r.endHour*60+r.endMinute; t+=5){
+    const h = Math.floor(t/60), mi = t%60;
+    options.push('<option value="'+h+':'+mi+'">'+hhmm(h,mi)+'</option>');
+  }
+  select.innerHTML = options.join('');
+
+  document.getElementById('rangePickerHint').textContent = 'Godzina startu:';
   document.getElementById('rangeConfirmErr').classList.remove('show');
+  picker.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function backToRanges(){
   document.getElementById('rangePicker').classList.remove('show');
-  document.getElementById('slotsGrid').style.display = '';
+  document.querySelectorAll('#slotsGrid .slot-pill').forEach(p=>p.classList.remove('selected'));
 }
 
 function confirmRangeTime(){
   const picker = document.getElementById('rangePicker');
-  const input = document.getElementById('rangeTimeInput');
+  const select = document.getElementById('rangeTimeInput');
   const err = document.getElementById('rangeConfirmErr');
-  const val = input.value;
+  const val = select.value;
   if(!val){
-    err.textContent = 'Podaj godzinę.';
+    err.textContent = 'Wybierz godzinę.';
     err.classList.add('show');
     return;
   }
   const [h,mi] = val.split(':').map(Number);
-  const totalMin = h*60+mi;
-  const [sh,sm] = picker.dataset.start.split(':').map(Number);
-  const [eh,em] = picker.dataset.end.split(':').map(Number);
-  const startMin = sh*60+sm, endMin = eh*60+em;
-  if(mi%5!==0 || totalMin<startMin || totalMin>endMin){
-    err.textContent = 'Wybierz godzinę w przedziale '+picker.dataset.start+'–'+picker.dataset.end+' (co 5 minut).';
-    err.classList.add('show');
-    return;
-  }
   err.classList.remove('show');
   openCalBook(selectedDateKey, h, mi);
+  /* openCalBook czyści zaznaczenie wszystkich .slot-pill (zakładając, że
+     kliknięto bezpośrednio pigułkę) — przywracamy podświetlenie przedziału,
+     z którego pochodzi ten wybór, żeby nie znikało po potwierdzeniu. */
+  const rangeIndex = picker.dataset.rangeIndex;
+  const pill = document.querySelector('#slotsGrid .slot-pill[data-range-i="'+rangeIndex+'"]');
+  if(pill) pill.classList.add('selected');
 }
 
 function openCalBook(key, hour, minute){
@@ -2133,6 +2166,7 @@ function openCalBook(key, hour, minute){
     duration: MNIE_DURATION
   };
   calResetPianoState();
+  calRenderDurationUI();
 
   const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
   document.getElementById('calBookWhen').textContent = label;
@@ -2185,24 +2219,30 @@ function calSetInstrument(type){
 function calDeliveryFee(){
   if(!bookCtx || bookCtx.mode!=='uczen') return 0;
   if(calPianoHas) return 0;
-  if(calInstrumentType==='premium') return 60;
-  return 20;
+  if(calInstrumentType==='premium') return 49;
+  return 19;
+}
+
+function calDurationLabel(mins){
+  return mins%60===0 ? (mins/60)+' godz.' : mins+' min';
 }
 
 function calUpdatePriceBox(){
   const box = document.getElementById('calPriceBox');
   if(!box) return;
-  const lessonBase = LESSON_BASE_PRICE;
+  const duration = (bookCtx && bookCtx.duration) || MNIE_DURATION;
+  const lessonBase = Math.round(LESSON_BASE_PRICE*duration/60*100)/100;
   const codeOk = document.getElementById('calPromo').value.trim().toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
   const total = lessonPrice + deliveryFee;
+  const durLabel = ' zł / '+calDurationLabel(duration);
   let html = '';
   if(codeOk){
-    html += '<span class="cw-price-old">'+(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+' zł / h</span>';
+    html += '<span class="cw-price-old">'+formatPLN(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+durLabel+'</span>';
     if(deliveryFee>0) html += '<div class="cw-price-note">Rabat nie obejmuje dowozu instrumentu ('+deliveryFee+' zł).</div>';
   }else{
-    html += '<span class="cw-price-plain">'+formatPLN(total)+' zł / h</span>';
+    html += '<span class="cw-price-plain">'+formatPLN(total)+durLabel+'</span>';
   }
   box.innerHTML = html;
 }
@@ -2210,15 +2250,34 @@ function calUpdatePriceBox(){
 function calOnModeToggle(){
   const checked = document.getElementById('calModeMnie').checked;
   bookCtx.mode = checked ? 'mnie' : 'uczen';
-  bookCtx.duration = MNIE_DURATION;
   calApplyModeToUI();
+  recalcCalBooking();
+}
+
+/* Buduje kafelki wyboru długości lekcji (60/90/120 min). Cena skaluje się
+   liniowo z LESSON_BASE_PRICE (np. 90 min = 1.5x stawki godzinowej). Zmiana
+   trybu (u nauczyciela / u ucznia) NIE resetuje już wybranej długości —
+   isCandidateValid w recalcCalBooking sam sprawdzi, czy dłuższa lekcja
+   nadal mieści się z zachowaniem bufora od sąsiednich zajęć. */
+function calRenderDurationUI(){
+  const row = document.getElementById('calDurationRow');
+  if(!row) return;
+  row.innerHTML = LESSON_DURATIONS.map(mins=>{
+    const label = mins%60===0 ? (mins/60)+' godz.' : mins+' min';
+    const sel = bookCtx.duration===mins ? ' selected' : '';
+    return '<button type="button" class="cw-piano-tile'+sel+'" onclick="calSetDuration('+mins+')">'+label+'</button>';
+  }).join('');
+}
+
+function calSetDuration(mins){
+  bookCtx.duration = mins;
+  calRenderDurationUI();
   recalcCalBooking();
 }
 
 function calApplyModeToUI(){
   const addrWrap = document.getElementById('calAddrWrap');
   const pianoArea = document.getElementById('calPianoArea');
-  bookCtx.duration = MNIE_DURATION;
   if(bookCtx.mode==='mnie'){
     addrWrap.style.display = 'none';
     pianoArea.style.display = 'none';
@@ -2289,13 +2348,14 @@ function calBuildSummary(){
   const promo = document.getElementById('calPromo').value.trim();
   const codeOk = promo.toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
-  const lessonBase = LESSON_BASE_PRICE;
+  const lessonBase = Math.round(LESSON_BASE_PRICE*bookCtx.duration/60*100)/100;
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
   const total = lessonPrice + deliveryFee;
 
   const row = (label, val) => '<div class="bs-row"><span>'+label+'</span><b>'+val+'</b></div>';
   let html = '';
   html += row('Termin', dateLabel+', godz. '+timeLabel);
+  html += row('Długość', calDurationLabel(bookCtx.duration));
   html += row('Miejsce', modeLabel);
   if(bookCtx.mode==='uczen'){
     const pianoLine = calPianoHas ? 'Masz własne pianino' : 'Dowóz: '+(calInstrumentType==='premium'?'Yamaha P-525':'Roland GO:PIANO88PX')+' ('+deliveryFee+' zł)';
@@ -2306,7 +2366,7 @@ function calBuildSummary(){
   html += row('Telefon', '+48 '+phoneDigits);
   html += row('Email', email);
   if(promo) html += row('Kod rabatowy', promo+(codeOk?' ✓':' (nieprawidłowy)'));
-  html += row('Cena', formatPLN(total)+' zł / h');
+  html += row('Cena', formatPLN(total)+' zł / '+calDurationLabel(bookCtx.duration));
   el.innerHTML = html;
 }
 
@@ -2379,18 +2439,18 @@ async function submitCalBooking(){
   const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
   const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
 
-  /* Cena: baza (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu */
-  const baseBefore = LESSON_BASE_PRICE;
+  /* Cena: baza skalowana długością lekcji (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu i bez skalowania */
+  const baseBefore = Math.round(LESSON_BASE_PRICE*bookCtx.duration/60*100)/100;
   const baseAfter = promoOk ? baseBefore*(1-PROMO_DISCOUNT) : baseBefore;
   const deliveryFee = calDeliveryFee();
   const totalPrice = baseAfter + deliveryFee;
-  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza '+baseBefore+' zł -60% rabat)' : baseBefore+' zł (cena bazowa)')
+  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza '+formatPLN(baseBefore)+' zł -60% rabat, '+calDurationLabel(bookCtx.duration)+')' : formatPLN(baseBefore)+' zł (cena bazowa, '+calDurationLabel(bookCtx.duration)+')')
     + (deliveryFee ? ' + '+deliveryFee+' zł (dowóz, bez rabatu)' : '');
 
   let pianoOpis = '—';
   if(bookCtx.mode==='uczen'){
     if(calPianoHas) pianoOpis = 'Tak';
-    else if(calInstrumentType==='premium') pianoOpis = 'Nie — dowóz: Yamaha P-525, 60 zł';
+    else if(calInstrumentType==='premium') pianoOpis = 'Nie — dowóz: Yamaha P-525, 49 zł';
     else pianoOpis = 'Nie — dowóz: Roland GO:PIANO88PX, '+deliveryFee+' zł';
   }
 
@@ -2401,7 +2461,7 @@ async function submitCalBooking(){
     email: email,
     miejsce: address,
     pianino: pianoOpis,
-    tresc: modeLabel+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
+    tresc: modeLabel+'\nDługość: '+calDurationLabel(bookCtx.duration)+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
     kod_rabatowy: promoCode,
     cena: formatPLN(totalPrice)+' zł łącznie — '+priceBreakdown,
     data_start: bookCtx.start.toISOString(),
