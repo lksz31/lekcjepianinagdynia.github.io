@@ -1617,9 +1617,9 @@ const TEACHER_ADDRESS = 'Lipnowska 17/2, Gdynia';
 const DAYS_AHEAD = 14;
 
 const MNIE_DURATION = 60;
-const MNIE_BUFFER = 5;
+const BUFFER_SAME_TEACHER = 5;  /* obie lekcje (istniejąca i nowa) potwierdzone u nauczyciela */
+const BUFFER_DEFAULT = 30;      /* nie da się potwierdzić lokalizacji sąsiedniej lekcji, lub któraś jest u ucznia */
 const UCZEN_DURATIONS = [60,75,90];
-const UCZEN_BUFFER = 25;
 
 const MONTH_NAMES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
 const WEEKDAY_FULL = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
@@ -1744,8 +1744,57 @@ async function fetchBusyForRange(rangeStart, rangeEnd){
   return intervals;
 }
 
+/* Próbuje dociągnąć lokalizację (location) wydarzeń w zadanym zakresie,
+   żeby rozpoznać, które zajęte terminy są "u nauczyciela" — tylko wtedy
+   można zastosować krótszy, 5-minutowy odstęp. Jeśli kalendarz ma
+   ukryte szczegóły (widoczne tylko zajęte/wolne) albo zapytanie się nie
+   powiedzie z jakiegokolwiek innego powodu, po prostu nic nie zwracamy —
+   wywołujący kod bezpiecznie potraktuje taki termin jako "nieznany"
+   i zastosuje domyślny, dłuższy odstęp.*/
+async function fetchEventLocationsForRange(rangeStart, rangeEnd){
+  const map = new Map();
+  for(const calId of CALENDAR_IDS){
+    try{
+      const url = 'https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(calId)+'/events'
+        + '?key='+CAL_API_KEY
+        + '&timeMin='+encodeURIComponent(rangeStart.toISOString())
+        + '&timeMax='+encodeURIComponent(rangeEnd.toISOString())
+        + '&singleEvents=true'
+        + '&fields='+encodeURIComponent('items(start,end,location)');
+      const res = await fetch(url);
+      if(!res.ok) continue;
+      const data = await res.json();
+      (data.items||[]).forEach(ev=>{
+        if(!ev.start || !ev.start.dateTime || !ev.end || !ev.end.dateTime) return; /* pomijamy wydarzenia całodniowe */
+        const key = ev.start.dateTime+'|'+ev.end.dateTime;
+        map.set(key, ev.location || '');
+      });
+    }catch(err){
+      /* brak lokalizacji dla tego kalendarza — zajęte terminy zostaną potraktowane jako nieznane */
+    }
+  }
+  return map;
+}
+
+/* Łączy listę zajętych przedziałów z informacją o lokalizacji: każdy
+   przedział dostaje atTeacher = true (potwierdzone u nauczyciela),
+   false (potwierdzone u ucznia / inny adres) albo null (nie da się
+   sprawdzić — np. kalendarz ukrywa szczegóły). */
+function annotateBusyWithLocation(intervals, locationMap){
+  return intervals.map(iv=>{
+    const key = iv.start.toISOString()+'|'+iv.end.toISOString();
+    if(!locationMap.has(key)) return {start:iv.start, end:iv.end, atTeacher:null};
+    const loc = (locationMap.get(key)||'').trim().toLowerCase();
+    const atTeacher = loc.length>0 && loc === TEACHER_ADDRESS.trim().toLowerCase();
+    return {start:iv.start, end:iv.end, atTeacher};
+  });
+}
+
+function bufferForCandidate(mode, atTeacher){
+  return (mode==='mnie' && atTeacher===true) ? BUFFER_SAME_TEACHER : BUFFER_DEFAULT;
+}
+
 function isCandidateValid(start, end, mode, windows, busy){
-  const buffer = mode==='mnie' ? MNIE_BUFFER : UCZEN_BUFFER;
   const fitsWindow = windows.some(w=>{
     const wStart = new Date(start); wStart.setHours(w.start,0,0,0);
     const wEnd = new Date(start); wEnd.setHours(w.end,0,0,0);
@@ -1754,6 +1803,7 @@ function isCandidateValid(start, end, mode, windows, busy){
   });
   if(!fitsWindow) return false;
   for(const iv of busy){
+    const buffer = bufferForCandidate(mode, iv.atTeacher);
     const bufStart = new Date(iv.start.getTime() - buffer*60000);
     const bufEnd = new Date(iv.end.getTime() + buffer*60000);
     if(start < bufEnd && end > bufStart) return false;
@@ -1800,7 +1850,9 @@ function computeDayState(dayDate){
 
   /* Kandydaci co 30 minut (nie tylko pełne godziny) — jeśli coś koliduje,
      następny możliwy start liczony jest 30 min dalej, o ile mieści się
-     wymagany odstęp (5 min u nauczyciela / 25 min u ucznia) przed kolejnym
+     wymagany odstęp (5 min, gdy obie lekcje są potwierdzone u nauczyciela;
+     w pozostałych przypadkach — w tym gdy lokalizacji sąsiedniej lekcji nie
+     da się ustalić — 30 min) przed kolejnym
      wydarzeniem. */
   const candidates = [];
   for(let totalMin=rangeStart*60; totalMin<rangeEnd*60; totalMin+=30){
@@ -1894,7 +1946,9 @@ async function renderCalDays(){
   rangeEnd.setHours(23,59,59);
 
   try{
-    busyIntervals = await fetchBusyForRange(rangeStart, rangeEnd);
+    const rawIntervals = await fetchBusyForRange(rangeStart, rangeEnd);
+    const locationMap = await fetchEventLocationsForRange(rangeStart, rangeEnd);
+    busyIntervals = annotateBusyWithLocation(rawIntervals, locationMap);
   }catch(err){
     body.innerHTML = '<div class="cal-error">Nie udało się pobrać kalendarza.<br>'+err.message+'</div>';
     return;
@@ -2163,9 +2217,7 @@ function recalcCalBooking(){
   const nextBtn = document.getElementById('calStep1NextBtn');
 
   if(!valid){
-    errEl.textContent = bookCtx.mode==='mnie'
-      ? 'Ta godzina nie mieści się z zachowaniem 5-minutowego odstępu od sąsiednich lekcji.'
-      : 'Ta godzina nie mieści się z zachowaniem 25-minutowego odstępu (czas na dojazd).';
+    errEl.textContent = 'Ta godzina nie mieści się z zachowaniem wymaganego odstępu od sąsiednich zajęć.';
     if(nextBtn) nextBtn.disabled = true;
     btn.disabled = true;
     return false;
