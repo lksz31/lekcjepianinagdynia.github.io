@@ -680,6 +680,18 @@
   .slot-pill.selected svg circle,.slot-pill.selected svg path{stroke:#fff !important;}
   .no-slots{color:var(--text-mid);font-size:0.82rem;}
 
+  .range-picker{display:none;}
+  .range-picker.show{display:block;}
+  .range-back{background:none;border:none;color:var(--navy);font-size:0.82rem;font-weight:700;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px;}
+  .range-back:hover{color:var(--gold);}
+  .range-picker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .range-picker-row input[type="time"]{padding:9px 12px;border-radius:10px;border:1px solid var(--border);font-size:0.9rem;font-weight:700;color:var(--navy);font-family:inherit;}
+  .range-picker-hint{color:var(--text-mid);font-size:0.78rem;margin:8px 0 14px;}
+  .range-confirm-btn{padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--navy),#2d4fb0);color:#fff;font-weight:700;font-size:0.84rem;cursor:pointer;transition:0.2s;}
+  .range-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(30,58,138,0.3);}
+  .range-confirm-err{color:#dc2626;font-size:0.78rem;margin-top:8px;display:none;}
+  .range-confirm-err.show{display:block;}
+
   .book-panel{margin-top:18px;padding:20px;border-radius:16px;background:var(--navy-solid);display:none;position:relative;}
   .book-panel.show{display:block;}
   .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;margin:0 36px 4px 0;}
@@ -924,6 +936,15 @@
       <div class="detail-panel" id="detailPanel">
         <div class="slots-heading" id="slotsHeading"></div>
         <div class="slots-grid" id="slotsGrid"></div>
+        <div class="range-picker" id="rangePicker">
+          <button class="range-back" onclick="backToRanges()">← Wróć do przedziałów</button>
+          <div class="range-picker-row">
+            <input type="time" id="rangeTimeInput" step="300">
+            <button class="range-confirm-btn" onclick="confirmRangeTime()">Wybierz →</button>
+          </div>
+          <div class="range-picker-hint" id="rangePickerHint"></div>
+          <div class="range-confirm-err" id="rangeConfirmErr"></div>
+        </div>
       </div>
 
       <div class="book-panel" id="calBookPanel">
@@ -1986,6 +2007,37 @@ async function renderCalDays(){
   body.innerHTML = html;
 }
 
+/* Grupuje kandydatów (co 5 min) w ciągłe przedziały czasu o tym samym
+   zestawie dostępnych trybów — zamiast pokazywać osobny przycisk na
+   każde 5 minut, pokazujemy jeden przedział (np. "09:00–10:25"), w
+   którym uczeń sam wybiera dokładną, pasującą mu godzinę startu. */
+function computeRanges(candidates){
+  const ranges = [];
+  let cur = null;
+  let prevTotalMin = null;
+  candidates.forEach(c=>{
+    const modeKey = Array.from(c.modes).sort().join(',');
+    const totalMin = c.hour*60+c.minute;
+    /* Łączymy w jeden przedział tylko gdy ten sam zestaw trybów I nie ma
+       przerwy względem poprzedniego kandydata (np. zajęta lekcja w środku
+       z takim samym trybem po obu stronach nie może stać się jednym
+       "ciągłym" przedziałem — to złamałoby walidację bufora). */
+    if(cur && cur.modeKey===modeKey && prevTotalMin!==null && totalMin-prevTotalMin===5){
+      cur.endHour = c.hour; cur.endMinute = c.minute;
+    }else{
+      if(cur) ranges.push(cur);
+      cur = {startHour:c.hour, startMinute:c.minute, endHour:c.hour, endMinute:c.minute, modes:c.modes, modeKey};
+    }
+    prevTotalMin = totalMin;
+  });
+  if(cur) ranges.push(cur);
+  return ranges;
+}
+
+function hhmm(h,m){ return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
+
+let calRanges = [];
+
 function selectCalDay(key){
   selectedDateKey = key;
   document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('selected'));
@@ -1995,21 +2047,71 @@ function selectCalDay(key){
   const [y,m,d] = key.split('-').map(Number);
   const dateObj = new Date(y,m-1,d);
   const label = WEEKDAY_FULL[dateObj.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y;
-  document.getElementById('slotsHeading').textContent = 'Wybierz godzinę — '+label;
+  document.getElementById('slotsHeading').textContent = 'Wybierz przedział — '+label;
 
+  document.getElementById('rangePicker').classList.remove('show');
   const grid = document.getElementById('slotsGrid');
+  grid.style.display = '';
   const candidates = state.candidates || [];
-  if(candidates.length===0){
+  calRanges = computeRanges(candidates);
+  if(calRanges.length===0){
     grid.innerHTML = '<span class="no-slots">Brak dostępnych godzin tego dnia.</span>';
   }else{
-    grid.innerHTML = candidates.map(c=>{
-      const label = String(c.hour).padStart(2,'0')+':'+String(c.minute).padStart(2,'0');
-      const info = colorInfoForModes(c.modes);
-      return '<button class="slot-pill slot-pill-'+info.key+'" title="'+info.tooltip+'" onclick="openCalBook(\''+key+'\','+c.hour+','+c.minute+')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
+    grid.innerHTML = calRanges.map((r,i)=>{
+      const info = colorInfoForModes(r.modes);
+      const isSingle = r.startHour===r.endHour && r.startMinute===r.endMinute;
+      const label = isSingle ? hhmm(r.startHour,r.startMinute) : hhmm(r.startHour,r.startMinute)+'–'+hhmm(r.endHour,r.endMinute);
+      return '<button class="slot-pill slot-pill-'+info.key+'" title="'+info.tooltip+'" onclick="'+(isSingle?'openCalBook(\''+key+'\','+r.startHour+','+r.startMinute+')':'pickCalRange('+i+')')+'"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
     }).join('');
   }
   document.getElementById('detailPanel').classList.add('show');
   document.getElementById('calBookPanel').classList.remove('show');
+}
+
+function pickCalRange(rangeIndex){
+  const r = calRanges[rangeIndex];
+  if(!r) return;
+  document.getElementById('slotsGrid').style.display = 'none';
+  const picker = document.getElementById('rangePicker');
+  picker.classList.add('show');
+  picker.dataset.start = hhmm(r.startHour,r.startMinute);
+  picker.dataset.end = hhmm(r.endHour,r.endMinute);
+  const input = document.getElementById('rangeTimeInput');
+  input.min = picker.dataset.start;
+  input.max = picker.dataset.end;
+  input.value = picker.dataset.start;
+  document.getElementById('rangePickerHint').textContent =
+    'Dostępny przedział: '+picker.dataset.start+'–'+picker.dataset.end+'. Wybierz dokładną godzinę startu (co 5 minut).';
+  document.getElementById('rangeConfirmErr').classList.remove('show');
+}
+
+function backToRanges(){
+  document.getElementById('rangePicker').classList.remove('show');
+  document.getElementById('slotsGrid').style.display = '';
+}
+
+function confirmRangeTime(){
+  const picker = document.getElementById('rangePicker');
+  const input = document.getElementById('rangeTimeInput');
+  const err = document.getElementById('rangeConfirmErr');
+  const val = input.value;
+  if(!val){
+    err.textContent = 'Podaj godzinę.';
+    err.classList.add('show');
+    return;
+  }
+  const [h,mi] = val.split(':').map(Number);
+  const totalMin = h*60+mi;
+  const [sh,sm] = picker.dataset.start.split(':').map(Number);
+  const [eh,em] = picker.dataset.end.split(':').map(Number);
+  const startMin = sh*60+sm, endMin = eh*60+em;
+  if(mi%5!==0 || totalMin<startMin || totalMin>endMin){
+    err.textContent = 'Wybierz godzinę w przedziale '+picker.dataset.start+'–'+picker.dataset.end+' (co 5 minut).';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+  openCalBook(selectedDateKey, h, mi);
 }
 
 function openCalBook(key, hour, minute){
@@ -2343,5 +2445,6 @@ initCalWidget();
 
 </script>
 
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6382ff89750343d58cd6eb36d9a66e95"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
