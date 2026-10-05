@@ -1702,22 +1702,28 @@ function getDayWindows(weekday){
   return [];
 }
 
-/* Stałe, zawsze zajęte okno w poniedziałki 15:00–18:00 — niezależnie od
-   tego, czy w kalendarzu Google jest tam realne wydarzenie. Dołączane do
-   busyIntervals tak samo jak prawdziwe wydarzenia, więc obowiązuje przy
-   nim ten sam bufor przed/po co przy każdej innej zajętości (lokalizacja
-   nieznana → domyślny, 30-minutowy odstęp). */
+/* Stałe, zawsze zajęte okna co tydzień — niezależnie od tego, czy w
+   kalendarzu Google jest tam realne wydarzenie. Dołączane do busyIntervals
+   tak samo jak prawdziwe wydarzenia, więc obowiązuje przy nich ten sam
+   bufor przed/po co przy każdej innej zajętości (lokalizacja nieznana →
+   domyślny, 30-minutowy odstęp). */
+const RECURRING_BLOCKS = [
+  {weekday:1, start:15, end:18}, /* poniedziałek 15:00–18:00 */
+  {weekday:3, start:8,  end:15}, /* środa od rana do 15:00 */
+];
 function getRecurringBlocks(rangeStart, rangeEnd){
   const blocks = [];
   const d = new Date(rangeStart);
   d.setHours(0,0,0,0);
   const end = new Date(rangeEnd);
   while(d <= end){
-    if(d.getDay() === 1){
-      const start = new Date(d); start.setHours(15,0,0,0);
-      const stop = new Date(d); stop.setHours(18,0,0,0);
-      blocks.push({start, end: stop, atTeacher: null});
-    }
+    RECURRING_BLOCKS.forEach(rb=>{
+      if(d.getDay() === rb.weekday){
+        const start = new Date(d); start.setHours(rb.start,0,0,0);
+        const stop = new Date(d); stop.setHours(rb.end,0,0,0);
+        blocks.push({start, end: stop, atTeacher: null});
+      }
+    });
     d.setDate(d.getDate()+1);
   }
   return blocks;
