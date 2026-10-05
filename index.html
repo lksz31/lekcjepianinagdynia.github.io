@@ -741,8 +741,6 @@
   .close-book{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);font-size:0.85rem;line-height:1;cursor:pointer;transition:0.2s;display:flex;align-items:center;justify-content:center;padding:0;}
   .close-book:hover{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.4);transform:rotate(90deg);}
   .cw-piano-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-  .cw-duration-row{grid-template-columns:repeat(3,1fr);}
-  .cw-duration-row .cw-piano-tile{text-align:center;}
   .cw-piano-tile{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;transition:0.2s;font-size:0.78rem;color:rgba(255,255,255,0.85);}
   .cw-piano-tile b{display:block;font-size:0.82rem;color:#fff;}
   .cw-piano-tile.selected{border-color:var(--gold);background:rgba(212,175,55,0.16);}
@@ -959,9 +957,6 @@
           <div class="cw-price-box" id="calPriceBox"></div>
 
           <div id="calModeArea"></div>
-
-          <p class="pd-instr-note">Długość lekcji:</p>
-          <div class="cw-piano-row cw-duration-row" id="calDurationRow"></div>
 
           <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
 
@@ -1642,7 +1637,6 @@ const CALENDAR_IDS = [
 ];
 const TEACHER_ADDRESS = 'Lipnowska 17/2, Gdynia';
 const DAYS_AHEAD = 14;
-const LESSON_DURATIONS = [60, 90, 120]; /* minuty — cena skaluje się liniowo względem LESSON_BASE_PRICE/h */
 
 const MNIE_DURATION = 60;
 const BUFFER_SAME_TEACHER = 5;  /* obie lekcje (istniejąca i nowa) potwierdzone u nauczyciela */
@@ -2166,7 +2160,6 @@ function openCalBook(key, hour, minute){
     duration: MNIE_DURATION
   };
   calResetPianoState();
-  calRenderDurationUI();
 
   const label = WEEKDAY_FULL[dayDate.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y+', start '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
   document.getElementById('calBookWhen').textContent = label;
@@ -2223,26 +2216,20 @@ function calDeliveryFee(){
   return 19;
 }
 
-function calDurationLabel(mins){
-  return mins%60===0 ? (mins/60)+' godz.' : mins+' min';
-}
-
 function calUpdatePriceBox(){
   const box = document.getElementById('calPriceBox');
   if(!box) return;
-  const duration = (bookCtx && bookCtx.duration) || MNIE_DURATION;
-  const lessonBase = Math.round(LESSON_BASE_PRICE*duration/60*100)/100;
+  const lessonBase = LESSON_BASE_PRICE;
   const codeOk = document.getElementById('calPromo').value.trim().toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
   const total = lessonPrice + deliveryFee;
-  const durLabel = ' zł / '+calDurationLabel(duration);
   let html = '';
   if(codeOk){
-    html += '<span class="cw-price-old">'+formatPLN(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+durLabel+'</span>';
+    html += '<span class="cw-price-old">'+formatPLN(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+' zł / h</span>';
     if(deliveryFee>0) html += '<div class="cw-price-note">Rabat nie obejmuje dowozu instrumentu ('+deliveryFee+' zł).</div>';
   }else{
-    html += '<span class="cw-price-plain">'+formatPLN(total)+durLabel+'</span>';
+    html += '<span class="cw-price-plain">'+formatPLN(total)+' zł / h</span>';
   }
   box.innerHTML = html;
 }
@@ -2251,27 +2238,6 @@ function calOnModeToggle(){
   const checked = document.getElementById('calModeMnie').checked;
   bookCtx.mode = checked ? 'mnie' : 'uczen';
   calApplyModeToUI();
-  recalcCalBooking();
-}
-
-/* Buduje kafelki wyboru długości lekcji (60/90/120 min). Cena skaluje się
-   liniowo z LESSON_BASE_PRICE (np. 90 min = 1.5x stawki godzinowej). Zmiana
-   trybu (u nauczyciela / u ucznia) NIE resetuje już wybranej długości —
-   isCandidateValid w recalcCalBooking sam sprawdzi, czy dłuższa lekcja
-   nadal mieści się z zachowaniem bufora od sąsiednich zajęć. */
-function calRenderDurationUI(){
-  const row = document.getElementById('calDurationRow');
-  if(!row) return;
-  row.innerHTML = LESSON_DURATIONS.map(mins=>{
-    const label = mins%60===0 ? (mins/60)+' godz.' : mins+' min';
-    const sel = bookCtx.duration===mins ? ' selected' : '';
-    return '<button type="button" class="cw-piano-tile'+sel+'" onclick="calSetDuration('+mins+')">'+label+'</button>';
-  }).join('');
-}
-
-function calSetDuration(mins){
-  bookCtx.duration = mins;
-  calRenderDurationUI();
   recalcCalBooking();
 }
 
@@ -2348,14 +2314,13 @@ function calBuildSummary(){
   const promo = document.getElementById('calPromo').value.trim();
   const codeOk = promo.toLowerCase() === PROMO_CODE;
   const deliveryFee = calDeliveryFee();
-  const lessonBase = Math.round(LESSON_BASE_PRICE*bookCtx.duration/60*100)/100;
+  const lessonBase = LESSON_BASE_PRICE;
   const lessonPrice = codeOk ? lessonBase*(1-PROMO_DISCOUNT) : lessonBase;
   const total = lessonPrice + deliveryFee;
 
   const row = (label, val) => '<div class="bs-row"><span>'+label+'</span><b>'+val+'</b></div>';
   let html = '';
   html += row('Termin', dateLabel+', godz. '+timeLabel);
-  html += row('Długość', calDurationLabel(bookCtx.duration));
   html += row('Miejsce', modeLabel);
   if(bookCtx.mode==='uczen'){
     const pianoLine = calPianoHas ? 'Masz własne pianino' : 'Dowóz: '+(calInstrumentType==='premium'?'Yamaha P-525':'Roland GO:PIANO88PX')+' ('+deliveryFee+' zł)';
@@ -2366,7 +2331,7 @@ function calBuildSummary(){
   html += row('Telefon', '+48 '+phoneDigits);
   html += row('Email', email);
   if(promo) html += row('Kod rabatowy', promo+(codeOk?' ✓':' (nieprawidłowy)'));
-  html += row('Cena', formatPLN(total)+' zł / '+calDurationLabel(bookCtx.duration));
+  html += row('Cena', formatPLN(total)+' zł / h');
   el.innerHTML = html;
 }
 
@@ -2439,12 +2404,12 @@ async function submitCalBooking(){
   const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela' : 'U ucznia — dojazd';
   const address = bookCtx.mode==='mnie' ? TEACHER_ADDRESS : fullAddress;
 
-  /* Cena: baza skalowana długością lekcji (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu i bez skalowania */
-  const baseBefore = Math.round(LESSON_BASE_PRICE*bookCtx.duration/60*100)/100;
+  /* Cena: baza (-60% jeśli poprawny kod), dowóz ZAWSZE bez rabatu */
+  const baseBefore = LESSON_BASE_PRICE;
   const baseAfter = promoOk ? baseBefore*(1-PROMO_DISCOUNT) : baseBefore;
   const deliveryFee = calDeliveryFee();
   const totalPrice = baseAfter + deliveryFee;
-  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza '+formatPLN(baseBefore)+' zł -60% rabat, '+calDurationLabel(bookCtx.duration)+')' : formatPLN(baseBefore)+' zł (cena bazowa, '+calDurationLabel(bookCtx.duration)+')')
+  const priceBreakdown = (promoOk ? formatPLN(baseAfter)+' zł (baza '+baseBefore+' zł -60% rabat)' : baseBefore+' zł (cena bazowa)')
     + (deliveryFee ? ' + '+deliveryFee+' zł (dowóz, bez rabatu)' : '');
 
   let pianoOpis = '—';
@@ -2461,7 +2426,7 @@ async function submitCalBooking(){
     email: email,
     miejsce: address,
     pianino: pianoOpis,
-    tresc: modeLabel+'\nDługość: '+calDurationLabel(bookCtx.duration)+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
+    tresc: modeLabel+'\nAdres: '+address+'\nTel: '+phone+'\nEmail: '+email,
     kod_rabatowy: promoCode,
     cena: formatPLN(totalPrice)+' zł łącznie — '+priceBreakdown,
     data_start: bookCtx.start.toISOString(),
