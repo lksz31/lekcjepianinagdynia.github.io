@@ -680,18 +680,6 @@
   .slot-pill.selected svg circle,.slot-pill.selected svg path{stroke:#fff !important;}
   .no-slots{color:var(--text-mid);font-size:0.82rem;}
 
-  .range-picker{display:none;margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);}
-  .range-picker.show{display:block;}
-  .range-back{background:none;border:1px solid var(--border);border-radius:10px;color:var(--text-mid);font-size:0.82rem;font-weight:700;cursor:pointer;padding:9px 14px;}
-  .range-back:hover{color:var(--navy);border-color:var(--navy);}
-  .range-picker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .range-picker-row select{padding:9px 12px;border-radius:10px;border:1px solid var(--border);font-size:0.9rem;font-weight:700;color:var(--navy);font-family:inherit;background:#fff;}
-  .range-picker-hint{color:var(--navy);font-size:0.82rem;font-weight:700;margin:0 0 10px;}
-  .range-confirm-btn{padding:9px 18px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--navy),#2d4fb0);color:#fff;font-weight:700;font-size:0.84rem;cursor:pointer;transition:0.2s;}
-  .range-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(30,58,138,0.3);}
-  .range-confirm-err{color:#dc2626;font-size:0.78rem;margin-top:8px;display:none;}
-  .range-confirm-err.show{display:block;}
-
   .book-panel{margin-top:18px;padding:20px;border-radius:16px;background:var(--navy-solid);display:none;position:relative;}
   .book-panel.show{display:block;}
   .book-panel h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.15rem;margin:0 36px 6px 0;}
@@ -936,15 +924,6 @@
       <div class="detail-panel" id="detailPanel">
         <div class="slots-heading" id="slotsHeading"></div>
         <div class="slots-grid" id="slotsGrid"></div>
-        <div class="range-picker" id="rangePicker">
-          <div class="range-picker-hint" id="rangePickerHint"></div>
-          <div class="range-picker-row">
-            <select id="rangeTimeInput"></select>
-            <button class="range-confirm-btn" onclick="confirmRangeTime()">Wybierz →</button>
-            <button class="range-back" onclick="backToRanges()">Anuluj</button>
-          </div>
-          <div class="range-confirm-err" id="rangeConfirmErr"></div>
-        </div>
       </div>
 
       <div class="book-panel" id="calBookPanel">
@@ -1838,8 +1817,7 @@ function isCandidateValid(start, end, mode, windows, busy){
 
 /* Zwraca zbiór trybów ('mnie'/'uczen') faktycznie możliwych do zarezerwowania
    o dokładnej godzinie:minucie — sprawdzając realny bufor wobec zajętości,
-   nie tylko strukturę okien. Dzięki temu sloty mogą zaczynać się co 5 min,
-   a nie tylko o pełnej lub połowie godziny. */
+   nie tylko strukturę okien. */
 function candidateModesAt(dayDate, hour, minute, windows, busy){
   const start = new Date(dayDate); start.setHours(hour, minute, 0, 0);
   const modes = new Set();
@@ -1873,14 +1851,10 @@ function computeDayState(dayDate){
   const rangeStart = Math.min.apply(null, windows.map(w=>w.start));
   const rangeEnd = Math.max.apply(null, windows.map(w=>w.end));
 
-  /* Kandydaci co 5 minut (nie tylko pełne/połówkowe godziny) — najmniejsza
-     jednostka używana w buforach (5 min u nauczyciela). Dzięki temu grafik
-     jest maksymalnie wypełniony: żaden realnie wolny start (np. 10:05 po
-     5-minutowej przerwie od poprzedniej lekcji u nauczyciela, albo 10:30
-     odcięte wymaganym 30-minutowym odstępem w pozostałych przypadkach) nie
-     zostaje pominięty przez sztywną siatkę co 30 minut. */
+  /* Kandydaci co 30 minut — godzinne lekcje do wyboru o pełnej i połowie
+     godziny, bez dalszego rozbijania na mniejsze interwały. */
   const candidates = [];
-  for(let totalMin=rangeStart*60; totalMin<rangeEnd*60; totalMin+=5){
+  for(let totalMin=rangeStart*60; totalMin<rangeEnd*60; totalMin+=30){
     const hour = Math.floor(totalMin/60), minute = totalMin%60;
     const start = new Date(dayDate); start.setHours(hour, minute, 0, 0);
     if(isToday && start <= now) continue;
@@ -2007,47 +1981,6 @@ async function renderCalDays(){
   body.innerHTML = html;
 }
 
-/* Grupuje kandydatów (co 5 min) w ciągłe przedziały czasu o tym samym
-   zestawie dostępnych trybów — zamiast pokazywać osobny przycisk na
-   każde 5 minut, pokazujemy jeden przedział (np. "09:00–10:25"), w
-   którym uczeń sam wybiera dokładną, pasującą mu godzinę startu. */
-function computeRanges(candidates){
-  const ranges = [];
-  let cur = null;
-  let prevTotalMin = null;
-  candidates.forEach(c=>{
-    const modeKey = Array.from(c.modes).sort().join(',');
-    const totalMin = c.hour*60+c.minute;
-    /* Łączymy w jeden przedział tylko gdy ten sam zestaw trybów I nie ma
-       przerwy względem poprzedniego kandydata (np. zajęta lekcja w środku
-       z takim samym trybem po obu stronach nie może stać się jednym
-       "ciągłym" przedziałem — to złamałoby walidację bufora). */
-    if(cur && cur.modeKey===modeKey && prevTotalMin!==null && totalMin-prevTotalMin===5){
-      cur.endHour = c.hour; cur.endMinute = c.minute;
-    }else{
-      if(cur) ranges.push(cur);
-      cur = {startHour:c.hour, startMinute:c.minute, endHour:c.hour, endMinute:c.minute, modes:c.modes, modeKey};
-    }
-    prevTotalMin = totalMin;
-  });
-  if(cur) ranges.push(cur);
-  return ranges;
-}
-
-function hhmm(h,m){ return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
-
-/* Dodaje minuty do pary godzina/minuta (w obrębie doby). Używane do
-   pokazania skrajnej możliwej godziny ZAKOŃCZENIA lekcji w etykiecie
-   przedziału — endHour/endMinute w range to ostatni możliwy START
-   (bazowej, godzinnej lekcji), więc do wyświetlenia trzeba dodać
-   standardową długość lekcji. */
-function addMinutesToHM(h,m,delta){
-  const total = h*60+m+delta;
-  return {h:Math.floor(total/60)%24, m:total%60};
-}
-
-let calRanges = [];
-
 function selectCalDay(key){
   selectedDateKey = key;
   document.querySelectorAll('.day-cell').forEach(c=>c.classList.remove('selected'));
@@ -2057,88 +1990,21 @@ function selectCalDay(key){
   const [y,m,d] = key.split('-').map(Number);
   const dateObj = new Date(y,m-1,d);
   const label = WEEKDAY_FULL[dateObj.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y;
-  document.getElementById('slotsHeading').textContent = 'Wybierz przedział — '+label;
+  document.getElementById('slotsHeading').textContent = 'Wybierz godzinę — '+label;
 
-  document.getElementById('rangePicker').classList.remove('show');
   const grid = document.getElementById('slotsGrid');
   const candidates = state.candidates || [];
-  calRanges = computeRanges(candidates);
-  if(calRanges.length===0){
+  if(candidates.length===0){
     grid.innerHTML = '<span class="no-slots">Brak dostępnych godzin tego dnia.</span>';
   }else{
-    grid.innerHTML = calRanges.map((r,i)=>{
-      const info = colorInfoForModes(r.modes);
-      const isSingle = r.startHour===r.endHour && r.startMinute===r.endMinute;
-      /* r.endHour/r.endMinute to ostatni możliwy START godzinnej lekcji —
-         do etykiety pokazujemy skrajną możliwą godzinę ZAKOŃCZENIA, czyli
-         ten start + standardowa długość lekcji (MNIE_DURATION). */
-      const lastEnd = addMinutesToHM(r.endHour, r.endMinute, MNIE_DURATION);
-      const label = hhmm(r.startHour,r.startMinute)+'–'+hhmm(lastEnd.h,lastEnd.m);
-      return '<button class="slot-pill slot-pill-'+info.key+'" data-range-i="'+i+'" title="'+info.tooltip+'" onclick="'+(isSingle?'openCalBook(\''+key+'\','+r.startHour+','+r.startMinute+')':'pickCalRange('+i+')')+'"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
+    grid.innerHTML = candidates.map(c=>{
+      const label = String(c.hour).padStart(2,'0')+':'+String(c.minute).padStart(2,'0');
+      const info = colorInfoForModes(c.modes);
+      return '<button class="slot-pill slot-pill-'+info.key+'" title="'+info.tooltip+'" onclick="openCalBook(\''+key+'\','+c.hour+','+c.minute+')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke-width="2"/><path d="M12 7v5l3.5 2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+label+'</button>';
     }).join('');
   }
   document.getElementById('detailPanel').classList.add('show');
   document.getElementById('calBookPanel').classList.remove('show');
-}
-
-/* Generuje listę rzeczywiście dostępnych godzin startu w danym przedziale
-   (co 5 minut) — w przeciwieniu do natywnego <input type="time">, który
-   pozwala przewijać/wpisać dowolną z 24 godzin niezależnie od min/max,
-   <select> pokazuje wyłącznie opcje faktycznie pasujące do przedziału. */
-function pickCalRange(rangeIndex){
-  const r = calRanges[rangeIndex];
-  if(!r) return;
-
-  document.querySelectorAll('#slotsGrid .slot-pill').forEach(p=>p.classList.remove('selected'));
-  const clicked = document.querySelector('#slotsGrid .slot-pill[data-range-i="'+rangeIndex+'"]');
-  if(clicked) clicked.classList.add('selected');
-
-  /* Nowy wybór przedziału unieważnia wcześniej potwierdzoną (lub w trakcie
-     wypełniania) rezerwację z innego przedziału/dnia — ukrywamy ją, żeby
-     nie pokazywać sprzecznych, nieaktualnych danych obok nowego wyboru. */
-  document.getElementById('calBookPanel').classList.remove('show');
-
-  const picker = document.getElementById('rangePicker');
-  picker.classList.add('show');
-  picker.dataset.rangeIndex = rangeIndex;
-
-  const select = document.getElementById('rangeTimeInput');
-  const options = [];
-  for(let t=r.startHour*60+r.startMinute; t<=r.endHour*60+r.endMinute; t+=5){
-    const h = Math.floor(t/60), mi = t%60;
-    options.push('<option value="'+h+':'+mi+'">'+hhmm(h,mi)+'</option>');
-  }
-  select.innerHTML = options.join('');
-
-  document.getElementById('rangePickerHint').textContent = 'Godzina startu:';
-  document.getElementById('rangeConfirmErr').classList.remove('show');
-  picker.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function backToRanges(){
-  document.getElementById('rangePicker').classList.remove('show');
-  document.querySelectorAll('#slotsGrid .slot-pill').forEach(p=>p.classList.remove('selected'));
-}
-
-function confirmRangeTime(){
-  const picker = document.getElementById('rangePicker');
-  const select = document.getElementById('rangeTimeInput');
-  const err = document.getElementById('rangeConfirmErr');
-  const val = select.value;
-  if(!val){
-    err.textContent = 'Wybierz godzinę.';
-    err.classList.add('show');
-    return;
-  }
-  const [h,mi] = val.split(':').map(Number);
-  err.classList.remove('show');
-  openCalBook(selectedDateKey, h, mi);
-  /* openCalBook czyści zaznaczenie wszystkich .slot-pill (zakładając, że
-     kliknięto bezpośrednio pigułkę) — przywracamy podświetlenie przedziału,
-     z którego pochodzi ten wybór, żeby nie znikało po potwierdzeniu. */
-  const rangeIndex = picker.dataset.rangeIndex;
-  const pill = document.querySelector('#slotsGrid .slot-pill[data-range-i="'+rangeIndex+'"]');
-  if(pill) pill.classList.add('selected');
 }
 
 function openCalBook(key, hour, minute){
