@@ -1702,6 +1702,27 @@ function getDayWindows(weekday){
   return [];
 }
 
+/* Stałe, zawsze zajęte okno w poniedziałki 15:00–18:00 — niezależnie od
+   tego, czy w kalendarzu Google jest tam realne wydarzenie. Dołączane do
+   busyIntervals tak samo jak prawdziwe wydarzenia, więc obowiązuje przy
+   nim ten sam bufor przed/po co przy każdej innej zajętości (lokalizacja
+   nieznana → domyślny, 30-minutowy odstęp). */
+function getRecurringBlocks(rangeStart, rangeEnd){
+  const blocks = [];
+  const d = new Date(rangeStart);
+  d.setHours(0,0,0,0);
+  const end = new Date(rangeEnd);
+  while(d <= end){
+    if(d.getDay() === 1){
+      const start = new Date(d); start.setHours(15,0,0,0);
+      const stop = new Date(d); stop.setHours(18,0,0,0);
+      blocks.push({start, end: stop, atTeacher: null});
+    }
+    d.setDate(d.getDate()+1);
+  }
+  return blocks;
+}
+
 async function fetchBusyForRange(rangeStart, rangeEnd){
   const timeMin = rangeStart.toISOString();
   const timeMax = rangeEnd.toISOString();
@@ -1947,7 +1968,7 @@ async function renderCalDays(){
   try{
     const rawIntervals = await fetchBusyForRange(rangeStart, rangeEnd);
     const locationMap = await fetchEventLocationsForRange(rangeStart, rangeEnd);
-    busyIntervals = annotateBusyWithLocation(rawIntervals, locationMap);
+    busyIntervals = annotateBusyWithLocation(rawIntervals, locationMap).concat(getRecurringBlocks(rangeStart, rangeEnd));
   }catch(err){
     body.innerHTML = '<div class="cal-error">Nie udało się pobrać kalendarza.<br>'+err.message+'</div>';
     return;
