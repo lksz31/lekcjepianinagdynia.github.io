@@ -72,4 +72,8 @@
     <loc>https://lekcjepianinagdynia.pl/index/podrecznik/podrecznik.html</loc>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://lekcjepianinagdynia.pl/polityka-prywatnosci.html</loc>
+    <priority>0.3</priority>
+  </url>
 </urlset>
