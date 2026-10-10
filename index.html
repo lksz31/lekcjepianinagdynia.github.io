@@ -892,39 +892,39 @@
 <!-- ══ TERMINY — uproszczone okno rezerwacji ══ -->
 <section class="terminy-section" id="terminy">
   <div class="section-inner">
-    <div class="section-label">Rezerwacja</div>
-    <h2 class="section-title" style="text-align:center;">Umów lekcję</h2>
+    <div class="section-label" data-i18n="secLabel">Rezerwacja</div>
+    <h2 class="section-title" style="text-align:center;" data-i18n="secTitle">Umów lekcję</h2>
     <div class="apple-card" id="appleLocation">
-      <h2 class="apple-card-title">Poproś o kontakt</h2>
-      <p class="apple-card-sub">Nie widzisz pasującej godziny w kalendarzu poniżej albo wolisz, żebym się do Ciebie odezwał? Zostaw swoje dane — skontaktuję się, żeby ustalić termin.</p>
-      <button class="btn-open-form" onclick="toggleForm(true)">POPROŚ O KONTAKT</button>
+      <h2 class="apple-card-title" data-i18n="askContactTitle">Poproś o kontakt</h2>
+      <p class="apple-card-sub" data-i18n="askContactSub">Nie widzisz pasującej godziny w kalendarzu poniżej albo wolisz, żebym się do Ciebie odezwał? Zostaw swoje dane — skontaktuję się, żeby ustalić termin.</p>
+      <button class="btn-open-form" onclick="toggleForm(true)" data-i18n="askContactBtn">POPROŚ O KONTAKT</button>
     </div>
 
     <div class="cal-widget-wrap" id="calWidgetWrap">
       <div class="cal-widget-header">
         <div>
-          <div class="cal-widget-title">Wybierz wolny termin zajęć i umów lekcję</div>
+          <div class="cal-widget-title" data-i18n="calTitle">Wybierz wolny termin zajęć i umów lekcję</div>
           <div class="cal-widget-range" id="calRange">—</div>
         </div>
         <div class="cal-widget-nav">
-          <button id="prevBtn" onclick="shiftCalWeeks(-14)" aria-label="Poprzednie dwa tygodnie">‹</button>
-          <button id="nextBtn" onclick="shiftCalWeeks(14)" aria-label="Następne dwa tygodnie">›</button>
+          <button id="prevBtn" onclick="shiftCalWeeks(-14)" aria-label="Poprzednie dwa tygodnie" data-i18n-aria="prevWeeks">‹</button>
+          <button id="nextBtn" onclick="shiftCalWeeks(14)" aria-label="Następne dwa tygodnie" data-i18n-aria="nextWeeks">›</button>
         </div>
       </div>
 
       <div class="weekday-row">
-        <span>Pn</span><span>Wt</span><span>Śr</span><span>Cz</span><span>Pt</span><span>So</span><span>Nd</span>
+        <span data-i18n="wd0">Pn</span><span data-i18n="wd1">Wt</span><span data-i18n="wd2">Śr</span><span data-i18n="wd3">Cz</span><span data-i18n="wd4">Pt</span><span data-i18n="wd5">So</span><span data-i18n="wd6">Nd</span>
       </div>
 
       <div id="calWarning"></div>
       <div id="calBody">
-        <div class="cal-loading">Ładowanie kalendarza…</div>
+        <div class="cal-loading" data-i18n="loading">Ładowanie kalendarza…</div>
       </div>
 
       <div class="color-legend">
-        <span><i class="cl-dot cl-gold"></i>u ucznia</span>
-        <span><i class="cl-dot cl-blue"></i>u nauczyciela</span>
-        <span><i class="cl-dot cl-green"></i>u nauczyciela lub u ucznia</span>
+        <span><i class="cl-dot cl-gold"></i><span data-i18n="legStudent">u ucznia</span></span>
+        <span><i class="cl-dot cl-blue"></i><span data-i18n="legTeacher">u nauczyciela</span></span>
+        <span><i class="cl-dot cl-green"></i><span data-i18n="legEither">u nauczyciela lub u ucznia</span></span>
       </div>
 
       <div class="detail-panel" id="detailPanel">
@@ -933,8 +933,8 @@
       </div>
 
       <div class="book-panel" id="calBookPanel">
-        <button class="close-book" onclick="closeCalBook()" aria-label="Zamknij" title="Zamknij">✕</button>
-        <h3>Zarezerwuj termin</h3>
+        <button class="close-book" onclick="closeCalBook()" aria-label="Zamknij" title="Zamknij" data-i18n-aria="closeLabel" data-i18n-title="closeLabel">✕</button>
+        <h3 data-i18n="bookTitle">Zarezerwuj termin</h3>
         <div class="book-when" id="calBookWhen"></div>
         <div class="book-error" id="calBookError"></div>
 
@@ -943,50 +943,50 @@
 
           <div id="calModeArea"></div>
 
-          <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()">
+          <input type="text" id="calPromo" placeholder="Kod rabatowy (opcjonalnie)" oninput="recalcCalBooking()" data-i18n-placeholder="promoPh">
 
           <div id="calPianoArea" style="display:none;">
             <div class="cw-piano-row">
-              <div class="cw-piano-tile selected" id="calPianoYes" onclick="calSetPiano(true)"><b>Mam pianino</b>bez dopłaty</div>
-              <div class="cw-piano-tile" id="calPianoNo" onclick="calSetPiano(false)"><b>Nie mam</b>dowóz instrumentu</div>
+              <div class="cw-piano-tile selected" id="calPianoYes" onclick="calSetPiano(true)" data-i18n-html="pianoYesHtml"><b>Mam pianino</b>bez dopłaty</div>
+              <div class="cw-piano-tile" id="calPianoNo" onclick="calSetPiano(false)" data-i18n-html="pianoNoHtml"><b>Nie mam</b>dowóz instrumentu</div>
             </div>
             <div id="calInstrumentArea" style="display:none;">
-              <p class="pd-instr-note">Wybierz pianino, które ma zostać do Ciebie dostarczone:</p>
+              <p class="pd-instr-note" data-i18n="chooseInstrument">Wybierz pianino, które ma zostać do Ciebie dostarczone:</p>
               <div class="cw-piano-row">
-                <div class="cw-piano-tile tile-silver selected" id="calInstrEco" onclick="calSetInstrument('eco')"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>19 zł</div>
-                <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>49 zł</div>
+                <div class="cw-piano-tile tile-silver selected" id="calInstrEco" onclick="calSetInstrument('eco')" data-i18n-html="instrEcoHtml"><b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Lekki, przenośny keyboard cyfrowy. 88 klawiszy o dotyku zbliżonym do fortepianu, wbudowane głośniki. Dobry wybór na pierwsze miesiące nauki. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>19 zł</div>
+                <div class="cw-piano-tile tile-gold" id="calInstrPremium" onclick="calSetInstrument('premium')" data-i18n-html="instrPremiumHtml"><b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">Zaawansowane pianino cyfrowe z ważoną mechaniką klawiatury i realistycznym brzmieniem akustycznym. Dla uczniów zaawansowanych i przygotowujących się do egzaminów. W cenie dowozu wliczony jest również stojak pod instrument.</span></span></b>49 zł</div>
               </div>
             </div>
           </div>
 
-          <button class="book-submit" id="calStep1NextBtn" onclick="calGoStep(2)">DALEJ →</button>
+          <button class="book-submit" id="calStep1NextBtn" onclick="calGoStep(2)" data-i18n="next">DALEJ →</button>
         </div>
 
         <div class="cal-step" id="calStep2">
-          <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()">
+          <input type="text" id="calName" placeholder="Imię" oninput="recalcCalBooking()" data-i18n-placeholder="namePh">
           <div class="phone-row">
             <span class="phone-prefix">+48</span>
-            <input type="tel" id="calPhone" placeholder="123 456 789" oninput="calPhoneInput(this)">
+            <input type="tel" id="calPhone" placeholder="123 456 789" oninput="calPhoneInput(this)" data-i18n-placeholder="phonePh">
           </div>
-          <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()">
+          <input type="email" id="calEmail" placeholder="Adres email" oninput="recalcCalBooking()" data-i18n-placeholder="emailPh">
           <div id="calAddrWrap">
             <select id="calCity" onchange="recalcCalBooking()">
               <option value="Gdynia" selected>Gdynia</option>
               <option value="Sopot">Sopot</option>
             </select>
-            <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()">
+            <input type="text" id="calStreet" placeholder="Ulica i numer mieszkania" oninput="recalcCalBooking()" data-i18n-placeholder="streetPh">
           </div>
           <div class="book-step-nav">
-            <button class="book-btn-outline" onclick="calGoStep(1)">← COFNIJ</button>
-            <button class="book-submit" onclick="calGoStep(3)">PODSUMUJ →</button>
+            <button class="book-btn-outline" onclick="calGoStep(1)" data-i18n="back">← COFNIJ</button>
+            <button class="book-submit" onclick="calGoStep(3)" data-i18n="summaryBtn">PODSUMUJ →</button>
           </div>
         </div>
 
         <div class="cal-step" id="calStep3">
           <div class="book-summary" id="calSummary"></div>
           <div class="book-step-nav">
-            <button class="book-btn-outline" onclick="calGoStep(2)">← COFNIJ</button>
-            <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()">ZAREZERWUJ TERMIN</button>
+            <button class="book-btn-outline" onclick="calGoStep(2)" data-i18n="back">← COFNIJ</button>
+            <button class="book-submit" id="calBookSubmitBtn" onclick="submitCalBooking()" data-i18n="submitBtn">ZAREZERWUJ TERMIN</button>
           </div>
           <div class="book-status" id="calBookStatus"></div>
         </div>
@@ -994,9 +994,9 @@
         <div class="book-confirm-overlay" id="calConfirmOverlay">
           <div class="book-confirm-card">
             <div class="book-confirm-check">✓</div>
-            <h4>Lekcja zarezerwowana</h4>
-            <p>Niedługo skontaktuje się z Państwem nauczyciel, żeby potwierdzić termin zajęć.</p>
-            <button class="book-confirm-ok" onclick="closeCalBookConfirm()">OK</button>
+            <h4 data-i18n="confirmedTitle">Lekcja zarezerwowana</h4>
+            <p data-i18n="confirmedText">Niedługo skontaktuje się z Państwem nauczyciel, żeby potwierdzić termin zajęć.</p>
+            <button class="book-confirm-ok" onclick="closeCalBookConfirm()" data-i18n="ok">OK</button>
           </div>
         </div>
       </div>
@@ -1008,23 +1008,23 @@
 <div class="form-overlay" id="formOverlay" onclick="if(event.target===this)toggleForm(false)">
   <div class="form-content">
     <button class="close-btn" onclick="toggleForm(false)">✕</button>
-    <h3 style="margin-top:0;margin-bottom:14px;color:var(--navy);font-family:'Playfair Display',serif;">Poproś o kontakt</h3>
+    <h3 style="margin-top:0;margin-bottom:14px;color:var(--navy);font-family:'Playfair Display',serif;" data-i18n="askContactTitle">Poproś o kontakt</h3>
 
     <div id="res-choice">
-      <p style="font-size:0.85rem;color:var(--text-mid);line-height:1.6;margin:0 0 18px;">Chcesz najpierw zobaczyć wolne terminy w kalendarzu?</p>
-      <button class="form-choice-btn" onclick="formGoCalendar('desktop')">📅 Tak, pokaż wolne terminy</button>
-      <button class="form-choice-btn-outline" onclick="formShowSimple('desktop')">✉️ Nie, po prostu wyślę zapytanie</button>
+      <p style="font-size:0.85rem;color:var(--text-mid);line-height:1.6;margin:0 0 18px;" data-i18n="askCalFirst">Chcesz najpierw zobaczyć wolne terminy w kalendarzu?</p>
+      <button class="form-choice-btn" onclick="formGoCalendar('desktop')" data-i18n="showAvail">📅 Tak, pokaż wolne terminy</button>
+      <button class="form-choice-btn-outline" onclick="formShowSimple('desktop')" data-i18n="justSend">✉️ Nie, po prostu wyślę zapytanie</button>
     </div>
 
     <div id="res-simple" style="display:none;">
       <div class="contact-box">
-        <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()">
-        <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()">
-        <input type="email" id="res-email" placeholder="Adres email" oninput="val()">
-        <textarea id="res-msg" placeholder="Wiadomość (np. wiek ucznia, preferowane godziny...)"></textarea>
-        <button class="btn-submit" id="subBtn" onclick="wyslij()">WYŚLIJ ZGŁOSZENIE</button>
+        <input type="text" id="res-name" placeholder="Twoje imię i nazwisko" oninput="val()" data-i18n-placeholder="namePhFull">
+        <input type="tel" id="res-phone" placeholder="Numer telefonu" oninput="val()" data-i18n-placeholder="phonePhFull">
+        <input type="email" id="res-email" placeholder="Adres email" oninput="val()" data-i18n-placeholder="emailPhFull">
+        <textarea id="res-msg" placeholder="Wiadomość (np. wiek ucznia, preferowane godziny...)" data-i18n-placeholder="msgPh"></textarea>
+        <button class="btn-submit" id="subBtn" onclick="wyslij()" data-i18n="sendRequest">WYŚLIJ ZGŁOSZENIE</button>
       </div>
-      <button class="form-back-link" onclick="formBackToChoice('desktop')">← Wróć</button>
+      <button class="form-back-link" onclick="formBackToChoice('desktop')" data-i18n="backSimple">← Wróć</button>
       <div id="res-status" style="margin-top:12px;font-weight:600;font-size:0.85rem;"></div>
     </div>
   </div>
@@ -1032,7 +1032,7 @@
 
 <div class="cal-modal-overlay" id="calModalOverlay" onclick="if(event.target===this)closeCalModal()">
   <div class="cal-modal-content">
-    <div class="cal-modal-closebar"><button class="cal-modal-close" onclick="closeCalModal()" aria-label="Zamknij">✕</button></div>
+    <div class="cal-modal-closebar"><button class="cal-modal-close" onclick="closeCalModal()" aria-label="Zamknij" data-i18n-aria="closeLabel">✕</button></div>
     <div id="calModalSlot"></div>
   </div>
 </div>
@@ -1317,6 +1317,116 @@
 const FORM_WEBHOOK  = "https://hook.eu1.make.com/3w8cbmpc1v3fff8k0qq4fk6w8mo81wd6";
 const BRIEF_WEBHOOK = "https://hook.eu1.make.com/q71o8tfhdg3pj1nwe21t16dbkhoms4ye";
 const OWNER_EMAIL   = "lukaszgkorepetycje@gmail.com";
+
+/* ══ i18n — kalendarz rezerwacji działa identycznie w obu językach;
+   dane wysyłane do FORM_WEBHOOK (dla Make.com / Łukasza) ZAWSZE zostają
+   po polsku, niezależnie od LANG — tłumaczony jest wyłącznie interfejs. ══ */
+const LANG = /[?&]lang=en(&|$)/.test(location.search) ? 'en' : 'pl';
+const CAL_I18N = {
+  pl: {
+    monthNames: ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'],
+    weekdayFull: ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'],
+    weekdayShort: ['Pn','Wt','Śr','Cz','Pt','So','Nd'],
+    loading: 'Ładowanie kalendarza…',
+    noConnect: 'Nie udało się pobrać kalendarza.',
+    calWarnPrefix: '⚠ Kalendarz nie odpowiedział poprawnie: ',
+    calWarnSuffix: '. Widoczna dostępność może być niepełna.',
+    chooseTime: 'Wybierz godzinę — ',
+    noSlots: 'Brak dostępnych godzin tego dnia.',
+    tipEither: 'Dostępne u ucznia lub u nauczyciela — do wyboru.',
+    tipTeacherOnly: 'Dostępne wyłącznie u nauczyciela.',
+    tipStudentOnly: 'Dostępne u ucznia (dojazd).',
+    tipBusy: 'Zajęte.',
+    lessonAtTeacher: 'Lekcja u nauczyciela (',
+    lockedOnlyTeacherNote: 'Ta godzina jest dostępna wyłącznie u nauczyciela — nie można jej odznaczyć.',
+    lockedOnlyStudentNote: 'Ta godzina wymaga dojazdu do ucznia — nie można wybrać lekcji u nauczyciela.',
+    discountNote1: 'Rabat nie obejmuje dowozu instrumentu (',
+    discountNote2: ' zł).',
+    errFillContact: 'Wypełnij imię, telefon (9 cyfr) i email.',
+    errFillStreet: 'Wpisz ulicę i numer mieszkania.',
+    errBuffer: 'Ta godzina nie mieści się z zachowaniem wymaganego odstępu od sąsiednich zajęć.',
+    timeConnector: ', godz. ',
+    sumTermin: 'Termin', sumMiejsce: 'Miejsce', sumPianino: 'Pianino',
+    sumHasPiano: 'Masz własne pianino', sumDelivery: 'Dowóz: ',
+    sumAddress: 'Adres', sumName: 'Imię i nazwisko', sumPhone: 'Telefon', sumEmail: 'Email',
+    sumPromo: 'Kod rabatowy', sumPromoValid: ' ✓', sumPromoInvalid: ' (nieprawidłowy)', sumPrice: 'Cena',
+    modeAtTeacher: 'U nauczyciela (', modeAtStudent: 'U ucznia — dojazd',
+    sending: '⏳ Wysyłanie...', bookedToast: '✅ Zarezerwowano!',
+    sendErr: '❌ Błąd wysyłki. Zadzwoń: 514 338 875', sendErrToast: 'Błąd wysyłki.'
+  },
+  en: {
+    monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    weekdayFull: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+    weekdayShort: ['Mo','Tu','We','Th','Fr','Sa','Su'],
+    loading: 'Loading calendar…',
+    noConnect: 'Could not load the calendar.',
+    calWarnPrefix: '⚠ The calendar did not respond correctly: ',
+    calWarnSuffix: '. Visible availability may be incomplete.',
+    chooseTime: 'Choose a time — ',
+    noSlots: 'No available times on this day.',
+    tipEither: 'Available at the student’s or the teacher’s — your choice.',
+    tipTeacherOnly: 'Available at the teacher’s only.',
+    tipStudentOnly: 'Available at the student’s (with delivery).',
+    tipBusy: 'Busy.',
+    lessonAtTeacher: 'Lesson at the teacher’s (',
+    lockedOnlyTeacherNote: 'This time is only available at the teacher’s — it cannot be unchecked.',
+    lockedOnlyStudentNote: 'This time requires travel to the student — a lesson at the teacher’s cannot be selected.',
+    discountNote1: 'The discount code does not cover instrument delivery (',
+    discountNote2: ' zł).',
+    errFillContact: 'Please fill in your name, phone (9 digits) and email.',
+    errFillStreet: 'Please enter your street and apartment/house number.',
+    errBuffer: 'This time does not leave the required gap from a neighboring lesson.',
+    timeConnector: ', ',
+    sumTermin: 'Date & time', sumMiejsce: 'Location', sumPianino: 'Piano',
+    sumHasPiano: 'You have your own piano', sumDelivery: 'Delivery: ',
+    sumAddress: 'Address', sumName: 'Full name', sumPhone: 'Phone', sumEmail: 'Email',
+    sumPromo: 'Discount code', sumPromoValid: ' ✓', sumPromoInvalid: ' (invalid)', sumPrice: 'Price',
+    modeAtTeacher: 'At the teacher’s (', modeAtStudent: 'At the student’s — delivery',
+    sending: '⏳ Sending...', bookedToast: '✅ Booked!',
+    sendErr: '❌ Sending failed. Call: +48 514 338 875', sendErrToast: 'Sending failed.',
+
+    /* static-markup translations, applied only when LANG==='en' */
+    secLabel: 'Booking', secTitle: 'Book a Lesson',
+    askContactTitle: 'Request Contact',
+    askContactSub: 'Don’t see a matching time in the calendar below, or would rather I reach out to you? Leave your details — I’ll get in touch to arrange a time.',
+    askContactBtn: 'REQUEST CONTACT',
+    calTitle: 'Choose a free lesson slot and book',
+    prevWeeks: 'Previous two weeks', nextWeeks: 'Next two weeks',
+    wd0: 'Mo', wd1: 'Tu', wd2: 'We', wd3: 'Th', wd4: 'Fr', wd5: 'Sa', wd6: 'Su',
+    legStudent: 'at student’s', legTeacher: 'at teacher’s', legEither: 'at teacher’s or student’s',
+    bookTitle: 'Book This Slot', closeLabel: 'Close',
+    promoPh: 'Discount code (optional)',
+    pianoYesHtml: '<b>I have a piano</b>no extra fee',
+    pianoNoHtml: '<b>I don’t have one</b>instrument delivery',
+    chooseInstrument: 'Choose the piano to be delivered to you:',
+    instrEcoHtml: '<b>Roland GO:PIANO88PX<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">A lightweight, portable digital keyboard. 88 keys with a piano-like touch, built-in speakers. A good choice for the first months of learning. The delivery price also includes a stand for the instrument.</span></span></b>19 zł',
+    instrPremiumHtml: '<b>Yamaha P-525<span class="pd-info-wrap" onclick="event.stopPropagation()"><span class="pd-info-icon">i</span><span class="pd-info-tooltip">An advanced digital piano with weighted key action and realistic acoustic sound. For advanced students and those preparing for exams. The delivery price also includes a stand for the instrument.</span></span></b>49 zł',
+    next: 'NEXT →',
+    namePh: 'First name', phonePh: '123 456 789', emailPh: 'Email address', streetPh: 'Street and apartment number',
+    back: '← BACK', summaryBtn: 'REVIEW →', submitBtn: 'BOOK THIS SLOT',
+    confirmedTitle: 'Lesson booked',
+    confirmedText: 'The teacher will be in touch shortly to confirm the lesson time.',
+    ok: 'OK',
+    askCalFirst: 'Would you like to see available times in the calendar first?',
+    showAvail: '📅 Yes, show available times',
+    justSend: '✉️ No, I’ll just send a request',
+    namePhFull: 'Your full name', phonePhFull: 'Phone number', emailPhFull: 'Email address',
+    msgPh: 'Message (e.g. student’s age, preferred times...)',
+    sendRequest: 'SEND REQUEST', backSimple: '← Back'
+  }
+};
+const CT = CAL_I18N[LANG];
+
+function translatePage(){
+  if(LANG!=='en') return;
+  document.documentElement.lang = 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(CT[k]!==undefined) el.textContent=CT[k];});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{const k=el.getAttribute('data-i18n-html');if(CT[k]!==undefined) el.innerHTML=CT[k];});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{const k=el.getAttribute('data-i18n-placeholder');if(CT[k]!==undefined) el.setAttribute('placeholder',CT[k]);});
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{const k=el.getAttribute('data-i18n-aria');if(CT[k]!==undefined) el.setAttribute('aria-label',CT[k]);});
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{const k=el.getAttribute('data-i18n-title');if(CT[k]!==undefined) el.setAttribute('title',CT[k]);});
+}
+translatePage();
 
 function showToast(msg,isError=false){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isError?' error':'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),4000);}
 async function sendToMake(payload){const r=await fetch(FORM_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
@@ -1628,8 +1738,8 @@ const BUFFER_SAME_TEACHER = 5;  /* obie lekcje (istniejąca i nowa) potwierdzone
 const BUFFER_DEFAULT = 30;      /* nie da się potwierdzić lokalizacji sąsiedniej lekcji, lub któraś jest u ucznia */
 const UCZEN_DURATIONS = [60,75,90];
 
-const MONTH_NAMES = ['styczeń','luty','marzec','kwiecień','maj','czerwiec','lipiec','sierpień','wrzesień','październik','listopad','grudzień'];
-const WEEKDAY_FULL = ['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'];
+const MONTH_NAMES = CT.monthNames;
+const WEEKDAY_FULL = CT.weekdayFull;
 
 let busyIntervals = [];
 let dayStates = {};
@@ -1865,9 +1975,9 @@ function candidateModesAt(dayDate, hour, minute, windows, busy){
    niebieski = wyłącznie u nauczyciela. */
 function colorInfoForModes(modes){
   const hasM = modes.has('mnie'), hasU = modes.has('uczen');
-  if(hasM && hasU) return {key:'green', color:'#16a34a', tooltip:'Dostępne u ucznia lub u nauczyciela — do wyboru.'};
-  if(hasM) return {key:'blue', color:'#3b82f6', tooltip:'Dostępne wyłącznie u nauczyciela.'};
-  return {key:'gold', color:'#d4af37', tooltip:'Dostępne u ucznia (dojazd).'};
+  if(hasM && hasU) return {key:'green', color:'#16a34a', tooltip:CT.tipEither};
+  if(hasM) return {key:'blue', color:'#3b82f6', tooltip:CT.tipTeacherOnly};
+  return {key:'gold', color:'#d4af37', tooltip:CT.tipStudentOnly};
 }
 
 function computeDayState(dayDate){
@@ -1949,7 +2059,7 @@ function calSunSVG(slots, windows){
     const x1 = cx + r1*Math.cos(angle), y1 = cy + r1*Math.sin(angle);
     const x2 = cx + r2*Math.cos(angle), y2 = cy + r2*Math.sin(angle);
     const color = rd.free ? rd.info.color : '#e2e8f0';
-    const tooltip = rd.free ? rd.info.tooltip : 'Zajęte.';
+    const tooltip = rd.free ? rd.info.tooltip : CT.tipBusy;
     rays += '<g><title>'+tooltip+'</title><line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+color+'" stroke-width="2" stroke-linecap="round"/></g>';
   });
   return '<svg class="day-sun" viewBox="0 0 '+size+' '+size+'">'+rays+'<circle cx="'+cx+'" cy="'+cy+'" r="'+rCenter+'" fill="#fdf6e3" stroke="#d4af37" stroke-width="1.5"/></svg>';
@@ -1967,7 +2077,7 @@ function calMoonSVG(size,cx,cy){
 
 async function renderCalDays(){
   const body = document.getElementById('calBody');
-  body.innerHTML = '<div class="cal-loading">Ładowanie kalendarza…</div>';
+  body.innerHTML = '<div class="cal-loading">'+CT.loading+'</div>';
   document.getElementById('detailPanel').classList.remove('show');
   document.getElementById('calBookPanel').classList.remove('show');
   selectedDateKey = null;
@@ -1982,12 +2092,12 @@ async function renderCalDays(){
     const locationMap = await fetchEventLocationsForRange(rangeStart, rangeEnd);
     busyIntervals = annotateBusyWithLocation(rawIntervals, locationMap).concat(getRecurringBlocks(rangeStart, rangeEnd));
   }catch(err){
-    body.innerHTML = '<div class="cal-error">Nie udało się pobrać kalendarza.<br>'+err.message+'</div>';
+    body.innerHTML = '<div class="cal-error">'+CT.noConnect+'<br>'+err.message+'</div>';
     return;
   }
 
   if(lastCalErrors.length){
-    document.getElementById('calWarning').innerHTML = '<div class="cal-error" style="margin-bottom:14px;">⚠ Kalendarz nie odpowiedział poprawnie: '+lastCalErrors.join('; ')+'. Widoczna dostępność może być niepełna.</div>';
+    document.getElementById('calWarning').innerHTML = '<div class="cal-error" style="margin-bottom:14px;">'+CT.calWarnPrefix+lastCalErrors.join('; ')+CT.calWarnSuffix+'</div>';
   }
 
   dayStates = {};
@@ -2023,12 +2133,12 @@ function selectCalDay(key){
   const [y,m,d] = key.split('-').map(Number);
   const dateObj = new Date(y,m-1,d);
   const label = WEEKDAY_FULL[dateObj.getDay()]+', '+d+' '+MONTH_NAMES[m-1]+' '+y;
-  document.getElementById('slotsHeading').textContent = 'Wybierz godzinę — '+label;
+  document.getElementById('slotsHeading').textContent = CT.chooseTime+label;
 
   const grid = document.getElementById('slotsGrid');
   const candidates = state.candidates || [];
   if(candidates.length===0){
-    grid.innerHTML = '<span class="no-slots">Brak dostępnych godzin tego dnia.</span>';
+    grid.innerHTML = '<span class="no-slots">'+CT.noSlots+'</span>';
   }else{
     grid.innerHTML = candidates.map(c=>{
       const label = String(c.hour).padStart(2,'0')+':'+String(c.minute).padStart(2,'0');
@@ -2066,13 +2176,13 @@ function openCalBook(key, hour, minute){
 
   const modeArea = document.getElementById('calModeArea');
   if(bothAvailable){
-    modeArea.innerHTML = '<label class="mode-row"><input type="checkbox" id="calModeMnie" checked onchange="calOnModeToggle()"><span>Lekcja u nauczyciela ('+TEACHER_ADDRESS+')</span></label>';
+    modeArea.innerHTML = '<label class="mode-row"><input type="checkbox" id="calModeMnie" checked onchange="calOnModeToggle()"><span>'+CT.lessonAtTeacher+TEACHER_ADDRESS+')</span></label>';
   }else if(defaultMode==='mnie'){
-    modeArea.innerHTML = '<div class="mode-row mode-row-locked"><span class="mode-check-locked on">✓</span><span>Lekcja u nauczyciela ('+TEACHER_ADDRESS+')</span></div>'
-      + '<div class="mode-note">Ta godzina jest dostępna wyłącznie u nauczyciela — nie można jej odznaczyć.</div>';
+    modeArea.innerHTML = '<div class="mode-row mode-row-locked"><span class="mode-check-locked on">✓</span><span>'+CT.lessonAtTeacher+TEACHER_ADDRESS+')</span></div>'
+      + '<div class="mode-note">'+CT.lockedOnlyTeacherNote+'</div>';
   }else{
-    modeArea.innerHTML = '<div class="mode-row mode-row-locked"><span class="mode-check-locked off"></span><span class="mode-strike">Lekcja u nauczyciela ('+TEACHER_ADDRESS+')</span></div>'
-      + '<div class="mode-note">Ta godzina wymaga dojazdu do ucznia — nie można wybrać lekcji u nauczyciela.</div>';
+    modeArea.innerHTML = '<div class="mode-row mode-row-locked"><span class="mode-check-locked off"></span><span class="mode-strike">'+CT.lessonAtTeacher+TEACHER_ADDRESS+')</span></div>'
+      + '<div class="mode-note">'+CT.lockedOnlyStudentNote+'</div>';
   }
 
   calApplyModeToUI();
@@ -2126,7 +2236,7 @@ function calUpdatePriceBox(){
   let html = '';
   if(codeOk){
     html += '<span class="cw-price-old">'+formatPLN(lessonBase+deliveryFee)+' zł</span><span class="cw-price-new">'+formatPLN(total)+' zł / h</span>';
-    if(deliveryFee>0) html += '<div class="cw-price-note">Rabat nie obejmuje dowozu instrumentu ('+deliveryFee+' zł).</div>';
+    if(deliveryFee>0) html += '<div class="cw-price-note">'+CT.discountNote1+deliveryFee+CT.discountNote2+'</div>';
   }else{
     html += '<span class="cw-price-plain">'+formatPLN(total)+' zł / h</span>';
   }
@@ -2181,9 +2291,9 @@ function calGoStep(step){
       const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
       const email = document.getElementById('calEmail').value.trim();
       if(name.length<2 || phoneDigits.length!==9 || !email.includes('@') || !email.includes('.')){
-        errEl.textContent = 'Wypełnij imię, telefon (9 cyfr) i email.';
+        errEl.textContent = CT.errFillContact;
       }else{
-        errEl.textContent = 'Wpisz ulicę i numer mieszkania.';
+        errEl.textContent = CT.errFillStreet;
       }
       return;
     }
@@ -2204,7 +2314,7 @@ function calBuildSummary(){
   const dateLabel = WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear();
   const timeLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0')
     +'–'+String(end.getHours()).padStart(2,'0')+':'+String(end.getMinutes()).padStart(2,'0');
-  const modeLabel = bookCtx.mode==='mnie' ? 'U nauczyciela ('+TEACHER_ADDRESS+')' : 'U ucznia — dojazd';
+  const modeLabel = bookCtx.mode==='mnie' ? CT.modeAtTeacher+TEACHER_ADDRESS+')' : CT.modeAtStudent;
   const name = document.getElementById('calName').value.trim();
   const phoneDigits = document.getElementById('calPhone').value.replace(/\D/g,'');
   const email = document.getElementById('calEmail').value.trim();
@@ -2219,18 +2329,18 @@ function calBuildSummary(){
 
   const row = (label, val) => '<div class="bs-row"><span>'+label+'</span><b>'+val+'</b></div>';
   let html = '';
-  html += row('Termin', dateLabel+', godz. '+timeLabel);
-  html += row('Miejsce', modeLabel);
+  html += row(CT.sumTermin, dateLabel+CT.timeConnector+timeLabel);
+  html += row(CT.sumMiejsce, modeLabel);
   if(bookCtx.mode==='uczen'){
-    const pianoLine = calPianoHas ? 'Masz własne pianino' : 'Dowóz: '+(calInstrumentType==='premium'?'Yamaha P-525':'Roland GO:PIANO88PX')+' ('+deliveryFee+' zł)';
-    html += row('Pianino', pianoLine);
-    if(street) html += row('Adres', street+', '+city);
+    const pianoLine = calPianoHas ? CT.sumHasPiano : CT.sumDelivery+(calInstrumentType==='premium'?'Yamaha P-525':'Roland GO:PIANO88PX')+' ('+deliveryFee+' zł)';
+    html += row(CT.sumPianino, pianoLine);
+    if(street) html += row(CT.sumAddress, street+', '+city);
   }
-  html += row('Imię i nazwisko', name);
-  html += row('Telefon', '+48 '+phoneDigits);
-  html += row('Email', email);
-  if(promo) html += row('Kod rabatowy', promo+(codeOk?' ✓':' (nieprawidłowy)'));
-  html += row('Cena', formatPLN(total)+' zł / h');
+  html += row(CT.sumName, name);
+  html += row(CT.sumPhone, '+48 '+phoneDigits);
+  html += row(CT.sumEmail, email);
+  if(promo) html += row(CT.sumPromo, promo+(codeOk?CT.sumPromoValid:CT.sumPromoInvalid));
+  html += row(CT.sumPrice, formatPLN(total)+' zł / h');
   el.innerHTML = html;
 }
 
@@ -2247,7 +2357,7 @@ function recalcCalBooking(){
   const nextBtn = document.getElementById('calStep1NextBtn');
 
   if(!valid){
-    errEl.textContent = 'Ta godzina nie mieści się z zachowaniem wymaganego odstępu od sąsiednich zajęć.';
+    errEl.textContent = CT.errBuffer;
     if(nextBtn) nextBtn.disabled = true;
     btn.disabled = true;
     return false;
@@ -2259,7 +2369,7 @@ function recalcCalBooking(){
   const startLabel = String(start.getHours()).padStart(2,'0')+':'+String(start.getMinutes()).padStart(2,'0');
   document.getElementById('calBookWhen').textContent =
     WEEKDAY_FULL[start.getDay()]+', '+start.getDate()+' '+MONTH_NAMES[start.getMonth()]+' '+start.getFullYear()
-    +', godz. '+startLabel+'–'+endLabel;
+    +CT.timeConnector+startLabel+'–'+endLabel;
 
   btn.disabled = !calFormComplete();
   return true;
@@ -2285,11 +2395,11 @@ async function submitCalBooking(){
   const submitBtn = document.getElementById('calBookSubmitBtn');
 
   if(name.length<2 || phoneDigits.length!==9 || !email.includes('@')){
-    errEl.textContent = 'Wypełnij imię, telefon (9 cyfr) i email.';
+    errEl.textContent = CT.errFillContact;
     return;
   }
   if(bookCtx.mode==='uczen' && street.length<3){
-    errEl.textContent = 'Wpisz ulicę i numer mieszkania.';
+    errEl.textContent = CT.errFillStreet;
     return;
   }
   if(!recalcCalBooking()){
@@ -2337,19 +2447,19 @@ async function submitCalBooking(){
 
   submitBtn.disabled = true;
   status.style.color = 'var(--text-mid)';
-  status.textContent = '⏳ Wysyłanie...';
+  status.textContent = CT.sending;
 
   try{
     const r = await fetch(FORM_WEBHOOK, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
     const text = await r.text();
     if(!r.ok && !text.toLowerCase().includes('accepted')) throw new Error('HTTP '+r.status);
     status.textContent = '';
-    showToast('✅ Zarezerwowano!');
+    showToast(CT.bookedToast);
     document.getElementById('calConfirmOverlay').classList.add('show');
   }catch(e){
     status.style.color = '#f87171';
-    status.textContent = '❌ Błąd wysyłki. Zadzwoń: 514 338 875';
-    showToast('Błąd wysyłki.', true);
+    status.textContent = CT.sendErr;
+    showToast(CT.sendErrToast, true);
     submitBtn.disabled = false;
   }
 }
