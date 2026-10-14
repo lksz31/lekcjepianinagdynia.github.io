@@ -2006,6 +2006,21 @@ function computeDayState(dayDate){
     if(modes.size>0) candidates.push({hour, minute, modes});
   }
 
+  /* Dodatkowy termin "u mnie" w środy 17:40–18:40, poza standardową siatką
+     co pół godziny. Pokazuje się tylko wtedy, gdy w tym czasie nie ma
+     żadnego wydarzenia w kalendarzu (sprawdzane tak samo jak każdy inny
+     kandydat — z pełnym buforem przed/po). */
+  if(weekday===3){
+    const extraStart = new Date(dayDate); extraStart.setHours(17, 40, 0, 0);
+    if(!(isToday && extraStart <= now)){
+      const extraEnd = new Date(extraStart.getTime()+MNIE_DURATION*60000);
+      if(isCandidateValid(extraStart, extraEnd, 'mnie', windows, busyIntervals)){
+        candidates.push({hour:17, minute:40, modes:new Set(['mnie'])});
+      }
+    }
+    candidates.sort((a,b)=> (a.hour*60+a.minute) - (b.hour*60+b.minute));
+  }
+
   const hourModes = {};
   candidates.forEach(c=>{
     if(!hourModes[c.hour]) hourModes[c.hour] = new Set();
