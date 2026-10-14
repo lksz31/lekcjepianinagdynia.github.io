@@ -2008,13 +2008,20 @@ function computeDayState(dayDate){
 
   /* Dodatkowy termin "u mnie" w środy 17:40–18:40, poza standardową siatką
      co pół godziny. Pokazuje się tylko wtedy, gdy w tym czasie nie ma
-     żadnego wydarzenia w kalendarzu (sprawdzane tak samo jak każdy inny
-     kandydat — z pełnym buforem przed/po). */
+     żadnego wydarzenia w kalendarzu — licząc tylko 10-minutowy bufor
+     przed/po (lekcja u mnie, nie trzeba pełnego, domyślnego bufora na
+     dojazd), a nie standardową logikę isCandidateValid/bufferForCandidate. */
   if(weekday===3){
     const extraStart = new Date(dayDate); extraStart.setHours(17, 40, 0, 0);
     if(!(isToday && extraStart <= now)){
       const extraEnd = new Date(extraStart.getTime()+MNIE_DURATION*60000);
-      if(isCandidateValid(extraStart, extraEnd, 'mnie', windows, busyIntervals)){
+      const EXTRA_BUFFER = 10;
+      const blocked = busyIntervals.some(iv=>{
+        const bufStart = new Date(iv.start.getTime() - EXTRA_BUFFER*60000);
+        const bufEnd = new Date(iv.end.getTime() + EXTRA_BUFFER*60000);
+        return extraStart < bufEnd && extraEnd > bufStart;
+      });
+      if(!blocked){
         candidates.push({hour:17, minute:40, modes:new Set(['mnie'])});
       }
     }
