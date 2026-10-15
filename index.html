@@ -1959,6 +1959,22 @@ function isCandidateValid(start, end, mode, windows, busy){
   return true;
 }
 
+/* Wyjątek: środa 17:40–18:40 "u mnie" nie wymaga pełnego, domyślnego
+   bufora na dojazd — wystarczy 10 minut przerwy przed i po, bo to
+   lekcja u mnie. Używane zarówno przy budowaniu listy terminów, jak i
+   przy ostatecznej walidacji rezerwacji, żeby obie ścieżki się zgadzały. */
+const EXTRA_WED_BUFFER = 10;
+function isExtraWed1740(start, mode){
+  return mode==='mnie' && start.getDay()===3 && start.getHours()===17 && start.getMinutes()===40;
+}
+function isExtraWed1740Valid(start, end, busy){
+  return !busy.some(iv=>{
+    const bufStart = new Date(iv.start.getTime() - EXTRA_WED_BUFFER*60000);
+    const bufEnd = new Date(iv.end.getTime() + EXTRA_WED_BUFFER*60000);
+    return start < bufEnd && end > bufStart;
+  });
+}
+
 /* Zwraca zbiór trybów ('mnie'/'uczen') faktycznie możliwych do zarezerwowania
    o dokładnej godzinie:minucie — sprawdzając realny bufor wobec zajętości,
    nie tylko strukturę okien. */
@@ -2008,20 +2024,12 @@ function computeDayState(dayDate){
 
   /* Dodatkowy termin "u mnie" w środy 17:40–18:40, poza standardową siatką
      co pół godziny. Pokazuje się tylko wtedy, gdy w tym czasie nie ma
-     żadnego wydarzenia w kalendarzu — licząc tylko 10-minutowy bufor
-     przed/po (lekcja u mnie, nie trzeba pełnego, domyślnego bufora na
-     dojazd), a nie standardową logikę isCandidateValid/bufferForCandidate. */
+     żadnego wydarzenia w kalendarzu (patrz isExtraWed1740Valid). */
   if(weekday===3){
     const extraStart = new Date(dayDate); extraStart.setHours(17, 40, 0, 0);
     if(!(isToday && extraStart <= now)){
       const extraEnd = new Date(extraStart.getTime()+MNIE_DURATION*60000);
-      const EXTRA_BUFFER = 10;
-      const blocked = busyIntervals.some(iv=>{
-        const bufStart = new Date(iv.start.getTime() - EXTRA_BUFFER*60000);
-        const bufEnd = new Date(iv.end.getTime() + EXTRA_BUFFER*60000);
-        return extraStart < bufEnd && extraEnd > bufStart;
-      });
-      if(!blocked){
+      if(isExtraWed1740Valid(extraStart, extraEnd, busyIntervals)){
         candidates.push({hour:17, minute:40, modes:new Set(['mnie'])});
       }
     }
@@ -2374,7 +2382,9 @@ function recalcCalBooking(){
   const end = new Date(start.getTime() + bookCtx.duration*60000);
   bookCtx.start = start; bookCtx.end = end;
 
-  const valid = isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
+  const valid = isExtraWed1740(start, bookCtx.mode)
+    ? isExtraWed1740Valid(start, end, busyIntervals)
+    : isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
   const errEl = document.getElementById('calBookError');
   const btn = document.getElementById('calBookSubmitBtn');
   const nextBtn = document.getElementById('calStep1NextBtn');
