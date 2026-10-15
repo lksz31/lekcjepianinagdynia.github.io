@@ -1153,7 +1153,7 @@
 <section class="promo-section">
   <div class="promo-inner">
     <div class="section-label">Narzędzia dla uczniów</div>
-    <h2 class="section-title">Ucz się z autorską aplikacją</h2>
+    <h2 class="section-title">Ucz się także między lekcjami</h2>
     <a href="/index/fiszki/fiszki.html" class="feature-banner" id="featureBanner">
       <div class="feature-banner-text">
         <div class="feature-banner-icon">🎼</div>
@@ -1164,6 +1164,17 @@
         </div>
       </div>
       <span class="feature-banner-cta">Otwórz fiszki →</span>
+    </a>
+    <a href="https://joytunes.onelink.me/2834563531/5arhue40" target="_blank" rel="noopener noreferrer" class="feature-banner" id="joytunesBanner" style="margin-top:24px;">
+      <div class="feature-banner-text">
+        <div class="feature-banner-icon">📱</div>
+        <div>
+          <div class="feature-banner-badge">Polecana aplikacja</div>
+          <h3 class="feature-banner-title">JoyTunes — miesiąc gratis</h3>
+          <p class="feature-banner-desc">Dodatkowa, codzienna praktyka między lekcjami. Załóż konto w aplikacji JoyTunes (Simply Piano) i odbierz pierwszy miesiąc za darmo.</p>
+        </div>
+      </div>
+      <span class="feature-banner-cta">Odbierz miesiąc gratis →</span>
     </a>
   </div>
 </section>
@@ -1557,6 +1568,7 @@ async function wyslijModal(){
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('bentoBox'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('appleLocation'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('featureBanner'));
+new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('joytunesBanner'));
 new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting&&e.target.classList.add('active')),{threshold:0.1}).observe(document.getElementById('faqList'));
 const promoObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('active');}),{threshold:0.15});
 document.querySelectorAll('.promo-card').forEach((c,i)=>{c.style.transitionDelay=i*0.12+'s';promoObs.observe(c);});
