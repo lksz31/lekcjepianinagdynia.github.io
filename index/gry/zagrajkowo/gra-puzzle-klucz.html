@@ -35,23 +35,26 @@
   .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
 
-  .memory-board{display:grid;grid-template-columns:repeat(7,84px);grid-template-rows:repeat(2,100px);gap:10px;}
-  @media(max-width:700px){.memory-board{grid-template-columns:repeat(4,78px);grid-template-rows:repeat(4,94px);}}
-  @media(max-width:360px){.memory-board{grid-template-columns:repeat(4,68px);grid-template-rows:repeat(4,82px);gap:7px;}}
+  .mode-toggle{display:flex;gap:4px;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:4px;}
+  .mode-btn{border:none;background:transparent;color:var(--text-mid);font-weight:700;font-size:0.78rem;padding:8px 16px;border-radius:50px;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;}
+  .mode-btn.active{background:var(--navy);color:#fff;}
 
-  .card-slot{perspective:800px;}
+  .memory-board{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(6px,2vw,10px);max-width:700px;}
+
+  .card-slot{perspective:800px;width:clamp(60px,12vw,84px);aspect-ratio:84/100;}
   .card-inner{position:relative;width:100%;height:100%;transition:transform 0.45s cubic-bezier(0.4,0.1,0.2,1);transform-style:preserve-3d;cursor:pointer;}
   .card-slot.revealed .card-inner,.card-slot.matched .card-inner{transform:rotateY(180deg);}
   .card-slot.matched .card-inner{cursor:default;}
   .card-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.08);}
-  .card-back{background:linear-gradient(135deg,var(--navy),#16306e);border:2px solid var(--navy);}
-  .card-back::after{content:'♪';color:rgba(212,175,55,0.75);font-size:1.8rem;}
+  .card-back{position:relative;overflow:hidden;background:radial-gradient(circle at 30% 18%,rgba(255,255,255,0.18),transparent 55%),linear-gradient(135deg,#2a4fb0 0%,var(--navy) 45%,#16306e 75%,#0d1f4a 100%);border:2px solid var(--gold);box-shadow:inset 0 0 0 3px rgba(212,175,55,0.22),0 4px 14px rgba(0,0,0,0.08);}
+  .card-back::before{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(212,175,55,0.22) 1.6px,transparent 1.6px);background-size:14px 14px;}
+  .card-back::after{content:'♪';position:relative;z-index:1;color:var(--gold);font-size:clamp(1.4rem,5vw,1.9rem);text-shadow:0 0 10px rgba(212,175,55,0.55);}
   .card-front{background:var(--card-bg);border:2px solid var(--border);transform:rotateY(180deg);overflow:hidden;}
   .card-slot.matched .card-front{border-color:var(--green);box-shadow:0 4px 14px rgba(22,163,74,0.25);}
-  .card-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--navy);}
+  .card-slot.selected .card-front{box-shadow:0 0 0 3px var(--gold),0 4px 14px rgba(0,0,0,0.08);}
+  .card-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.5rem,6vw,2.2rem);color:var(--navy);}
   .card-slot.matched .card-letter{color:var(--green);}
   .card-staff-svg{width:82%;height:82%;}
-  @media(max-width:360px){.card-letter{font-size:1.8rem;}}
 
   .memory-actions{display:flex;gap:12px;}
   .shuffle-btn{background:var(--card-bg);border:2px solid var(--border);color:var(--navy);padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.82rem;cursor:pointer;}
@@ -100,6 +103,11 @@
 
 <div class="game-area">
   <p class="instructions" id="instructionsText">Zapamiętaj, gdzie leży która karta — za chwilę się odwrócą! Potem <strong>znajdź pary</strong>: literę dźwięku i jego miejsce na pięciolinii.</p>
+
+  <div class="mode-toggle" id="modeToggle">
+    <button class="mode-btn active" data-mode="hidden" onclick="setMode('hidden')">🙈 Karty zakryte</button>
+    <button class="mode-btn" data-mode="open" onclick="setMode('open')">👀 Karty odkryte</button>
+  </div>
 
   <div class="memory-board" id="memoryBoard"></div>
 
@@ -163,6 +171,38 @@ let revealedIds = [];
 let matchedCount = 0;
 let moves = 0;
 let inputLocked = true;
+let openMode = false;
+
+function getAudioCtx(){
+  if(!window.__memoryAudioCtx){
+    window.__memoryAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  }
+  if(window.__memoryAudioCtx.state === 'suspended') window.__memoryAudioCtx.resume();
+  return window.__memoryAudioCtx;
+}
+
+function playClickTone(){
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 740;
+  gain.gain.setValueAtTime(0.16, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.16);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime+0.18);
+}
+
+function setMode(mode){
+  openMode = (mode === 'open');
+  document.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mode===mode); });
+  restartGame();
+}
+
+function updateMoves(){
+  document.getElementById('movesVal').textContent = moves;
+}
 
 function buildDeck(){
   const deck = [];
@@ -186,7 +226,8 @@ function cardContentHtml(card){
 function renderBoard(){
   const board = document.getElementById('memoryBoard');
   board.innerHTML = cards.map(function(card){
-    return '<div class="card-slot" id="slot-'+card.id+'" data-id="'+card.id+'" onclick="onCardClick(\''+card.id+'\')">'
+    const revealedClass = openMode ? ' revealed' : '';
+    return '<div class="card-slot'+revealedClass+'" id="slot-'+card.id+'" data-id="'+card.id+'" onclick="onCardClick(\''+card.id+'\')">'
       + '<div class="card-inner">'
       + '<div class="card-face card-back"></div>'
       + '<div class="card-face card-front">'+cardContentHtml(card)+'</div>'
@@ -197,16 +238,56 @@ function renderBoard(){
 function onCardClick(id){
   if(inputLocked) return;
   const slot = document.getElementById('slot-'+id);
-  if(!slot || slot.classList.contains('revealed') || slot.classList.contains('matched')) return;
+  if(!slot || slot.classList.contains('matched')) return;
+
+  if(openMode){
+    if(slot.classList.contains('selected') || revealedIds.length >= 2) return;
+    playClickTone();
+    slot.classList.add('selected');
+    revealedIds.push(id);
+
+    if(revealedIds.length === 2){
+      inputLocked = true;
+      moves++;
+      updateMoves();
+      const [idA, idB] = revealedIds;
+      const cardA = cards.find(function(c){return c.id===idA;});
+      const cardB = cards.find(function(c){return c.id===idB;});
+      const slotA = document.getElementById('slot-'+idA);
+      const slotB = document.getElementById('slot-'+idB);
+
+      if(cardA.pairId === cardB.pairId && cardA.kind !== cardB.kind){
+        setTimeout(function(){
+          slotA.classList.remove('selected'); slotA.classList.add('matched');
+          slotB.classList.remove('selected'); slotB.classList.add('matched');
+          matchedCount++;
+          revealedIds = [];
+          inputLocked = false;
+          if(matchedCount === LETTERS_ORDER.length) showWin();
+        }, 350);
+      }else{
+        setTimeout(function(){
+          slotA.classList.remove('selected');
+          slotB.classList.remove('selected');
+          revealedIds = [];
+          inputLocked = false;
+        }, 500);
+      }
+    }
+    return;
+  }
+
+  if(slot.classList.contains('revealed')) return;
   if(revealedIds.length >= 2) return;
 
+  playClickTone();
   slot.classList.add('revealed');
   revealedIds.push(id);
 
   if(revealedIds.length === 2){
     inputLocked = true;
     moves++;
-    document.getElementById('movesVal').textContent = moves;
+    updateMoves();
     const [idA, idB] = revealedIds;
     const cardA = cards.find(function(c){return c.id===idA;});
     const cardB = cards.find(function(c){return c.id===idB;});
@@ -240,12 +321,19 @@ function restartGame(){
   moves = 0;
   matchedCount = 0;
   revealedIds = [];
-  document.getElementById('movesVal').textContent = '0';
+  updateMoves();
   document.getElementById('winOverlay').classList.remove('show');
-  document.getElementById('instructionsText').innerHTML = 'Zapamiętaj, gdzie leży która karta — za chwilę się odwrócą! Potem <strong>znajdź pary</strong>: literę dźwięku i jego miejsce na pięciolinii.';
+  document.getElementById('instructionsText').innerHTML = openMode
+    ? 'Karty są cały czas odkryte — kliknij dwie, które do siebie pasują: literę dźwięku i jej miejsce na pięciolinii.'
+    : 'Zapamiętaj, gdzie leży która karta — za chwilę się odwrócą! Potem <strong>znajdź pary</strong>: literę dźwięku i jego miejsce na pięciolinii.';
 
   cards = buildDeck();
   renderBoard();
+
+  if(openMode){
+    inputLocked = false;
+    return;
+  }
 
   /* Podgląd: wszystkie karty na chwilę odkryte, potem jednoczesny obrót
      w dół i start właściwej gry — klasyczny wstęp do memory. */
