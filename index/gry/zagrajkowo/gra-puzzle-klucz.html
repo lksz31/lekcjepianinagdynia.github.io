@@ -7,18 +7,18 @@
 <link rel="icon" href="/index/grafiki-index/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/index/grafiki-index/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Ułóż Klucz Wiolinowy | Zagrajkowo</title>
-<meta name="description" content="Ułóż Klucz Wiolinowy — gra puzzle z serii Zagrajkowo, w której dziecko uczy się rozpoznawać klucz wiolinowy, układając go z elementów. Darmowa gra edukacyjna dla najmłodszych uczniów pianina.">
+<title>Nutowe Memory | Zagrajkowo</title>
+<meta name="description" content="Nutowe Memory — gra pamięciowa z serii Zagrajkowo, w której dziecko łączy w pary literę dźwięku z jego pozycją na pięciolinii. Darmowa gra edukacyjna dla najmłodszych uczniów pianina.">
 <link rel="canonical" href="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-puzzle-klucz.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Lekcje Pianina Gdynia">
-<meta property="og:title" content="Ułóż Klucz Wiolinowy | Zagrajkowo">
-<meta property="og:description" content="Gra puzzle z serii Zagrajkowo — dziecko uczy się rozpoznawać klucz wiolinowy, układając go z elementów.">
+<meta property="og:title" content="Nutowe Memory | Zagrajkowo">
+<meta property="og:description" content="Gra pamięciowa z serii Zagrajkowo — dziecko łączy w pary literę dźwięku z jego pozycją na pięciolinii.">
 <meta property="og:url" content="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-puzzle-klucz.html">
 <meta property="og:image" content="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/zagrajkowo-mapa.webp">
 <meta property="og:locale" content="pl_PL">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700&family=Poppins:wght@400;500;600;700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
   :root{--gold:#d4af37;--navy:#1e3a8a;--border:#f0f0f0;--text:#334155;--text-mid:#64748b;--bg:#faf9f7;--card-bg:#ffffff;--green:#16a34a;}
   *,*::before,*::after{box-sizing:border-box;}
@@ -32,18 +32,28 @@
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
   .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 16px 50px;gap:22px;}
-  .instructions{text-align:center;max-width:420px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
+  .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
 
-  .puzzle-card{background:var(--card-bg);border-radius:24px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.08);padding:18px;}
-  .puzzle-grid{display:grid;grid-template-columns:repeat(3,75px);grid-template-rows:repeat(3,175px);gap:3px;background:var(--border);border-radius:10px;overflow:hidden;}
-  @media(max-width:400px){.puzzle-grid{grid-template-columns:repeat(3,60px);grid-template-rows:repeat(3,140px);}}
-  .piece{background-image:url('/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png');background-color:#fff;background-repeat:no-repeat;cursor:pointer;transition:0.2s;position:relative;filter:sepia(0.15);}
-  .piece:hover{filter:brightness(1.08) sepia(0.15);}
-  .piece.selected{outline:3px solid var(--gold);outline-offset:-3px;z-index:2;}
-  .piece.correct{outline:2px solid var(--green);outline-offset:-2px;}
+  .memory-board{display:grid;grid-template-columns:repeat(7,84px);grid-template-rows:repeat(2,100px);gap:10px;}
+  @media(max-width:700px){.memory-board{grid-template-columns:repeat(4,78px);grid-template-rows:repeat(4,94px);}}
+  @media(max-width:360px){.memory-board{grid-template-columns:repeat(4,68px);grid-template-rows:repeat(4,82px);gap:7px;}}
 
-  .puzzle-actions{display:flex;gap:12px;}
+  .card-slot{perspective:800px;}
+  .card-inner{position:relative;width:100%;height:100%;transition:transform 0.45s cubic-bezier(0.4,0.1,0.2,1);transform-style:preserve-3d;cursor:pointer;}
+  .card-slot.revealed .card-inner,.card-slot.matched .card-inner{transform:rotateY(180deg);}
+  .card-slot.matched .card-inner{cursor:default;}
+  .card-face{position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.08);}
+  .card-back{background:linear-gradient(135deg,var(--navy),#16306e);border:2px solid var(--navy);}
+  .card-back::after{content:'♪';color:rgba(212,175,55,0.75);font-size:1.8rem;}
+  .card-front{background:var(--card-bg);border:2px solid var(--border);transform:rotateY(180deg);overflow:hidden;}
+  .card-slot.matched .card-front{border-color:var(--green);box-shadow:0 4px 14px rgba(22,163,74,0.25);}
+  .card-letter{font-family:'Nunito',sans-serif;font-weight:900;font-size:2.2rem;color:var(--navy);}
+  .card-slot.matched .card-letter{color:var(--green);}
+  .card-staff-svg{width:82%;height:82%;}
+  @media(max-width:360px){.card-letter{font-size:1.8rem;}}
+
+  .memory-actions{display:flex;gap:12px;}
   .shuffle-btn{background:var(--card-bg);border:2px solid var(--border);color:var(--navy);padding:10px 22px;border-radius:50px;font-weight:700;font-size:0.82rem;cursor:pointer;}
   .shuffle-btn:hover{border-color:var(--gold);}
 
@@ -73,7 +83,7 @@
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "Ułóż Klucz Wiolinowy",
+      "name": "Nutowe Memory",
       "item": "https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-puzzle-klucz.html"
     }
   ]
@@ -84,105 +94,167 @@
 
 <div class="top-bar">
   <a href="/index.html#zagrajkowo" class="back-link">‹ Wróć do gier</a>
-  <span class="game-title-bar">🧩 Ułóż klucz wiolinowy</span>
+  <span class="game-title-bar">🃏 Nutowe memory</span>
   <span class="score-box">🔀 <span id="movesVal">0</span> ruchów</span>
 </div>
 
 <div class="game-area">
-  <p class="instructions">Klucz wiolinowy został pocięty na kawałki. Kliknij dwa kafelki, żeby je <strong>zamienić miejscami</strong> — ułóż obrazek z powrotem w całość.</p>
+  <p class="instructions" id="instructionsText">Zapamiętaj, gdzie leży która karta — za chwilę się odwrócą! Potem <strong>znajdź pary</strong>: literę dźwięku i jego miejsce na pięciolinii.</p>
 
-  <div class="puzzle-card">
-    <div class="puzzle-grid" id="puzzleGrid"></div>
-  </div>
+  <div class="memory-board" id="memoryBoard"></div>
 
-  <div class="puzzle-actions">
-    <button class="shuffle-btn" onclick="restartGame()">🔀 Przetasuj od nowa</button>
+  <div class="memory-actions">
+    <button class="shuffle-btn" onclick="restartGame()">🔀 Zagraj od nowa</button>
   </div>
 </div>
 
 <div class="win-overlay" id="winOverlay">
   <div style="font-size:3.5rem;">🏆</div>
-  <h2>Ułożone!</h2>
+  <h2>Wszystkie pary znalezione!</h2>
   <p id="winText"></p>
   <button class="win-btn" onclick="restartGame()">Zagraj jeszcze raz</button>
 </div>
 
 <script>
-const COLS = 3, ROWS = 3;
-const TILE_W = 75, TILE_H = 175;
-const IMG_W = TILE_W * COLS, IMG_H = TILE_H * ROWS;
+/* ══ Klucz wiolinowy, pozycje liter na pięciolinii (jedna oktawa) ══
+   Te same wartości co w pozostałych grach Zagrajkowa (dopasuj-nute),
+   żeby pozycja nuty na pięciolinii była spójna w całym serwisie. */
+const CLEF_URL = '/index/fiszki/concept-art/wiolinowy-fiszki-bez-tla.png';
+const CLEF_RATIO = 581/1361, CLEF_CH_MUL = 6.0, CLEF_PCT = 0.64, CLEF_REF_IDX = 3;
+const STAFF_Y = {C:10,D:9,E:8,F:7,G:6,A:5,H:4};
+const LETTERS_ORDER = ['C','D','E','F','G','A','H'];
+const STAFF_VB_W = 125, STAFF_VB_H = 96, SG = 13, STAFF_TOP = 24, NOTE_X = 100;
 
-let pieces = [];
-let selected = null;
-let moves = 0;
+function buildStaffSvg(letter){
+  const c = '#1e3a8a';
+  const noteY = STAFF_TOP + (STAFF_Y[letter] * SG / 2);
+  const topLine = STAFF_TOP, botLine = STAFF_TOP + 4*SG, ledW = 9;
 
-function shuffled(arr){
-  const a = arr.slice();
-  do{
-    for(let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  let s = '';
+  for(let i=0;i<5;i++){
+    const ly = STAFF_TOP + i*SG;
+    s += '<line x1="10" y1="'+ly+'" x2="'+(STAFF_VB_W-6)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.4"/>';
+  }
+  const ch = SG * CLEF_CH_MUL, cw = ch * CLEF_RATIO;
+  const cy = (STAFF_TOP + CLEF_REF_IDX*SG) - CLEF_PCT * ch;
+  s += '<image href="'+CLEF_URL+'" x="9" y="'+cy.toFixed(1)+'" width="'+cw.toFixed(1)+'" height="'+ch.toFixed(1)+'" preserveAspectRatio="none"/>';
+
+  if(noteY > botLine + SG*0.5){
+    let ly = botLine + SG;
+    while(ly <= noteY + SG*0.3){
+      s += '<line x1="'+(NOTE_X-ledW)+'" y1="'+ly+'" x2="'+(NOTE_X+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.2"/>';
+      ly += SG;
     }
-  }while(a.every(function(v,i){return v===i;}));
-  return a;
+  }
+  if(noteY < topLine - SG*0.5){
+    let ly = topLine - SG;
+    while(ly >= noteY - SG*0.3){
+      s += '<line x1="'+(NOTE_X-ledW)+'" y1="'+ly+'" x2="'+(NOTE_X+ledW)+'" y2="'+ly+'" stroke="'+c+'" stroke-width="2.2"/>';
+      ly -= SG;
+    }
+  }
+  s += '<circle cx="'+NOTE_X+'" cy="'+noteY.toFixed(1)+'" r="5.4" fill="'+c+'"/>';
+  return '<svg class="card-staff-svg" viewBox="0 0 '+STAFF_VB_W+' '+STAFF_VB_H+'" xmlns="http://www.w3.org/2000/svg">'+s+'</svg>';
 }
 
-function renderGrid(){
-  const grid = document.getElementById('puzzleGrid');
-  grid.innerHTML = '';
-  pieces.forEach(function(correctIdx, slot){
-    const col = correctIdx % COLS, row = Math.floor(correctIdx / COLS);
-    const bx = -(col * TILE_W), by = -(row * TILE_H);
-    const div = document.createElement('div');
-    div.className = 'piece';
-    div.style.width = TILE_W+'px';
-    div.style.height = TILE_H+'px';
-    div.style.backgroundSize = IMG_W+'px '+IMG_H+'px';
-    div.style.backgroundPosition = bx+'px '+by+'px';
-    div.dataset.slot = slot;
-    if(correctIdx === slot) div.classList.add('correct');
-    div.addEventListener('click', function(){selectPiece(slot);});
-    grid.appendChild(div);
+/* ══ Stan gry ══ */
+let cards = [];
+let revealedIds = [];
+let matchedCount = 0;
+let moves = 0;
+let inputLocked = true;
+
+function buildDeck(){
+  const deck = [];
+  LETTERS_ORDER.forEach(function(letter){
+    deck.push({id: letter+'-letter', pairId: letter, kind: 'letter'});
+    deck.push({id: letter+'-staff', pairId: letter, kind: 'staff'});
   });
+  for(let i=deck.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+  }
+  return deck;
 }
 
-function selectPiece(slot){
-  const el = document.querySelector('.piece[data-slot="'+slot+'"]');
-  if(selected === null){
-    selected = slot;
-    el.classList.add('selected');
-  }else if(selected === slot){
-    el.classList.remove('selected');
-    selected = null;
-  }else{
-    const tmp = pieces[selected];
-    pieces[selected] = pieces[slot];
-    pieces[slot] = tmp;
+function cardContentHtml(card){
+  return card.kind === 'letter'
+    ? '<span class="card-letter">'+card.pairId+'</span>'
+    : buildStaffSvg(card.pairId);
+}
+
+function renderBoard(){
+  const board = document.getElementById('memoryBoard');
+  board.innerHTML = cards.map(function(card){
+    return '<div class="card-slot" id="slot-'+card.id+'" data-id="'+card.id+'" onclick="onCardClick(\''+card.id+'\')">'
+      + '<div class="card-inner">'
+      + '<div class="card-face card-back"></div>'
+      + '<div class="card-face card-front">'+cardContentHtml(card)+'</div>'
+      + '</div></div>';
+  }).join('');
+}
+
+function onCardClick(id){
+  if(inputLocked) return;
+  const slot = document.getElementById('slot-'+id);
+  if(!slot || slot.classList.contains('revealed') || slot.classList.contains('matched')) return;
+  if(revealedIds.length >= 2) return;
+
+  slot.classList.add('revealed');
+  revealedIds.push(id);
+
+  if(revealedIds.length === 2){
+    inputLocked = true;
     moves++;
     document.getElementById('movesVal').textContent = moves;
-    document.querySelectorAll('.piece.selected').forEach(function(e){e.classList.remove('selected');});
-    selected = null;
-    renderGrid();
-    checkWin();
+    const [idA, idB] = revealedIds;
+    const cardA = cards.find(function(c){return c.id===idA;});
+    const cardB = cards.find(function(c){return c.id===idB;});
+
+    if(cardA.pairId === cardB.pairId && cardA.kind !== cardB.kind){
+      setTimeout(function(){
+        document.getElementById('slot-'+idA).classList.add('matched');
+        document.getElementById('slot-'+idB).classList.add('matched');
+        matchedCount++;
+        revealedIds = [];
+        inputLocked = false;
+        if(matchedCount === LETTERS_ORDER.length) showWin();
+      }, 350);
+    }else{
+      setTimeout(function(){
+        document.getElementById('slot-'+idA).classList.remove('revealed');
+        document.getElementById('slot-'+idB).classList.remove('revealed');
+        revealedIds = [];
+        inputLocked = false;
+      }, 900);
+    }
   }
 }
 
-function checkWin(){
-  if(pieces.every(function(v,i){return v===i;})){
-    document.getElementById('winText').textContent = 'Ułożyłeś/aś klucz wiolinowy w ' + moves + ' ruchach!';
-    document.getElementById('winOverlay').classList.add('show');
-  }
+function showWin(){
+  document.getElementById('winText').textContent = 'Znalazłeś/aś wszystkie 7 par w ' + moves + ' ruchach!';
+  document.getElementById('winOverlay').classList.add('show');
 }
 
 function restartGame(){
   moves = 0;
+  matchedCount = 0;
+  revealedIds = [];
   document.getElementById('movesVal').textContent = '0';
   document.getElementById('winOverlay').classList.remove('show');
-  selected = null;
-  const base = [];
-  for(let i=0;i<COLS*ROWS;i++) base.push(i);
-  pieces = shuffled(base);
-  renderGrid();
+  document.getElementById('instructionsText').innerHTML = 'Zapamiętaj, gdzie leży która karta — za chwilę się odwrócą! Potem <strong>znajdź pary</strong>: literę dźwięku i jego miejsce na pięciolinii.';
+
+  cards = buildDeck();
+  renderBoard();
+
+  /* Podgląd: wszystkie karty na chwilę odkryte, potem jednoczesny obrót
+     w dół i start właściwej gry — klasyczny wstęp do memory. */
+  inputLocked = true;
+  document.querySelectorAll('.card-slot').forEach(function(el){ el.classList.add('revealed'); });
+  setTimeout(function(){
+    document.querySelectorAll('.card-slot').forEach(function(el){ el.classList.remove('revealed'); });
+    inputLocked = false;
+  }, 1800);
 }
 
 restartGame();
