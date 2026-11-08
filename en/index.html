@@ -1965,11 +1965,35 @@ function isCandidateValid(start, end, mode, windows, busy){
 /* Zwraca zbiór trybów ('mnie'/'uczen') faktycznie możliwych do zarezerwowania
    o dokładnej godzinie:minucie — sprawdzając realny bufor wobec zajętości,
    nie tylko strukturę okien. */
+/* Wyjątki: w środy "u mnie" kilka konkretnych godzin nie wymaga pełnego,
+   domyślnego bufora na dojazd — wystarczy 10 minut przerwy przed i po,
+   bo to lekcje u mnie, ciasno upakowane między innymi zajęciami:
+   17:40–18:40 (poza standardową siatką co pół godziny), 16:30–17:30
+   (wolne co drugi tydzień) i 20:00–21:00 (wolne zawsze). Używane zarówno
+   przy budowaniu listy terminów, jak i przy ostatecznej walidacji
+   rezerwacji, żeby obie ścieżki się zgadzały. */
+const EXTRA_WED_BUFFER = 10;
+const LOW_BUFFER_WED_SLOTS = [[17,40], [16,30], [20,0]];
+function isLowBufferWedSlot(start, mode){
+  return mode==='mnie' && start.getDay()===3
+    && LOW_BUFFER_WED_SLOTS.some(([h,m]) => start.getHours()===h && start.getMinutes()===m);
+}
+function isLowBufferWedSlotValid(start, end, busy){
+  return !busy.some(iv=>{
+    const bufStart = new Date(iv.start.getTime() - EXTRA_WED_BUFFER*60000);
+    const bufEnd = new Date(iv.end.getTime() + EXTRA_WED_BUFFER*60000);
+    return start < bufEnd && end > bufStart;
+  });
+}
+
 function candidateModesAt(dayDate, hour, minute, windows, busy){
   const start = new Date(dayDate); start.setHours(hour, minute, 0, 0);
   const modes = new Set();
   const mnieEnd = new Date(start.getTime()+MNIE_DURATION*60000);
-  if(isCandidateValid(start, mnieEnd, 'mnie', windows, busy)) modes.add('mnie');
+  const mnieValid = isLowBufferWedSlot(start, 'mnie')
+    ? isLowBufferWedSlotValid(start, mnieEnd, busy)
+    : isCandidateValid(start, mnieEnd, 'mnie', windows, busy);
+  if(mnieValid) modes.add('mnie');
   const uczenEnd = new Date(start.getTime()+UCZEN_DURATIONS[0]*60000);
   if(isCandidateValid(start, uczenEnd, 'uczen', windows, busy)) modes.add('uczen');
   return modes;
@@ -2007,6 +2031,20 @@ function computeDayState(dayDate){
     if(isToday && start <= now) continue;
     const modes = candidateModesAt(dayDate, hour, minute, windows, busyIntervals);
     if(modes.size>0) candidates.push({hour, minute, modes});
+  }
+
+  /* Dodatkowy termin "u mnie" w środy 17:40–18:40, poza standardową siatką
+     co pół godziny. Pokazuje się tylko wtedy, gdy w tym czasie nie ma
+     żadnego wydarzenia w kalendarzu (patrz isLowBufferWedSlotValid). */
+  if(weekday===3){
+    const extraStart = new Date(dayDate); extraStart.setHours(17, 40, 0, 0);
+    if(!(isToday && extraStart <= now)){
+      const extraEnd = new Date(extraStart.getTime()+MNIE_DURATION*60000);
+      if(isLowBufferWedSlotValid(extraStart, extraEnd, busyIntervals)){
+        candidates.push({hour:17, minute:40, modes:new Set(['mnie'])});
+      }
+    }
+    candidates.sort((a,b)=> (a.hour*60+a.minute) - (b.hour*60+b.minute));
   }
 
   const hourModes = {};
@@ -2355,7 +2393,9 @@ function recalcCalBooking(){
   const end = new Date(start.getTime() + bookCtx.duration*60000);
   bookCtx.start = start; bookCtx.end = end;
 
-  const valid = isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
+  const valid = isLowBufferWedSlot(start, bookCtx.mode)
+    ? isLowBufferWedSlotValid(start, end, busyIntervals)
+    : isCandidateValid(start, end, bookCtx.mode, bookCtx.windows, busyIntervals);
   const errEl = document.getElementById('calBookError');
   const btn = document.getElementById('calBookSubmitBtn');
   const nextBtn = document.getElementById('calStep1NextBtn');
