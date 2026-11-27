@@ -6,7 +6,7 @@
 <link rel="icon" href="/index/grafiki-index/favicon-48.png" type="image/png" sizes="48x48">
 <link rel="icon" href="/index/grafiki-index/favicon-96.png" type="image/png" sizes="96x96">
 <link rel="apple-touch-icon" href="/index/grafiki-index/apple-touch-icon.png">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Posprzątaj Łąkę Nutkami | Nauka Nut</title>
 <meta name="description" content="Posprzątaj Łąkę Nutkami — gra z serii Zagrajkowo, w której dziecko dopasowuje nutki do właściwych miejsc na pięciolinii. Darmowa gra edukacyjna dla najmłodszych uczniów pianina.">
 <link rel="canonical" href="https://lekcjepianinagdynia.pl/index/gry/zagrajkowo/gra-dopasuj-nute.html">
@@ -31,7 +31,7 @@
   .game-title-bar{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:1.05rem;}
   .score-box{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--navy);font-size:0.9rem;background:#fdf8ec;border:1.5px solid var(--gold);border-radius:50px;padding:6px 16px;}
 
-  .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 50px;gap:20px;}
+  .game-area{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 50px;gap:20px;}
 
   .instructions{text-align:center;max-width:460px;color:var(--text-mid);font-size:0.86rem;line-height:1.6;}
   .instructions strong{color:var(--navy);}
@@ -60,7 +60,12 @@
   .staff-widget{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);}
   .staff-widget svg{display:block;width:min(38vw,300px);height:auto;filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 6px rgba(0,0,0,0.35));}
 
-  .flying-item{position:fixed;display:none;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;z-index:500;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.32));transition:left 0.6s cubic-bezier(0.3,0.7,0.3,1),top 0.6s cubic-bezier(0.3,0.7,0.3,1);}
+  /* position:absolute (względem .game-area), NIE position:fixed — na
+     wielu przeglądarkach mobilnych elementy "fixed" nie skalują/przesuwają
+     się razem z resztą strony przy przybliżeniu (pinch-zoom), więc po
+     zoomie śmieć zostawał na starej, nieprzybliżonej pozycji, podczas gdy
+     kosze i pięciolinia (zwykłe elementy strony) poprawnie się przybliżały. */
+  .flying-item{position:absolute;display:none;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;user-drag:none;z-index:500;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.32));transition:left 0.6s cubic-bezier(0.3,0.7,0.3,1),top 0.6s cubic-bezier(0.3,0.7,0.3,1);}
   .flying-item.dragging{transition:none;cursor:grabbing;}
 
   .letters-row{position:absolute;left:2%;right:2%;bottom:3%;display:flex;gap:1.4%;flex-wrap:nowrap;justify-content:center;z-index:5;}
@@ -353,14 +358,23 @@ function getAudioCtx(){
     const Ctx = window.AudioContext || window.webkitAudioContext;
     audioCtx = new Ctx();
   }
-  if(audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
+}
+
+/* resume() jest asynchroniczne — planowanie dźwięku na "teraz" zaraz po
+   jego wywołaniu, bez czekania aż faktycznie się zakończy, potrafi
+   bezgłośnie zgubić ten pierwszy dźwięk (stąd pierwszy efekt dźwiękowy
+   w grze czasem nie był słyszalny, dopóki coś innego "nie obudziło"
+   kontekstu). Tony planujemy dopiero gdy kontekst na pewno już gra. */
+function ensureAudioRunning(){
+  const ctx = getAudioCtx();
+  if(ctx.state === 'running') return Promise.resolve(ctx);
+  return ctx.resume().then(function(){ return ctx; });
 }
 
 /* ══ Dźwięk błędu ══ */
 function playErrorBeep(){
-  try{
-    const ctx = getAudioCtx();
+  ensureAudioRunning().then(function(ctx){
     const now = ctx.currentTime;
     function tone(freq, start, dur){
       const osc = ctx.createOscillator(), gain = ctx.createGain();
@@ -374,13 +388,12 @@ function playErrorBeep(){
     }
     tone(220, 0, 0.14);
     tone(185, 0.16, 0.20);
-  }catch(e){}
+  }).catch(function(){});
 }
 
 /* ══ Dźwięk poprawnej odpowiedzi — dzwoneczki jak przy gwiazdkach ══ */
 function playSuccessChime(){
-  try{
-    const ctx = getAudioCtx();
+  ensureAudioRunning().then(function(ctx){
     const now = ctx.currentTime;
     function tone(freq, start, dur, vol){
       const osc = ctx.createOscillator(), gain = ctx.createGain();
@@ -396,7 +409,7 @@ function playSuccessChime(){
     tone(1318.5, 0.07, 0.18, 0.13);
     tone(1568.0, 0.14, 0.22, 0.14);
     tone(2093.0, 0.22, 0.30, 0.12);
-  }catch(e){}
+  }).catch(function(){});
 }
 
 function spawnSparkles(x, y){
@@ -418,10 +431,16 @@ function spawnSparkles(x, y){
 /* ══ Latający śmieć — przeciąganie ══ */
 let dragOffsetX = 0, dragOffsetY = 0;
 
+/* x,y to współrzędne względem viewportu (tak samo liczone jak dotąd przez
+   wywołujących, przez getBoundingClientRect()) — tu zamieniane na
+   współrzędne względem .game-area, bo .flying-item jest teraz do niej
+   pozycjonowany (position:absolute), a nie względem całego viewportu. */
 function flyItemTo(x, y, sizePx){
   const el = document.getElementById('flyingItem');
-  el.style.left = (x - (sizePx||el.offsetWidth)/2)+'px';
-  el.style.top = (y - (sizePx||el.offsetHeight)/2)+'px';
+  const gaRect = document.querySelector('.game-area').getBoundingClientRect();
+  const w = sizePx||el.offsetWidth, h = sizePx||el.offsetHeight;
+  el.style.left = (x - gaRect.left - w/2)+'px';
+  el.style.top = (y - gaRect.top - h/2)+'px';
 }
 
 function startRound(){
@@ -482,8 +501,9 @@ function onFlyingPointerDown(e){
 function onFlyingPointerMove(e){
   if(!flying) return;
   const el = document.getElementById('flyingItem');
-  el.style.left = (e.clientX - dragOffsetX)+'px';
-  el.style.top = (e.clientY - dragOffsetY)+'px';
+  const gaRect = document.querySelector('.game-area').getBoundingClientRect();
+  el.style.left = (e.clientX - dragOffsetX - gaRect.left)+'px';
+  el.style.top = (e.clientY - dragOffsetY - gaRect.top)+'px';
   el.style.pointerEvents = 'none';
   const under = document.elementFromPoint(e.clientX, e.clientY);
   el.style.pointerEvents = '';
