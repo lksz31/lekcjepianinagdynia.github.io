@@ -1447,7 +1447,7 @@ async function wyslij(){
     s.textContent='✅ Dziękujemy! Odezwiemy się wkrótce.';s.style.color='#16a34a';btn.textContent='WYŚLIJ ZGŁOSZENIE';
     setTimeout(()=>{toggleForm(false);s.textContent='';['res-name','res-phone','res-email','res-msg'].forEach(id=>document.getElementById(id).value='');btn.disabled=false;},3000);
   }catch(e){
-    s.textContent='❌ Błąd wysyłki. Zadzwoń: 514 338 875';s.style.color='#ef4444';
+    s.textContent='❌ Błąd wysyłki. Zadzwoń: 727 711 642';s.style.color='#ef4444';
     btn.textContent='WYŚLIJ ZGŁOSZENIE';btn.disabled=false;btn.classList.add('active');
   }
 }
@@ -1473,7 +1473,7 @@ async function wyslijModal(){
     if(!r.ok&&!text.toLowerCase().includes('accepted'))throw new Error('HTTP '+r.status);
     s.textContent='✅ Wysłano!';s.style.color='#22c55e';submitBtn.textContent='WYŚLIJ PROŚBĘ';
     setTimeout(()=>{closeBookingModal();s.textContent='';['m-name','m-phone','m-email','m-msg'].forEach(id=>document.getElementById(id).value='');submitBtn.disabled=false;},3000);
-  }catch(e){s.textContent='❌ Błąd. Zadzwoń: 514 338 875';s.style.color='#ef4444';submitBtn.textContent='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
+  }catch(e){s.textContent='❌ Błąd. Zadzwoń: 727 711 642';s.style.color='#ef4444';submitBtn.textContent='WYŚLIJ PROŚBĘ';submitBtn.disabled=false;}
 }
 </script>
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6382ff89750343d58cd6eb36d9a66e95"}'></script><!-- End Cloudflare Web Analytics -->
