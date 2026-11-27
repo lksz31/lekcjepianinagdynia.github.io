@@ -372,6 +372,17 @@ function ensureAudioRunning(){
   return ctx.resume().then(function(){ return ctx; });
 }
 
+/* Dodatkowe, wcześniejsze "obudzenie" kontekstu już przy pierwszym dotyku
+   strony (nie dopiero przy pierwszym dźwięku gry) — zanim faktycznie
+   potrzebny jest pierwszy efekt dźwiękowy, resume() ma już cały czas
+   trwania np. przeciągnięcia śmiecia (setki ms), żeby się zakończyć, co
+   dodatkowo zabezpiecza przed utratą dźwięku przy bardzo szybkiej,
+   pierwszej interakcji na wolniejszych urządzeniach. */
+document.addEventListener('pointerdown', function unlockAudioOnce(){
+  ensureAudioRunning();
+  document.removeEventListener('pointerdown', unlockAudioOnce);
+}, {once:true});
+
 /* ══ Dźwięk błędu ══ */
 function playErrorBeep(){
   ensureAudioRunning().then(function(ctx){
